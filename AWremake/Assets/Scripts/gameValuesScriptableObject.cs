@@ -16,22 +16,20 @@ public class gameValuesScriptableObject : ScriptableObject
     //public string[] unitNames;
     //public int[,] unitvalues;
 
-    /*
-    edorum = eaters. e dorum = out of the house. idorum = of the people
-    e solis, a sole = from the sun
-    etulus = ate
-    avarus = greedy, evarus = evasive
-    earthus = earthy
-    erthus = shock
-    herthus = garden
-    */
+
 
     private List<metadataBaseUnit> metadataBaseUnits = new List<metadataBaseUnit>();
+    private string[] progenyNames;
     //public metadataBaseUnit infantryM;
 
     // Start is called before the first frame update
     void Start()
     {
+        progenyNames = new string[3];
+        progenyNames[0]="ertrian";
+        progenyNames[1]="virix";
+        progenyNames[2]="sentus";
+        //private string[] progenyNames = new string[] { "ertrian", "virix", "sentus" };
         instantiateInfantry();
         instantiateGattlingTank();
 
@@ -43,8 +41,8 @@ public class gameValuesScriptableObject : ScriptableObject
     {
         metadataBaseUnit infantryM = new metadataBaseUnit();
 
-        infantryM.unitName = "infanty";
-        infantryM.progeny = "erthus";
+        infantryM.unitName = "Infanty";
+        infantryM.progeny = progenyNames[0];
         infantryM.healthMax = 100;
         infantryM.healthType = "light";
         infantryM.weaponType = "projectile";
@@ -62,21 +60,37 @@ public class gameValuesScriptableObject : ScriptableObject
     {
         metadataBaseUnit gattlingTankM = new metadataBaseUnit();
 
-        gattlingTankM.unitName = "infanty";
-        gattlingTankM.progeny = "erthus";
-        gattlingTankM.healthMax = 100;
+        gattlingTankM.unitName = "Gattling Tank";
+        gattlingTankM.progeny = progenyNames[0];
+        gattlingTankM.healthMax = 400;
         gattlingTankM.healthType = "light";
         gattlingTankM.weaponType = "projectile";
         gattlingTankM.damageType = "light";
-        gattlingTankM.baseDamage = 50;
+        gattlingTankM.baseDamage = 100;
         gattlingTankM.attackRange = 1;
-        gattlingTankM.price = 100;
-        gattlingTankM.movementRange = 3;
+        gattlingTankM.price = 600;
+        gattlingTankM.movementRange = 6;
         gattlingTankM.sprite = Resources.Load<Sprite>("sprites/gattlingTankSprite");
 
         metadataBaseUnits.Add(gattlingTankM);
     }
 
+    private void instantiateLightTank()
+    {
+        metadataBaseUnit lightTankM = new metadataBaseUnit();
 
+        lightTankM.unitName = "Light Tank";
+        lightTankM.progeny = progenyNames[0];
+        lightTankM.healthMax = 700;
+        lightTankM.healthType = "light";
+        lightTankM.weaponType = "projectile";
+        lightTankM.damageType = "light";
+        lightTankM.baseDamage = 300;
+        lightTankM.attackRange = 1;
+        lightTankM.price = 700;
+        lightTankM.movementRange = 7;
+        lightTankM.sprite = Resources.Load<Sprite>("sprites/lightTankSprite");
 
+        metadataBaseUnits.Add(lightTankM);
+    }
 }
