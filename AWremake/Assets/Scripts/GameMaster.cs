@@ -50,7 +50,7 @@ public class GameMaster : MonoBehaviour
     public void structureHasBeenClicked(BaseStructure structure)
     {
         //should probably try/catch if structure is null
-        if(structure.playerControl == playerTurn)
+        if(structure.playerControl == playerTurn && structure.structureType == 1)
         {
             structurePanel.SetActive(true);
             productionPanel.SetActive(true);

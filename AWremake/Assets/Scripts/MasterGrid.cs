@@ -260,7 +260,7 @@ public class MasterGrid : MonoBehaviour
         for (var i = 0; i < movementSquares.Length; i++)
             Destroy(movementSquares[i]);
         drawing = false;
-        turnOnAllStructureColliders();
+        turnOnAllUncoveredStructureColliders();
     }
 
     public void clearAttackableUnits()
@@ -426,13 +426,22 @@ public class MasterGrid : MonoBehaviour
         spriteOffStructures.Add(s);
     }    
     
-    public void turnOnAllStructureColliders()
+    public void turnOnAllUncoveredStructureColliders()
     {
+        List<BaseStructure> tempSpriteOffStructures = new List<BaseStructure>();
         foreach (BaseStructure s in spriteOffStructures)
         {
-            s.turnOnCollider();
+            if (whatUnitIsInThisLocation(s.xPos, s.yPos) == null)
+            {
+                s.turnOnCollider();
+                tempSpriteOffStructures.Add(s);
+            }
         }
-        spriteOffStructures.Clear();
+
+        foreach (BaseStructure t in tempSpriteOffStructures)
+        {
+            spriteOffStructures.Remove(t);
+        }
     }
 
     public int getPlayerTurn()
