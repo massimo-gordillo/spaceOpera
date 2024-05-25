@@ -97,6 +97,8 @@ public class BaseUnit : MonoBehaviour
             progeny = data.progeny;
             price = data.price;
         }
+        else
+            print("nodata found");
     }
 
     public void staticSpriteHasBeenClicked()

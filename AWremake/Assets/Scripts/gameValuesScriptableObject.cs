@@ -45,14 +45,16 @@ public class gameValuesScriptableObject : ScriptableObject
 
     public metadataBaseUnit GetUnitDataByTitle(string unitName)
     {
-        return metadataBaseUnits.Find(metadataBaseUnit => metadataBaseUnit.unitName == unitName);
+        metadataBaseUnit m = metadataBaseUnits.Find(metadataBaseUnit => metadataBaseUnit.unitName == unitName);
+        return m;
+        //return metadataBaseUnits.Find(metadataBaseUnit => metadataBaseUnit.unitName == unitName);
     }
 
     private void populateGameValuesInfantry()
     {
         metadataBaseUnit infantryM = new metadataBaseUnit();
 
-        infantryM.unitName = "Infanty";
+        infantryM.unitName = "Infantry";
         infantryM.progeny = progenyNames[0];
         infantryM.unitType = unitTypes[0];
         infantryM.healthMax = 100;
@@ -62,7 +64,7 @@ public class gameValuesScriptableObject : ScriptableObject
         infantryM.baseDamage = 50;
         infantryM.attackRange = 1;
         infantryM.price = 100;
-        infantryM.movementRange = 3;
+        infantryM.movementRange = 4;
         infantryM.sprite = Resources.Load<Sprite>("sprites/infantrySprite");
 
         metadataBaseUnits.Add(infantryM);

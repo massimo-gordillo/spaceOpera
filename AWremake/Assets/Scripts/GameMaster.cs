@@ -45,9 +45,20 @@ public class GameMaster : MonoBehaviour
         BaseUnit unit = baseUnitPrefab;
         unit.unitName = "Infantry";
         metadataBaseUnit infantryData = gameValues.GetUnitDataByTitle("Infantry");
+
         unit.xPos = 18;
         unit.yPos = 19;
         Instantiate(unit, new Vector2(unit.xPos, unit.yPos), Quaternion.identity, unitList);
+        unit.startupPopulateValues(infantryData);
+
+        /*
+        BaseUnit unit2 = baseUnitPrefab;
+        unit2.unitName = "Infantry";
+        metadataBaseUnit infantryData = gameValues.GetUnitDataByTitle("Infantry");
+        unit2.xPos = 16;
+        unit2.yPos = 18;
+        Instantiate(unit2, new Vector2(unit2.xPos, unit2.yPos), Quaternion.identity, unitList); BaseUnit unit2 = baseUnitPrefab;
+     */
     }
 
     public int getIncomeForPlayer(int player)
