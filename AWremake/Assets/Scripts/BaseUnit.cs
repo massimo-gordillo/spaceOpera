@@ -10,10 +10,15 @@ public class BaseUnit : MonoBehaviour
 
     //in future this values will be pulled from a UnitValues table/function.
     public string unitName;
+    public string unitType;
+    public string progeny;
     public int healthMax;
+    public string healthType;
     public int healthCurrent;
     public int type;
     public int baseDamage = 50;
+    public string damageType;
+    public string weaponType;
     public int attackRange = 1;
     public int price = 100;
     public int movementRange = 3;
@@ -25,6 +30,7 @@ public class BaseUnit : MonoBehaviour
     private Color baseColor;
     public bool movementNonExhausted;
     public bool nonExhausted;
+    public Sprite sprite; //will need to kill this value eventually. Just for data initialization PoC.
     public SpriteRenderer crosshairSpriteRenderer;
     public SpriteRenderer unitSpriteRenderer;
     public MasterGrid masterGrid;
@@ -74,7 +80,24 @@ public class BaseUnit : MonoBehaviour
         }*/
     }
 
-
+    public void startupPopulateValues(metadataBaseUnit data)
+    {
+        if (data != null)
+        {
+            unitName = data.unitName;
+            unitType = data.unitType;
+            healthMax = data.healthMax;
+            healthType = data.healthType;
+            damageType = data.damageType;
+            weaponType = data.weaponType;
+            baseDamage = data.baseDamage;
+            attackRange = data.attackRange;
+            movementRange = data.movementRange;
+            sprite = data.sprite;
+            progeny = data.progeny;
+            price = data.price;
+        }
+    }
 
     public void staticSpriteHasBeenClicked()
     {

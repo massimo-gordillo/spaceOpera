@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[System.Serializable]
 public class metadataBaseUnit : MonoBehaviour
 {
     public string unitName;

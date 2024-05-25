@@ -20,6 +20,7 @@ public class gameValuesScriptableObject : ScriptableObject
 
     private List<metadataBaseUnit> metadataBaseUnits = new List<metadataBaseUnit>();
     private string[] progenyNames;
+    private string[] unitTypes;
     //public metadataBaseUnit infantryM;
 
     // Start is called before the first frame update
@@ -35,14 +36,19 @@ public class gameValuesScriptableObject : ScriptableObject
         unitTypes[2] = "air";
         unitTypes[3] = "sea";
         //private string[] progenyNames = new string[] { "ertrian", "virix", "sentus" };
-        instantiateInfantry();
-        instantiateGattlingTank();
+        populateGameValuesInfantry();
+        populateGameValuesGattlingTank();
 
 
 
     }
 
-    private void instantiateInfantry()
+    public metadataBaseUnit GetUnitDataByTitle(string unitName)
+    {
+        return metadataBaseUnits.Find(metadataBaseUnit => metadataBaseUnit.unitName == unitName);
+    }
+
+    private void populateGameValuesInfantry()
     {
         metadataBaseUnit infantryM = new metadataBaseUnit();
 
@@ -62,7 +68,7 @@ public class gameValuesScriptableObject : ScriptableObject
         metadataBaseUnits.Add(infantryM);
     }
 
-    private void instantiateGattlingTank()
+    private void populateGameValuesGattlingTank()
     {
         metadataBaseUnit gattlingTankM = new metadataBaseUnit();
 
@@ -81,7 +87,7 @@ public class gameValuesScriptableObject : ScriptableObject
         metadataBaseUnits.Add(gattlingTankM);
     }
 
-    private void instantiateLightTank()
+    private void populateGameValuesLightTank()
     {
         metadataBaseUnit lightTankM = new metadataBaseUnit();
 

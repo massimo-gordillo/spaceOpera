@@ -483,7 +483,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1315573905}
   m_HandleRect: {fileID: 1315573904}
   m_Direction: 0
-  m_Value: 1
+  m_Value: 0
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -743,7 +743,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1102248382}
   m_HandleRect: {fileID: 1102248381}
   m_Direction: 2
-  m_Value: 1
+  m_Value: 0
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -1667,7 +1667,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1228598279}
   m_HandleRect: {fileID: 1228598278}
   m_Direction: 0
-  m_Value: 1
+  m_Value: 0
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -2049,6 +2049,8 @@ MonoBehaviour:
   playerTurnText: {fileID: 2010402610}
   playerResourceText: {fileID: 1998717953}
   unitList: {fileID: 472514404}
+  gameValues: {fileID: 11400000, guid: 95e84872001a58a4093a057ff0301922, type: 2}
+  baseUnitPrefab: {fileID: 1052146141851546522, guid: 4fceb5c91e72f6d4ca175f0eafad39d8, type: 3}
 --- !u!4 &1024135145
 Transform:
   m_ObjectHideFlags: 0
@@ -2064,6 +2066,7 @@ Transform:
   - {fileID: 450342576}
   - {fileID: 783286229}
   - {fileID: 1089601035}
+  - {fileID: 1056431368}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -2179,6 +2182,36 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: -20, y: -20}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!1 &1056431367
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1056431368}
+  m_Layer: 0
+  m_Name: GameData
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1056431368
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1056431367}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 1024135145}
+  m_RootOrder: 4
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1089601032
 GameObject:
   m_ObjectHideFlags: 0
@@ -3208,7 +3241,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1673569941}
   m_HandleRect: {fileID: 1673569940}
   m_Direction: 2
-  m_Value: 1
+  m_Value: 0
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:

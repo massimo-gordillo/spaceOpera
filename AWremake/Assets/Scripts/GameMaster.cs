@@ -20,9 +20,12 @@ public class GameMaster : MonoBehaviour
     private int baseResourcePerTurn;
     private int structureResourcePerTurn;
     public Transform unitList;
+    public gameValuesScriptableObject gameValues;
+    public BaseUnit baseUnitPrefab;
     // Start is called before the first frame update
     void Awake()
     {
+        //gameValues = AssetDatabase.LoadAssetAtPath<gameValuesScriptableObject>("Assets/Scripts/Assets/Scripts/gameValuesScriptableObject.cs.cs");
         hideStructurePanel();
         playerTurn = 1;
         numPlayers = 2; //will set dynamically later
@@ -34,12 +37,17 @@ public class GameMaster : MonoBehaviour
         for (int i = 1; i <= numPlayers; i++)
             setPlayerResources(i);
         print("player turn initated: " + getPlayerTurn());
+        startupInstantiateUnits();
     }
 
-    // Update is called once per frame
-    void Update()
+    private void startupInstantiateUnits()
     {
-        
+        BaseUnit unit = baseUnitPrefab;
+        unit.unitName = "Infantry";
+        metadataBaseUnit infantryData = gameValues.GetUnitDataByTitle("Infantry");
+        unit.xPos = 18;
+        unit.yPos = 19;
+        Instantiate(unit, new Vector2(unit.xPos, unit.yPos), Quaternion.identity, unitList);
     }
 
     public int getIncomeForPlayer(int player)
