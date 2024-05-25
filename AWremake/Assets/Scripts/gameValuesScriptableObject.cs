@@ -29,6 +29,11 @@ public class gameValuesScriptableObject : ScriptableObject
         progenyNames[0]="ertrian";
         progenyNames[1]="virix";
         progenyNames[2]="sentus";
+        unitTypes = new string[4];
+        unitTypes[0] = "resource";
+        unitTypes[1] = "land";
+        unitTypes[2] = "air";
+        unitTypes[3] = "sea";
         //private string[] progenyNames = new string[] { "ertrian", "virix", "sentus" };
         instantiateInfantry();
         instantiateGattlingTank();
@@ -43,6 +48,7 @@ public class gameValuesScriptableObject : ScriptableObject
 
         infantryM.unitName = "Infanty";
         infantryM.progeny = progenyNames[0];
+        infantryM.unitType = unitTypes[0];
         infantryM.healthMax = 100;
         infantryM.healthType = "light";
         infantryM.weaponType = "projectile";
@@ -63,7 +69,7 @@ public class gameValuesScriptableObject : ScriptableObject
         gattlingTankM.unitName = "Gattling Tank";
         gattlingTankM.progeny = progenyNames[0];
         gattlingTankM.healthMax = 400;
-        gattlingTankM.healthType = "light";
+        gattlingTankM.healthType = "medium";
         gattlingTankM.weaponType = "projectile";
         gattlingTankM.damageType = "light";
         gattlingTankM.baseDamage = 100;
@@ -82,9 +88,9 @@ public class gameValuesScriptableObject : ScriptableObject
         lightTankM.unitName = "Light Tank";
         lightTankM.progeny = progenyNames[0];
         lightTankM.healthMax = 700;
-        lightTankM.healthType = "light";
+        lightTankM.healthType = "heavy";
         lightTankM.weaponType = "projectile";
-        lightTankM.damageType = "light";
+        lightTankM.damageType = "heavy";
         lightTankM.baseDamage = 300;
         lightTankM.attackRange = 1;
         lightTankM.price = 700;

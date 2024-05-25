@@ -6,6 +6,7 @@ public class metadataBaseUnit : MonoBehaviour
 {
     public string unitName;
     public string progeny;
+    public string unitType;
     public int healthMax;
     public string healthType;
     public string damageType;

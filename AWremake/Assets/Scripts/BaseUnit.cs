@@ -9,6 +9,7 @@ public class BaseUnit : MonoBehaviour
 {
 
     //in future this values will be pulled from a UnitValues table/function.
+    public string unitName;
     public int healthMax;
     public int healthCurrent;
     public int type;

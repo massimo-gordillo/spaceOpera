@@ -483,7 +483,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1315573905}
   m_HandleRect: {fileID: 1315573904}
   m_Direction: 0
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -743,7 +743,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1102248382}
   m_HandleRect: {fileID: 1102248381}
   m_Direction: 2
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -922,6 +922,7 @@ MonoBehaviour:
   spriteOffStructures: []
   allUnits: []
   gameMaster: {fileID: 1024135144}
+  playerTurn: 0
   moveSquare: {fileID: 4767315479213016531, guid: 45dd1bafd4332f345914066612cff201, type: 3}
 --- !u!1 &462848101
 GameObject:
@@ -1666,7 +1667,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1228598279}
   m_HandleRect: {fileID: 1228598278}
   m_Direction: 0
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -1941,6 +1942,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 472514404}
     m_Modifications:
+    - target: {fileID: 1052146141851546522, guid: 4fceb5c91e72f6d4ca175f0eafad39d8, type: 3}
+      propertyPath: unitName
+      value: Infantry
+      objectReference: {fileID: 0}
     - target: {fileID: 1052146141851546522, guid: 4fceb5c91e72f6d4ca175f0eafad39d8, type: 3}
       propertyPath: nonExhausted
       value: 0
@@ -2322,6 +2327,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 472514404}
     m_Modifications:
+    - target: {fileID: 1052146141851546522, guid: 4fceb5c91e72f6d4ca175f0eafad39d8, type: 3}
+      propertyPath: unitName
+      value: Infantry
+      objectReference: {fileID: 0}
     - target: {fileID: 1052146141851546522, guid: 4fceb5c91e72f6d4ca175f0eafad39d8, type: 3}
       propertyPath: playerControl
       value: 2
@@ -3199,7 +3208,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1673569941}
   m_HandleRect: {fileID: 1673569940}
   m_Direction: 2
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -3684,6 +3693,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 472514404}
     m_Modifications:
+    - target: {fileID: 1052146141851546522, guid: 4fceb5c91e72f6d4ca175f0eafad39d8, type: 3}
+      propertyPath: unitName
+      value: Infantry
+      objectReference: {fileID: 0}
     - target: {fileID: 1052146141851546522, guid: 4fceb5c91e72f6d4ca175f0eafad39d8, type: 3}
       propertyPath: playerControl
       value: 1
