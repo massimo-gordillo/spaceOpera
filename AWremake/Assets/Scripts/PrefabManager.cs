@@ -1,27 +1,27 @@
 using UnityEngine;
 
-public class PrefabManager : MonoBehaviour
+public class PrefabManager
 {
-    //public GameValuesSO gameValuesSO;
+    private GameValuesSO gameValuesSO;
 
-    void Start()
+    public void setGameValues(GameValuesSO setGameValuesSO)
     {
-
+        gameValuesSO = setGameValuesSO;
     }
 
     public void modifyPrefab(string prefabPath, AttributesBaseUnit unitData)
     {
-        string tempPrefabPath = prefabPath;
-        GameObject prefab = Resources.Load<GameObject>(tempPrefabPath);
+        //string prefabPath = gameValuesSO.prefabPath.Replace("Assets/Resources/", "").Replace(".prefab", "");
+        GameObject prefab = Resources.Load<GameObject>(prefabPath);
 
         if (prefab == null)
         {
-            Debug.LogError("Prefab not found at path: " + tempPrefabPath);
+            Debug.LogError("Prefab not found at path: " + prefabPath);
             return;
         }
 
         // Instantiate the prefab temporarily to modify its values
-        GameObject tempInstance = Instantiate(prefab);
+        GameObject tempInstance = Object.Instantiate(prefab);
 
         // Assuming the prefab has a script with public variables "health" and "attackPower"
         BaseUnit unitScript = tempInstance.GetComponent<BaseUnit>();
@@ -44,10 +44,10 @@ public class PrefabManager : MonoBehaviour
 
         // Apply the changes to the prefab itself
         #if UNITY_EDITOR
-        UnityEditor.PrefabUtility.SaveAsPrefabAsset(tempInstance, prefabPath + ".prefab");
+        UnityEditor.PrefabUtility.SaveAsPrefabAsset(tempInstance, "Assets/Resources/" + prefabPath + ".prefab");
         #endif
 
         // Destroy the temporary instance
-        Destroy(tempInstance);
+        Object.DestroyImmediate(tempInstance);
     }
 }
