@@ -34,6 +34,7 @@ public class BaseUnit : MonoBehaviour
     public SpriteRenderer crosshairSpriteRenderer;
     public SpriteRenderer unitSpriteRenderer;
     public MasterGrid masterGrid;
+    public string prefabPath;
 
     public TMP_Text healthTextContainer;
     //use healthTextContainer.text= to update text.

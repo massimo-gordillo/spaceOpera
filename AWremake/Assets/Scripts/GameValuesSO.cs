@@ -23,6 +23,7 @@ public class GameValuesSO : ScriptableObject
     private List<AttributesBaseUnit> attributesBaseUnits;
     private string[] progenyNames;
     private string[] unitTypes;
+    private PrefabManager prefabManager;
     //public AttributesBaseUnit infantryM;
 
     // Start is called before the first frame update
@@ -43,6 +44,7 @@ public class GameValuesSO : ScriptableObject
         unitTypes[2] = "air";
         unitTypes[3] = "sea";
         //private string[] progenyNames = new string[] { "ertrian", "virix", "sentus" };
+        prefabManager = new PrefabManager();
         populateGameValuesInfantry();
         //populateGameValuesGattlingTank();
     }
@@ -106,10 +108,12 @@ public class GameValuesSO : ScriptableObject
             movementRange = 6,
             sprite = Resources.Load<Sprite>("sprites/infantrySprite"),
             prefabPath = "Assets/Resources/unitPrefabs/progeny1/Infantry"
-    };
+        };
 
         attributesBaseUnits.Add(infantryM);
         Debug.Log($"Adding prefab path: {infantryM.prefabPath}");
+        prefabManager.modifyPrefab(infantryM.prefabPath, infantryM);
+
     }
     /*private void populateGameValuesInfantry()
     {
