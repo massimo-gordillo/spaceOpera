@@ -21,7 +21,7 @@ public class GameMaster : MonoBehaviour
     private int structureResourcePerTurn;
     public Transform unitList;
     public GameValuesSO gameValues;
-    public BaseUnit baseUnitPrefab;
+    public BaseUnit infantryUnitPrefab;
     // Start is called before the first frame update
     void Awake()
     {
@@ -40,37 +40,25 @@ public class GameMaster : MonoBehaviour
         startupInstantiateUnits();
     }
 
-    /*private void startupInstantiateUnits()
+    private void startupInstantiateUnits()
     {
-        BaseUnit unit = baseUnitPrefab;
-        unit.unitName = "Infantry";
-        AttributesBaseUnit infantryData = gameValues.GetUnitDataByTitle("Infantry");
+        BaseUnit unit = infantryUnitPrefab;
+        //AttributesBaseUnit infantryData = gameValues.GetUnitDataByTitle("Infantry");
 
-        unit.xPos = 18;
-        unit.yPos = 19;
-        Instantiate(unit, new Vector2(unit.xPos, unit.yPos), Quaternion.identity, unitList);
-        unit.startupPopulateValues(infantryData);
+        //unit.xPos = 18;
+        //unit.yPos = 19;
+        //Instantiate(unit, new Vector2(unit.xPos, unit.yPos), Quaternion.identity, unitList);
+        Instantiate(unit, new Vector2(18, 19), Quaternion.identity, unitList);
+        //unit.startupPopulateValues(infantryData);
 
         /*
-        BaseUnit unit2 = baseUnitPrefab;
+        BaseUnit unit2 = infantryUnitPrefab;
         unit2.unitName = "Infantry";
         AttributesBaseUnit infantryData = gameValues.GetUnitDataByTitle("Infantry");
         unit2.xPos = 16;
         unit2.yPos = 18;
-        Instantiate(unit2, new Vector2(unit2.xPos, unit2.yPos), Quaternion.identity, unitList); BaseUnit unit2 = baseUnitPrefab;
-     
-    }*/
-
-    private void startupInstantiateUnits()
-    {
-        if (gameValues == null)
-        {
-            Debug.LogError("gameValues is not assigned!");
-            return;
-        }
-
-        //instantiateUnit("Infantry", new Vector2(18, 19));
-        // Add more calls to InstantiateUnit with other unit types and positions as needed
+        Instantiate(unit2, new Vector2(unit2.xPos, unit2.yPos), Quaternion.identity, unitList); BaseUnit unit2 = infantryUnitPrefab;
+        */
     }
 
     //2024-05-31 this script doesn't work as intended and honestly modifying the prefab should be done in the scriptableObject initialization
@@ -96,7 +84,7 @@ public class GameMaster : MonoBehaviour
 
         
 
-        BaseUnit unitObject = Instantiate(baseUnitPrefab, position, Quaternion.identity, unitList);
+        BaseUnit unitObject = Instantiate(infantryUnitPrefab, position, Quaternion.identity, unitList);
         BaseUnit unit = unitObject.GetComponent<BaseUnit>();
 
         if (unit == null)
