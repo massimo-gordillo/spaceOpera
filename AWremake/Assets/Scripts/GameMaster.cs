@@ -20,12 +20,12 @@ public class GameMaster : MonoBehaviour
     private int baseResourcePerTurn;
     private int structureResourcePerTurn;
     public Transform unitList;
-    public gameValuesScriptableObject gameValues;
+    public GameValuesSO gameValues;
     public BaseUnit baseUnitPrefab;
     // Start is called before the first frame update
     void Awake()
     {
-        //gameValues = AssetDatabase.LoadAssetAtPath<gameValuesScriptableObject>("Assets/Scripts/Assets/Scripts/gameValuesScriptableObject.cs.cs");
+        //gameValues = AssetDatabase.LoadAssetAtPath<GameValuesSO>("Assets/Scripts/Assets/Scripts/GameValuesSO.cs.cs");
         hideStructurePanel();
         playerTurn = 1;
         numPlayers = 2; //will set dynamically later
@@ -40,11 +40,11 @@ public class GameMaster : MonoBehaviour
         startupInstantiateUnits();
     }
 
-    private void startupInstantiateUnits()
+    /*private void startupInstantiateUnits()
     {
         BaseUnit unit = baseUnitPrefab;
         unit.unitName = "Infantry";
-        metadataBaseUnit infantryData = gameValues.GetUnitDataByTitle("Infantry");
+        AttributesBaseUnit infantryData = gameValues.GetUnitDataByTitle("Infantry");
 
         unit.xPos = 18;
         unit.yPos = 19;
@@ -54,11 +54,61 @@ public class GameMaster : MonoBehaviour
         /*
         BaseUnit unit2 = baseUnitPrefab;
         unit2.unitName = "Infantry";
-        metadataBaseUnit infantryData = gameValues.GetUnitDataByTitle("Infantry");
+        AttributesBaseUnit infantryData = gameValues.GetUnitDataByTitle("Infantry");
         unit2.xPos = 16;
         unit2.yPos = 18;
         Instantiate(unit2, new Vector2(unit2.xPos, unit2.yPos), Quaternion.identity, unitList); BaseUnit unit2 = baseUnitPrefab;
-     */
+     
+    }*/
+
+    private void startupInstantiateUnits()
+    {
+        if (gameValues == null)
+        {
+            Debug.LogError("gameValues is not assigned!");
+            return;
+        }
+
+        instantiateUnit("Infantry", new Vector2(18, 19));
+        // Add more calls to InstantiateUnit with other unit types and positions as needed
+    }
+
+    private void instantiateUnit(string unitName, Vector2 position)
+    {
+        AttributesBaseUnit unitData = gameValues.GetUnitDataByTitle(unitName);
+        if (unitData == null)
+        {
+            Debug.LogError($"Unit data for {unitName} not found!");
+            return;
+        }
+
+        /*Debug.Log($"Unit name data says: {unitData.unitName} prefab location says: {unitData.prefabPath}, cost says {unitData.price}");
+
+        GameObject prefab = Resources.Load<GameObject>(unitData.prefabPath);
+        if (prefab == null)
+        {
+            Debug.LogError($"Prefab not found for {unitData.unitName}");
+            return;
+        }*/
+
+        //prefab.attackRange = unitData.attackRange;
+
+        
+
+        BaseUnit unitObject = Instantiate(baseUnitPrefab, position, Quaternion.identity, unitList);
+        BaseUnit unit = unitObject.GetComponent<BaseUnit>();
+
+        if (unit == null)
+        {
+            Debug.LogError("BaseUnit component not found on the instantiated prefab!");
+            return;
+        }
+
+        //unit.unitName = unitData.unitName;
+        unit.xPos = (int)position.x;
+        unit.yPos = (int)position.y;
+
+        // Add any additional properties here
     }
 
     public int getIncomeForPlayer(int player)

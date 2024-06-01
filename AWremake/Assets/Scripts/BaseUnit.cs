@@ -80,7 +80,7 @@ public class BaseUnit : MonoBehaviour
         }*/
     }
 
-    public void startupPopulateValues(metadataBaseUnit data)
+    public void startupPopulateValues(AttributesBaseUnit data)
     {
         if (data != null)
         {
