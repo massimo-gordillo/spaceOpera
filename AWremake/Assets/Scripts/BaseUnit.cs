@@ -20,7 +20,7 @@ public class BaseUnit : MonoBehaviour
     public string damageType;
     public string weaponType;
     public int attackRange = 1;
-    public int price = 100;
+    public int price = 999;
     public int movementRange = 3;
     public int playerControl;
     public int team;

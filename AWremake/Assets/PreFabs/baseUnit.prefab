@@ -290,10 +290,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ddd300f7034367e458d91576dc576f5a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  unitName: Infantry
+  unitType: 
+  progeny: 
   healthMax: 0
+  healthType: 
   healthCurrent: 0
   type: 0
   baseDamage: 50
+  damageType: 
+  weaponType: 
   attackRange: 1
   price: 100
   movementRange: 3
@@ -304,6 +310,7 @@ MonoBehaviour:
   yPos: 0
   movementNonExhausted: 0
   nonExhausted: 0
+  sprite: {fileID: 0}
   crosshairSpriteRenderer: {fileID: 8169301051409498620}
   unitSpriteRenderer: {fileID: 6758245729223989031}
   masterGrid: {fileID: 0}

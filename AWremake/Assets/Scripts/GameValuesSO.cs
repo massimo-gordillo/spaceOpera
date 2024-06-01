@@ -28,6 +28,7 @@ public class GameValuesSO : ScriptableObject
     // Start is called before the first frame update
     void OnEnable()
     {
+        Debug.Log("GameValuesSO OnEnable called.");
         if (attributesBaseUnits == null)
         {
             attributesBaseUnits = new List<AttributesBaseUnit>();
@@ -46,6 +47,7 @@ public class GameValuesSO : ScriptableObject
         //populateGameValuesGattlingTank();
     }
 
+    //2024-05-31 this might be broken.
     public AttributesBaseUnit GetUnitDataByTitle(string unitName)
     {
         // Iterate through each AttributesBaseUnit in the list
@@ -58,7 +60,8 @@ public class GameValuesSO : ScriptableObject
             if (unitData.unitName == unitName)
             {
                 // Log and return the matching unit
-                Debug.Log($"Found unit: {unitData.unitName} it has prefabPath data {unitData.prefabPath}");
+                printToLogs(unitData);
+                Debug.Log($"Found unit: {unitData.unitName} it has prefabPath data : **{unitData.prefabPath}**");
                 return unitData;
             }
         }
@@ -69,7 +72,46 @@ public class GameValuesSO : ScriptableObject
         //return attributesBaseUnit.Find(AttributesBaseUnit => AttributesBaseUnit.unitName == unitName);
     }
 
+    private void printToLogs(AttributesBaseUnit unitData)
+    {
+        Debug.Log($"unitName: {unitData.unitName}");
+        Debug.Log($".progeny: {unitData.progeny}");
+        Debug.Log($"unitType: {unitData.unitType}");
+        Debug.Log($"healthMax: {unitData.healthMax}");
+        Debug.Log($"healthType: {unitData.healthType}");
+        Debug.Log($"weaponType: {unitData.weaponType}");
+        Debug.Log($"damageType: {unitData.damageType}");
+        Debug.Log($"baseDamage: {unitData.baseDamage}");
+        Debug.Log($"attackRange: {unitData.attackRange}");
+        Debug.Log($".price: {unitData.price}");
+        Debug.Log($"movementRange: {unitData.movementRange}");
+        Debug.Log($".sprite: {unitData.sprite}");
+        Debug.Log($"prefabPath: {unitData.prefabPath}");
+    }
+
     private void populateGameValuesInfantry()
+    {
+        AttributesBaseUnit infantryM = new AttributesBaseUnit
+        {
+            unitName = "Infantry",
+            progeny = progenyNames[0],
+            unitType = unitTypes[0],
+            healthMax = 100,
+            healthType = "light",
+            weaponType = "projectile",
+            damageType = "light",
+            baseDamage = 50,
+            attackRange = 1,
+            price = 800,
+            movementRange = 6,
+            sprite = Resources.Load<Sprite>("sprites/infantrySprite"),
+            prefabPath = "Assets/Resources/unitPrefabs/progeny1/Infantry"
+    };
+
+        attributesBaseUnits.Add(infantryM);
+        Debug.Log($"Adding prefab path: {infantryM.prefabPath}");
+    }
+    /*private void populateGameValuesInfantry()
     {
         AttributesBaseUnit infantryM = new AttributesBaseUnit();
 
@@ -82,15 +124,15 @@ public class GameValuesSO : ScriptableObject
         infantryM.damageType = "light";
         infantryM.baseDamage = 50;
         infantryM.attackRange = 1;
-        infantryM.price = 800;
+        infantryM.price = 888;
         infantryM.movementRange = 6;
         infantryM.sprite = Resources.Load<Sprite>("sprites/infantrySprite");
-        infantryM.prefabPath = "Assets/Resources/unitPrefabs/progeny1/Infantry";
-        //infantryM.prefabPath = "helloworld";
+        //infantryM.prefabPath = "Assets/Resources/unitPrefabs/progeny1/Infantry";
+        infantryM.prefabPath = "helloworld";
 
         attributesBaseUnits.Add(infantryM);
         Debug.Log($"Adding prefab path: {infantryM.prefabPath}");
-    }
+    }*/
 
-    
+
 }

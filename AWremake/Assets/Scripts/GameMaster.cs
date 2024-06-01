@@ -69,11 +69,12 @@ public class GameMaster : MonoBehaviour
             return;
         }
 
-        instantiateUnit("Infantry", new Vector2(18, 19));
+        //instantiateUnit("Infantry", new Vector2(18, 19));
         // Add more calls to InstantiateUnit with other unit types and positions as needed
     }
 
-    private void instantiateUnit(string unitName, Vector2 position)
+    //2024-05-31 this script doesn't work as intended and honestly modifying the prefab should be done in the scriptableObject initialization
+    /*private void instantiateUnit(string unitName, Vector2 position)
     {
         AttributesBaseUnit unitData = gameValues.GetUnitDataByTitle(unitName);
         if (unitData == null)
@@ -82,14 +83,14 @@ public class GameMaster : MonoBehaviour
             return;
         }
 
-        /*Debug.Log($"Unit name data says: {unitData.unitName} prefab location says: {unitData.prefabPath}, cost says {unitData.price}");
+        Debug.Log($"Unit name data says: {unitData.unitName} prefab location says: {unitData.prefabPath}, cost says {unitData.price}");
 
         GameObject prefab = Resources.Load<GameObject>(unitData.prefabPath);
         if (prefab == null)
         {
             Debug.LogError($"Prefab not found for {unitData.unitName}");
             return;
-        }*/
+        }
 
         //prefab.attackRange = unitData.attackRange;
 
@@ -109,7 +110,7 @@ public class GameMaster : MonoBehaviour
         unit.yPos = (int)position.y;
 
         // Add any additional properties here
-    }
+    }*/
 
     public int getIncomeForPlayer(int player)
     {
