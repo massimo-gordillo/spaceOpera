@@ -5,28 +5,11 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "UnitData", menuName = "ScriptableObjects/UnitData", order = 1)]
 public class GameValuesSO : ScriptableObject
 {
-
-    /* I could make a unitValTypes object which contain the name and a title for each value type
-     * and then in this scriptableObject I would create N instances of that unitValTypes object and
-     * populate all the values for the N different units. 
-     * Would be much more readable.
-     * It's unclear if I can do that kind of operations in a ScriptableObject. 
-     * Looks like it's possible. See:
-    * https://unity.com/how-to/architect-game-code-scriptable-objects#:~:text=ScriptableObject%20is%20a%20serializable%20Unity,to%20manage%20changes%20and%20debugging.
-    */
-    //public string[] unitNames;
-    //public int[,] unitvalues;
-
-
-
-    //private List<AttributesBaseUnit> attributesBaseUnit = new List<AttributesBaseUnit>();
     private List<AttributesBaseUnit> attributesBaseUnits;
     private string[] progenyNames;
     private string[] unitTypes;
     private PrefabManager prefabManager = new PrefabManager();
-    //public AttributesBaseUnit infantryM;
 
-    // Start is called before the first frame update
     void OnEnable()
     {
         Debug.Log("GameValuesSO OnEnable called.");
@@ -43,12 +26,11 @@ public class GameValuesSO : ScriptableObject
         unitTypes[1] = "land";
         unitTypes[2] = "air";
         unitTypes[3] = "sea";
-        //private string[] progenyNames = new string[] { "ertrian", "virix", "sentus" };
         populateGameValuesInfantry();
         //populateGameValuesGattlingTank();
     }
 
-    //2024-05-31 this might be broken.
+    //this function calls a unit in the list with an empty name. May be worth investigating should I call on this function in future.
     public AttributesBaseUnit GetUnitDataByTitle(string unitName)
     {
         // Iterate through each AttributesBaseUnit in the list
@@ -73,6 +55,7 @@ public class GameValuesSO : ScriptableObject
         //return attributesBaseUnit.Find(AttributesBaseUnit => AttributesBaseUnit.unitName == unitName);
     }
 
+    //debugging function
     private void printToLogs(AttributesBaseUnit unitData)
     {
         Debug.Log($"unitName: {unitData.unitName}");
@@ -111,32 +94,7 @@ public class GameValuesSO : ScriptableObject
         };
 
         attributesBaseUnits.Add(infantryM);
-        //Debug.Log($"Adding prefab path: {infantryM.prefabPath}");
         prefabManager.modifyPrefab(infantryM.prefabPath, infantryM);
 
     }
-    /*private void populateGameValuesInfantry()
-    {
-        AttributesBaseUnit infantryM = new AttributesBaseUnit();
-
-        infantryM.unitName = "Infantry";
-        infantryM.progeny = progenyNames[0];
-        infantryM.unitType = unitTypes[0];
-        infantryM.healthMax = 100;
-        infantryM.healthType = "light";
-        infantryM.weaponType = "projectile";
-        infantryM.damageType = "light";
-        infantryM.baseDamage = 50;
-        infantryM.attackRange = 1;
-        infantryM.price = 888;
-        infantryM.movementRange = 6;
-        infantryM.sprite = Resources.Load<Sprite>("sprites/infantrySprite");
-        //infantryM.prefabPath = "Assets/Resources/unitPrefabs/progeny1/Infantry";
-        infantryM.prefabPath = "helloworld";
-
-        attributesBaseUnits.Add(infantryM);
-        Debug.Log($"Adding prefab path: {infantryM.prefabPath}");
-    }*/
-
-
 }
