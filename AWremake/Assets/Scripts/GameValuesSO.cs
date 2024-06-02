@@ -86,8 +86,8 @@ public class GameValuesSO : ScriptableObject
             damageType = "light",
             baseDamage = 50,
             attackRange = 1,
-            price = 777,
-            movementRange = 6,
+            price = 105,
+            movementRange = 4,
             sprite = Resources.Load<Sprite>("sprites/infantrySprite"),
             //prefabPath = "Assets/Resources/unitPrefabs/progeny1/Infantry.prefab"
             prefabPath = "unitPrefabs/progeny1/Infantry"

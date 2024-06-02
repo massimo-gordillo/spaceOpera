@@ -136,10 +136,12 @@ public class MasterGrid : MonoBehaviour
                         if (xCheck >= 0 && xCheck < gridX + 2 && yCheck >= 0 && yCheck < gridY + 2 && !checkedCells[xCheck, yCheck])
                         {
                             checkedCells[xCheck, yCheck] = true;
-
-                            if (legalMove(xCheck - 1, yCheck - 1, mTarget) == 1)
+                            //if cell is empty or occupied by an allied unit
+                            if (legalMove(xCheck - 1, yCheck - 1, mTarget) >= 1)
                             {
-                                Instantiate(moveSquare, new Vector2(xCheck - 1, yCheck - 1), Quaternion.identity);
+                                //if cell is empty make a movement square.
+                                if (legalMove(xCheck - 1, yCheck - 1, mTarget) == 1)
+                                    Instantiate(moveSquare, new Vector2(xCheck - 1, yCheck - 1), Quaternion.identity);
                                 //  if (BaseStructure s = whatStructureIsInThisLocation(xCheck -1, yCheck - 1) != null) //I wish I could do this.
                                 BaseStructure s = whatStructureIsInThisLocation(xCheck - 1, yCheck - 1);
                                 if(s!=null)
@@ -236,13 +238,11 @@ public class MasterGrid : MonoBehaviour
         if (x < 0 || y < 0 || x >= gridX || y >= gridY)
             return 0;
         else if (whatUnitIsInThisLocation(x, y) == null)
-        {
             return 1;
-        }
         else if (whatUnitIsInThisLocation(x, y) == mTarget)
-        {
             return -1;
-        }
+        else if (whatUnitIsInThisLocation(x, y).playerControl == selectedUnit.playerControl)
+            return 2;
         else
             return 0;
     }

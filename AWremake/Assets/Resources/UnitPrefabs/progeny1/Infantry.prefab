@@ -417,9 +417,9 @@ MonoBehaviour:
   damageType: light
   weaponType: projectile
   attackRange: 1
-  price: 777
-  movementRange: 6
-  playerControl: 1
+  price: 105
+  movementRange: 4
+  playerControl: 2
   team: 0
   orientation: 3
   xPos: 0
