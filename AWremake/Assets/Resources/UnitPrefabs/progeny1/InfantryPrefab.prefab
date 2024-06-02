@@ -371,7 +371,7 @@ GameObject:
   - component: {fileID: 4548533291501861208}
   - component: {fileID: 7803690413202824681}
   m_Layer: 0
-  m_Name: Infantry
+  m_Name: InfantryPrefab
   m_TagString: BaseUnitTag
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -430,7 +430,7 @@ MonoBehaviour:
   crosshairSpriteRenderer: {fileID: 1408094258978992015}
   unitSpriteRenderer: {fileID: 4548533290679335252}
   masterGrid: {fileID: 0}
-  prefabPath: unitPrefabs/progeny1/Infantry
+  prefabPath: unitPrefabs/progeny1/InfantryPrefab
   healthTextContainer: {fileID: 4133299307564673074}
 --- !u!1 &6245751191550553801
 GameObject:

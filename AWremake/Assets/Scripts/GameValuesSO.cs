@@ -27,7 +27,8 @@ public class GameValuesSO : ScriptableObject
         unitTypes[2] = "air";
         unitTypes[3] = "sea";
         populateGameValuesInfantry();
-        //populateGameValuesGattlingTank();
+        populateGameValuesGattlingTank();
+        populateGameValuesLightTank();
     }
 
     //this function calls a unit in the list with an empty name. May be worth investigating should I call on this function in future.
@@ -73,12 +74,31 @@ public class GameValuesSO : ScriptableObject
         Debug.Log($"prefabPath: {unitData.prefabPath}");
     }
 
+    private string getPrefabLocationString(string unitName, string progeny)
+    {
+        string prefabPath = "unitPrefabs/";
+        int i = 1;
+
+        foreach (string s in progenyNames)
+        {
+            if (s == progeny)
+                prefabPath = prefabPath + "progeny" + i;
+            i++;
+        }
+
+        unitName = unitName.Replace(" ", "");
+        prefabPath = prefabPath + "/" + unitName + "Prefab";
+        return prefabPath;
+    }
+
     private void populateGameValuesInfantry()
     {
+        string hardcodedUnitName = "Infantry";
+        string hardcodedProgeny = progenyNames[0];
         AttributesBaseUnit infantryM = new AttributesBaseUnit
         {
-            unitName = "Infantry",
-            progeny = progenyNames[0],
+            unitName = hardcodedUnitName,
+            progeny = hardcodedProgeny,
             unitType = unitTypes[0],
             healthMax = 100,
             healthType = "light",
@@ -89,12 +109,112 @@ public class GameValuesSO : ScriptableObject
             price = 105,
             movementRange = 4,
             sprite = Resources.Load<Sprite>("sprites/infantrySprite"),
-            //prefabPath = "Assets/Resources/unitPrefabs/progeny1/Infantry.prefab"
-            prefabPath = "unitPrefabs/progeny1/Infantry"
+            //prefabPath = "unitPrefabs/progeny1/Infantry"
+            prefabPath = getPrefabLocationString(hardcodedUnitName, hardcodedProgeny)
         };
-
+        Debug.Log($"prefabPath: {infantryM.prefabPath}");
         attributesBaseUnits.Add(infantryM);
         prefabManager.modifyPrefab(infantryM.prefabPath, infantryM);
 
     }
+
+
+    private void populateGameValuesGattlingTank()
+    {
+        string hardcodedUnitName = "Gattling Tank";
+        string hardcodedProgeny = progenyNames[0];
+        AttributesBaseUnit gattlingTankM = new AttributesBaseUnit
+        {
+            unitName = hardcodedUnitName,
+            progeny = hardcodedProgeny,
+            unitType = unitTypes[1],
+            healthMax = 400,
+            healthType = "medium",
+            weaponType = "projectile",
+            damageType = "light",
+            baseDamage = 100,
+            attackRange = 1,
+            price = 600,
+            movementRange = 6,
+            sprite = Resources.Load<Sprite>("sprites/GattlingTankSprite"),
+            //prefabPath = "unitPrefabs/progeny1/gattlingTank"
+            prefabPath = getPrefabLocationString(hardcodedUnitName, hardcodedProgeny)
+        };
+        Debug.Log($"prefabPath: {gattlingTankM.prefabPath}");
+        attributesBaseUnits.Add(gattlingTankM);
+        prefabManager.modifyPrefab(gattlingTankM.prefabPath, gattlingTankM);
+
+    }
+
+    private void populateGameValuesLightTank()
+    {
+        string hardcodedUnitName = "Light Tank";
+        string hardcodedProgeny = progenyNames[0];
+        AttributesBaseUnit lightTankM = new AttributesBaseUnit
+        {
+            unitName = hardcodedUnitName,
+            progeny = hardcodedProgeny,
+            unitType = unitTypes[1],
+            healthMax = 700,
+            healthType = "heavy",
+            weaponType = "projectile",
+            damageType = "heavy",
+            baseDamage = 300,
+            attackRange = 1,
+            price = 700,
+            movementRange = 7,
+            sprite = Resources.Load<Sprite>("sprites/lightTankSprite"),
+            //prefabPath = "unitPrefabs/progeny1/lightTank"
+            prefabPath = getPrefabLocationString(hardcodedUnitName, hardcodedProgeny)
+        };
+        Debug.Log($"prefabPath: {lightTankM.prefabPath}");
+        attributesBaseUnits.Add(lightTankM);
+        prefabManager.modifyPrefab(lightTankM.prefabPath, lightTankM);
+
+    }
+
+
+
+
+
+
+
+
+    /*private void populateGameValuesGattlingTank()
+    {
+        MetadataBaseUnit gattlingTankM = new MetadataBaseUnit();
+
+        gattlingTankM.unitName = "Gattling Tank";
+        gattlingTankM.progeny = progenyNames[0];
+        gattlingTankM.healthMax = 400;
+        gattlingTankM.healthType = "medium";
+        gattlingTankM.weaponType = "projectile";
+        gattlingTankM.damageType = "light";
+        gattlingTankM.baseDamage = 100;
+        gattlingTankM.attackRange = 1;
+        gattlingTankM.price = 600;
+        gattlingTankM.movementRange = 6;
+        gattlingTankM.sprite = Resources.Load<Sprite>("sprites/gattlingTankSprite");
+
+        metadataBaseUnits.Add(gattlingTankM);
+    }
+
+    private void populateGameValuesLightTank()
+    {
+        MetadataBaseUnit lightTankM = new MetadataBaseUnit();
+
+        lightTankM.unitName = "Light Tank";
+        lightTankM.progeny = progenyNames[0];
+        lightTankM.healthMax = 700;
+        lightTankM.healthType = "heavy";
+        lightTankM.weaponType = "projectile";
+        lightTankM.damageType = "heavy";
+        lightTankM.baseDamage = 300;
+        lightTankM.attackRange = 1;
+        lightTankM.price = 700;
+        lightTankM.movementRange = 7;
+        lightTankM.sprite = Resources.Load<Sprite>("sprites/lightTankSprite");
+
+        metadataBaseUnits.Add(lightTankM);
+    }*/
 }
