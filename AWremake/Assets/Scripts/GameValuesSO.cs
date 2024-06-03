@@ -56,6 +56,11 @@ public class GameValuesSO : ScriptableObject
         //return attributesBaseUnit.Find(AttributesBaseUnit => AttributesBaseUnit.unitName == unitName);
     }
 
+    public List<AttributesBaseUnit> getAttributesBaseUnits()
+    {
+        return attributesBaseUnits;
+    }
+
     //debugging function
     private void printToLogs(AttributesBaseUnit unitData)
     {

@@ -61,45 +61,6 @@ public class GameMaster : MonoBehaviour
         */
     }
 
-    //2024-05-31 this script doesn't work as intended and honestly modifying the prefab should be done in the scriptableObject initialization
-    /*private void instantiateUnit(string unitName, Vector2 position)
-    {
-        AttributesBaseUnit unitData = gameValues.GetUnitDataByTitle(unitName);
-        if (unitData == null)
-        {
-            Debug.LogError($"Unit data for {unitName} not found!");
-            return;
-        }
-
-        Debug.Log($"Unit name data says: {unitData.unitName} prefab location says: {unitData.prefabPath}, cost says {unitData.price}");
-
-        GameObject prefab = Resources.Load<GameObject>(unitData.prefabPath);
-        if (prefab == null)
-        {
-            Debug.LogError($"Prefab not found for {unitData.unitName}");
-            return;
-        }
-
-        //prefab.attackRange = unitData.attackRange;
-
-        
-
-        BaseUnit unitObject = Instantiate(infantryUnitPrefab, position, Quaternion.identity, unitList);
-        BaseUnit unit = unitObject.GetComponent<BaseUnit>();
-
-        if (unit == null)
-        {
-            Debug.LogError("BaseUnit component not found on the instantiated prefab!");
-            return;
-        }
-
-        //unit.unitName = unitData.unitName;
-        unit.xPos = (int)position.x;
-        unit.yPos = (int)position.y;
-
-        // Add any additional properties here
-    }*/
-
     public int getIncomeForPlayer(int player)
     {
         return 0;
