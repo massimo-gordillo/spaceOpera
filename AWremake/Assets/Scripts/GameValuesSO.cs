@@ -13,10 +13,7 @@ public class GameValuesSO : ScriptableObject
     void OnEnable()
     {
         Debug.Log("GameValuesSO OnEnable called.");
-        if (attributesBaseUnits == null)
-        {
-            attributesBaseUnits = new List<AttributesBaseUnit>();
-        }
+        attributesBaseUnits = new List<AttributesBaseUnit>();
         progenyNames = new string[3];
         progenyNames[0] = "ertrian";
         progenyNames[1] = "virix";
@@ -117,7 +114,6 @@ public class GameValuesSO : ScriptableObject
             //prefabPath = "unitPrefabs/progeny1/Infantry"
             prefabPath = getPrefabLocationString(hardcodedUnitName, hardcodedProgeny)
         };
-        Debug.Log($"prefabPath: {infantryM.prefabPath}");
         attributesBaseUnits.Add(infantryM);
         prefabManager.modifyPrefab(infantryM.prefabPath, infantryM);
 
@@ -141,11 +137,10 @@ public class GameValuesSO : ScriptableObject
             attackRange = 1,
             price = 600,
             movementRange = 6,
-            sprite = Resources.Load<Sprite>("sprites/GattlingTankSprite"),
+            sprite = Resources.Load<Sprite>("sprites/gattlingTankSprite"),
             //prefabPath = "unitPrefabs/progeny1/gattlingTank"
             prefabPath = getPrefabLocationString(hardcodedUnitName, hardcodedProgeny)
         };
-        Debug.Log($"prefabPath: {gattlingTankM.prefabPath}");
         attributesBaseUnits.Add(gattlingTankM);
         prefabManager.modifyPrefab(gattlingTankM.prefabPath, gattlingTankM);
 
@@ -172,7 +167,6 @@ public class GameValuesSO : ScriptableObject
             //prefabPath = "unitPrefabs/progeny1/lightTank"
             prefabPath = getPrefabLocationString(hardcodedUnitName, hardcodedProgeny)
         };
-        Debug.Log($"prefabPath: {lightTankM.prefabPath}");
         attributesBaseUnits.Add(lightTankM);
         prefabManager.modifyPrefab(lightTankM.prefabPath, lightTankM);
 

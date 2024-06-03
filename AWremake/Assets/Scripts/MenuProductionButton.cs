@@ -8,4 +8,5 @@ public class MenuProductionButton : MonoBehaviour
 {
     public TMP_Text buttonText;
     public SpriteRenderer sprite;
+    public GameObject unitPrefab;
 }

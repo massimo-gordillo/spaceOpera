@@ -9,16 +9,23 @@ public class PrefabManager
         gameValuesSO = setGameValuesSO;
     }
 
-    public void modifyPrefab(string prefabPath, AttributesBaseUnit unitData)
+    public GameObject getPrefab(string prefabPath)
     {
-        //string prefabPath = gameValuesSO.prefabPath.Replace("Assets/Resources/", "").Replace(".prefab", "");
         GameObject prefab = Resources.Load<GameObject>(prefabPath);
 
         if (prefab == null)
         {
             Debug.LogError("Prefab not found at path: " + prefabPath);
-            return;
+            return null;
         }
+        else
+            return Resources.Load<GameObject>(prefabPath);
+    }
+
+    public void modifyPrefab(string prefabPath, AttributesBaseUnit unitData)
+    {
+        //string prefabPath = gameValuesSO.prefabPath.Replace("Assets/Resources/", "").Replace(".prefab", "");
+        GameObject prefab = getPrefab(prefabPath);
 
         // Instantiate the prefab temporarily to modify its values
         GameObject tempInstance = Object.Instantiate(prefab);
