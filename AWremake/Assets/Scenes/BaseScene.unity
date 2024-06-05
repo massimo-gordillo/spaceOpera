@@ -1207,6 +1207,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a91a05de125305544974a595d2a33863, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isMouseDownOnClickableObject: 0
 --- !u!20 &519420031
 Camera:
   m_ObjectHideFlags: 0
@@ -1503,7 +1504,7 @@ GameObject:
   - component: {fileID: 657177015}
   - component: {fileID: 657177014}
   - component: {fileID: 657177016}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: ProductionPanel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1592,7 +1593,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 783286229}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Menus
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3302,7 +3303,7 @@ GameObject:
   - component: {fileID: 1781273297}
   - component: {fileID: 1781273300}
   - component: {fileID: 1781273299}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: ResourcePanel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3773,7 +3774,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1960264573}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: StructureMenu
   m_TagString: Untagged
   m_Icon: {fileID: 0}

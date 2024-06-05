@@ -16,6 +16,7 @@ public class CameraDrag : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(0))
         {
+            //only flag that you've moused down on a clickableObject if you're not dragging. 
             isMouseDownOnClickableObject = IsPointerOverClickableObject() && isDragging;
             dragOrigin = Input.mousePosition;
             isDragging = false;
