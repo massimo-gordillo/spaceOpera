@@ -19,6 +19,7 @@ public class MenuProductionButton : MonoBehaviour
 
     public void OnClick()
     {
+        print("I've been clicked!");
         GameObject tempInstance = Object.Instantiate(unitPrefab);
         gameMaster.unitProductionButtonPressed(tempInstance.GetComponent<BaseUnit>());
     }
