@@ -11,6 +11,7 @@ public class BaseUnit : MonoBehaviour
     //in future this values will be pulled from a UnitValues table/function.
     public string unitName;
     public string unitType;
+    public bool isResourceUnit;
     public string progeny;
     public int healthMax;
     public string healthType;

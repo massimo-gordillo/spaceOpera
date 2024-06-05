@@ -18,11 +18,10 @@ public class GameValuesSO : ScriptableObject
         progenyNames[0] = "ertrian";
         progenyNames[1] = "virix";
         progenyNames[2] = "sentus";
-        unitTypes = new string[4];
-        unitTypes[0] = "resource";
-        unitTypes[1] = "land";
-        unitTypes[2] = "air";
-        unitTypes[3] = "sea";
+        unitTypes = new string[3];
+        unitTypes[0] = "land";
+        unitTypes[1] = "air";
+        unitTypes[2] = "sea";
         populateGameValuesInfantry();
         populateGameValuesGattlingTank();
         populateGameValuesLightTank();
@@ -102,6 +101,7 @@ public class GameValuesSO : ScriptableObject
             unitName = hardcodedUnitName,
             progeny = hardcodedProgeny,
             unitType = unitTypes[0],
+            isResourceUnit = true,
             healthMax = 100,
             healthType = "light",
             weaponType = "projectile",
@@ -128,7 +128,8 @@ public class GameValuesSO : ScriptableObject
         {
             unitName = hardcodedUnitName,
             progeny = hardcodedProgeny,
-            unitType = unitTypes[1],
+            unitType = unitTypes[0],
+            isResourceUnit = false,
             healthMax = 400,
             healthType = "medium",
             weaponType = "projectile",
@@ -154,7 +155,8 @@ public class GameValuesSO : ScriptableObject
         {
             unitName = hardcodedUnitName,
             progeny = hardcodedProgeny,
-            unitType = unitTypes[1],
+            unitType = unitTypes[0],
+            isResourceUnit = false,
             healthMax = 700,
             healthType = "heavy",
             weaponType = "projectile",

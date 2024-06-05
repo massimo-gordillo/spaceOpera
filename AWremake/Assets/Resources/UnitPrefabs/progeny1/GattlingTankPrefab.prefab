@@ -264,6 +264,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   unitName: Gattling Tank
   unitType: land
+  isResourceUnit: 0
   progeny: ertrian
   healthMax: 400
   healthType: medium

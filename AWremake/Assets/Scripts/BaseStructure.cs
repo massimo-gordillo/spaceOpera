@@ -69,7 +69,9 @@ public class BaseStructure : MonoBehaviour
 
     public bool isCapturableBy(BaseUnit unit)
     {
-        return (unit.getPlayerControl() != playerControl);
+        //"resource" probably shouldn't be hardcoded here. Should it instead reference the 1st item in the GameValuesSO unitTypes array?
+        //What if I want to change the unitTypes array? Should I just have a "is resource unit" flag?
+        return (unit.getPlayerControl() != playerControl && unit.isResourceUnit);  
     }
 
     public void switchAlliance(int capturePlayerInt)

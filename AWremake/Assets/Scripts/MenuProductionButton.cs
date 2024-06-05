@@ -14,13 +14,12 @@ public class MenuProductionButton : MonoBehaviour
     public void Start()
     {
         gameMaster = GameObject.FindGameObjectWithTag("GameMasterTag").GetComponent<GameMaster>();
-
     }
 
     public void OnClick()
     {
-        print("I've been clicked!");
         GameObject tempInstance = Object.Instantiate(unitPrefab);
         gameMaster.unitProductionButtonPressed(tempInstance.GetComponent<BaseUnit>());
+        Object.DestroyImmediate(tempInstance);
     }
 }

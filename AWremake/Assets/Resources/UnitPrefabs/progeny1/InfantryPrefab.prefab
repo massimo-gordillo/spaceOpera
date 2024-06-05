@@ -407,7 +407,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   unitName: Infantry
-  unitType: resource
+  unitType: land
+  isResourceUnit: 0
   progeny: ertrian
   healthMax: 100
   healthType: light

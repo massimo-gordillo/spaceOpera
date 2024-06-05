@@ -5,6 +5,7 @@ public class AttributesBaseUnit
 {
     public string unitName;
     public string progeny;
+    public bool isResourceUnit;
     public string unitType;
     public int healthMax;
     public string healthType;

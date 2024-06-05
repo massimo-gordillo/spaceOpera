@@ -48,6 +48,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   unitName: Light Tank
   unitType: land
+  isResourceUnit: 0
   progeny: ertrian
   healthMax: 700
   healthType: heavy
