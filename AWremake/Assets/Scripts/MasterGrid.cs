@@ -59,8 +59,8 @@ public class MasterGrid : MonoBehaviour
         else if (getSelectedUnit() == null && unit.getNonExhausted() && unit.getPlayerControl() == gameMaster.getPlayerTurn()) //what if you don't control this unit?
         { 
             setSelectedUnit(unit);
-            checkEnemiesInRange(unit.xPos, unit.yPos, unit.attackRange);
-            BaseStructure structure = manageStructureAtLocation(unit.xPos, unit.yPos);
+            presentGameActionsAtLocation(unit.xPos, unit.yPos, unit);
+            
             if(unit.movementNonExhausted == true) //if the unit hasn't moved already this turn.
                 drawMovement(unit.movementRange, (int)unit.transform.position.x, (int)unit.transform.position.y, unit);
         }
@@ -104,7 +104,7 @@ public class MasterGrid : MonoBehaviour
             print("attempting to capture structure but no selectedUnit to capture it.");
     }
 
-    public void turnOnAttackable()
+    public void attackButtonPressed()
     {
 
     }
@@ -299,8 +299,9 @@ public class MasterGrid : MonoBehaviour
             BaseStructure structure = null;
             if (selectedUnit is BaseUnit) //why is this check here? MG: 24-05-08
             {
-                checkEnemiesInRange(selectedUnit.xPos, selectedUnit.yPos, selectedUnit.attackRange);
-                structure = manageStructureAtLocation(selectedUnit.xPos, selectedUnit.yPos);
+                presentGameActionsAtLocation(x, y, selectedUnit);
+                //checkEnemiesInRange(selectedUnit.xPos, selectedUnit.yPos, selectedUnit.attackRange);
+                //structure = manageStructureAtLocation(selectedUnit.xPos, selectedUnit.yPos);
             }
 
             if (structure == null) //after moving, if the unit is not on a structure AND
@@ -410,16 +411,25 @@ public class MasterGrid : MonoBehaviour
         return num;
     }
 
+    public void presentGameActionsAtLocation(int x, int y, BaseUnit unit)
+    {
+        checkEnemiesInRange(unit.xPos, unit.yPos, unit.attackRange);
+        BaseStructure structure = manageStructureAtLocation(unit.xPos, unit.yPos);
+        //if the unit cannot capture the structure it's on then don't add a capture option to the menu.
+        //MG 24-06-07: Maybe we want to grey out the capture option instead? Do we want the UI positioning to be consistent regardless of what options are available?
+        if (!structure.isCapturableBy(selectedUnit))
+        {
+            structure=null;
+        }
+        gameMaster.showUnitChoicePanel(attackableUnits.Count != 0, structure);
+    }
+
     public BaseStructure manageStructureAtLocation(int x, int y)
     {
         BaseStructure structure = whatStructureIsInThisLocation(x, y);
         if (structure != null)
         {
-            structure.turnOffCollider();
-            if (structure.isCapturableBy(selectedUnit))
-            {
-                gameMaster.showUnitChoicePanel(structure);
-            }
+            turnOffStructureCollider(structure);
         }
         return structure;
     }

@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using TMPro;
 
 public class GameMaster : MonoBehaviour
@@ -22,6 +23,8 @@ public class GameMaster : MonoBehaviour
     public Transform unitList;
     public GameValuesSO gameValues;
     public BaseUnit infantryUnitPrefab;
+    public Button captureButton;
+    public Button attackButton;
     // Start is called before the first frame update
     void Awake()
     {
@@ -88,7 +91,7 @@ public class GameMaster : MonoBehaviour
 
     public void attackButtonPressed()
     {
-        masterGrid.turnOnAttackable();
+        masterGrid.attackButtonPressed();
         hideChoicePanel();
     }
 
@@ -142,15 +145,33 @@ public class GameMaster : MonoBehaviour
         playerTurnText.color = color;
     }
 
-    public void showUnitChoicePanel(BaseStructure structure)
+    public void showUnitChoicePanel(bool attackableUnitsExists, BaseStructure structure)
     {
-        print(structure);
-        if(structure != null)
+        //print(structure);
+        bool capturableStructureExists = (structure != null);
+        if (attackableUnitsExists || capturableStructureExists)
         {
-            selectedStructure = structure;
             choicePanel.SetActive(true);
             unitChoicePanel.SetActive(true);
+            if (attackableUnitsExists)
+            {
+                showAttackButton();
+            }
+            if (capturableStructureExists)
+            {
+                showCaptureButton();
+                selectedStructure = structure;
+            }
         }
+    }
+
+    public void showAttackButton()
+    {
+
+    }
+    public void showCaptureButton()
+    {
+
     }
 
     public void hideChoicePanel()
