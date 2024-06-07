@@ -49,7 +49,8 @@ public class MasterGrid : MonoBehaviour
             if (attackableUnits.Count == 0)
             {
                 exhaustSelectedUnit(unit, false);
-                unit.movementNonExhausted = false;
+                //testing
+                unit.movementNonExhausted = true;
             }
             else
                 exhaustSelectedUnit(unit, true);
@@ -101,8 +102,11 @@ public class MasterGrid : MonoBehaviour
         }
         else
             print("attempting to capture structure but no selectedUnit to capture it.");
+    }
 
-        
+    public void turnOnAttackable()
+    {
+
     }
 
     //MG 24-04-10: this really needs to be a recursive function. It will create the "wrap around an enemy" behaviour.
@@ -301,7 +305,7 @@ public class MasterGrid : MonoBehaviour
 
             if (structure == null) //after moving, if the unit is not on a structure AND
             {
-                gameMaster.hideStructurePanel();
+                gameMaster.hideChoicePanel();
                 if (attackableUnits.Count == 0) //and there is no nearby units, unselect it.
                 {
                     //selectedUnit.setNonExhausted(false);
@@ -364,7 +368,7 @@ public class MasterGrid : MonoBehaviour
             unit.setNonExhausted(!exhaust);
             clearAttackableUnits();
             clearSelectedUnit();
-            gameMaster.hideStructurePanel();
+            gameMaster.hideChoicePanel();
         }
         else
         {
@@ -414,7 +418,7 @@ public class MasterGrid : MonoBehaviour
             structure.turnOffCollider();
             if (structure.isCapturableBy(selectedUnit))
             {
-                gameMaster.showStructureCapturePanel(structure);
+                gameMaster.showUnitChoicePanel(structure);
             }
         }
         return structure;

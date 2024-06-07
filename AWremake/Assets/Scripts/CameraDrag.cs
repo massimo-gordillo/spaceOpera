@@ -40,8 +40,6 @@ public class CameraDrag : MonoBehaviour
         }
         if (Input.GetMouseButtonUp(0))
         {
-            print("isDragging: " + isDragging);
-            print("isMouseDownOnClickableObject" + isMouseDownOnClickableObject);
             if (!isDragging)
             {
                 if (!isMouseDownOnClickableObject)

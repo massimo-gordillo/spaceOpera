@@ -42,7 +42,7 @@ public class ClickableObject : MonoBehaviour
 
     public virtual void HandleClick()
     {
-        Debug.Log("should be overridden: Clicked on: " + gameObject.name);
+        Debug.Log("should be overridden by StaticSprite class: Clicked on: " + gameObject.name);
         // Override this method in the derived class to handle clicks
     }
 }

@@ -9,9 +9,9 @@ public class GameMaster : MonoBehaviour
     public Canvas canvas;
     public BaseStructure selectedStructure;
     public MasterGrid masterGrid;
-    public GameObject structurePanel;
+    public GameObject choicePanel;
     public GameObject productionPanel;
-    public GameObject resourcePanel;
+    public GameObject unitChoicePanel;
     public int playerTurn;
     public int numPlayers;
     public TMP_Text playerTurnText;
@@ -26,7 +26,7 @@ public class GameMaster : MonoBehaviour
     void Awake()
     {
         //gameValues = AssetDatabase.LoadAssetAtPath<GameValuesSO>("Assets/Scripts/Assets/Scripts/GameValuesSO.cs.cs");
-        hideStructurePanel();
+        hideChoicePanel();
         playerTurn = 1;
         numPlayers = 2; //will set dynamically later
         setPlayerTurnText(playerTurn);
@@ -71,7 +71,7 @@ public class GameMaster : MonoBehaviour
         //should probably try/catch if structure is null
         if(structure.playerControl == playerTurn && structure.structureType == 1)
         {
-            structurePanel.SetActive(true);
+            choicePanel.SetActive(true);
             productionPanel.SetActive(true);
             selectedStructure = structure;
         }
@@ -82,8 +82,14 @@ public class GameMaster : MonoBehaviour
         if(selectedStructure != null)
         {
             masterGrid.captureStructure(selectedStructure);
-            hideStructurePanel();
+            hideChoicePanel();
         }
+    }
+
+    public void attackButtonPressed()
+    {
+        masterGrid.turnOnAttackable();
+        hideChoicePanel();
     }
 
     public void unitProductionButtonPressed(BaseUnit unit)
@@ -98,7 +104,7 @@ public class GameMaster : MonoBehaviour
             Instantiate(unit, new Vector2(selectedStructure.xPos, selectedStructure.yPos), Quaternion.identity, unitList);
             playerResourceText.text = "" + playerResources[playerTurn];
             selectedStructure.turnOffCollider();
-            hideStructurePanel();
+            hideChoicePanel();
         }
         else
             print("You must mine more minerals!");
@@ -108,12 +114,12 @@ public class GameMaster : MonoBehaviour
     {
         if (masterGrid.selectedUnit != null)
             masterGrid.exhaustSelectedUnit(masterGrid.selectedUnit, true);
-        hideStructurePanel();
+        hideChoicePanel();
     }
 
     public void endTurnButtonPressed()
     {
-        hideStructurePanel();
+        hideChoicePanel();
         masterGrid.refreshUnits(playerTurn);
         masterGrid.clearMovement();
         masterGrid.clearSelectedUnit();
@@ -136,27 +142,27 @@ public class GameMaster : MonoBehaviour
         playerTurnText.color = color;
     }
 
-    public void showStructureCapturePanel(BaseStructure structure)
+    public void showUnitChoicePanel(BaseStructure structure)
     {
         print(structure);
         if(structure != null)
         {
             selectedStructure = structure;
-            structurePanel.SetActive(true);
-            resourcePanel.SetActive(true);
+            choicePanel.SetActive(true);
+            unitChoicePanel.SetActive(true);
         }
     }
 
-    public void hideStructurePanel()
+    public void hideChoicePanel()
     {
         selectedStructure = null;
-        structurePanel.SetActive(false);
+        choicePanel.SetActive(false);
         hideAllSubPanels();
     }
 
     public void hideAllSubPanels()
     {
-        resourcePanel.SetActive(false);
+        unitChoicePanel.SetActive(false);
         productionPanel.SetActive(false);
     }
 
