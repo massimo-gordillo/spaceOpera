@@ -426,12 +426,14 @@ public class MasterGrid : MonoBehaviour
         BaseStructure structure = manageStructureAtLocation(unit.xPos, unit.yPos);
         //if the unit cannot capture the structure it's on then don't add a capture option to the menu.
         //MG 24-06-07: Maybe we want to grey out the capture option instead? Do we want the UI positioning to be consistent regardless of what options are available?
-        if (structure != null && structure.isCapturableBy(unit))
-        { 
+        bool canStructureBeCapturedHere = (structure != null && structure.isCapturableBy(unit));
+        print("canStructureBecapturedHere: " + canStructureBeCapturedHere);
+        if (canStructureBeCapturedHere)
+        {
             gameMaster.selectedStructure = structure;
         }
-        gameMaster.showUnitChoicePanel(attackableUnits.Count != 0, structure != null);
-        if (!unit.movementNonExhausted && attackableUnits.Count == 0 && structure == null)
+        gameMaster.showUnitChoicePanel(attackableUnits.Count != 0, canStructureBeCapturedHere);
+        if (!unit.movementNonExhausted && attackableUnits.Count == 0 && !canStructureBeCapturedHere)
             exhaustSelectedUnit(unit, true);
     }
 
