@@ -41,52 +41,61 @@ public class MasterGrid : MonoBehaviour
     public void unitHasBeenClicked(BaseUnit unit)
     {
         print("You've clicked on " + unit.GetInstanceID());
-        //if it's the selected unit
-        if (getSelectedUnit() == unit) 
-        {
-            //if there are no attackable units, reset. Otherwise, exhaust the unit.
-            //This will need to be corrected when there's an undo functionality/when the UI asks you directly what you want to do with the unit. MG:24-05-14
-            if (attackableUnits.Count == 0)
+        //if Choice Panel is not presented by GameMaster
+        if (!gameMaster.choicePanel.activeInHierarchy) {
+            //if it's the selected unit (MG 24-06-11 this should never occur anymore given the choice menu behaviour)
+            /*if (getSelectedUnit() == unit)
             {
-                exhaustSelectedUnit(unit, false);
-                //testing
-                unit.movementNonExhausted = true;
+                //if there are no attackable units, reset. Otherwise, exhaust the unit.
+                //This will need to be corrected when there's an undo functionality/when the UI asks you directly what you want to do with the unit. MG:24-05-14
+                if (attackableUnits.Count == 0)
+                {
+                    exhaustSelectedUnit(unit, false);
+                    //testing
+                    unit.movementNonExhausted = true;
+                }
+                else
+                    exhaustSelectedUnit(unit, true);
+            }elseif (getSelectedUnit() == null && unit.getNonExhausted() && unit.getPlayerControl() == gameMaster.getPlayerTurn()) //what if you don't control this unit?
+            */
+            if (getSelectedUnit() == unit && unit.movementNonExhausted == true)
+            {
+                clearSelectedUnit();
             }
-            else
-                exhaustSelectedUnit(unit, true);
-        }
-        //if there is no selected unit and the clicked unit isn't exhausted & player controls that unit.
-        else if (getSelectedUnit() == null && unit.getNonExhausted() && unit.getPlayerControl() == gameMaster.getPlayerTurn()) //what if you don't control this unit?
-        { 
-            setSelectedUnit(unit);
-            presentGameActionsAtLocation(unit.xPos, unit.yPos, unit);
-            
-            if(unit.movementNonExhausted == true) //if the unit hasn't moved already this turn.
-                drawMovement(unit.movementRange, (int)unit.transform.position.x, (int)unit.transform.position.y, unit);
-        }
-        //if there is a selected unit and you click on a (different) unit
-        else if (getSelectedUnit() != unit && getSelectedUnit() != null) 
-        { 
-            /*foreach (BaseUnit attackableUnit in attackableUnits)
-            {
-                Debug.Log("attackableUnits ID: " + attackableUnit.GetInstanceID());
-            }*/
 
-            //if the clicked unit is in the list of attackableUnits
-            if (attackableUnits.Contains(unit))
+            //if there is no selected unit and the clicked unit isn't exhausted & player controls that unit.
+            else if (getSelectedUnit() == null && unit.getNonExhausted() && unit.getPlayerControl() == gameMaster.getPlayerTurn()) //what if you don't control this unit?
             {
-                unit.hideCrosshairs();
-                unit.takeDamage(getSelectedUnit().baseDamage); //expand, obviously.
-                unit.setHealth(unit.healthCurrent);
-                //selectedUnit.setNonExhausted(false);
-                exhaustSelectedUnit(selectedUnit, true);
+                setSelectedUnit(unit);
+                presentGameActionsAtLocation(unit.xPos, unit.yPos, unit);
+
+                if (unit.movementNonExhausted == true) //if the unit hasn't moved already this turn.
+                    drawMovement(unit.movementRange, (int)unit.transform.position.x, (int)unit.transform.position.y, unit);
             }
+            //if there is a selected unit and you click on a (different) unit
+            else if (getSelectedUnit() != unit && getSelectedUnit() != null)
+            {
+                /*foreach (BaseUnit attackableUnit in attackableUnits)
+                {
+                    Debug.Log("attackableUnits ID: " + attackableUnit.GetInstanceID());
+                }*/
+
+                //if the clicked unit is in the list of attackableUnits
+                if (attackableUnits.Contains(unit))
+                {
+                    unit.hideCrosshairs();
+                    unit.takeDamage(getSelectedUnit().baseDamage); //expand, obviously.
+                    unit.setHealth(unit.healthCurrent);
+                    //selectedUnit.setNonExhausted(false);
+                    exhaustSelectedUnit(selectedUnit, true);
+                }
+            }
+            /*else
+            {
+                print("You've clicked on " + unit.GetInstanceID() + "but no mg action was taken. Potential softlock");
+                Debug.Log("You've clicked on " + unit.GetInstanceID()+ "but no mg action was taken. Potential softlock");
+            }*/
         }
-        /*else
-        {
-            print("You've clicked on " + unit.GetInstanceID() + "but no mg action was taken. Potential softlock");
-            Debug.Log("You've clicked on " + unit.GetInstanceID()+ "but no mg action was taken. Potential softlock");
-        }*/
     }
 
     public void captureStructure(BaseStructure structure)
@@ -297,7 +306,7 @@ public class MasterGrid : MonoBehaviour
             setUnitInGrid(x, y, selectedUnit);
             selectedUnit.movementNonExhausted = false;
             BaseStructure structure = null;
-            if (selectedUnit is BaseUnit) //why is this check here? MG: 24-05-08
+            /*if (selectedUnit is BaseUnit) //why is this check here? MG: 24-05-08
             {
                 presentGameActionsAtLocation(x, y, selectedUnit);
                 //checkEnemiesInRange(selectedUnit.xPos, selectedUnit.yPos, selectedUnit.attackRange);
@@ -312,8 +321,9 @@ public class MasterGrid : MonoBehaviour
                     //selectedUnit.setNonExhausted(false);
                     exhaustSelectedUnit(selectedUnit,true);
                 }
-            }
-            
+            }*/
+            presentGameActionsAtLocation(x, y, selectedUnit);
+
             clearMovement();
             structure = null;
 
@@ -417,11 +427,13 @@ public class MasterGrid : MonoBehaviour
         BaseStructure structure = manageStructureAtLocation(unit.xPos, unit.yPos);
         //if the unit cannot capture the structure it's on then don't add a capture option to the menu.
         //MG 24-06-07: Maybe we want to grey out the capture option instead? Do we want the UI positioning to be consistent regardless of what options are available?
-        if (!structure.isCapturableBy(selectedUnit))
-        {
-            structure=null;
+        if (structure != null && structure.isCapturableBy(unit))
+        { 
+            gameMaster.selectedStructure = structure;
         }
-        gameMaster.showUnitChoicePanel(attackableUnits.Count != 0, structure);
+        gameMaster.showUnitChoicePanel(attackableUnits.Count != 0, structure != null);
+        if (!unit.movementNonExhausted)
+            exhaustSelectedUnit(unit, true);
     }
 
     public BaseStructure manageStructureAtLocation(int x, int y)

@@ -23,8 +23,10 @@ public class GameMaster : MonoBehaviour
     public Transform unitList;
     public GameValuesSO gameValues;
     public BaseUnit infantryUnitPrefab;
-    public Button captureButton;
     public Button attackButton;
+    public Button captureButton;
+    public Button undoButton;
+
     // Start is called before the first frame update
     void Awake()
     {
@@ -145,34 +147,29 @@ public class GameMaster : MonoBehaviour
         playerTurnText.color = color;
     }
 
-    public void showUnitChoicePanel(bool attackableUnitsExists, BaseStructure structure)
+    public void showUnitChoicePanel(bool attackableUnitsBool, bool capturableStructureBool)
     {
         //print(structure);
-        bool capturableStructureExists = (structure != null);
-        if (attackableUnitsExists || capturableStructureExists)
+        if (attackableUnitsBool || capturableStructureBool)
         {
             choicePanel.SetActive(true);
             unitChoicePanel.SetActive(true);
-            if (attackableUnitsExists)
-            {
-                showAttackButton();
-            }
-            if (capturableStructureExists)
-            {
-                showCaptureButton();
-                selectedStructure = structure;
-            }
+
+            //clickableAttackButton(attackableUnitsBool);
+            //clickableCaptureButton(capturableStructureBool);
+            attackButton.interactable = attackableUnitsBool;
+            captureButton.interactable = capturableStructureBool;
         }
     }
 
-    public void showAttackButton()
+/*    public void clickableAttackButton(bool b)
     {
-
+        attackButton.interactable = b;
     }
-    public void showCaptureButton()
+    public void clickableCaptureButton(bool b)
     {
-
-    }
+        captureButton.interactable = b;
+    }*/
 
     public void hideChoicePanel()
     {
