@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class CameraDrag : MonoBehaviour
 {
@@ -16,6 +17,13 @@ public class CameraDrag : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(0))
         {
+            // Check if the pointer is over a UI element
+            if (EventSystem.current.IsPointerOverGameObject())
+            {
+                isMouseDownOnClickableObject = true;
+                return;
+            }
+
             //only flag that you've moused down on a clickableObject if you're not dragging. 
             isMouseDownOnClickableObject = IsPointerOverClickableObject() && isDragging;
             dragOrigin = Input.mousePosition;
@@ -24,6 +32,11 @@ public class CameraDrag : MonoBehaviour
 
         if (Input.GetMouseButton(0))
         {
+            if (isMouseDownOnClickableObject)
+            {
+                return;
+            }
+
             Vector3 currentMousePosition = Input.mousePosition;
             if (!isDragging && Vector3.Distance(dragOrigin, currentMousePosition) > dragThreshold)
             {
