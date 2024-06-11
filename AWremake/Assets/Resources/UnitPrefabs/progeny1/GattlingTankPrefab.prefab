@@ -283,6 +283,7 @@ MonoBehaviour:
   yPos: 0
   movementNonExhausted: 0
   nonExhausted: 0
+  undoingMovement: 0
   sprite: {fileID: 21300000, guid: c67d75e41ea86734987bee3f9b8c6a22, type: 3}
   crosshairSpriteRenderer: {fileID: 1966561738080298895}
   unitSpriteRenderer: {fileID: 4026092526458499412}

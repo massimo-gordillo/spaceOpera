@@ -25,7 +25,7 @@ public class GameMaster : MonoBehaviour
     public BaseUnit infantryUnitPrefab;
     public Button attackButton;
     public Button captureButton;
-    public Button undoButton;
+    public Button undoMovementButton;
 
     // Start is called before the first frame update
     void Awake()
@@ -93,7 +93,14 @@ public class GameMaster : MonoBehaviour
 
     public void attackButtonPressed()
     {
+        //MG 24-06-11 this currently doesn't do anything.
         masterGrid.attackButtonPressed();
+        hideChoicePanel();
+    }
+    
+    public void undoMovementButtonPressed()
+    {
+        masterGrid.undoMovementButtonPressed();
         hideChoicePanel();
     }
 

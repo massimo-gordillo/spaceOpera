@@ -31,6 +31,9 @@ public class BaseUnit : MonoBehaviour
     private Color baseColor;
     public bool movementNonExhausted;
     public bool nonExhausted;
+    public bool undoingMovement = false;
+    public int? oldXPos = null;
+    public int? oldYPos = null;
     public Sprite sprite; //will need to kill this value eventually. Just for data initialization PoC.
     public SpriteRenderer crosshairSpriteRenderer;
     public SpriteRenderer unitSpriteRenderer;

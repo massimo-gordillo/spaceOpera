@@ -2222,7 +2222,7 @@ MonoBehaviour:
   infantryUnitPrefab: {fileID: 7803690413202824681, guid: 983ef1501268ffe41b8514bfa205ddc5, type: 3}
   attackButton: {fileID: 99806018}
   captureButton: {fileID: 1570366192}
-  undoButton: {fileID: 1480146372}
+  undoMovementButton: {fileID: 0}
 --- !u!4 &1024135145
 Transform:
   m_ObjectHideFlags: 0
@@ -2967,7 +2967,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1024135144}
         m_TargetAssemblyTypeName: GameMaster, Assembly-CSharp
-        m_MethodName: 
+        m_MethodName: undoMovementButtonPressed
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

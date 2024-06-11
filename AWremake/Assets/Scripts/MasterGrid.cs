@@ -117,6 +117,13 @@ public class MasterGrid : MonoBehaviour
     {
 
     }
+    
+    public void undoMovementButtonPressed()
+    {
+        selectedUnit.undoingMovement = true;
+        if(selectedUnit.oldXPos != null && selectedUnit.oldYPos != null)
+            moveTarget((int)selectedUnit.oldXPos, (int)selectedUnit.oldYPos);
+    }
 
     //MG 24-04-10: this really needs to be a recursive function. It will create the "wrap around an enemy" behaviour.
     public GameObject moveSquare;
@@ -291,10 +298,10 @@ public class MasterGrid : MonoBehaviour
         if (selectedUnit != null&&whatUnitIsInThisLocation(x,y)==null)
         {
             clearAttackableUnits();
-            int oldx = selectedUnit.xPos;
-            int oldy = selectedUnit.yPos;
+            selectedUnit.oldXPos = selectedUnit.xPos;
+            selectedUnit.oldYPos = selectedUnit.yPos;
             // do we want to try and define this just within the if statement?
-            BaseStructure oldStructure = whatStructureIsInThisLocation(oldx, oldy);
+            BaseStructure oldStructure = whatStructureIsInThisLocation(selectedUnit.xPos, selectedUnit.yPos);
             if (oldStructure != null)
             {
                 oldStructure.turnOnCollider();
@@ -304,7 +311,7 @@ public class MasterGrid : MonoBehaviour
             //removeUnitInGrid((int)selectedUnit.transform.position.x, (int)selectedUnit.transform.position.y);
             removeUnitInGrid(selectedUnit.xPos, selectedUnit.yPos);
             setUnitInGrid(x, y, selectedUnit);
-            selectedUnit.movementNonExhausted = false;
+
             /*if (selectedUnit is BaseUnit) //why is this check here? MG: 24-05-08
             {
                 presentGameActionsAtLocation(x, y, selectedUnit);
@@ -321,7 +328,20 @@ public class MasterGrid : MonoBehaviour
                     exhaustSelectedUnit(selectedUnit,true);
                 }
             }*/
-            presentGameActionsAtLocation(x, y, selectedUnit);
+            if (!selectedUnit.undoingMovement)
+            {
+                selectedUnit.movementNonExhausted = false;
+                presentGameActionsAtLocation(x, y, selectedUnit);
+            }
+            else
+            {
+                selectedUnit.movementNonExhausted = true;
+                selectedUnit.undoingMovement = false;
+                selectedUnit.oldXPos = null;
+                selectedUnit.oldYPos = null;
+                exhaustSelectedUnit(selectedUnit, false);
+            }
+
             clearMovement();
 
         }
