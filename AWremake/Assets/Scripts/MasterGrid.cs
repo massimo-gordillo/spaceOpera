@@ -85,7 +85,7 @@ public class MasterGrid : MonoBehaviour
                 {
                     unit.hideCrosshairs();
                     unit.takeDamage(getSelectedUnit().baseDamage); //expand, obviously.
-                    unit.setHealth(unit.healthCurrent);
+
                     //selectedUnit.setNonExhausted(false);
                     exhaustSelectedUnit(selectedUnit, true);
                 }
@@ -305,7 +305,6 @@ public class MasterGrid : MonoBehaviour
             removeUnitInGrid(selectedUnit.xPos, selectedUnit.yPos);
             setUnitInGrid(x, y, selectedUnit);
             selectedUnit.movementNonExhausted = false;
-            BaseStructure structure = null;
             /*if (selectedUnit is BaseUnit) //why is this check here? MG: 24-05-08
             {
                 presentGameActionsAtLocation(x, y, selectedUnit);
@@ -323,9 +322,7 @@ public class MasterGrid : MonoBehaviour
                 }
             }*/
             presentGameActionsAtLocation(x, y, selectedUnit);
-
             clearMovement();
-            structure = null;
 
         }
     }
@@ -350,6 +347,8 @@ public class MasterGrid : MonoBehaviour
     public void deleteUnit(BaseUnit deadUnit)
     {
         removeUnitInGrid(deadUnit.xPos, deadUnit.yPos);
+        //if not null call the function
+        whatStructureIsInThisLocation(deadUnit.xPos, deadUnit.yPos)?.resetCaptureHealth();
         Destroy(deadUnit.gameObject);
         //Destroy(deadUnit.GetComponent<UnitSprite>());
     }
@@ -432,7 +431,7 @@ public class MasterGrid : MonoBehaviour
             gameMaster.selectedStructure = structure;
         }
         gameMaster.showUnitChoicePanel(attackableUnits.Count != 0, structure != null);
-        if (!unit.movementNonExhausted)
+        if (!unit.movementNonExhausted && attackableUnits.Count == 0 && structure == null)
             exhaustSelectedUnit(unit, true);
     }
 
