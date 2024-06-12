@@ -12,7 +12,8 @@ public class MasterGrid : MonoBehaviour
     //public MasterGrid masterGrid;
     public BaseUnit [,] unitGrid; //2D array
     public BaseStructure[,] structureGrid; //2D array
-    public int[,] mapGrid;
+    public byte[,] terrainGrid;
+    public TerrainCell terrainCell;
     public List<BaseUnit> attackableUnits;
     public List<BaseStructure> spriteOffStructures;
     //public List<BaseStructure> resourceStructures;
@@ -26,10 +27,10 @@ public class MasterGrid : MonoBehaviour
         //gameMaster = GameObject.FindGameObjectWithTag("GameMasterTag").GetComponent<GameMaster>();
         selectedUnit = null;
         unitGrid = new BaseUnit[gridX, gridY]; //initialize 2D array
+        //setTerrain();
         structureGrid = new BaseStructure[gridX, gridY]; //initialize 2D array
         attackableUnits = new List<BaseUnit>();
         spriteOffStructures = new List<BaseStructure>();
-        mapGrid = new int[gridX, gridY];
         //public GameObject masterGrid = GameObject.FindGameObjectWithTag("MasterGridTag").GetComponent<MasterGrid>();
         //transform.position = new Vector2((float)(gridX + 0.5), (float)(gridY + 0.5));
 
@@ -37,6 +38,20 @@ public class MasterGrid : MonoBehaviour
 
         //build map
     }
+
+/*    public void setTerrain()
+    {
+        terrainGrid = new byte[gridX, gridY]; //initialize 2D array
+        for (int i = 0; i < gridX; i++)
+            for (int j = 0; j < gridY; j++)
+                terrainGrid[i, j] = 0;
+
+        for (int i = 0; i < gridX; i++)
+            for (int j = 0; j < gridY; j++)
+                if (terrainGrid[i, j] == 0)
+                    Instantiate(terrainCell, new Vector2(i, j), Quaternion.identity, terrainCells);
+
+    }*/
 
     public void unitHasBeenClicked(BaseUnit unit)
     {
