@@ -6,8 +6,8 @@ public class MasterGrid : MonoBehaviour
 {
     bool drawing = false;
 
-    public int gridX =30;
-    public int gridY =20;
+    public int gridX;
+    public int gridY;
     public BaseUnit selectedUnit;
     //public MasterGrid masterGrid;
     public BaseUnit [,] unitGrid; //2D array
@@ -22,8 +22,10 @@ public class MasterGrid : MonoBehaviour
     public int playerTurn;
 
     // Start is called before the first frame update before all Start().
-    void Awake()
+    public void startup(int x, int y)
     {
+        gridX = x;
+        gridY = y;
         //gameMaster = GameObject.FindGameObjectWithTag("GameMasterTag").GetComponent<GameMaster>();
         selectedUnit = null;
         unitGrid = new BaseUnit[gridX, gridY]; //initialize 2D array

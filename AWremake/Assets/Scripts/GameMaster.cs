@@ -7,9 +7,11 @@ using TMPro;
 public class GameMaster : MonoBehaviour
 {
 
+    public MasterGrid masterGrid;
+    public TilemapManager tilemapManager;
+
     public Canvas canvas;
     public BaseStructure selectedStructure;
-    public MasterGrid masterGrid;
     public GameObject choicePanel;
     public GameObject productionPanel;
     public GameObject unitChoicePanel;
@@ -27,10 +29,19 @@ public class GameMaster : MonoBehaviour
     public Button captureButton;
     public Button undoMovementButton;
 
+    public int gridX = 30;
+    public int gridY = 20;
+
     // Start is called before the first frame update
     void Awake()
     {
         //gameValues = AssetDatabase.LoadAssetAtPath<GameValuesSO>("Assets/Scripts/Assets/Scripts/GameValuesSO.cs.cs");
+
+        //initializes all unit values, modifies their prefab and sprites.
+        gameValues.initialize();
+        //initializes the masterGrid arrays etc with the map size
+        masterGrid.startup(gridX, gridY);
+
         hideChoicePanel();
         playerTurn = 1;
         numPlayers = 2; //will set dynamically later
@@ -41,7 +52,6 @@ public class GameMaster : MonoBehaviour
         playerResources[0] = 0;
         for (int i = 1; i <= numPlayers; i++)
             setPlayerResources(i);
-        print("player turn initated: " + getPlayerTurn());
         startupInstantiateUnits();
     }
 

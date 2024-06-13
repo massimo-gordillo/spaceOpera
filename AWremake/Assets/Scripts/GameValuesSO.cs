@@ -10,7 +10,7 @@ public class GameValuesSO : ScriptableObject
     private string[] unitTypes;
     private PrefabManager prefabManager = new PrefabManager();
 
-    void OnEnable()
+    public void initialize()
     {
         Debug.Log("GameValuesSO OnEnable called.");
         attributesBaseUnits = new List<AttributesBaseUnit>();
