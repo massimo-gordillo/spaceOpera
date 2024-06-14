@@ -2,10 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MovementSquare : MonoBehaviour
+public class MovementSquare : ClickableObject
 {
-    void Start()
+    public MasterGrid mg;
+
+    protected override void Start()
     {
+        base.Start();
         //set opacity
         SpriteRenderer sr = gameObject.GetComponent<SpriteRenderer>();
         Color color = sr.color;
@@ -13,10 +16,10 @@ public class MovementSquare : MonoBehaviour
         sr.sortingLayerID = SortingLayer.NameToID("Drawing");
     }
 
-        void OnMouseDown()
+    public override void HandleClick()
     {
-        MasterGrid mg = GameObject.FindGameObjectWithTag("MasterGridTag").GetComponent<MasterGrid>();
-        print("Movement square moves you to: "+(int)transform.position.x +", "+ (int)transform.position.y);
+        mg = GameObject.FindGameObjectWithTag("MasterGridTag").GetComponent<MasterGrid>();
+        //print("Movement square moves you to: "+(int)transform.position.x +", "+ (int)transform.position.y);
         mg.moveTarget((int)transform.position.x, (int)transform.position.y);
     }
 }

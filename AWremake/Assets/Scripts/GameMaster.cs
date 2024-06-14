@@ -63,7 +63,7 @@ public class GameMaster : MonoBehaviour
         //unit.xPos = 18;
         //unit.yPos = 19;
         //Instantiate(unit, new Vector2(unit.xPos, unit.yPos), Quaternion.identity, unitList);
-        Instantiate(unit, new Vector2(18, 19), Quaternion.identity, unitList);
+        Instantiate(unit, new Vector2(20, 17), Quaternion.identity, unitList);
         //unit.startupPopulateValues(infantryData);
 
         /*
