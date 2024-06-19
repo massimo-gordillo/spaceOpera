@@ -13,7 +13,7 @@ public class MasterGrid : MonoBehaviour
     public BaseUnit [,] unitGrid; //2D array
     public BaseStructure[,] structureGrid; //2D array
     public byte[,] terrainGrid;
-    public TerrainCell terrainCell;
+    //public TerrainCell terrainCell;
     public List<BaseUnit> attackableUnits;
     public List<BaseStructure> spriteOffStructures;
     //public List<BaseStructure> resourceStructures;
@@ -21,15 +21,14 @@ public class MasterGrid : MonoBehaviour
     public GameMaster gameMaster;
     public int playerTurn;
 
-    // Start is called before the first frame update before all Start().
-    public void startup(int x, int y)
+    // Called by GameMaster
+    public void startup(int gridX, int gridY, byte[] tilemapByteArray)
     {
-        gridX = x;
-        gridY = y;
+
         //gameMaster = GameObject.FindGameObjectWithTag("GameMasterTag").GetComponent<GameMaster>();
         selectedUnit = null;
         unitGrid = new BaseUnit[gridX, gridY]; //initialize 2D array
-        //setTerrain();
+        //setTerrain(tilemapByteArray);
         structureGrid = new BaseStructure[gridX, gridY]; //initialize 2D array
         attackableUnits = new List<BaseUnit>();
         spriteOffStructures = new List<BaseStructure>();
@@ -41,19 +40,49 @@ public class MasterGrid : MonoBehaviour
         //build map
     }
 
-/*    public void setTerrain()
+    public void setTerrain(byte[] tilemapByteArray)
     {
-        terrainGrid = new byte[gridX, gridY]; //initialize 2D array
-        for (int i = 0; i < gridX; i++)
-            for (int j = 0; j < gridY; j++)
-                terrainGrid[i, j] = 0;
+        // Check if tilemapByteArray is null
+        if (tilemapByteArray == null)
+        {
+            Debug.LogError("Tilemap byte array is null. Cannot set terrain.");
+            return;
+        }
 
-        for (int i = 0; i < gridX; i++)
-            for (int j = 0; j < gridY; j++)
-                if (terrainGrid[i, j] == 0)
-                    Instantiate(terrainCell, new Vector2(i, j), Quaternion.identity, terrainCells);
+        // Check if terrainGrid dimensions are compatible with tilemapByteArray
+        if (gridX <= 0 || gridY <= 0 || gridX * gridY != tilemapByteArray.Length)
+        {
+            Debug.LogError($"Terrain grid dimensions ({gridX}, {gridY}) are incompatible with tilemap byte array length ({tilemapByteArray.Length}). Cannot set terrain.");
+            return;
+        }
 
-    }*/
+        // Initialize terrainGrid if it hasn't been already
+        if (terrainGrid == null || terrainGrid.GetLength(0) != gridX || terrainGrid.GetLength(1) != gridY)
+        {
+            terrainGrid = new byte[gridX, gridY];
+        }
+
+        // Populate terrainGrid from tilemapByteArray
+        for (int i = 0; i < gridX; i++)
+        {
+            for (int j = 0; j < gridY; j++)
+            {
+                int index = j * gridX + i;
+                if (index < tilemapByteArray.Length)
+                {
+                    terrainGrid[i, j] = tilemapByteArray[index];
+                }
+                else
+                {
+                    Debug.LogWarning($"Index {index} exceeds tilemap byte array length {tilemapByteArray.Length}. Setting default value (0) for terrain grid.");
+                    terrainGrid[i, j] = 0; // or any default value appropriate for your application
+                }
+            }
+        }
+
+        // Optionally, you can log success message or additional information here
+        Debug.Log("Terrain set successfully.");
+    }
 
     public void unitHasBeenClicked(BaseUnit unit)
     {

@@ -39,8 +39,12 @@ public class GameMaster : MonoBehaviour
 
         //initializes all unit values, modifies their prefab and sprites.
         gameValues.initialize();
+
+        //initializes the TilemapManager
+        tilemapManager.initialize();
+
         //initializes the masterGrid arrays etc with the map size
-        masterGrid.startup(gridX, gridY);
+        masterGrid.startup(gridX, gridY, tilemapManager.getTilemapByteArray());
 
         hideChoicePanel();
         playerTurn = 1;
