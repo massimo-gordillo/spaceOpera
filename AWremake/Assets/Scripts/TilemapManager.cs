@@ -35,7 +35,7 @@ public class TilemapManager : MonoBehaviour
         
         gridWidth = 30;
         gridHeight = 20;
-        gridTrimOffset = 1;
+        gridTrimOffset = 4;
         gridWidthWithTrim = gridWidth + gridTrimOffset * 2;
         gridHeightWithTrim = gridHeight + gridTrimOffset * 2;
         // Validate and Initialize the tileAssets list

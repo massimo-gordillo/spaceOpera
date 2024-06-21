@@ -1,19 +1,7 @@
 fileFormatVersion: 2
-guid: dd38b078e338ba7468ebb81f7f6f6256
+guid: c99948f5925e3a244bfd4639f148a104
 TextureImporter:
-  internalIDToNameTable:
-  - first:
-      213: -8087216778062963789
-    second: basicTilemap_0
-  - first:
-      213: -7227268298010434755
-    second: basicTilemap_1
-  - first:
-      213: 8817217888186722999
-    second: basicTilemap_2
-  - first:
-      213: 2913614538932693545
-    second: basicTilemap_3
+  internalIDToNameTable: []
   externalObjects: {}
   serializedVersion: 11
   mipmaps:
@@ -93,7 +81,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 0
+    textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -101,11 +89,11 @@ TextureImporter:
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
-    buildTarget: WebGL
+    buildTarget: Server
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 0
+    textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -116,7 +104,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: basicTilemap_0
+      name: basicTilemap v1_0
       rect:
         serializedVersion: 2
         x: 0
@@ -130,14 +118,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 3bb5af1303f64cf80800000000000000
-      internalID: -8087216778062963789
+      spriteID: 66d668f16c9a4df48aec2f8e1cc4a24c
+      internalID: -1851160799
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: basicTilemap_1
+      name: basicTilemap v1_1
       rect:
         serializedVersion: 2
         x: 16
@@ -151,14 +139,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: d3365a056c593bb90800000000000000
-      internalID: -7227268298010434755
+      spriteID: 69fd69eac2c3ffd48b4c215b66eb307f
+      internalID: 2118057324
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: basicTilemap_2
+      name: basicTilemap v1_2
       rect:
         serializedVersion: 2
         x: 0
@@ -172,14 +160,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 7bae69424fc0d5a70800000000000000
-      internalID: 8817217888186722999
+      spriteID: 252cdba037ea05a47810d0790f945093
+      internalID: 1530070122
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: basicTilemap_3
+      name: basicTilemap v1_3
       rect:
         serializedVersion: 2
         x: 16
@@ -193,8 +181,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 92a2f757cfc3f6820800000000000000
-      internalID: 2913614538932693545
+      spriteID: 004d97fb734b374409ecb4048776d8f1
+      internalID: -1088272921
       vertices: []
       indices: 
       edges: []
@@ -210,10 +198,10 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      basicTilemap_0: -8087216778062963789
-      basicTilemap_1: -7227268298010434755
-      basicTilemap_3: 2913614538932693545
-      basicTilemap_2: 8817217888186722999
+      basicTilemap v1_0: -1851160799
+      basicTilemap v1_3: -1088272921
+      basicTilemap v1_2: 1530070122
+      basicTilemap v1_1: 2118057324
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0
