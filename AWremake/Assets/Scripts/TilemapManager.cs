@@ -8,10 +8,6 @@ using MessagePack;
 public class TilemapManager : MonoBehaviour
 {
     public Tilemap tilemap; // Reference to the Tilemap component
-    public TileBase grassTile; // Reference to the Grass Tile asset
-    public TileBase waterTile; // Reference to the Water Tile asset
-    public TileBase hillTile; // Reference to the Sand Tile asset
-    public TileBase forestTile; // Reference to the Sand Tile asset
 
     public List<TileBase> tileAssets; // List of available Tile assets
     //private Dictionary<string, TileBase> tileDictionary; // Map tile types to Tile assets
@@ -22,7 +18,6 @@ public class TilemapManager : MonoBehaviour
 
     //trim tile to surround the map with.
     public TileBase baseEdgeTile;
-
 
     public int gridWidth;
     public int gridHeight;
@@ -35,9 +30,13 @@ public class TilemapManager : MonoBehaviour
         
         gridWidth = 30;
         gridHeight = 20;
-        gridTrimOffset = 4;
+        gridTrimOffset = 5;
         gridWidthWithTrim = gridWidth + gridTrimOffset * 2;
         gridHeightWithTrim = gridHeight + gridTrimOffset * 2;
+        //load all tile Assets in location specified.
+        foreach (TileBase t in Resources.LoadAll<TileBase>("Tilemap/Tiles/Tilemapv2"))
+            tileAssets.Add(t);
+
         // Validate and Initialize the tileAssets list
         if (tileAssets == null || tileAssets.Count == 0)
         {
@@ -77,7 +76,7 @@ public class TilemapManager : MonoBehaviour
         tileToByteDictionary = new Dictionary<TileBase, byte>();
 
         //set the trim tile
-        baseEdgeTile = tileAssets[0];
+        //baseEdgeTile = tileAssets[0];
 
         for (byte i = 0; i < tileAssets.Count; i++)
         {
@@ -130,6 +129,7 @@ public class TilemapManager : MonoBehaviour
                 if (y < 0 || y >= height || x < 0 || x >= width)
                 {
                     Vector3Int pos = new Vector3Int(x, y, 0);
+
                     tilemap.SetTile(pos, baseEdgeTile);
                 }
                 else

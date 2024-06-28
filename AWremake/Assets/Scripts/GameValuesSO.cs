@@ -6,6 +6,7 @@ using UnityEngine;
 public class GameValuesSO : ScriptableObject
 {
     private List<AttributesBaseUnit> attributesBaseUnits;
+    private List<AttributesTiles> attributesTiles;
     private string[] progenyNames;
     private string[] unitTypes;
     private PrefabManager prefabManager = new PrefabManager();
