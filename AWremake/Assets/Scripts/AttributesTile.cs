@@ -4,9 +4,10 @@ using UnityEngine;
 
 public class AttributesTile
 {
-    byte byteValue;
-    int defenceValue;
-    int movementCost;
-    bool canInfantyTraverse;
-    bool canVehicleTraverse;
+    public string tileName { get; set; }
+    public byte byteValue { get; set; }
+    public int defenceValue { get; set; }
+    public int movementCost { get; set; }
+    public bool canInfantyTraverse { get; set; }
+    public bool canVehicleTraverse { get; set; }
 }

@@ -41,7 +41,7 @@ public class GameMaster : MonoBehaviour
         gameValues.initialize();
 
         //initializes the TilemapManager
-        tilemapManager.initialize();
+        tilemapManager.initialize(gameValues.getAttributesTiles());
 
         //initializes the masterGrid arrays etc with the map size
         masterGrid.startup(gridX, gridY, tilemapManager.getTilemapByteArray());

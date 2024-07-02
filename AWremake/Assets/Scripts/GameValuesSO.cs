@@ -9,7 +9,7 @@ using System;
 public class GameValuesSO : ScriptableObject
 {
     private List<AttributesBaseUnit> attributesBaseUnits;
-    private List<AttributesTile> attributesTile;
+    private List<AttributesTile> attributesTiles;
     private string[] progenyNames;
     private string[] unitTypes;
     private PrefabManager prefabManager = new PrefabManager();
@@ -18,6 +18,7 @@ public class GameValuesSO : ScriptableObject
     {
         Debug.Log("GameValuesSO OnEnable called.");
         attributesBaseUnits = new List<AttributesBaseUnit>();
+        attributesTiles = new List<AttributesTile>();
 
         //need to sync these up with the UnitValues.csv until a better soln is implemented.
         progenyNames = new string[3];
@@ -56,7 +57,7 @@ public class GameValuesSO : ScriptableObject
 
         if (lines.Length <= 1)
         {
-            Debug.LogError("CSV file is empty or only contains headers.");
+            Debug.LogError("CSV file (units) is empty or only contains headers.");
             return;
         }
 
@@ -90,6 +91,70 @@ public class GameValuesSO : ScriptableObject
         }
     }
 
+    public void LoadTilesFromCSV(string filePath)
+    {
+        string[] lines = File.ReadAllLines(filePath);
+
+        if (lines.Length <= 1)
+        {
+            Debug.LogError("CSV file (tiles) is empty or only contains headers.");
+            return;
+        }
+
+        // Read headers
+        string[] headers = lines[0].Split(',');
+
+        for (int i = 1; i < lines.Length; i++) // Skip header line
+        {
+            string[] values = lines[i].Split(',');
+            AttributesTile tileAttribute = new AttributesTile();
+
+            for (int j = 0; j < headers.Length; j++)
+            {
+                string header = headers[j];
+                string value = values[j];
+
+                PropertyInfo property = typeof(AttributesTile).GetProperty(header, BindingFlags.Public | BindingFlags.Instance);
+                if (property != null && property.CanWrite)
+                {
+                    try
+                    {
+                        object convertedValue;
+
+                        // Custom conversion for byte type
+                        if (property.PropertyType == typeof(byte))
+                        {
+                            convertedValue = Convert.ToByte(value);
+                        }
+                        else
+                        {
+                            convertedValue = Convert.ChangeType(value, Nullable.GetUnderlyingType(property.PropertyType) ?? property.PropertyType);
+                        }
+
+                        property.SetValue(tileAttribute, convertedValue, null);
+
+                        //Debug.Log($"Set {header} to {convertedValue} for tile.");
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.LogError($"Error converting value '{value}' for property '{header}': {ex.Message}");
+                    }
+                }
+                else
+                {
+                    Debug.LogWarning($"No property named '{header}' found in AttributesTile.");
+                }
+            }
+
+            // Debugging the byteValue
+            Debug.Log($"AttributesTile has a byte value of: {tileAttribute.byteValue}");
+
+            attributesTiles.Add(tileAttribute);
+        }
+    }
+
+    
+
     //odd bug, this function calls a unit in the list with an empty name. May be worth investigating should I call on this function in future.
     public AttributesBaseUnit GetUnitDataByTitle(string unitName)
     {
@@ -118,6 +183,11 @@ public class GameValuesSO : ScriptableObject
     public List<AttributesBaseUnit> getAttributesBaseUnits()
     {
         return attributesBaseUnits;
+    }    
+    
+    public List<AttributesTile> getAttributesTiles()
+    {
+        return attributesTiles;
     }
 
     //debugging function
