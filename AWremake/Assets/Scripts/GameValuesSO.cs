@@ -145,10 +145,6 @@ public class GameValuesSO : ScriptableObject
                     Debug.LogWarning($"No property named '{header}' found in AttributesTile.");
                 }
             }
-
-            // Debugging the byteValue
-            Debug.Log($"AttributesTile has a byte value of: {tileAttribute.byteValue}");
-
             attributesTiles.Add(tileAttribute);
         }
     }

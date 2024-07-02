@@ -14,7 +14,7 @@ public class TilemapManager : MonoBehaviour
     public List<TileBase> tileAssets; // List of available Tile assets
     private Dictionary<byte, AttributesTile> byteToAttributesTileDictionary; // Map byte values to AttributeTiles (tile rules)
     private Dictionary<byte, List<TileBase>> byteToTilesListDictionary; //Map byte values to a list of Tiles that have that bytevalue.
-    private Dictionary<TileBase, byte> tileToByteDictionary; // Map Tile assets to byte values (MG:24-07-02 
+    private Dictionary<TileBase, byte> tileToByteDictionary; // Map Tile assets to byte values
 
     public byte[] tilemapByteArray;
 
@@ -106,8 +106,16 @@ public class TilemapManager : MonoBehaviour
                     }
                     byteToTilesListDictionary[byteNumber].Add(tile);
 
-                    Debug.Log($"Loaded tile {tile.name} from folder {byteNumber}");
+                    //Debug.Log($"Loaded tile {tile.name} from folder {byteNumber}");
                 }
+
+
+/*                if (tileToByteDictionary == null || tileToByteDictionary.Count == 0)
+                {
+                    Debug.Log("tileToByteDictionary is empty or null.");
+                }*/
+
+
             }
         }
 
@@ -138,6 +146,17 @@ public class TilemapManager : MonoBehaviour
             {
                 Vector3Int pos = new Vector3Int(x, y, 0);
                 TileBase tile = tilemap.GetTile(pos); //this is a built in tilemap function
+                foreach (var kvp in tileToByteDictionary)
+                {
+                    TileBase t = kvp.Key;
+                    byte b = kvp.Value;
+                    Debug.Log($"HELLO WORLD ITS ME I WAS WONDERING IF YOU Loaded tile {t} from tileToByteDictionary with bytevalue {b}");
+                    Debug.Log($"tile t has type: {t.GetType()}, tile from TileMap has type {tile.GetType()}");
+
+                    if (tile == t)
+                        Debug.Log("They're the same picture");
+                }
+                Debug.Log($"What is tile: {tile} and am I getting anything out of the dictionary: { tileToByteDictionary.TryGetValue(tile, out byte tileByteTest)}");
                 if (tile != null && tileToByteDictionary.TryGetValue(tile, out byte tileByte))
                 {
                     tilemapByteArray[y * width + x] = tileByte;
