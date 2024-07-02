@@ -1,0 +1,12 @@
+tileName,byteValue,defenceValue,movementCost,canInfantyTraverse,canVehicleTraverse
+Plains,,1,0,TRUE,TRUE
+Forest,,2,0,TRUE,FALSE
+Water,,0,0,FALSE,FALSE
+Beach,,0,1,TRUE,TRUE
+Reef,,1,0,TRUE,FALSE
+SmallMountain,,3,0,TRUE,FALSE
+Mountain,,4,1,TRUE,FALSE
+Swamp,,1,1,TRUE,TRUE
+Road,,0,0,TRUE,TRUE
+Structure,,4,0,TRUE,TRUE
+Resource,,2,0,TRUE,TRUE

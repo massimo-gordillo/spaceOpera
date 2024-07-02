@@ -421,8 +421,8 @@ MonoBehaviour:
   healthCurrent: 0
   type: 0
   baseDamage: 50
-  damageType: light
-  weaponType: projectile
+  damageType: projectile
+  weaponType: light
   attackRange: 1
   price: 105
   movementRange: 4

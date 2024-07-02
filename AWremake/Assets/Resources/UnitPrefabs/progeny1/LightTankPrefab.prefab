@@ -47,7 +47,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ddd300f7034367e458d91576dc576f5a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  unitName: Light Tank
+  unitName: LightTank
   unitType: land
   isResourceUnit: 0
   progeny: ertrian
@@ -56,8 +56,8 @@ MonoBehaviour:
   healthCurrent: 0
   type: 0
   baseDamage: 300
-  damageType: heavy
-  weaponType: projectile
+  damageType: projectile
+  weaponType: heavy
   attackRange: 1
   price: 700
   movementRange: 7

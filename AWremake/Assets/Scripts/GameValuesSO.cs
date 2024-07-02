@@ -19,11 +19,14 @@ public class GameValuesSO : ScriptableObject
         Debug.Log("GameValuesSO OnEnable called.");
         attributesBaseUnits = new List<AttributesBaseUnit>();
 
-        LoadUnitsFromCSV("Assets/StreamingAssets");
-/*        progenyNames = new string[3];
+        LoadUnitsFromCSV("Assets/StreamingAssets/SpaceOperaUnitValues - UnitValues.csv");
+
+        //need to sync these up with the UnitValues.csv until a better soln is implemented.
+        progenyNames = new string[3];
         progenyNames[0] = "ertrian";
         progenyNames[1] = "virix";
         progenyNames[2] = "sentus";
+        /*
         unitTypes = new string[3];
         unitTypes[0] = "land";
         unitTypes[1] = "air";
@@ -32,16 +35,16 @@ public class GameValuesSO : ScriptableObject
         populateGameValuesGattlingTank();
         populateGameValuesLightTank();*/
 
-/*      populateGameValuesPlainsTile();
-        populateGameValuesForestTile();
-        populateGameValuesWaterTile();
-        populateGameValuesReefTile();
-        populateGameValuesSmallMountainTile();
-        populateGameValuesMountainTile();
-        populateGameValuesSwampTile();
-        populateGameValuesRoadTile();
-        populateGameValuesStructureTile();
-        populateGameValuesResourceTile();*/
+        /*      populateGameValuesPlainsTile();
+                populateGameValuesForestTile();
+                populateGameValuesWaterTile();
+                populateGameValuesReefTile();
+                populateGameValuesSmallMountainTile();
+                populateGameValuesMountainTile();
+                populateGameValuesSwampTile();
+                populateGameValuesRoadTile();
+                populateGameValuesStructureTile();
+                populateGameValuesResourceTile();*/
     }
 
     public void LoadUnitsFromCSV(string filePath)
@@ -162,7 +165,7 @@ public class GameValuesSO : ScriptableObject
         prefabManager.modifyPrefab(unit.prefabPath, unit);
     }
 
-    private void populateGameValuesInfantry()
+    /*private void populateGameValuesInfantry()
     {
         string hardcodedUnitName = "Infantry";
         string hardcodedProgeny = progenyNames[0];
@@ -229,7 +232,7 @@ public class GameValuesSO : ScriptableObject
             movementRange = 7
         };
         finalizePopulateGameValues(lightTankM);
-    }
+    }*/
 
 
 

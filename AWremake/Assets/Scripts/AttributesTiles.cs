@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class AttributesTiles
 {
-    byte bitValue;
+    byte byteValue;
     int defenceValue;
     int movementCost;
     bool canInfantyTraverse;
