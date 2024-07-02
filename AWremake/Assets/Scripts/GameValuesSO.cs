@@ -1,6 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.IO;
+using System.Reflection;
+using System;
 
 [CreateAssetMenu(fileName = "UnitData", menuName = "ScriptableObjects/UnitData", order = 1)]
 public class GameValuesSO : ScriptableObject
@@ -15,7 +18,9 @@ public class GameValuesSO : ScriptableObject
     {
         Debug.Log("GameValuesSO OnEnable called.");
         attributesBaseUnits = new List<AttributesBaseUnit>();
-        progenyNames = new string[3];
+
+        LoadUnitsFromCSV("Assets/StreamingAssets");
+/*        progenyNames = new string[3];
         progenyNames[0] = "ertrian";
         progenyNames[1] = "virix";
         progenyNames[2] = "sentus";
@@ -25,9 +30,9 @@ public class GameValuesSO : ScriptableObject
         unitTypes[2] = "sea";
         populateGameValuesInfantry();
         populateGameValuesGattlingTank();
-        populateGameValuesLightTank();
+        populateGameValuesLightTank();*/
 
-        populateGameValuesPlainsTile();
+/*      populateGameValuesPlainsTile();
         populateGameValuesForestTile();
         populateGameValuesWaterTile();
         populateGameValuesReefTile();
@@ -36,10 +41,50 @@ public class GameValuesSO : ScriptableObject
         populateGameValuesSwampTile();
         populateGameValuesRoadTile();
         populateGameValuesStructureTile();
-        populateGameValuesResourceTile();
+        populateGameValuesResourceTile();*/
     }
 
-    //this function calls a unit in the list with an empty name. May be worth investigating should I call on this function in future.
+    public void LoadUnitsFromCSV(string filePath)
+    {
+        string[] lines = File.ReadAllLines(filePath);
+
+        if (lines.Length <= 1)
+        {
+            Debug.LogError("CSV file is empty or only contains headers.");
+            return;
+        }
+
+        // Read headers
+        string[] headers = lines[0].Split(',');
+
+        for (int i = 1; i < lines.Length; i++) // Skip header line
+        {
+            string[] values = lines[i].Split(',');
+            AttributesBaseUnit unit = new AttributesBaseUnit();
+
+            for (int j = 0; j < headers.Length; j++)
+            {
+                string header = headers[j];
+                string value = values[j];
+
+                PropertyInfo property = typeof(AttributesBaseUnit).GetProperty(header, BindingFlags.Public | BindingFlags.Instance);
+                if (property != null && property.CanWrite)
+                {
+                    object convertedValue = Convert.ChangeType(value, property.PropertyType);
+                    property.SetValue(unit, convertedValue, null);
+                }
+            }
+
+            // Handle sprite loading separately
+            unit.sprite = Resources.Load<Sprite>($"sprites/{unit.unitName.ToLower().Replace(" ", "")}Sprite");
+            unit.prefabPath = getPrefabLocationString(unit.unitName, unit.progeny);
+
+            attributesBaseUnits.Add(unit);
+            prefabManager.modifyPrefab(unit.prefabPath, unit);
+        }
+    }
+
+    //odd bug, this function calls a unit in the list with an empty name. May be worth investigating should I call on this function in future.
     public AttributesBaseUnit GetUnitDataByTitle(string unitName)
     {
         // Iterate through each AttributesBaseUnit in the list
@@ -107,8 +152,11 @@ public class GameValuesSO : ScriptableObject
     private void finalizePopulateGameValues(AttributesBaseUnit unit)
     {
         //requires the sprite in the inspector to be in Resources/Sprites and named aaaaSprite
-        string spritePath = "sprites/" + unit.unitName.ToLower().Replace(" ", "") + "Sprite");
-        unit.sprite = Resources.Load<Sprite>(spritePath);
+
+/*        string spritePath = ("sprites/" + unit.unitName.ToLower().Replace(" ", "") + "Sprite"));
+        unit.sprite = Resources.Load<Sprite>(spritePath);*/
+        unit.sprite = Resources.Load<Sprite>($"sprites/{unit.unitName.ToLower().Replace(" ", "")}Sprite");
+
         unit.prefabPath = getPrefabLocationString(unit.unitName, unit.progeny);
         attributesBaseUnits.Add(unit);
         prefabManager.modifyPrefab(unit.prefabPath, unit);
@@ -183,16 +231,6 @@ public class GameValuesSO : ScriptableObject
         finalizePopulateGameValues(lightTankM);
     }
 
-    populateGameValuesPlainsTile();
-    populateGameValuesForestTile();
-    populateGameValuesWaterTile();
-    populateGameValuesReefTile();
-    populateGameValuesSmallMountainTile();
-    populateGameValuesMountainTile();
-    populateGameValuesSwampTile();
-    populateGameValuesRoadTile();
-    populateGameValuesStructureTile();
-    populateGameValuesResourceTile();
 
 
 

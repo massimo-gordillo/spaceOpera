@@ -3,20 +3,20 @@ using UnityEngine;
 [System.Serializable]
 public class AttributesBaseUnit
 {
-    public string unitName;
-    public string progeny;
-    public bool isResourceUnit;
-    public string unitType;
-    public bool unitIsInfantry;
-    public int healthMax;
-    public string healthType;
-    public string damageType;
-    public string weaponType;
-    public int baseDamage;
-    public int attackRange;
-    public int price;
-    public int movementRange;
-    public Sprite sprite;
-    public string prefabPath; // Path to the prefab
+    public string unitName { get; set; }
+    public string progeny { get; set; }
+    public string unitType { get; set; }
+    public bool unitIsInfantry { get; set; }
+    public bool isResourceUnit { get; set; }
+    public int healthMax { get; set; }
+    public string healthType { get; set; }
+    public string weaponType { get; set; }
+    public string damageType { get; set; }
+    public int baseDamage { get; set; }
+    public int attackRange { get; set; }
+    public int price { get; set; }
+    public int movementRange { get; set; }
+    public Sprite sprite { get; set; }
+    public string prefabPath { get; set; }
 
 }
