@@ -9,7 +9,7 @@ using System;
 public class GameValuesSO : ScriptableObject
 {
     private List<AttributesBaseUnit> attributesBaseUnits;
-    private List<AttributesTiles> attributesTiles;
+    private List<AttributesTile> attributesTile;
     private string[] progenyNames;
     private string[] unitTypes;
     private PrefabManager prefabManager = new PrefabManager();
@@ -19,13 +19,15 @@ public class GameValuesSO : ScriptableObject
         Debug.Log("GameValuesSO OnEnable called.");
         attributesBaseUnits = new List<AttributesBaseUnit>();
 
-        LoadUnitsFromCSV("Assets/StreamingAssets/SpaceOperaUnitValues - UnitValues.csv");
-
         //need to sync these up with the UnitValues.csv until a better soln is implemented.
         progenyNames = new string[3];
         progenyNames[0] = "ertrian";
         progenyNames[1] = "virix";
         progenyNames[2] = "sentus";
+
+        LoadUnitsFromCSV("Assets/StreamingAssets/SpaceOperaUnitValues - UnitValues.csv");
+
+
         /*
         unitTypes = new string[3];
         unitTypes[0] = "land";

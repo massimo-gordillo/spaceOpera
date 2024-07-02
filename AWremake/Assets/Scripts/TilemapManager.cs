@@ -34,8 +34,10 @@ public class TilemapManager : MonoBehaviour
         gridWidthWithTrim = gridWidth + gridTrimOffset * 2;
         gridHeightWithTrim = gridHeight + gridTrimOffset * 2;
 
-        foreach (TileBase t in Resources.LoadAll<TileBase>("Tilemap/Tiles/Tilemapv2"))
-            tileAssets.Add(t);
+        /*foreach (TileBase t in Resources.LoadAll<TileBase>("Tilemap/Tiles/Tilemapv2"))
+            tileAssets.Add(t);*/
+
+        
 
         if (tileAssets == null || tileAssets.Count == 0)
         {
@@ -59,10 +61,43 @@ public class TilemapManager : MonoBehaviour
         //ImportTilemapFromBytes(data, gridWidth, gridHeight);
     }
 
-    private void InitializeTileDictionaries()
+/*    private void InitializeTileDictionaries()
     {
         byteToTileDictionary = new Dictionary<byte, TileBase>();
         tileToByteDictionary = new Dictionary<TileBase, byte>();
+
+        for (byte i = 0; i < tileAssets.Count; i++)
+        {
+            byteToTileDictionary.Add(i, tileAssets[i]);
+            tileToByteDictionary.Add(tileAssets[i], i);
+        }
+    }  */  
+    
+    private void InitializeTileDictionaries()
+    {
+        string basePath = "Tilemap/Tiles/DynamicTilemapTest";
+        string[] directories = Directory.GetDirectories(Path.Combine(Application.dataPath, "Resources", basePath));
+
+        byteToTileDictionary = new Dictionary<byte, TileBase>();
+        tileToByteDictionary = new Dictionary<TileBase, byte>();
+
+        foreach (string dir in directories)
+        {
+            string folderName = Path.GetFileName(dir);
+            if (byte.TryParse(folderName, out byte byteNumber))
+            {
+                string folderPath = $"{basePath}/{folderName}";
+                foreach (TileBase tile in Resources.LoadAll<TileBase>(folderPath))
+                {
+                    tileAssets.Add(tile);
+                    tileToByteDictionary.Add(tile, byteNumber);
+                    Debug.Log($"Loaded tile {tile.name} from folder {byteNumber}");
+                }
+            }
+        }
+
+
+
 
         for (byte i = 0; i < tileAssets.Count; i++)
         {
