@@ -26,6 +26,7 @@ public class GameValuesSO : ScriptableObject
         progenyNames[2] = "sentus";
 
         LoadUnitsFromCSV("Assets/StreamingAssets/SpaceOperaUnitValues - UnitValues.csv");
+        LoadTilesFromCSV("Assets/StreamingAssets/SpaceOperaTileValues - TileValues.csv");
 
 
         /*

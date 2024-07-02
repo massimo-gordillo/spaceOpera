@@ -35,16 +35,13 @@ public class TilemapManager : MonoBehaviour
         gridWidthWithTrim = gridWidth + gridTrimOffset * 2;
         gridHeightWithTrim = gridHeight + gridTrimOffset * 2;
 
-        /*foreach (TileBase t in Resources.LoadAll<TileBase>("Tilemap/Tiles/Tilemapv2"))
-            tileAssets.Add(t);*/
-
         InitializeTileDictionaries();
 
         
-        SaveTilemapToFile("myTilemap.dat");
-        LoadTilemapFromFile("myTilemap.dat");
-        //byte[] data = ExportTilemapToBytes(gridWidth, gridHeight);
-        //ImportTilemapFromBytes(data, gridWidth, gridHeight);
+        //SaveTilemapToFile("myTilemap.dat");
+        //LoadTilemapFromFile("myTilemap.dat");
+        byte[] data = ExportTilemapToBytes(gridWidth, gridHeight);
+        ImportTilemapFromBytes(data, gridWidth, gridHeight);
     }
 
 /*    private void InitializeTileDictionaries()
@@ -110,7 +107,7 @@ public class TilemapManager : MonoBehaviour
 
     public byte[] ExportTilemapToBytes(int width, int height)
     {
-        byte[] data = new byte[width * height];
+        byte[] tilemapByteArray = new byte[width * height];
         BoundsInt bounds = tilemap.cellBounds;
 
         for (int y = 0; y < height; y++)
@@ -118,19 +115,19 @@ public class TilemapManager : MonoBehaviour
             for (int x = 0; x < width; x++)
             {
                 Vector3Int pos = new Vector3Int(x, y, 0);
-                TileBase tile = tilemap.GetTile(pos);
+                TileBase tile = tilemap.GetTile(pos); //this is a built in tilemap function
                 if (tile != null && tileToByteDictionary.TryGetValue(tile, out byte tileByte))
                 {
-                    data[y * width + x] = tileByte;
+                    tilemapByteArray[y * width + x] = tileByte;
                 }
                 else
                 {
-                    data[y * width + x] = 255; // Use 255 for empty or unrecognized tiles
+                    tilemapByteArray[y * width + x] = 255; // Use 255 for empty or unrecognized tiles
                 }
             }
         }
 
-        return MessagePackSerializer.Serialize(data);
+        return MessagePackSerializer.Serialize(tilemapByteArray);
     }
 
     public void ImportTilemapFromBytes(byte[] serializedData, int width, int height)
@@ -150,7 +147,9 @@ public class TilemapManager : MonoBehaviour
                 else
                 {
                     byte tileByte = tilemapByteArray[y * width + x];
-                    if (tileByte != 255 && getTile(tileByte) is TileBase tile) //MG:24-07-02 this is how you define a var in an if statement
+                    //if (tileByte != 255 && getTile(tileByte, null) is TileBase tile) //MG:24-07-02 this is how you define a var in an if statement
+                    TileBase tile = getTile(tileByte, null);
+                    if (tileByte != 255 && tile != null)
                     {
                         Vector3Int pos = new Vector3Int(x, y, 0);
                         tilemap.SetTile(pos, tile);
@@ -180,6 +179,7 @@ public class TilemapManager : MonoBehaviour
 
             if (index == null)
             {
+                Debug.Log($"Tile {tiles[0]} with byte {b} returned.");
                 if (length == 1)
                     return tiles[0];
                 else
