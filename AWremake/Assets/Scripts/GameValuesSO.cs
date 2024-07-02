@@ -26,6 +26,17 @@ public class GameValuesSO : ScriptableObject
         populateGameValuesInfantry();
         populateGameValuesGattlingTank();
         populateGameValuesLightTank();
+
+        populateGameValuesPlainsTile();
+        populateGameValuesForestTile();
+        populateGameValuesWaterTile();
+        populateGameValuesReefTile();
+        populateGameValuesSmallMountainTile();
+        populateGameValuesMountainTile();
+        populateGameValuesSwampTile();
+        populateGameValuesRoadTile();
+        populateGameValuesStructureTile();
+        populateGameValuesResourceTile();
     }
 
     //this function calls a unit in the list with an empty name. May be worth investigating should I call on this function in future.
@@ -93,6 +104,16 @@ public class GameValuesSO : ScriptableObject
         return prefabPath;
     }
 
+    private void finalizePopulateGameValues(AttributesBaseUnit unit)
+    {
+        //requires the sprite in the inspector to be in Resources/Sprites and named aaaaSprite
+        string spritePath = "sprites/" + unit.unitName.ToLower().Replace(" ", "") + "Sprite");
+        unit.sprite = Resources.Load<Sprite>(spritePath);
+        unit.prefabPath = getPrefabLocationString(unit.unitName, unit.progeny);
+        attributesBaseUnits.Add(unit);
+        prefabManager.modifyPrefab(unit.prefabPath, unit);
+    }
+
     private void populateGameValuesInfantry()
     {
         string hardcodedUnitName = "Infantry";
@@ -102,6 +123,7 @@ public class GameValuesSO : ScriptableObject
             unitName = hardcodedUnitName,
             progeny = hardcodedProgeny,
             unitType = unitTypes[0],
+            unitIsInfantry = true,
             isResourceUnit = true,
             healthMax = 100,
             healthType = "light",
@@ -110,16 +132,10 @@ public class GameValuesSO : ScriptableObject
             baseDamage = 50,
             attackRange = 1,
             price = 105,
-            movementRange = 4,
-            sprite = Resources.Load<Sprite>("sprites/infantrySprite"),
-            //prefabPath = "unitPrefabs/progeny1/Infantry"
-            prefabPath = getPrefabLocationString(hardcodedUnitName, hardcodedProgeny)
+            movementRange = 4
         };
-        attributesBaseUnits.Add(infantryM);
-        prefabManager.modifyPrefab(infantryM.prefabPath, infantryM);
-
+        finalizePopulateGameValues(infantryM);
     }
-
 
     private void populateGameValuesGattlingTank()
     {
@@ -130,6 +146,7 @@ public class GameValuesSO : ScriptableObject
             unitName = hardcodedUnitName,
             progeny = hardcodedProgeny,
             unitType = unitTypes[0],
+            unitIsInfantry = false,
             isResourceUnit = false,
             healthMax = 400,
             healthType = "medium",
@@ -138,14 +155,9 @@ public class GameValuesSO : ScriptableObject
             baseDamage = 100,
             attackRange = 1,
             price = 600,
-            movementRange = 6,
-            sprite = Resources.Load<Sprite>("sprites/gattlingTankSprite"),
-            //prefabPath = "unitPrefabs/progeny1/gattlingTank"
-            prefabPath = getPrefabLocationString(hardcodedUnitName, hardcodedProgeny)
+            movementRange = 6
         };
-        attributesBaseUnits.Add(gattlingTankM);
-        prefabManager.modifyPrefab(gattlingTankM.prefabPath, gattlingTankM);
-
+        finalizePopulateGameValues(gattlingTankM);
     }
 
     private void populateGameValuesLightTank()
@@ -157,6 +169,7 @@ public class GameValuesSO : ScriptableObject
             unitName = hardcodedUnitName,
             progeny = hardcodedProgeny,
             unitType = unitTypes[0],
+            unitIsInfantry = false,
             isResourceUnit = false,
             healthMax = 700,
             healthType = "heavy",
@@ -165,17 +178,21 @@ public class GameValuesSO : ScriptableObject
             baseDamage = 300,
             attackRange = 1,
             price = 700,
-            movementRange = 7,
-            sprite = Resources.Load<Sprite>("sprites/lightTankSprite"),
-            //prefabPath = "unitPrefabs/progeny1/lightTank"
-            prefabPath = getPrefabLocationString(hardcodedUnitName, hardcodedProgeny)
+            movementRange = 7
         };
-        attributesBaseUnits.Add(lightTankM);
-        prefabManager.modifyPrefab(lightTankM.prefabPath, lightTankM);
-
+        finalizePopulateGameValues(lightTankM);
     }
 
-
+    populateGameValuesPlainsTile();
+    populateGameValuesForestTile();
+    populateGameValuesWaterTile();
+    populateGameValuesReefTile();
+    populateGameValuesSmallMountainTile();
+    populateGameValuesMountainTile();
+    populateGameValuesSwampTile();
+    populateGameValuesRoadTile();
+    populateGameValuesStructureTile();
+    populateGameValuesResourceTile();
 
 
 

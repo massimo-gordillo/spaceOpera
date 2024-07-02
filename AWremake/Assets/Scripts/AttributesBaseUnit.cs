@@ -7,6 +7,7 @@ public class AttributesBaseUnit
     public string progeny;
     public bool isResourceUnit;
     public string unitType;
+    public bool unitIsInfantry;
     public int healthMax;
     public string healthType;
     public string damageType;
