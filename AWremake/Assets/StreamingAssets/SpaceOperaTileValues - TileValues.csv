@@ -10,3 +10,4 @@ Swamp,,1,1,TRUE,TRUE
 Road,,0,0,TRUE,TRUE
 Structure,,4,0,TRUE,TRUE
 Resource,,2,0,TRUE,TRUE
+OutOfBounds,0,0,0,FALSE,FALSE
