@@ -22,13 +22,13 @@ public class MasterGrid : MonoBehaviour
     public int playerTurn;
 
     // Called by GameMaster
-    public void startup(int gridX, int gridY, byte[] tilemapByteArray)
+    public void startup(int gridX, int gridY, byte[] tilemapByteArray, Dictionary<byte, AttributesTile> byteToAttributesTileDictionary)
     {
 
         //gameMaster = GameObject.FindGameObjectWithTag("GameMasterTag").GetComponent<GameMaster>();
         selectedUnit = null;
         unitGrid = new BaseUnit[gridX, gridY]; //initialize 2D array
-        //setTerrain(tilemapByteArray);
+        setTerrain(tilemapByteArray);
         structureGrid = new BaseStructure[gridX, gridY]; //initialize 2D array
         attackableUnits = new List<BaseUnit>();
         spriteOffStructures = new List<BaseStructure>();
@@ -74,8 +74,8 @@ public class MasterGrid : MonoBehaviour
                 }
                 else
                 {
-                    Debug.LogWarning($"Index {index} exceeds tilemap byte array length {tilemapByteArray.Length}. Setting default value (0) for terrain grid.");
-                    terrainGrid[i, j] = 0; // or any default value appropriate for your application
+                    Debug.LogWarning($"Index {index} exceeds tilemap byte array length {tilemapByteArray.Length}. Setting default value (255) for terrain grid.");
+                    terrainGrid[i, j] = 255;
                 }
             }
         }

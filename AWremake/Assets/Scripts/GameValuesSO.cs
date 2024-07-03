@@ -9,16 +9,17 @@ using System;
 public class GameValuesSO : ScriptableObject
 {
     private List<AttributesBaseUnit> attributesBaseUnits;
-    private List<AttributesTile> attributesTiles;
+    //private List<AttributesTile> attributesTiles;
     private string[] progenyNames;
     private string[] unitTypes;
     private PrefabManager prefabManager = new PrefabManager();
+    private Dictionary<byte, AttributesTile> byteToAttributesTileDictionary; // Map byte values to AttributeTiles (tile rules)
 
     public void initialize()
     {
         Debug.Log("GameValuesSO OnEnable called.");
         attributesBaseUnits = new List<AttributesBaseUnit>();
-        attributesTiles = new List<AttributesTile>();
+        //attributesTiles = new List<AttributesTile>();
 
         //need to sync these up with the UnitValues.csv until a better soln is implemented.
         progenyNames = new string[3];
@@ -93,6 +94,7 @@ public class GameValuesSO : ScriptableObject
 
     public void LoadTilesFromCSV(string filePath)
     {
+        byteToAttributesTileDictionary = new Dictionary<byte, AttributesTile>();
         string[] lines = File.ReadAllLines(filePath);
 
         if (lines.Length <= 1)
@@ -107,7 +109,7 @@ public class GameValuesSO : ScriptableObject
         for (int i = 1; i < lines.Length; i++) // Skip header line
         {
             string[] values = lines[i].Split(',');
-            AttributesTile tileAttribute = new AttributesTile();
+            AttributesTile attributesTile = new AttributesTile();
 
             for (int j = 0; j < headers.Length; j++)
             {
@@ -131,7 +133,7 @@ public class GameValuesSO : ScriptableObject
                             convertedValue = Convert.ChangeType(value, Nullable.GetUnderlyingType(property.PropertyType) ?? property.PropertyType);
                         }
 
-                        property.SetValue(tileAttribute, convertedValue, null);
+                        property.SetValue(attributesTile, convertedValue, null);
 
                         //Debug.Log($"Set {header} to {convertedValue} for tile.");
                     }
@@ -145,7 +147,12 @@ public class GameValuesSO : ScriptableObject
                     Debug.LogWarning($"No property named '{header}' found in AttributesTile.");
                 }
             }
-            attributesTiles.Add(tileAttribute);
+            if (byteToAttributesTileDictionary.ContainsKey(attributesTile.byteValue))
+                Debug.LogWarning($"Skipping tile with byteValue {attributesTile.byteValue} as it already exists in the dictionary.");
+            else if (attributesTile.byteValue < 0 || attributesTile.byteValue > 255)
+                Debug.LogError($"Invalid byteValue {attributesTile.byteValue} for AttributesTile. Must be between 0 and 255.");
+            else
+                byteToAttributesTileDictionary.Add(attributesTile.byteValue, attributesTile);
         }
     }
 
@@ -181,9 +188,9 @@ public class GameValuesSO : ScriptableObject
         return attributesBaseUnits;
     }    
     
-    public List<AttributesTile> getAttributesTiles()
+    public Dictionary<byte, AttributesTile> getAttributesTilesDictionary()
     {
-        return attributesTiles;
+        return byteToAttributesTileDictionary;
     }
 
     //debugging function

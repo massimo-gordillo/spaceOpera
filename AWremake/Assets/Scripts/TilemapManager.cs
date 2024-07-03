@@ -9,12 +9,12 @@ public class TilemapManager : MonoBehaviour
 {
     public Tilemap tilemap; // Reference to the Tilemap component
 
-    private List<AttributesTile> attributesTiles; 
+    //private List<AttributesTile> attributesTiles; 
 
     public List<TileBase> tileAssets; // List of available Tile assets
-    private Dictionary<byte, AttributesTile> byteToAttributesTileDictionary; // Map byte values to AttributeTiles (tile rules)
+    //private Dictionary<byte, AttributesTile> byteToAttributesTileDictionary; // Map byte values to AttributeTiles (tile rules)
     private Dictionary<byte, List<TileBase>> byteToTilesListDictionary; //Map byte values to a list of Tiles that have that bytevalue.
-    private Dictionary<String, byte> tileNameToByteDictionary; // Map Tile assets to byte values
+    private Dictionary<String, byte> tileNameToByteDictionary; // Map Tile asset names to byte values, required to compare Tiles set in the Tilemap vs pairing of tiles to bytes
 
     public byte[] tilemapByteArray;
 
@@ -27,9 +27,9 @@ public class TilemapManager : MonoBehaviour
     public int gridHeightWithTrim;
 
     //receives a list of all the attributesTile each of which contain the rules for each tile type (defined as a byte)
-    public void initialize(List<AttributesTile> inputAttributesTiles)
+    public void initialize()
     {
-        attributesTiles = inputAttributesTiles;
+        //byteToAttributesTileDictionary = inputAttributesTilesDictionary;
         // Log the tilemap reference
         Debug.Log($"Initializing TilemapManager with tilemap: {tilemap.name}");
 
@@ -66,27 +66,8 @@ public class TilemapManager : MonoBehaviour
         //get all the directories at the basePath. You will find a series of folders with a single byte at the name of the folder.
         string[] directories = Directory.GetDirectories(Path.Combine(Application.dataPath, "Resources", basePath));
 
-        byteToAttributesTileDictionary = new Dictionary<byte, AttributesTile>();
         byteToTilesListDictionary = new Dictionary<byte, List<TileBase>>();
         tileNameToByteDictionary = new Dictionary<String, byte>();
-
-        foreach (AttributesTile a in attributesTiles)
-        {
-            // Check if the tile already exists in the dictionary
-            if (byteToAttributesTileDictionary.ContainsKey(a.byteValue))
-            {
-                Debug.LogWarning($"Skipping tile with byteValue {a.byteValue} as it already exists in the dictionary.");
-                continue; // Skip adding this tile
-            }
-            // Check if the byteValue is within a valid range (0-255 for example)
-            if (a.byteValue < 0 || a.byteValue > 255)
-            {
-                Debug.LogError($"Invalid byteValue {a.byteValue} for AttributesTile. Must be between 0 and 255.");
-                continue; // Skip adding this tile
-            }
-
-            byteToAttributesTileDictionary.Add(a.byteValue, a);
-        }
 
         foreach (string dir in directories)
         {
@@ -222,7 +203,6 @@ public class TilemapManager : MonoBehaviour
 
             if (index == null)
             {
-                Debug.Log($"Tile {tiles[0]} with byte {b} returned.");
                 if (length == 1)
                     return tiles[0];
                 else

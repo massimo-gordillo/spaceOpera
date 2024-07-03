@@ -41,10 +41,10 @@ public class GameMaster : MonoBehaviour
         gameValues.initialize();
 
         //initializes the TilemapManager
-        tilemapManager.initialize(gameValues.getAttributesTiles());
+        tilemapManager.initialize();
 
         //initializes the masterGrid arrays etc with the map size
-        masterGrid.startup(gridX, gridY, tilemapManager.getTilemapByteArray());
+        masterGrid.startup(gridX, gridY, tilemapManager.getTilemapByteArray(), gameValues.getAttributesTilesDictionary());
 
         hideChoicePanel();
         playerTurn = 1;
