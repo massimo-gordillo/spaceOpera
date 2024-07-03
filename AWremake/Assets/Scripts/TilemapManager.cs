@@ -14,7 +14,7 @@ public class TilemapManager : MonoBehaviour
     public List<TileBase> tileAssets; // List of available Tile assets
     private Dictionary<byte, AttributesTile> byteToAttributesTileDictionary; // Map byte values to AttributeTiles (tile rules)
     private Dictionary<byte, List<TileBase>> byteToTilesListDictionary; //Map byte values to a list of Tiles that have that bytevalue.
-    private Dictionary<TileBase, byte> tileToByteDictionary; // Map Tile assets to byte values
+    private Dictionary<String, byte> tileNameToByteDictionary; // Map Tile assets to byte values
 
     public byte[] tilemapByteArray;
 
@@ -51,12 +51,12 @@ public class TilemapManager : MonoBehaviour
 /*    private void InitializeTileDictionaries()
     {
         byteToTileDictionary = new Dictionary<byte, TileBase>();
-        tileToByteDictionary = new Dictionary<TileBase, byte>();
+        tileNameToByteDictionary = new Dictionary<TileBase, byte>();
 
         for (byte i = 0; i < tileAssets.Count; i++)
         {
             byteToTileDictionary.Add(i, tileAssets[i]);
-            tileToByteDictionary.Add(tileAssets[i], i);
+            tileNameToByteDictionary.Add(tileAssets[i], i);
         }
     }  */  
     
@@ -68,7 +68,7 @@ public class TilemapManager : MonoBehaviour
 
         byteToAttributesTileDictionary = new Dictionary<byte, AttributesTile>();
         byteToTilesListDictionary = new Dictionary<byte, List<TileBase>>();
-        tileToByteDictionary = new Dictionary<TileBase, byte>();
+        tileNameToByteDictionary = new Dictionary<String, byte>();
 
         foreach (AttributesTile a in attributesTiles)
         {
@@ -99,20 +99,21 @@ public class TilemapManager : MonoBehaviour
                 foreach (TileBase tile in Resources.LoadAll<TileBase>(folderPath)) 
                 {
                     tileAssets.Add(tile);
-                    tileToByteDictionary.Add(tile, byteNumber);
+                    tileNameToByteDictionary.Add(tile.name, byteNumber);
+                    //Debug.Log($"Inserted tile {tile} with name {tile.name} and gameID {tile.GetInstanceID()} to bytenum {byteNumber}");
                     if (!byteToTilesListDictionary.ContainsKey(byteNumber))
                     {
                         byteToTilesListDictionary[byteNumber] = new List<TileBase>();
                     }
                     byteToTilesListDictionary[byteNumber].Add(tile);
 
-                    //Debug.Log($"Loaded tile {tile.name} from folder {byteNumber}");
+                    
                 }
 
 
-/*                if (tileToByteDictionary == null || tileToByteDictionary.Count == 0)
+/*                if (tileNameToByteDictionary == null || tileNameToByteDictionary.Count == 0)
                 {
-                    Debug.Log("tileToByteDictionary is empty or null.");
+                    Debug.Log("tileNameToByteDictionary is empty or null.");
                 }*/
 
 
@@ -146,18 +147,19 @@ public class TilemapManager : MonoBehaviour
             {
                 Vector3Int pos = new Vector3Int(x, y, 0);
                 TileBase tile = tilemap.GetTile(pos); //this is a built in tilemap function
-                foreach (var kvp in tileToByteDictionary)
+                /*foreach (var kvp in tileNameToByteDictionary)
                 {
                     TileBase t = kvp.Key;
                     byte b = kvp.Value;
-                    Debug.Log($"HELLO WORLD ITS ME I WAS WONDERING IF YOU Loaded tile {t} from tileToByteDictionary with bytevalue {b}");
+                    Debug.Log($"HELLO WORLD ITS ME I WAS WONDERING IF YOU Loaded tile {t} from tileNameToByteDictionary with bytevalue {b}");
                     Debug.Log($"tile t has type: {t.GetType()}, tile from TileMap has type {tile.GetType()}");
 
                     if (tile == t)
                         Debug.Log("They're the same picture");
-                }
-                Debug.Log($"What is tile: {tile} and am I getting anything out of the dictionary: { tileToByteDictionary.TryGetValue(tile, out byte tileByteTest)}");
-                if (tile != null && tileToByteDictionary.TryGetValue(tile, out byte tileByte))
+                }*/
+                //Debug.Log($"What is tile: {tile} and am I getting anything out of the dictionary: { tileNameToByteDictionary.TryGetValue(tile, out byte tileByteTest)}");
+                //Debug.Log($"What is tile: {tile} with name {tile.name} and gameID {tile.GetInstanceID()}");
+                if (tile != null && tileNameToByteDictionary.TryGetValue(tile.name, out byte tileByte))
                 {
                     tilemapByteArray[y * width + x] = tileByte;
                 }
