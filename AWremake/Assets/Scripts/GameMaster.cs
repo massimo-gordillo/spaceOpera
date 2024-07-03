@@ -67,6 +67,7 @@ public class GameMaster : MonoBehaviour
         //unit.xPos = 18;
         //unit.yPos = 19;
         //Instantiate(unit, new Vector2(unit.xPos, unit.yPos), Quaternion.identity, unitList);
+        Debug.Log($"UnitPrefab {unit} says its isInfantry value is {unit.isInfantry}");
         Instantiate(unit, new Vector2(20, 17), Quaternion.identity, unitList);
         //unit.startupPopulateValues(infantryData);
 

@@ -39,7 +39,7 @@ public class AttributesBaseUnit
     public string unitName { get; set; }
     public Progeny progeny { get; set; } //Ertiran, Virix, Sentus
     public UnitType unitType { get; set; } //land, sea, air
-    public bool unitIsInfantry { get; set; }
+    public bool isInfantry { get; set; }
     public bool isResourceUnit { get; set; }
     public int healthMax { get; set; }
     public HealthType healthType { get; set; } //light, medium, heavy

@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Reflection;
 
 public class PrefabManager
 {
@@ -18,6 +19,76 @@ public class PrefabManager
         }
         return prefab;
     }
+
+
+    /*public void modifyPrefab(string prefabPath, AttributesBaseUnit unitData)
+    {
+        GameObject prefab = getPrefab(prefabPath);
+
+        if (prefab == null)
+        {
+            Debug.LogError("Prefab not found at path: " + prefabPath);
+            return;
+        }
+
+        // Instantiate the prefab temporarily to modify its values
+        GameObject tempInstance = Object.Instantiate(prefab);
+
+        try
+        {
+            BaseUnit unitScript = tempInstance.GetComponent<BaseUnit>();
+            if (unitScript != null)
+            {
+                // Get all the public instance properties of AttributesBaseUnit
+                var properties = typeof(AttributesBaseUnit).GetProperties(BindingFlags.Public | BindingFlags.Instance);
+
+                foreach (var property in properties)
+                {
+                    // Get the value from the unitData object
+                    var value = property.GetValue(unitData);
+
+                    // Find the corresponding property in BaseUnit
+                    var targetProperty = typeof(BaseUnit).GetProperty(property.Name, BindingFlags.Public | BindingFlags.Instance);
+
+                    // Ensure the target property exists and is writable
+                    if (targetProperty != null && targetProperty.CanWrite)
+                    {
+                        targetProperty.SetValue(unitScript, value);
+                    }
+                    else
+                    {
+                        Debug.LogWarning($"Property '{property.Name}' does not exist or cannot be written to on BaseUnit.");
+                    }
+                }
+
+                // Optional: Debug log to verify properties
+                Debug.Log($"Modified prefab at path: {prefabPath} with unitData properties.");
+
+#if UNITY_EDITOR
+                UnityEditor.EditorUtility.SetDirty(tempInstance);  // Ensure Unity knows the prefab has been modified
+                string fullPath = "Assets/Resources/" + prefabPath.Replace("Assets/Resources/", "").Replace(".prefab", "") + ".prefab";
+                UnityEditor.PrefabUtility.SaveAsPrefabAsset(tempInstance, fullPath);
+                Debug.Log("Prefab saved successfully: " + fullPath);
+#endif
+            }
+            else
+            {
+                Debug.LogError("BaseUnit component not found on the prefab instance.");
+            }
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError("Error saving prefab: " + e.Message);
+        }
+        finally
+        {
+            // Destroy the temporary instance
+            Object.DestroyImmediate(tempInstance);
+        }
+    }*/
+
+
+
 
     public void modifyPrefab(string prefabPath, AttributesBaseUnit unitData)
     {
@@ -50,6 +121,8 @@ public class PrefabManager
                 unitScript.movementRange = unitData.movementRange;
                 unitScript.sprite = unitData.sprite;
                 unitScript.prefabPath = unitData.prefabPath;
+                unitScript.isInfantry = unitData.isInfantry;
+                unitScript.unitType = unitData.unitType;
             }
             else
             {
@@ -58,10 +131,10 @@ public class PrefabManager
 
             // Apply the changes to the prefab itself in an editor context
 #if UNITY_EDITOR
-            UnityEditor.EditorUtility.SetDirty(tempInstance);  // Ensure Unity knows the prefab has been modified
-            string fullPath = "Assets/Resources/" + prefabPath.Replace("Assets/Resources/", "").Replace(".prefab", "") + ".prefab";
-            UnityEditor.PrefabUtility.SaveAsPrefabAsset(tempInstance, fullPath);
-            Debug.Log("Prefab saved successfully: " + fullPath);
+                    UnityEditor.EditorUtility.SetDirty(tempInstance);  // Ensure Unity knows the prefab has been modified
+                    string fullPath = "Assets/Resources/" + prefabPath.Replace("Assets/Resources/", "").Replace(".prefab", "") + ".prefab";
+                    UnityEditor.PrefabUtility.SaveAsPrefabAsset(tempInstance, fullPath);
+                    Debug.Log("Prefab saved successfully: " + fullPath);
 #endif
         }
         catch (System.Exception e)
@@ -75,3 +148,64 @@ public class PrefabManager
         }
     }
 }
+
+/*public void modifyPrefab(string prefabPath, AttributesBaseUnit unitData)
+{
+    GameObject prefab = getPrefab(prefabPath);
+
+    if (prefab == null)
+    {
+        Debug.LogError("Prefab not found at path: " + prefabPath);
+        return;
+    }
+
+    // Instantiate the prefab temporarily to modify its values
+    GameObject tempInstance = Object.Instantiate(prefab);
+
+    try
+    {
+        BaseUnit unitScript = tempInstance.GetComponent<BaseUnit>();
+        if (unitScript != null)
+        {
+            // Get all the public instance properties of AttributesBaseUnit
+            var properties = typeof(AttributesBaseUnit).GetProperties(BindingFlags.Public | BindingFlags.Instance);
+
+            foreach (var property in properties)
+            {
+                // Get the value from the unitData object and set it on the unitScript object
+                var value = property.GetValue(unitData);
+                var targetProperty = typeof(BaseUnit).GetProperty(property.Name, BindingFlags.Public | BindingFlags.Instance);
+                if (targetProperty != null && targetProperty.CanWrite)
+                {
+                    targetProperty.SetValue(unitScript, value);
+                    Debug.Log($"SUCCESSfully wrote to targetProperty {targetProperty}, unitScript: {unitScript}, value: {value}");
+                }
+                else
+                    Debug.Log($"Failed to write to targetProperty {targetProperty}, unitScript: {unitScript}, value: {value}");
+            }
+
+            // Optional: Debug log to verify properties
+            Debug.Log($"Modified prefab at path: {prefabPath} with unitData properties.");
+
+#if UNITY_EDITOR
+        UnityEditor.EditorUtility.SetDirty(tempInstance);  // Ensure Unity knows the prefab has been modified
+        string fullPath = "Assets/Resources/" + prefabPath.Replace("Assets/Resources/", "").Replace(".prefab", "") + ".prefab";
+        UnityEditor.PrefabUtility.SaveAsPrefabAsset(tempInstance, fullPath);
+        Debug.Log("Prefab saved successfully: " + fullPath);
+#endif
+        }
+        else
+        {
+            Debug.LogError("BaseUnit component not found on the prefab instance.");
+        }
+    }
+    catch (System.Exception e)
+    {
+        Debug.LogError("Error saving prefab: " + e.Message);
+    }
+    finally
+    {
+        // Destroy the temporary instance
+        Object.DestroyImmediate(tempInstance);
+    }
+}*/

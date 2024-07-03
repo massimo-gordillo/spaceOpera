@@ -20,11 +20,12 @@ public class MasterGrid : MonoBehaviour
     public GameObject[] allUnits;
     public GameMaster gameMaster;
     public int playerTurn;
+    private Dictionary<byte, AttributesTile> byteToAttributesTileDictionary;
 
     // Called by GameMaster
-    public void startup(int gridX, int gridY, byte[] tilemapByteArray, Dictionary<byte, AttributesTile> byteToAttributesTileDictionary)
+    public void startup(int gridX, int gridY, byte[] tilemapByteArray, Dictionary<byte, AttributesTile> inputByteToAttributesTileDictionary)
     {
-
+        byteToAttributesTileDictionary = inputByteToAttributesTileDictionary;
         //gameMaster = GameObject.FindGameObjectWithTag("GameMasterTag").GetComponent<GameMaster>();
         selectedUnit = null;
         unitGrid = new BaseUnit[gridX, gridY]; //initialize 2D array
@@ -293,6 +294,46 @@ public class MasterGrid : MonoBehaviour
 
     }
 
+    public byte whatTileByteIsInThisLocation(int x, int y)
+    {
+        return terrainGrid[x, y];
+    }
+
+    public bool canUnitMoveToByteValue(BaseUnit unit, byte b)
+    {
+        if (byteToAttributesTileDictionary.TryGetValue(b, out AttributesTile a))
+        {
+            Debug.LogWarning($"Found. Can land? '{a.canLandTraverse}', can sea? {a.canSeaTraverse}");
+        }
+        else
+        {
+            Debug.LogWarning($"Key '{b}' was not found in the dictionary.");
+        }
+        bool moveCheck = true;
+        switch (unit.unitType)
+        {
+            case UnitType.Land:
+                moveCheck = moveCheck && a.canLandTraverse;
+                Debug.Log($"This unit is type land. Our attributesTile is named {a.tileName}. Can we traverse: {a.canLandTraverse}, but movecheck says: {moveCheck}");
+                break;
+            case UnitType.Sea:
+                moveCheck = moveCheck && a.canSeaTraverse;
+                break;
+            case UnitType.Air:
+                break;
+            default:
+                break;
+        }
+
+        if (unit.isInfantry)
+            moveCheck = moveCheck && a.canInfantryTraverse;
+        else
+            moveCheck = moveCheck && a.canVehicleTraverse;
+
+        Debug.Log($"unit isInfantry {unit.isInfantry}?  what about unitType? {unit.unitType}, but movecheck says: {moveCheck}");
+        return moveCheck;
+    }
+
 
     //this will return 1 if a legal move, 0 if illegal move, 2 if allied unit but not a landing square.
     //-1 if it's the same unit
@@ -304,8 +345,8 @@ public class MasterGrid : MonoBehaviour
 
         if (x < 0 || y < 0 || x >= gridX || y >= gridY)
             return 0;
-        //else if (mTarget.)
-        //    return 0;
+        else if (!canUnitMoveToByteValue(mTarget, whatTileByteIsInThisLocation(x, y)))
+            return 0;
         else if (whatUnitIsInThisLocation(x, y) == null)
             return 1;
         else if (whatUnitIsInThisLocation(x, y) == mTarget)

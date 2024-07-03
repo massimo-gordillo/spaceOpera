@@ -8,6 +8,8 @@ public class AttributesTile
     public byte byteValue { get; set; }
     public int defenceValue { get; set; }
     public int movementCost { get; set; }
-    public bool canInfantyTraverse { get; set; }
+    public bool canInfantryTraverse { get; set; }
     public bool canVehicleTraverse { get; set; }
+    public bool canLandTraverse { get; set; }
+    public bool canSeaTraverse { get; set; }
 }

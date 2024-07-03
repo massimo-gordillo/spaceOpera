@@ -75,6 +75,9 @@ public class GameValuesSO : ScriptableObject
                 string header = headers[j];
                 string value = values[j];
 
+                if (headers[j] == "isInfantry")
+                    Debug.Log($"Is row {i} setting isInfantry to T? {values[j]}");
+
                 PropertyInfo property = typeof(AttributesBaseUnit).GetProperty(header, BindingFlags.Public | BindingFlags.Instance);
                 if (property != null && property.CanWrite)
                 {

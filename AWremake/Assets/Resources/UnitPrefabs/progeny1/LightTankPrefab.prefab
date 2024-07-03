@@ -54,6 +54,7 @@ MonoBehaviour:
   damageType: 1
   weaponType: 1
   isResourceUnit: 0
+  isInfantry: 0
   healthMax: 700
   healthCurrent: 0
   type: 0

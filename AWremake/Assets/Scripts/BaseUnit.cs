@@ -19,6 +19,7 @@ public class BaseUnit : MonoBehaviour
     public WeaponType weaponType;
 
     public bool isResourceUnit;
+    public bool isInfantry;
     public int healthMax;
     public int healthCurrent;
     public int type;
