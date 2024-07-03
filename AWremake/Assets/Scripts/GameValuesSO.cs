@@ -78,7 +78,18 @@ public class GameValuesSO : ScriptableObject
                 PropertyInfo property = typeof(AttributesBaseUnit).GetProperty(header, BindingFlags.Public | BindingFlags.Instance);
                 if (property != null && property.CanWrite)
                 {
-                    object convertedValue = Convert.ChangeType(value, property.PropertyType);
+                    object convertedValue = null;
+
+                    // Handle enum conversions
+                    if (property.PropertyType.IsEnum)
+                    {
+                        convertedValue = Enum.Parse(property.PropertyType, value, true); // Convert string to enum
+                    }
+                    else
+                    {
+                        convertedValue = Convert.ChangeType(value, property.PropertyType);
+                    }
+
                     property.SetValue(unit, convertedValue, null);
                 }
             }
@@ -91,6 +102,7 @@ public class GameValuesSO : ScriptableObject
             prefabManager.modifyPrefab(unit.prefabPath, unit);
         }
     }
+
 
     public void LoadTilesFromCSV(string filePath)
     {
@@ -211,20 +223,15 @@ public class GameValuesSO : ScriptableObject
         Debug.Log($"prefabPath: {unitData.prefabPath}");
     }
 
-    private string getPrefabLocationString(string unitName, string progeny)
+    private string getPrefabLocationString(string unitName, Progeny progeny)
     {
         string prefabPath = "unitPrefabs/";
-        int i = 1;
+        int progenyIndex = (int)progeny + 1;
 
-        foreach (string s in progenyNames)
-        {
-            if (s == progeny)
-                prefabPath = prefabPath + "progeny" + i;
-            i++;
-        }
+        prefabPath = prefabPath + "progeny" + progenyIndex;
 
-        unitName = unitName.Replace(" ", "");
-        prefabPath = prefabPath + "/" + unitName + "Prefab";
+        prefabPath = prefabPath + "/" + unitName.Replace(" ", "") + "Prefab";
+
         return prefabPath;
     }
 

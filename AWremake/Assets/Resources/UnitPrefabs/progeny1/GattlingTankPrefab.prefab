@@ -267,16 +267,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   unitName: GattlingTank
-  unitType: land
+  progeny: 0
+  unitType: 0
+  healthType: 1
+  damageType: 0
+  weaponType: 1
   isResourceUnit: 0
-  progeny: ertrian
   healthMax: 400
-  healthType: medium
   healthCurrent: 0
   type: 0
   baseDamage: 100
-  damageType: projectile
-  weaponType: light
   attackRange: 1
   price: 600
   movementRange: 6

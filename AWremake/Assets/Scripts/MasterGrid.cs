@@ -301,8 +301,11 @@ public class MasterGrid : MonoBehaviour
     {
         int x = (int)xPos;
         int y = (int)yPos;
+
         if (x < 0 || y < 0 || x >= gridX || y >= gridY)
             return 0;
+        //else if (mTarget.)
+        //    return 0;
         else if (whatUnitIsInThisLocation(x, y) == null)
             return 1;
         else if (whatUnitIsInThisLocation(x, y) == mTarget)

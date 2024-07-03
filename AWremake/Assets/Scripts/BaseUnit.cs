@@ -10,16 +10,19 @@ public class BaseUnit : MonoBehaviour
 
     //in future this values will be pulled from a UnitValues table/function.
     public string unitName;
-    public string unitType;
+
+    //enums as defined in AttributesBaseUnit
+    public Progeny progeny; 
+    public UnitType unitType;
+    public HealthType healthType;
+    public DamageType damageType;
+    public WeaponType weaponType;
+
     public bool isResourceUnit;
-    public string progeny;
     public int healthMax;
-    public string healthType;
     public int healthCurrent;
     public int type;
     public int baseDamage = 50;
-    public string damageType;
-    public string weaponType;
     public int attackRange = 1;
     public int price = 999;
     public int movementRange = 3;

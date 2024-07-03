@@ -1,4 +1,4 @@
-unitName,progeny,isResourceUnit,unitType,unitIsInfantry,healthMax,healthType,damageType,weaponType,baseDamage,attackRange,price,movementRange,,
-Infantry,ertrian,TRUE,land,TRUE,100,light,projectile,light,50,1,105,4,,4
-GattlingTank,ertrian,FALSE,land,FALSE,400,medium,projectile,light,100,1,600,6,,
-LightTank,ertrian,FALSE,land,FALSE,700,heavy,projectile,heavy,300,1,700,7,,
+unitName,progeny,isResourceUnit,unitType,isInfantry,healthMax,healthType,damageType,weaponType,baseDamage,attackRange,price,movementRange,,
+Infantry,ertrian,TRUE,land,TRUE,100,light,light,projectile,50,1,105,4,,4
+GattlingTank,ertrian,FALSE,land,FALSE,400,medium,light,projectile,100,1,600,6,,
+LightTank,ertrian,FALSE,land,FALSE,700,heavy,heavy,projectile,300,1,700,7,,

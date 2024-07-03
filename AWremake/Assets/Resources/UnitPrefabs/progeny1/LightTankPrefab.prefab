@@ -48,16 +48,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   unitName: LightTank
-  unitType: land
+  progeny: 0
+  unitType: 0
+  healthType: 2
+  damageType: 1
+  weaponType: 1
   isResourceUnit: 0
-  progeny: ertrian
   healthMax: 700
-  healthType: heavy
   healthCurrent: 0
   type: 0
   baseDamage: 300
-  damageType: projectile
-  weaponType: heavy
   attackRange: 1
   price: 700
   movementRange: 7

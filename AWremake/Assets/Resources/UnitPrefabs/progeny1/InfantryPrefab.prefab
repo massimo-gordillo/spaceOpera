@@ -413,16 +413,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   unitName: Infantry
-  unitType: land
+  progeny: 0
+  unitType: 0
+  healthType: 0
+  damageType: 0
+  weaponType: 1
   isResourceUnit: 0
-  progeny: ertrian
   healthMax: 100
-  healthType: light
   healthCurrent: 0
   type: 0
   baseDamage: 50
-  damageType: projectile
-  weaponType: light
   attackRange: 1
   price: 105
   movementRange: 4
