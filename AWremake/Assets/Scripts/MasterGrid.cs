@@ -26,6 +26,12 @@ public class MasterGrid : MonoBehaviour
     public void startup(int gridX, int gridY, byte[] tilemapByteArray, Dictionary<byte, AttributesTile> inputByteToAttributesTileDictionary)
     {
         byteToAttributesTileDictionary = inputByteToAttributesTileDictionary;
+/*        foreach (KeyValuePair<byte, AttributesTile> kvp in byteToAttributesTileDictionary)
+        {
+            byte b = kvp.Key;
+            AttributesTile a = kvp.Value;
+            Debug.Log($"mastergrid says: byte {b} paired with tile {a.tileName}");
+        }*/
         //gameMaster = GameObject.FindGameObjectWithTag("GameMasterTag").GetComponent<GameMaster>();
         selectedUnit = null;
         unitGrid = new BaseUnit[gridX, gridY]; //initialize 2D array
@@ -301,20 +307,13 @@ public class MasterGrid : MonoBehaviour
 
     public bool canUnitMoveToByteValue(BaseUnit unit, byte b)
     {
-        if (byteToAttributesTileDictionary.TryGetValue(b, out AttributesTile a))
-        {
-            Debug.LogWarning($"Found. Can land? '{a.canLandTraverse}', can sea? {a.canSeaTraverse}");
-        }
-        else
-        {
+        if (!byteToAttributesTileDictionary.TryGetValue(b, out AttributesTile a))
             Debug.LogWarning($"Key '{b}' was not found in the dictionary.");
-        }
         bool moveCheck = true;
         switch (unit.unitType)
         {
             case UnitType.Land:
                 moveCheck = moveCheck && a.canLandTraverse;
-                Debug.Log($"This unit is type land. Our attributesTile is named {a.tileName}. Can we traverse: {a.canLandTraverse}, but movecheck says: {moveCheck}");
                 break;
             case UnitType.Sea:
                 moveCheck = moveCheck && a.canSeaTraverse;
@@ -329,8 +328,6 @@ public class MasterGrid : MonoBehaviour
             moveCheck = moveCheck && a.canInfantryTraverse;
         else
             moveCheck = moveCheck && a.canVehicleTraverse;
-
-        Debug.Log($"unit isInfantry {unit.isInfantry}?  what about unitType? {unit.unitType}, but movecheck says: {moveCheck}");
         return moveCheck;
     }
 

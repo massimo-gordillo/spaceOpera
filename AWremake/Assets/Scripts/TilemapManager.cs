@@ -83,12 +83,10 @@ public class TilemapManager : MonoBehaviour
                     tileNameToByteDictionary.Add(tile.name, byteNumber);
                     //Debug.Log($"Inserted tile {tile} with name {tile.name} and gameID {tile.GetInstanceID()} to bytenum {byteNumber}");
                     if (!byteToTilesListDictionary.ContainsKey(byteNumber))
-                    {
                         byteToTilesListDictionary[byteNumber] = new List<TileBase>();
-                    }
+
                     byteToTilesListDictionary[byteNumber].Add(tile);
 
-                    
                 }
 
 
@@ -124,6 +122,7 @@ public class TilemapManager : MonoBehaviour
 
         for (int y = 0; y < height; y++)
         {
+            //string debug = "createByteArray debug, line " + y + ": ";
             for (int x = 0; x < width; x++)
             {
                 Vector3Int pos = new Vector3Int(x, y, 0);
@@ -143,12 +142,16 @@ public class TilemapManager : MonoBehaviour
                 if (tile != null && tileNameToByteDictionary.TryGetValue(tile.name, out byte tileByte))
                 {
                     tilemapByteArray[y * width + x] = tileByte;
+                    //debug = debug + "" + tileByte + ", ";
                 }
                 else
                 {
                     tilemapByteArray[y * width + x] = 255; // Use 255 for empty or unrecognized tiles
+                    //debug = debug + "X, ";
                 }
+                
             }
+            //Debug.Log(debug);
         }
 
         return MessagePackSerializer.Serialize(tilemapByteArray);

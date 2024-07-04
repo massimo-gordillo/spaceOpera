@@ -121,16 +121,15 @@ public class GameValuesSO : ScriptableObject
         // Read headers
         string[] headers = lines[0].Split(',');
 
-        for (int i = 1; i < lines.Length; i++) // Skip header line
+        for (int i = 1; i < lines.Length; i++) // For each row in the array (skip header line)
         {
             string[] values = lines[i].Split(',');
             AttributesTile attributesTile = new AttributesTile();
 
-            for (int j = 0; j < headers.Length; j++)
+            for (int j = 0; j < headers.Length; j++) //for each column 
             {
-                string header = headers[j];
-                string value = values[j];
-
+                string header = headers[j]; //the header for column j
+                string value = values[j]; //the values in row j
                 PropertyInfo property = typeof(AttributesTile).GetProperty(header, BindingFlags.Public | BindingFlags.Instance);
                 if (property != null && property.CanWrite)
                 {
@@ -140,17 +139,12 @@ public class GameValuesSO : ScriptableObject
 
                         // Custom conversion for byte type
                         if (property.PropertyType == typeof(byte))
-                        {
                             convertedValue = Convert.ToByte(value);
-                        }
                         else
-                        {
                             convertedValue = Convert.ChangeType(value, Nullable.GetUnderlyingType(property.PropertyType) ?? property.PropertyType);
-                        }
 
                         property.SetValue(attributesTile, convertedValue, null);
 
-                        //Debug.Log($"Set {header} to {convertedValue} for tile.");
                     }
                     catch (Exception ex)
                     {
@@ -158,9 +152,7 @@ public class GameValuesSO : ScriptableObject
                     }
                 }
                 else
-                {
                     Debug.LogWarning($"No property named '{header}' found in AttributesTile.");
-                }
             }
             if (byteToAttributesTileDictionary.ContainsKey(attributesTile.byteValue))
                 Debug.LogWarning($"Skipping tile with byteValue {attributesTile.byteValue} as it already exists in the dictionary.");
