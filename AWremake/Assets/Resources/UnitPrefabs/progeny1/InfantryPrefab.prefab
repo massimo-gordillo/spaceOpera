@@ -426,7 +426,7 @@ MonoBehaviour:
   baseDamage: 50
   attackRange: 1
   price: 105
-  movementRange: 2
+  movementRange: 4
   playerControl: 1
   team: 0
   orientation: 3
