@@ -418,7 +418,7 @@ MonoBehaviour:
   healthType: 0
   damageType: 0
   weaponType: 1
-  isResourceUnit: 0
+  isResourceUnit: 1
   isInfantry: 1
   healthMax: 100
   healthCurrent: 0
@@ -426,7 +426,7 @@ MonoBehaviour:
   baseDamage: 50
   attackRange: 1
   price: 105
-  movementRange: 5
+  movementRange: 2
   playerControl: 1
   team: 0
   orientation: 3

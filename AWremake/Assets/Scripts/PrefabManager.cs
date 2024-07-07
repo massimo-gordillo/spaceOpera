@@ -90,7 +90,7 @@ public class PrefabManager
 
 
 
-    public void modifyPrefab(string prefabPath, AttributesBaseUnit unitData)
+    /*public void modifyPrefab(string prefabPath, AttributesBaseUnit unitData)
     {
         GameObject prefab = getPrefab(prefabPath);
 
@@ -147,65 +147,85 @@ public class PrefabManager
             Object.DestroyImmediate(tempInstance);
         }
     }
-}
+}*/
 
-/*public void modifyPrefab(string prefabPath, AttributesBaseUnit unitData)
-{
-    GameObject prefab = getPrefab(prefabPath);
-
-    if (prefab == null)
+   public void modifyPrefab(string prefabPath, AttributesBaseUnit unitData)
     {
-        Debug.LogError("Prefab not found at path: " + prefabPath);
-        return;
-    }
+        Debug.Log($"Attempting to modify prefab at path: {prefabPath}");
 
-    // Instantiate the prefab temporarily to modify its values
-    GameObject tempInstance = Object.Instantiate(prefab);
+        GameObject prefab = getPrefab(prefabPath);
 
-    try
-    {
-        BaseUnit unitScript = tempInstance.GetComponent<BaseUnit>();
-        if (unitScript != null)
+        if (prefab == null)
         {
-            // Get all the public instance properties of AttributesBaseUnit
-            var properties = typeof(AttributesBaseUnit).GetProperties(BindingFlags.Public | BindingFlags.Instance);
+            Debug.LogError("Prefab not found at path: " + prefabPath);
+            return;
+        }
 
-            foreach (var property in properties)
+        // Instantiate the prefab temporarily to modify its values
+        GameObject tempInstance = Object.Instantiate(prefab);
+        Debug.Log("Prefab instantiated successfully.");
+
+        try
+        {
+            BaseUnit unitScript = tempInstance.GetComponent<BaseUnit>();
+            if (unitScript != null)
             {
-                // Get the value from the unitData object and set it on the unitScript object
-                var value = property.GetValue(unitData);
-                var targetProperty = typeof(BaseUnit).GetProperty(property.Name, BindingFlags.Public | BindingFlags.Instance);
-                if (targetProperty != null && targetProperty.CanWrite)
-                {
-                    targetProperty.SetValue(unitScript, value);
-                    Debug.Log($"SUCCESSfully wrote to targetProperty {targetProperty}, unitScript: {unitScript}, value: {value}");
-                }
-                else
-                    Debug.Log($"Failed to write to targetProperty {targetProperty}, unitScript: {unitScript}, value: {value}");
-            }
+                // Get all the public instance properties of AttributesBaseUnit
+                var properties = typeof(AttributesBaseUnit).GetProperties(BindingFlags.Public | BindingFlags.Instance);
+                Debug.Log($"Found {properties.Length} properties in AttributesBaseUnit.");
 
-            // Optional: Debug log to verify properties
-            Debug.Log($"Modified prefab at path: {prefabPath} with unitData properties.");
+                foreach (var property in properties)
+                {
+                    // Log the property name from AttributesBaseUnit
+                    Debug.Log($"Processing property: {property.Name}");
+
+                    // Get the value from the unitData object and set it on the unitScript object
+                    var value = property.GetValue(unitData);
+                    if (value == null)
+                    {
+                        Debug.LogWarning($"Value for property {property.Name} is null.");
+                        continue;
+                    }
+
+                    // Attempt to set the value on the corresponding field in BaseUnit
+                    var targetField = typeof(BaseUnit).GetField(property.Name, BindingFlags.Public | BindingFlags.Instance);
+                    if (targetField != null)
+                    {
+                        targetField.SetValue(unitScript, value);
+                        Debug.Log($"Successfully wrote to targetField {targetField.Name}, value: {value}");
+                    }
+                    else
+                    {
+                        Debug.LogWarning($"Field {property.Name} not found in BaseUnit.");
+                    }
+                }
+
+                // Optional: Debug log to verify properties
+                Debug.Log($"Modified prefab at path: {prefabPath} with unitData properties.");
 
 #if UNITY_EDITOR
-        UnityEditor.EditorUtility.SetDirty(tempInstance);  // Ensure Unity knows the prefab has been modified
-        string fullPath = "Assets/Resources/" + prefabPath.Replace("Assets/Resources/", "").Replace(".prefab", "") + ".prefab";
-        UnityEditor.PrefabUtility.SaveAsPrefabAsset(tempInstance, fullPath);
-        Debug.Log("Prefab saved successfully: " + fullPath);
+            UnityEditor.EditorUtility.SetDirty(tempInstance);  // Ensure Unity knows the prefab has been modified
+            string fullPath = "Assets/Resources/" + prefabPath.Replace("Assets/Resources/", "").Replace(".prefab", "") + ".prefab";
+            UnityEditor.PrefabUtility.SaveAsPrefabAsset(tempInstance, fullPath);
+            Debug.Log("Prefab saved successfully: " + fullPath);
 #endif
+            }
+            else
+            {
+                Debug.LogError("BaseUnit component not found on the prefab instance.");
+            }
         }
-        else
+        catch (System.Exception e)
         {
-            Debug.LogError("BaseUnit component not found on the prefab instance.");
+            Debug.LogError("Error saving prefab: " + e.Message);
+        }
+        finally
+        {
+            // Destroy the temporary instance
+            Object.DestroyImmediate(tempInstance);
+            Debug.Log("Temporary instance destroyed.");
         }
     }
-    catch (System.Exception e)
-    {
-        Debug.LogError("Error saving prefab: " + e.Message);
-    }
-    finally
-    {
-        // Destroy the temporary instance
-        Object.DestroyImmediate(tempInstance);
-    }
-}*/
+
+
+}
