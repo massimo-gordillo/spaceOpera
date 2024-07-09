@@ -1,4 +1,14 @@
-unitName,progeny,isResourceUnit,unitType,isInfantry,healthMax,healthType,damageType,weaponType,baseDamage,attackRange,price,movementRange,,
-Infantry,ertrian,TRUE,land,TRUE,100,light,light,projectile,50,1,105,4,,4
-GattlingTank,ertrian,FALSE,land,FALSE,400,medium,light,projectile,100,1,600,6,,
-LightTank,ertrian,FALSE,land,FALSE,700,heavy,heavy,projectile,300,1,700,7,,
+unitName,progeny,isResourceUnit,unitType,isInfantry,healthMax,healthType,damageType,weaponType,damageCombined,canAttackGround,canAttackAir,baseDamage,attackRange,price,movementRange
+Infantry,ertrian,TRUE,land,TRUE,100,light,light,projectile,light projectile,TRUE,TRUE,60,1,100,3
+GattlingTank,ertrian,FALSE,land,FALSE,400,medium,light,projectile,light projectile,TRUE,TRUE,300,1,800,6
+LightTank,ertrian,FALSE,land,FALSE,700,medium,heavy,projectile,heavy projectile,TRUE,FALSE,300,1,700,7
+Artillery,ertrian,FALSE,land,FALSE,300,medium,heavy,projectile,heavy projectile,TRUE,FALSE,400,3,600,4
+Rockets,ertrian,FALSE,land,FALSE,200,medium,light,projectile,light projectile,TRUE,TRUE,400,5,1500,4
+APC,ertrian,FALSE,land,FALSE,500,heavy,none,none,none,TRUE,FALSE,0,0,500,7
+Electos,ertrian,FALSE,land,FALSE,350,light,light,melee,light melee,TRUE,FALSE,300,1,600,4
+HeavyTank,ertrian,FALSE,land,FALSE,1000,heavy,heavy,projectile,heavy projectile,TRUE,FALSE,800,1,1500,7
+EVA,ertrian,FALSE,land,FALSE,1400,light,heavy,melee,heavy melee,TRUE,TRUE,1200,1,2200,3
+Helicopter,ertrian,FALSE,air,FALSE,120,light,heavy,projectile,heavy projectile,TRUE,TRUE,250,1,900,6
+AAJet,ertrian,FALSE,air,FALSE,250,light,light,projectile,light projectile,FALSE,TRUE,1000,1,1800,9
+Bomber,ertrian,FALSE,air,FALSE,500,light,heavy,projectile,heavy projectile,TRUE,FALSE,1400,1,2000,4
+Battleship,ertrian,FALSE,air,FALSE,1300,heavy,heavy,projectile,heavy projectile,TRUE,TRUE,1500,2,2500,4

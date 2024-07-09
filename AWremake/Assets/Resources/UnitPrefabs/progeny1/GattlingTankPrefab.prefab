@@ -277,9 +277,9 @@ MonoBehaviour:
   healthMax: 400
   healthCurrent: 0
   type: 0
-  baseDamage: 100
+  baseDamage: 300
   attackRange: 1
-  price: 600
+  price: 800
   movementRange: 6
   playerControl: 1
   team: 0

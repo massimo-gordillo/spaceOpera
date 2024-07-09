@@ -50,7 +50,7 @@ MonoBehaviour:
   unitName: LightTank
   progeny: 0
   unitType: 0
-  healthType: 2
+  healthType: 1
   damageType: 1
   weaponType: 1
   isResourceUnit: 0

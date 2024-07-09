@@ -19,7 +19,7 @@ public enum HealthType
     Light,
     Medium,
     Heavy
-}
+} 
 
 public enum WeaponType
 {
