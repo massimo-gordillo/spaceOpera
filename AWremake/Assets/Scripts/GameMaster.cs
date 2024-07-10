@@ -68,7 +68,12 @@ public class GameMaster : MonoBehaviour
         //unit.xPos = 18;
         //unit.yPos = 19;
         //Instantiate(unit, new Vector2(unit.xPos, unit.yPos), Quaternion.identity, unitList);
+        unit.playerControl = 1;
         Instantiate(unit, new Vector2(20, 17), Quaternion.identity, unitList);
+
+        BaseUnit unit2 = infantryUnitPrefab;
+        unit2.playerControl = 2;
+        Instantiate(unit, new Vector2(18, 17), Quaternion.identity, unitList);
         //unit.startupPopulateValues(infantryData);
 
         /*

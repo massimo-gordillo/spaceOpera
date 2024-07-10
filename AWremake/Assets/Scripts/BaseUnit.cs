@@ -64,8 +64,8 @@ public class BaseUnit : MonoBehaviour
         //playerControl = 1; //will have to set dynamically later
         xPos = (int)transform.position.x;
         yPos = (int)transform.position.y;
-        healthMax = 100;
-        healthCurrent=100;
+        //healthMax = 100;
+        //healthCurrent= healthMax;
         setHealth(healthMax);
 
         

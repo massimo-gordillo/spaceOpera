@@ -159,7 +159,8 @@ public class MasterGrid : MonoBehaviour
     {
 
 
-        double baseDamage = attacker.baseDamage;
+        double baseDamage = attacker.baseDamage * ((double)attacker.healthCurrent/ attacker.healthMax);
+        //Debug.Log($"Unit attacks, dealing {attacker.baseDamage} damage, healthcurrent is {attacker.healthCurrent} and healthmax is { attacker.healthMax} with a health ratio of {(double)attacker.healthCurrent / attacker.healthMax}");
         double multiplier = getDamageMultiplier(attacker, defender);
         //int defenceVal;
         defender.takeDamage((int)(baseDamage*multiplier));
