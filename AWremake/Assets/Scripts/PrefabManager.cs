@@ -60,6 +60,12 @@ public class PrefabManager
                         targetField.SetValue(unitScript, value);
                     else
                         Debug.LogWarning($"For unit {unitData.unitName}, field {property.Name} not found in BaseUnit.");
+
+                    if (property.Name == "sprite" && unitScript.unitSpriteRenderer != null)
+                    {
+                        unitScript.unitSpriteRenderer.sprite = (Sprite)value;
+                        Debug.Log($"Sprite for unit {unitData.unitName} updated.");
+                    }
                 }
 
                 // Optional: Debug log to verify properties
@@ -86,6 +92,27 @@ public class PrefabManager
             // Destroy the temporary instance
             Object.DestroyImmediate(tempInstance);
         }
+    }
+
+    public void ClonePrefab(string basePrefabPath, string newPrefabPath)
+    {
+        GameObject basePrefab = getPrefab(basePrefabPath);
+
+        if (basePrefab == null)
+        {
+            Debug.LogError("Base prefab not found at path: " + basePrefabPath);
+            return;
+        }
+
+        GameObject newPrefabInstance = Object.Instantiate(basePrefab);
+
+#if UNITY_EDITOR
+        string fullPath = "Assets/Resources/" + newPrefabPath.Replace("Assets/Resources/", "").Replace(".prefab", "") + ".prefab";
+        UnityEditor.PrefabUtility.SaveAsPrefabAsset(newPrefabInstance, fullPath);
+        Debug.Log("New prefab saved successfully: " + fullPath);
+#endif
+
+        Object.DestroyImmediate(newPrefabInstance);
     }
 
 

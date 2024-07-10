@@ -10,7 +10,6 @@ public class GameValuesSO : ScriptableObject
 {
     private List<AttributesBaseUnit> attributesBaseUnits;
     //private List<AttributesTile> attributesTiles;
-    private string[] progenyNames;
     private string[] unitTypes;
     private PrefabManager prefabManager = new PrefabManager();
     private Dictionary<byte, AttributesTile> byteToAttributesTileDictionary; // Map byte values to AttributeTiles (tile rules)
@@ -21,35 +20,8 @@ public class GameValuesSO : ScriptableObject
         attributesBaseUnits = new List<AttributesBaseUnit>();
         //attributesTiles = new List<AttributesTile>();
 
-        //need to sync these up with the UnitValues.csv until a better soln is implemented.
-        progenyNames = new string[3];
-        progenyNames[0] = "ertrian";
-        progenyNames[1] = "virix";
-        progenyNames[2] = "sentus";
-
         LoadUnitsFromCSV("Assets/StreamingAssets/SpaceOperaUnitValues - UnitValues.csv");
         LoadTilesFromCSV("Assets/StreamingAssets/SpaceOperaTileValues - TileValues.csv");
-
-
-        /*
-        unitTypes = new string[3];
-        unitTypes[0] = "land";
-        unitTypes[1] = "air";
-        unitTypes[2] = "sea";
-        populateGameValuesInfantry();
-        populateGameValuesGattlingTank();
-        populateGameValuesLightTank();*/
-
-        /*      populateGameValuesPlainsTile();
-                populateGameValuesForestTile();
-                populateGameValuesWaterTile();
-                populateGameValuesReefTile();
-                populateGameValuesSmallMountainTile();
-                populateGameValuesMountainTile();
-                populateGameValuesSwampTile();
-                populateGameValuesRoadTile();
-                populateGameValuesStructureTile();
-                populateGameValuesResourceTile();*/
     }
 
     public void LoadUnitsFromCSV(string filePath)
@@ -95,10 +67,34 @@ public class GameValuesSO : ScriptableObject
             }
 
             // Handle sprite loading separately
-            unit.sprite = Resources.Load<Sprite>($"sprites/{unit.unitName.ToLower().Replace(" ", "")}Sprite");
-            unit.prefabPath = getPrefabLocationString(unit.unitName, unit.progeny);
 
+            /*String unitSpriteString = "sprites/progeny" + GetEnumIndex(unit.progeny) + "/" + unit.unitName.ToLower().Replace(" ", "") + "Sprite";
+            Debug.Log($"Unit Sprite should be here: {unitSpriteString}");
+            unit.sprite = Resources.Load<Sprite>(unitSpriteString);
+            //unit.sprite = Resources.Load<Sprite>($"sprites/{unit.unitName.ToLower().Replace(" ", "")}Sprite");*/
+
+            // Handle sprite loading separately
+            string unitSpritePath = $"sprites/progeny{GetEnumIndex(unit.progeny)}/{unit.unitName.ToLower().Replace(" ", "")}Sprite";
+            Debug.Log($"Attempting to load sprite from path: {unitSpritePath}");
+            unit.sprite = Resources.Load<Sprite>(unitSpritePath);
+
+            if (unit.sprite == null)
+            {
+                Debug.LogError($"Failed to load sprite at path: {unitSpritePath}");
+            }
+            else
+            {
+                Debug.Log($"Successfully loaded sprite: {unit.sprite.name}");
+            }
+
+            unit.prefabPath = generatePrefabLocationString(unit.unitName, unit.progeny);
+
+            //add unit attributes to list of attributesBaseUnit.
             attributesBaseUnits.Add(unit);
+
+            //Assets/Resources/UnitPrefabs/progeny1/BasePrefab.prefab
+            string basePrefabPath = "UnitPrefabs/BasePrefab";
+            prefabManager.ClonePrefab(basePrefabPath, unit.prefabPath);
             prefabManager.modifyPrefab(unit.prefabPath, unit);
         }
     }
@@ -215,7 +211,7 @@ public class GameValuesSO : ScriptableObject
         Debug.Log($"prefabPath: {unitData.prefabPath}");
     }
 
-    private string getPrefabLocationString(string unitName, Progeny progeny)
+    private string generatePrefabLocationString(string unitName, Progeny progeny)
     {
         string prefabPath = "unitPrefabs/";
         int progenyIndex = (int)progeny + 1;
@@ -235,121 +231,13 @@ public class GameValuesSO : ScriptableObject
         unit.sprite = Resources.Load<Sprite>(spritePath);*/
         unit.sprite = Resources.Load<Sprite>($"sprites/{unit.unitName.ToLower().Replace(" ", "")}Sprite");
 
-        unit.prefabPath = getPrefabLocationString(unit.unitName, unit.progeny);
+        unit.prefabPath = generatePrefabLocationString(unit.unitName, unit.progeny);
         attributesBaseUnits.Add(unit);
         prefabManager.modifyPrefab(unit.prefabPath, unit);
     }
 
-    /*private void populateGameValuesInfantry()
+    public static int GetEnumIndex<TEnum>(TEnum value) where TEnum : Enum
     {
-        string hardcodedUnitName = "Infantry";
-        string hardcodedProgeny = progenyNames[0];
-        AttributesBaseUnit infantryM = new AttributesBaseUnit
-        {
-            unitName = hardcodedUnitName,
-            progeny = hardcodedProgeny,
-            unitType = unitTypes[0],
-            unitIsInfantry = true,
-            isResourceUnit = true,
-            healthMax = 100,
-            healthType = "light",
-            weaponType = "projectile",
-            damageType = "light",
-            baseDamage = 50,
-            attackRange = 1,
-            price = 105,
-            movementRange = 4
-        };
-        finalizePopulateGameValues(infantryM);
+        return Array.IndexOf(Enum.GetValues(value.GetType()), value);
     }
-
-    private void populateGameValuesGattlingTank()
-    {
-        string hardcodedUnitName = "Gattling Tank";
-        string hardcodedProgeny = progenyNames[0];
-        AttributesBaseUnit gattlingTankM = new AttributesBaseUnit
-        {
-            unitName = hardcodedUnitName,
-            progeny = hardcodedProgeny,
-            unitType = unitTypes[0],
-            unitIsInfantry = false,
-            isResourceUnit = false,
-            healthMax = 400,
-            healthType = "medium",
-            weaponType = "projectile",
-            damageType = "light",
-            baseDamage = 100,
-            attackRange = 1,
-            price = 600,
-            movementRange = 6
-        };
-        finalizePopulateGameValues(gattlingTankM);
-    }
-
-    private void populateGameValuesLightTank()
-    {
-        string hardcodedUnitName = "Light Tank";
-        string hardcodedProgeny = progenyNames[0];
-        AttributesBaseUnit lightTankM = new AttributesBaseUnit
-        {
-            unitName = hardcodedUnitName,
-            progeny = hardcodedProgeny,
-            unitType = unitTypes[0],
-            unitIsInfantry = false,
-            isResourceUnit = false,
-            healthMax = 700,
-            healthType = "heavy",
-            weaponType = "projectile",
-            damageType = "heavy",
-            baseDamage = 300,
-            attackRange = 1,
-            price = 700,
-            movementRange = 7
-        };
-        finalizePopulateGameValues(lightTankM);
-    }*/
-
-
-
-
-
-
-
-    /*private void populateGameValuesGattlingTank()
-    {
-        MetadataBaseUnit gattlingTankM = new MetadataBaseUnit();
-
-        gattlingTankM.unitName = "Gattling Tank";
-        gattlingTankM.progeny = progenyNames[0];
-        gattlingTankM.healthMax = 400;
-        gattlingTankM.healthType = "medium";
-        gattlingTankM.weaponType = "projectile";
-        gattlingTankM.damageType = "light";
-        gattlingTankM.baseDamage = 100;
-        gattlingTankM.attackRange = 1;
-        gattlingTankM.price = 600;
-        gattlingTankM.movementRange = 6;
-        gattlingTankM.sprite = Resources.Load<Sprite>("sprites/gattlingTankSprite");
-
-        metadataBaseUnits.Add(gattlingTankM);
-    }
-
-    private void populateGameValuesLightTank()
-    {
-        MetadataBaseUnit lightTankM = new MetadataBaseUnit();
-
-        lightTankM.unitName = "Light Tank";
-        lightTankM.progeny = progenyNames[0];
-        lightTankM.healthMax = 700;
-        lightTankM.healthType = "heavy";
-        lightTankM.weaponType = "projectile";
-        lightTankM.damageType = "heavy";
-        lightTankM.baseDamage = 300;
-        lightTankM.attackRange = 1;
-        lightTankM.price = 700;
-        lightTankM.movementRange = 7;
-        lightTankM.sprite = Resources.Load<Sprite>("sprites/lightTankSprite");
-
-        metadataBaseUnits.Add(lightTankM);
-    }*/
 }

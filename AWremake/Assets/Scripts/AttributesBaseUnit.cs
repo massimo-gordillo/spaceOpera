@@ -24,13 +24,15 @@ public enum HealthType
 public enum WeaponType
 {
     Melee,
-    Projectile
+    Projectile,
+    None
 }
 
 public enum DamageType
 {
     Light,
-    Heavy
+    Heavy,
+    None
 }
 
 [System.Serializable]
