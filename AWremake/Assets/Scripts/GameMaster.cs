@@ -38,13 +38,14 @@ public class GameMaster : MonoBehaviour
         //gameValues = AssetDatabase.LoadAssetAtPath<GameValuesSO>("Assets/Scripts/Assets/Scripts/GameValuesSO.cs.cs");
 
         //initializes all unit values, modifies their prefab and sprites.
+        //initializes all Tilebases for tilemap
         gameValues.initialize();
 
         //initializes the TilemapManager
         tilemapManager.initialize();
 
         //initializes the masterGrid arrays etc with the map size
-        masterGrid.startup(gridX, gridY, tilemapManager.getTilemapByteArray(), gameValues.getAttributesTilesDictionary());
+        masterGrid.startup(gridX, gridY, tilemapManager.getTilemapByteArray(), gameValues.getAttributesTilesDictionary(),gameValues.getCombatMultiplierDictionary());
 
         hideChoicePanel();
         playerTurn = 1;

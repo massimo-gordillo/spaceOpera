@@ -20,18 +20,22 @@ public class MasterGrid : MonoBehaviour
     public GameObject[] allUnits;
     public GameMaster gameMaster;
     public int playerTurn;
-    private Dictionary<byte, AttributesTile> byteToAttributesTileDictionary;
+    private Dictionary<byte, AttributesTile> tileAttributes;
+    private Dictionary<string, Dictionary<string, double>> combatMultipliers;
 
     // Called by GameMaster
-    public void startup(int gridX, int gridY, byte[] tilemapByteArray, Dictionary<byte, AttributesTile> inputByteToAttributesTileDictionary)
+    public void startup(int gridX, int gridY, byte[] tilemapByteArray, 
+        Dictionary<byte, AttributesTile> inputTileAttributes, 
+        Dictionary<string, Dictionary<string, double>> inputCombatMultipliers)
     {
-        byteToAttributesTileDictionary = inputByteToAttributesTileDictionary;
-/*        foreach (KeyValuePair<byte, AttributesTile> kvp in byteToAttributesTileDictionary)
-        {
-            byte b = kvp.Key;
-            AttributesTile a = kvp.Value;
-            Debug.Log($"mastergrid says: byte {b} paired with tile {a.tileName}");
-        }*/
+        tileAttributes = inputTileAttributes;
+        combatMultipliers = inputCombatMultipliers;
+        /*        foreach (KeyValuePair<byte, AttributesTile> kvp in tileAttributes)
+                {
+                    byte b = kvp.Key;
+                    AttributesTile a = kvp.Value;
+                    Debug.Log($"mastergrid says: byte {b} paired with tile {a.tileName}");
+                }*/
         //gameMaster = GameObject.FindGameObjectWithTag("GameMasterTag").GetComponent<GameMaster>();
         selectedUnit = null;
         unitGrid = new BaseUnit[gridX, gridY]; //initialize 2D array
@@ -137,8 +141,8 @@ public class MasterGrid : MonoBehaviour
                 if (attackableUnits.Contains(unit))
                 {
                     unit.hideCrosshairs();
-                    unit.takeDamage(getSelectedUnit().baseDamage); //expand, obviously.
-
+                    //unit.takeDamage(getSelectedUnit().baseDamage); //expand, obviously.
+                    unitCombat(getSelectedUnit(), unit);
                     //selectedUnit.setNonExhausted(false);
                     exhaustSelectedUnit(selectedUnit, true);
                 }
@@ -148,6 +152,32 @@ public class MasterGrid : MonoBehaviour
                 print("You've clicked on " + unit.GetInstanceID() + "but no mg action was taken. Potential softlock");
                 Debug.Log("You've clicked on " + unit.GetInstanceID()+ "but no mg action was taken. Potential softlock");
             }*/
+        }
+    }
+
+    public void unitCombat(BaseUnit attacker, BaseUnit defender)
+    {
+
+
+        double baseDamage = attacker.baseDamage;
+        double multiplier = getDamageMultiplier(attacker, defender);
+        //int defenceVal;
+        defender.takeDamage((int)(baseDamage*multiplier));
+        Debug.Log($"Unit attacks, dealing {baseDamage} damage with a multipler of {multiplier}");
+    }
+
+    public double getDamageMultiplier(BaseUnit attacker, BaseUnit defender)
+    {
+        var combinedKey = CombineCombatEnums(attacker.damageType, attacker.weaponType);
+
+        if (combatMultipliers.ContainsKey(defender.healthType.ToString()) && combatMultipliers[defender.healthType.ToString()].ContainsKey(combinedKey))
+        {
+            return combatMultipliers[defender.healthType.ToString()][combinedKey];
+        }
+        else
+        {
+            Debug.LogError($"Invalid health type or combined key: HealthType = {defender.healthType}, DamageType = {attacker.damageType}, WeaponType = {attacker.weaponType}, CombinedKey = {combinedKey}");
+            return 0;
         }
     }
 
@@ -307,7 +337,7 @@ public class MasterGrid : MonoBehaviour
 
     public bool canUnitMoveToByteValue(BaseUnit unit, byte b)
     {
-        if (!byteToAttributesTileDictionary.TryGetValue(b, out AttributesTile a))
+        if (!tileAttributes.TryGetValue(b, out AttributesTile a))
             Debug.LogWarning($"Key '{b}' was not found in the dictionary.");
         bool moveCheck = true;
         switch (unit.unitType)
@@ -319,7 +349,7 @@ public class MasterGrid : MonoBehaviour
                 moveCheck = moveCheck && a.canSeaTraverse;
                 break;
             case UnitType.Air:
-                break;
+                return moveCheck;
             default:
                 break;
         }
@@ -580,5 +610,10 @@ public class MasterGrid : MonoBehaviour
     public int getPlayerTurn()
     {
         return gameMaster.getPlayerTurn();
+    }
+
+    private string CombineCombatEnums(DamageType damageType, WeaponType weaponType)
+    {
+        return $"{damageType} {weaponType}";
     }
 }

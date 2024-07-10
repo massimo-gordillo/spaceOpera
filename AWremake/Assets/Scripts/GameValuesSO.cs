@@ -13,6 +13,7 @@ public class GameValuesSO : ScriptableObject
     private string[] unitTypes;
     private PrefabManager prefabManager = new PrefabManager();
     private Dictionary<byte, AttributesTile> byteToAttributesTileDictionary; // Map byte values to AttributeTiles (tile rules)
+    private Dictionary<string, Dictionary<string, double>> combatMultipliersDictionary;
 
     public void initialize()
     {
@@ -22,6 +23,7 @@ public class GameValuesSO : ScriptableObject
 
         LoadUnitsFromCSV("Assets/StreamingAssets/SpaceOperaUnitValues - UnitValues.csv");
         LoadTilesFromCSV("Assets/StreamingAssets/SpaceOperaTileValues - TileValues.csv");
+        LoadCombatMultipliersFromCSV("Assets/StreamingAssets/SpaceOperaUnitValues - Combat Multipliers.csv");
     }
 
     public void LoadUnitsFromCSV(string filePath)
@@ -156,7 +158,32 @@ public class GameValuesSO : ScriptableObject
         }
     }
 
-    
+    private void LoadCombatMultipliersFromCSV(string csvFilePath)
+    {
+        combatMultipliersDictionary = new Dictionary<string, Dictionary<string, double>>();
+        using (var reader = new StreamReader(csvFilePath))
+        {
+            var header = reader.ReadLine().Split(',');
+
+            while (!reader.EndOfStream)
+            {
+                var line = reader.ReadLine().Split(',');
+                var healthType = line[0];
+
+                var innerDict = new Dictionary<string, double>();
+                for (int i = 1; i < header.Length; i++)
+                {
+                    innerDict[header[i]] = double.Parse(line[i]);
+                }
+
+                combatMultipliersDictionary[healthType] = innerDict;
+
+
+            }
+        }
+    }
+
+
 
     //odd bug, this function calls a unit in the list with an empty name. May be worth investigating should I call on this function in future.
     public AttributesBaseUnit GetUnitDataByTitle(string unitName)
@@ -191,6 +218,11 @@ public class GameValuesSO : ScriptableObject
     public Dictionary<byte, AttributesTile> getAttributesTilesDictionary()
     {
         return byteToAttributesTileDictionary;
+    }
+
+    public Dictionary<string, Dictionary<string, double>>  getCombatMultiplierDictionary()
+    {
+        return combatMultipliersDictionary;
     }
 
     //debugging function
