@@ -541,4 +541,7 @@ MonoBehaviour:
   unitSpriteRenderer: {fileID: 1281505375232010346}
   masterGrid: {fileID: 0}
   prefabPath: unitPrefabs/progeny1/HelicopterPrefab
+  canAttackLand: 1
+  canAttackAir: 1
+  canAttackSea: 1
   healthTextContainer: {fileID: 8301592626424303242}

@@ -221,6 +221,9 @@ MonoBehaviour:
   unitSpriteRenderer: {fileID: 1845900047701055079}
   masterGrid: {fileID: 0}
   prefabPath: unitPrefabs/progeny1/AAJetPrefab
+  canAttackLand: 0
+  canAttackAir: 1
+  canAttackSea: 0
   healthTextContainer: {fileID: 6658027887909763017}
 --- !u!1 &7558388235284691349
 GameObject:

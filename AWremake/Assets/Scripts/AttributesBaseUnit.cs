@@ -49,6 +49,9 @@ public class AttributesBaseUnit
     public DamageType damageType { get; set; } //light, heavy
     public int baseDamage { get; set; }
     public int attackRange { get; set; }
+    public bool canAttackLand { get; set; }
+    public bool canAttackAir { get; set; }
+    public bool canAttackSea { get; set; }
     public int price { get; set; }
     public int movementRange { get; set; }
     public Sprite sprite { get; set; }

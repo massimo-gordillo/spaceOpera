@@ -62,10 +62,9 @@ public class PrefabManager
                         Debug.LogWarning($"For unit {unitData.unitName}, field {property.Name} not found in BaseUnit.");
 
                     if (property.Name == "sprite" && unitScript.unitSpriteRenderer != null)
-                    {
                         unitScript.unitSpriteRenderer.sprite = (Sprite)value;
-                        Debug.Log($"Sprite for unit {unitData.unitName} updated.");
-                    }
+                    if (property.Name == "canAttackLand")
+                        Debug.Log($"can {unitData.unitName} attack ground? {value}");
                 }
 
                 // Optional: Debug log to verify properties

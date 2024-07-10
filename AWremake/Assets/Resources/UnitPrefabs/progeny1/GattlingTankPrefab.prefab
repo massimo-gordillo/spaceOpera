@@ -294,6 +294,9 @@ MonoBehaviour:
   unitSpriteRenderer: {fileID: 1211554258687783994}
   masterGrid: {fileID: 0}
   prefabPath: unitPrefabs/progeny1/GattlingTankPrefab
+  canAttackLand: 1
+  canAttackAir: 1
+  canAttackSea: 1
   healthTextContainer: {fileID: 8812191192939875255}
 --- !u!1 &6739541544821941019
 GameObject:

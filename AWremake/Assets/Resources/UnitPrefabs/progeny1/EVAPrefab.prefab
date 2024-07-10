@@ -294,6 +294,9 @@ MonoBehaviour:
   unitSpriteRenderer: {fileID: 9042674248127258872}
   masterGrid: {fileID: 0}
   prefabPath: unitPrefabs/progeny1/EVAPrefab
+  canAttackLand: 1
+  canAttackAir: 1
+  canAttackSea: 0
   healthTextContainer: {fileID: 7100229113055321074}
 --- !u!1 &8948029169086482632
 GameObject:

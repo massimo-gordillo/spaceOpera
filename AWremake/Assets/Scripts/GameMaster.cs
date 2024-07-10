@@ -62,28 +62,19 @@ public class GameMaster : MonoBehaviour
 
     private void startupInstantiateUnits()
     {
-        BaseUnit unit = infantryUnitPrefab;
-        //AttributesBaseUnit infantryData = gameValues.GetUnitDataByTitle("Infantry");
+        BaseUnit infantryUnitPrefab = Resources.Load<BaseUnit>("UnitPrefabs/progeny1/InfantryPrefab");
 
-        //unit.xPos = 18;
-        //unit.yPos = 19;
-        //Instantiate(unit, new Vector2(unit.xPos, unit.yPos), Quaternion.identity, unitList);
+        if (infantryUnitPrefab == null)
+        {
+            Debug.LogError("Infantry prefab not found at the specified path.");
+            return;
+        }
+
+        BaseUnit unit = Instantiate(infantryUnitPrefab, new Vector2(20, 17), Quaternion.identity, unitList);
         unit.playerControl = 1;
-        Instantiate(unit, new Vector2(20, 17), Quaternion.identity, unitList);
 
-        BaseUnit unit2 = infantryUnitPrefab;
+        BaseUnit unit2 = Instantiate(infantryUnitPrefab, new Vector2(18, 17), Quaternion.identity, unitList);
         unit2.playerControl = 2;
-        Instantiate(unit, new Vector2(18, 17), Quaternion.identity, unitList);
-        //unit.startupPopulateValues(infantryData);
-
-        /*
-        BaseUnit unit2 = infantryUnitPrefab;
-        unit2.unitName = "Infantry";
-        AttributesBaseUnit infantryData = gameValues.GetUnitDataByTitle("Infantry");
-        unit2.xPos = 16;
-        unit2.yPos = 18;
-        Instantiate(unit2, new Vector2(unit2.xPos, unit2.yPos), Quaternion.identity, unitList); BaseUnit unit2 = infantryUnitPrefab;
-        */
     }
 
     public int getIncomeForPlayer(int player)

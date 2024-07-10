@@ -150,7 +150,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   buttonText: {fileID: 7751100590271051732}
   sprite: {fileID: 7751100590174622828}
-  unitPrefab: {fileID: 6373046818696240236, guid: f458b322a941edf499e61baf59ec0bc8, type: 3}
+  unitPrefab: {fileID: 376317532261410512, guid: c9dd9b125f0255f418f3c22071c6030c, type: 3}
   gameMaster: {fileID: 0}
 --- !u!1 &7751100590174622830
 GameObject:
@@ -230,7 +230,7 @@ SpriteRenderer:
   m_SortingLayerID: 819369385
   m_SortingLayer: 5
   m_SortingOrder: 1
-  m_Sprite: {fileID: 21300000, guid: ee7b5ea9e41034445a4fee08cf86c29d, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 551b5acbce25d5741916dc05f5f3890b, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -307,9 +307,9 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Rockets
+  m_text: 'Battleship
 
-    1500'
+    2500'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}

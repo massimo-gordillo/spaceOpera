@@ -75,6 +75,9 @@ MonoBehaviour:
   unitSpriteRenderer: {fileID: 8990846733791526336}
   masterGrid: {fileID: 0}
   prefabPath: unitPrefabs/progeny1/BomberPrefab
+  canAttackLand: 1
+  canAttackAir: 0
+  canAttackSea: 1
   healthTextContainer: {fileID: 1086099939741947659}
 --- !u!1 &1226427135142893190
 GameObject:

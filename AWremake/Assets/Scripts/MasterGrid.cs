@@ -22,6 +22,8 @@ public class MasterGrid : MonoBehaviour
     public int playerTurn;
     private Dictionary<byte, AttributesTile> tileAttributes;
     private Dictionary<string, Dictionary<string, double>> combatMultipliers;
+    private double defenceMultiplier;
+    private double firebackMultiplier;
 
     // Called by GameMaster
     public void startup(int gridX, int gridY, byte[] tilemapByteArray, 
@@ -157,14 +159,39 @@ public class MasterGrid : MonoBehaviour
 
     public void unitCombat(BaseUnit attacker, BaseUnit defender)
     {
+        defenceMultiplier = 2.0;
+        firebackMultiplier = 0.8;
 
-
-        double baseDamage = attacker.baseDamage * ((double)attacker.healthCurrent/ attacker.healthMax);
         //Debug.Log($"Unit attacks, dealing {attacker.baseDamage} damage, healthcurrent is {attacker.healthCurrent} and healthmax is { attacker.healthMax} with a health ratio of {(double)attacker.healthCurrent / attacker.healthMax}");
+        double baseDamage = getAttackerBaseDamage(attacker);
         double multiplier = getDamageMultiplier(attacker, defender);
-        //int defenceVal;
-        defender.takeDamage((int)(baseDamage*multiplier));
-        Debug.Log($"Unit attacks, dealing {baseDamage} damage with a multipler of {multiplier}");
+        double defenceVal = getDefenceValueForDefender(defender);
+        
+        defender.takeDamage((int)(baseDamage * multiplier*defenceVal));
+        Debug.Log($"Unit attacks, dealing {baseDamage} damage with a multipler of {multiplier} and defenceval {defenceVal}");
+        if (canUnitAttack(defender, attacker))
+        {
+            attacker.takeDamage((int)(getAttackerBaseDamage(defender) * getDamageMultiplier(defender, attacker) * getDefenceValueForDefender(defender)* firebackMultiplier));
+            Debug.Log($"Defending Unit fires back");
+        }else
+            Debug.Log($"Defending Unit cannot fire back");
+    }
+
+    public double getAttackerBaseDamage(BaseUnit attacker)
+    {
+        return attacker.baseDamage * ((double)attacker.healthCurrent / attacker.healthMax);
+    }
+
+    public bool canUnitAttack(BaseUnit attacker, BaseUnit defender)
+    {
+        if (defender.unitType == UnitType.Land)
+            return attacker.canAttackLand;
+        else if(defender.unitType == UnitType.Sea)
+            return attacker.canAttackSea;
+        else if (defender.unitType == UnitType.Air)
+            return attacker.canAttackAir;
+        Debug.LogError("No unit Type returned when checking if a unit could attack");
+        return true;
     }
 
     public double getDamageMultiplier(BaseUnit attacker, BaseUnit defender)
@@ -331,10 +358,33 @@ public class MasterGrid : MonoBehaviour
 
     }
 
-    public byte whatTileByteIsInThisLocation(int x, int y)
+    public byte whatTileIsInThisLocation(int x, int y)
     {
         return terrainGrid[x, y];
     }
+
+    public double getTileDefenceValue(int x, int y)
+    {
+        AttributesTile tile;
+        if (tileAttributes.TryGetValue(whatTileIsInThisLocation(x, y), out tile))
+        {
+            return 1 - (double)tile.defenceValue / 100 * defenceMultiplier;
+        }
+        else
+        {
+            Debug.LogError($"In combat, tile for bytevalue {whatTileIsInThisLocation(x,y)} not found");
+            return 0;
+        }
+    }
+
+    public double getDefenceValueForDefender(BaseUnit defender)
+    {
+        if (defender.unitType == UnitType.Air)
+            return 0;
+        else
+            return getTileDefenceValue(defender.xPos, defender.yPos);
+    }
+    
 
     public bool canUnitMoveToByteValue(BaseUnit unit, byte b)
     {
@@ -373,7 +423,7 @@ public class MasterGrid : MonoBehaviour
 
         if (x < 0 || y < 0 || x >= gridX || y >= gridY)
             return 0;
-        else if (!canUnitMoveToByteValue(mTarget, whatTileByteIsInThisLocation(x, y)))
+        else if (!canUnitMoveToByteValue(mTarget, whatTileIsInThisLocation(x, y)))
             return 0;
         else if (whatUnitIsInThisLocation(x, y) == null)
             return 1;

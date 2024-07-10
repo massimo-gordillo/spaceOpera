@@ -43,6 +43,9 @@ public class BaseUnit : MonoBehaviour
     public SpriteRenderer unitSpriteRenderer;
     public MasterGrid masterGrid;
     public string prefabPath;
+    public bool canAttackLand;
+    public bool canAttackAir;
+    public bool canAttackSea;
 
     public TMP_Text healthTextContainer;
     //use healthTextContainer.text= to update text.
