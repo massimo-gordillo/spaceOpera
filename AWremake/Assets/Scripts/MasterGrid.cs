@@ -24,6 +24,7 @@ public class MasterGrid : MonoBehaviour
     private Dictionary<string, Dictionary<string, double>> combatMultipliers;
     private double defenceMultiplier;
     private double firebackMultiplier;
+    private double attackLuckRange;
 
     // Called by GameMaster
     public void startup(int gridX, int gridY, byte[] tilemapByteArray, 
@@ -48,9 +49,8 @@ public class MasterGrid : MonoBehaviour
         //public GameObject masterGrid = GameObject.FindGameObjectWithTag("MasterGridTag").GetComponent<MasterGrid>();
         //transform.position = new Vector2((float)(gridX + 0.5), (float)(gridY + 0.5));
 
-        //take in map initiation data
+        attackLuckRange = 10;
 
-        //build map
     }
 
     public void setTerrain(byte[] tilemapByteArray)
@@ -160,22 +160,81 @@ public class MasterGrid : MonoBehaviour
     public void unitCombat(BaseUnit attacker, BaseUnit defender)
     {
         defenceMultiplier = 2.0;
-        firebackMultiplier = 0.8;
+        firebackMultiplier = 0.7;
 
         //Debug.Log($"Unit attacks, dealing {attacker.baseDamage} damage, healthcurrent is {attacker.healthCurrent} and healthmax is { attacker.healthMax} with a health ratio of {(double)attacker.healthCurrent / attacker.healthMax}");
         double baseDamage = getAttackerBaseDamage(attacker);
         double multiplier = getDamageMultiplier(attacker, defender);
+        //if they are the same type of unit, they deal a maximum of 70% after type multiplier (defence and luck calculation comes after)
+        if(attacker.unitName == defender.unitName && baseDamage * multiplier > defender.healthMax * 0.70)
+        {
+            baseDamage = defender.healthMax * 0.70;
+            multiplier = 1;
+        }
         double defenceVal = getDefenceValueForDefender(defender);
-        
-        defender.takeDamage((int)(baseDamage * multiplier*defenceVal));
-        Debug.Log($"Unit attacks, dealing {baseDamage} damage with a multipler of {multiplier} and defenceval {defenceVal}");
+        double damagePreLuck = baseDamage * multiplier * defenceVal;
+        double finalDamage = getDamageAfterLuck(damagePreLuck);
+
+
+        defender.takeDamage((int)finalDamage);
+        Debug.Log($"Unit attacks, dealing {finalDamage} damage with a multipler of {multiplier}, defenceval {defenceVal}, luck factor of {finalDamage/damagePreLuck}");
         if (canUnitAttack(defender, attacker))
         {
-            attacker.takeDamage((int)(getAttackerBaseDamage(defender) * getDamageMultiplier(defender, attacker) * getDefenceValueForDefender(defender)* firebackMultiplier));
-            Debug.Log($"Defending Unit fires back");
+            double defenderFireBackDamage = getAttackerBaseDamage(defender) * getDamageMultiplier(defender, attacker) * getDefenceValueForDefender(defender) * firebackMultiplier;
+            //maximum damage a defender (to same type of unit) fireback can deal to an attacking unit is 50%.
+            if(defender.unitName == attacker.unitName && defenderFireBackDamage > attacker.healthMax * 0.50)
+                attacker.takeDamage((int)(attacker.healthMax * 0.50));
+            else
+                attacker.takeDamage((int)defenderFireBackDamage);
+            Debug.Log($"Defending Unit fires back with {defenderFireBackDamage}");
         }else
             Debug.Log($"Defending Unit cannot fire back");
     }
+
+    public double getDamageAfterLuck(double damageInput)
+    {
+        if (attackLuckRange % 2 == 0)
+        {
+            int luckPercentageBonus = Random.Range(0, (int)attackLuckRange + 1) - (int)attackLuckRange / 2;
+            return damageInput * (1 + (double)luckPercentageBonus / 100);
+        }
+        else
+        {
+            Debug.LogError($"attackLuckRange is not an even number! cannot compute random range calculation.");
+            return damageInput;
+        }
+    }
+
+    //return % damage taken by defending unit (ceiling, + attackLuckRange/2 percentage)
+    public double getAttackLuckCeiling(double damageInput, double health, double maxHealth)
+    {
+        double attackLuckCeiling = attackLuckRange / 200;
+        double ceiling = damageInput * (1 + attackLuckCeiling);
+        if (ceiling > maxHealth)
+            return 100;
+        else if (ceiling < 0)
+            return 0;
+        else if (health - ceiling < 0.1 * maxHealth)
+            return 0;
+        else
+            return ceiling / maxHealth;
+    }
+
+    //return % damage taken by defending unit (floor, - attackLuckRange/2 percentage)
+    public double getAttackLuckFloor(double damageInput, double health, double maxHealth)
+    {
+        double attackLuckFloor = (attackLuckRange / 2 - attackLuckRange)/100;
+        double floor = damageInput * (1+attackLuckFloor);
+        if (floor > maxHealth)
+            return 100;
+        if (floor < 0)
+            return 0;
+        else if (health - floor < 0.1 * maxHealth)
+            return 0;
+        else
+            return floor / maxHealth;
+    }    
+    
 
     public double getAttackerBaseDamage(BaseUnit attacker)
     {

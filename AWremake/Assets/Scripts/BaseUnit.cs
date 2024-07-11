@@ -150,6 +150,10 @@ public class BaseUnit : MonoBehaviour
         if (healthCurrent <= damage){
             setHealth(0);
             deleteMe();
+        }else if (healthCurrent - damage < 0.1 * healthMax)
+        {
+            setHealth(0);
+            deleteMe();
         }
         else
         {
