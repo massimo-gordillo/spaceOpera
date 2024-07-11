@@ -52,6 +52,7 @@ public class AttributesBaseUnit
     public bool canAttackLand { get; set; }
     public bool canAttackAir { get; set; }
     public bool canAttackSea { get; set; }
+    public bool canFireBack { get; set; }
     public int price { get; set; }
     public int movementRange { get; set; }
     public Sprite sprite { get; set; }

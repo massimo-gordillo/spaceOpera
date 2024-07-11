@@ -178,7 +178,7 @@ public class MasterGrid : MonoBehaviour
 
         defender.takeDamage((int)finalDamage);
         Debug.Log($"Unit attacks, dealing {finalDamage} damage with a multipler of {multiplier}, defenceval {defenceVal}, luck factor of {finalDamage/damagePreLuck}");
-        if (canUnitAttack(defender, attacker))
+        if (canUnitAttack(defender, attacker)&&defender.canFireBack)
         {
             double defenderFireBackDamage = getAttackerBaseDamage(defender) * getDamageMultiplier(defender, attacker) * getDefenceValueForDefender(defender) * firebackMultiplier;
             //maximum damage a defender (to same type of unit) fireback can deal to an attacking unit is 50%.

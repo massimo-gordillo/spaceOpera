@@ -224,6 +224,7 @@ MonoBehaviour:
   canAttackLand: 0
   canAttackAir: 1
   canAttackSea: 0
+  canFireBack: 1
   healthTextContainer: {fileID: 6658027887909763017}
 --- !u!1 &7558388235284691349
 GameObject:

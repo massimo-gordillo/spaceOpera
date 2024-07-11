@@ -46,6 +46,7 @@ public class BaseUnit : MonoBehaviour
     public bool canAttackLand;
     public bool canAttackAir;
     public bool canAttackSea;
+    public bool canFireBack;
 
     public TMP_Text healthTextContainer;
     //use healthTextContainer.text= to update text.

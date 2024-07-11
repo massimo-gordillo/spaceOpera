@@ -210,9 +210,10 @@ MonoBehaviour:
   unitSpriteRenderer: {fileID: 226034478597480244}
   masterGrid: {fileID: 0}
   prefabPath: unitPrefabs/progeny1/ElectosPrefab
-  canAttackLand: 1
+  canAttackLand: 0
   canAttackAir: 0
   canAttackSea: 0
+  canFireBack: 1
   healthTextContainer: {fileID: 5848722897782121745}
 --- !u!1 &2751241547868141111
 GameObject:
