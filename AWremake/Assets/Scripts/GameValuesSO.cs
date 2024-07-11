@@ -95,7 +95,7 @@ public class GameValuesSO : ScriptableObject
             attributesBaseUnits.Add(unit);
 
             //Assets/Resources/UnitPrefabs/progeny1/BasePrefab.prefab
-            string basePrefabPath = "UnitPrefabs/BasePrefab";
+            string basePrefabPath = "UnitPrefabs/BaseUnitBasePrefab";
             prefabManager.ClonePrefab(basePrefabPath, unit.prefabPath);
             prefabManager.modifyPrefab(unit.prefabPath, unit);
         }

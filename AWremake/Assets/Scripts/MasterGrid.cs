@@ -188,7 +188,7 @@ public class MasterGrid : MonoBehaviour
                 attacker.takeDamage((int)defenderFireBackDamage);
             Debug.Log($"Defending Unit fires back with {defenderFireBackDamage}");
         }else
-            Debug.Log($"Defending Unit cannot fire back");
+            Debug.Log($"Defending Unit cannot fire back {defender.canFireBack}");
     }
 
     public double getDamageAfterLuck(double damageInput)
