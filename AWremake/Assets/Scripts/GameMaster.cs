@@ -75,6 +75,12 @@ public class GameMaster : MonoBehaviour
 
         BaseUnit unit2 = Instantiate(infantryUnitPrefab, new Vector2(18, 17), Quaternion.identity, unitList);
         unit2.playerControl = 2;
+        BaseUnit unit3 = Instantiate(infantryUnitPrefab, new Vector2(22, 18), Quaternion.identity, unitList);
+        unit3.playerControl = 1;
+        BaseUnit unit4 = Instantiate(infantryUnitPrefab, new Vector2(24, 18), Quaternion.identity, unitList);
+        unit4.playerControl = 2;
+        BaseUnit unit5 = Instantiate(infantryUnitPrefab, new Vector2(24, 15), Quaternion.identity, unitList);
+        unit5.playerControl = 1;
     }
 
     public int getIncomeForPlayer(int player)

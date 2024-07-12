@@ -143,6 +143,7 @@ public class MasterGrid : MonoBehaviour
                 if (attackableUnits.Contains(unit))
                 {
                     unit.hideCrosshairs();
+                    unit.hideCombatTooltip();
                     //unit.takeDamage(getSelectedUnit().baseDamage); //expand, obviously.
                     unitCombat(getSelectedUnit(), unit);
                     //selectedUnit.setNonExhausted(false);
@@ -159,36 +160,48 @@ public class MasterGrid : MonoBehaviour
 
     public void unitCombat(BaseUnit attacker, BaseUnit defender)
     {
-        defenceMultiplier = 2.0;
+        defenceMultiplier = 4.0;
         firebackMultiplier = 0.7;
 
-        //Debug.Log($"Unit attacks, dealing {attacker.baseDamage} damage, healthcurrent is {attacker.healthCurrent} and healthmax is { attacker.healthMax} with a health ratio of {(double)attacker.healthCurrent / attacker.healthMax}");
-        double baseDamage = getAttackerBaseDamage(attacker);
-        double multiplier = getDamageMultiplier(attacker, defender);
-        //if they are the same type of unit, they deal a maximum of 70% after type multiplier (defence and luck calculation comes after)
-        if(attacker.unitName == defender.unitName && baseDamage * multiplier > defender.healthMax * 0.70)
-        {
-            baseDamage = defender.healthMax * 0.70;
-            multiplier = 1;
-        }
-        double defenceVal = getDefenceValueForDefender(defender);
-        double damagePreLuck = baseDamage * multiplier * defenceVal;
+
+        double damagePreLuck = getDamageBeforeLuck(attacker, defender, false);
         double finalDamage = getDamageAfterLuck(damagePreLuck);
 
 
         defender.takeDamage((int)finalDamage);
-        Debug.Log($"Unit attacks, dealing {finalDamage} damage with a multipler of {multiplier}, defenceval {defenceVal}, luck factor of {finalDamage/damagePreLuck}");
+        Debug.Log($"Unit attacks, dealing {finalDamage} damage with luck factor of {finalDamage/damagePreLuck}");
         if (canUnitAttack(defender, attacker)&&defender.canFireBack)
         {
-            double defenderFireBackDamage = getAttackerBaseDamage(defender) * getDamageMultiplier(defender, attacker) * getDefenceValueForDefender(defender) * firebackMultiplier;
-            //maximum damage a defender (to same type of unit) fireback can deal to an attacking unit is 50%.
-            if(defender.unitName == attacker.unitName && defenderFireBackDamage > attacker.healthMax * 0.50)
-                attacker.takeDamage((int)(attacker.healthMax * 0.50));
-            else
-                attacker.takeDamage((int)defenderFireBackDamage);
+            double defenderFireBackDamage = getDamageBeforeLuck(defender, attacker, true);
+            attacker.takeDamage((int)defenderFireBackDamage);
             Debug.Log($"Defending Unit fires back with {defenderFireBackDamage}");
         }else
             Debug.Log($"Defending Unit cannot fire back {defender.canFireBack}");
+    }
+
+    public double getDamageBeforeLuck(BaseUnit attacker, BaseUnit defender, bool firingBack)
+    {
+        //Debug.Log($"Unit attacks, dealing {attacker.baseDamage} damage, healthcurrent is {attacker.healthCurrent} and healthmax is { attacker.healthMax} with a health ratio of {(double)attacker.healthCurrent / attacker.healthMax}");
+        double baseDamage = getAttackerBaseDamage(attacker);
+        double multiplier = getDamageMultiplier(attacker, defender);
+        double defenceVal = getDefenceValueForDefender(defender);
+        Debug.Log($"defenceVal for defender {defender.GetInstanceID()} is {defenceVal}");
+        //if they are the same type of unit, they deal a maximum of 70% after type multiplier (defence and luck calculation comes after) 
+        if (attacker.unitName == defender.unitName)
+        {
+            if(!firingBack && baseDamage * multiplier > defender.healthMax * 0.70)
+            {
+                baseDamage = defender.healthMax * 0.70;
+                multiplier = 1;
+            }else if (firingBack && baseDamage * multiplier * defenceVal * firebackMultiplier > defender.healthMax * 0.50) //only 50% max if firing back.
+            {
+                return defender.healthMax * 0.50;
+            }
+        }
+        if (!firingBack)
+            return baseDamage * multiplier * defenceVal;
+        else
+            return baseDamage * multiplier * defenceVal * firebackMultiplier;
     }
 
     public double getDamageAfterLuck(double damageInput)
@@ -223,7 +236,8 @@ public class MasterGrid : MonoBehaviour
     //return % damage taken by defending unit (floor, - attackLuckRange/2 percentage)
     public double getAttackLuckFloor(double damageInput, double health, double maxHealth)
     {
-        double attackLuckFloor = (attackLuckRange / 2 - attackLuckRange)/100;
+        //the negative side of attackLuckRange
+        double attackLuckFloor = (-0.5*attackLuckRange)/100;
         double floor = damageInput * (1+attackLuckFloor);
         if (floor > maxHealth)
             return 100;
@@ -368,8 +382,7 @@ public class MasterGrid : MonoBehaviour
                 unitInLocation = whatUnitIsInThisLocation(xCheck, yCheck);
             if (unitInLocation != null && unitInLocation != selectedUnit && selectedUnit.playerControl != unitInLocation.playerControl)
             {
-                attackableUnits.Add(unitInLocation);
-                unitInLocation.drawCrosshairs();
+                setUnitToAttackable(selectedUnit, unitInLocation);
             }
         }
 
@@ -388,6 +401,18 @@ public class MasterGrid : MonoBehaviour
             }
         }
         print("this many units in the unitGrid: " + k);*/
+    }
+
+    public void setUnitToAttackable(BaseUnit attacker, BaseUnit defender)
+    {
+        attackableUnits.Add(defender);
+        defender.drawCrosshairs();
+        double damageBeforeLuck = getDamageBeforeLuck(attacker, defender, false);
+        int tileDefenceValue = getTileDefenceValueInt(defender.xPos, defender.yPos);
+        double floor = getAttackLuckFloor(damageBeforeLuck, defender.healthCurrent, defender.healthMax);
+        double ceiling = getAttackLuckCeiling(damageBeforeLuck, defender.healthCurrent, defender.healthMax);
+        defender.showCombatTooltip(tileDefenceValue, floor, ceiling);
+        Debug.Log($"For defender {defender.GetInstanceID()}, Tooltip displays floor: {floor}, ceiling: {ceiling}, base dmg before luck: {damageBeforeLuck}.");
     }
 
     public BaseUnit whatUnitIsInThisLocation(int x, int y)
@@ -422,16 +447,21 @@ public class MasterGrid : MonoBehaviour
         return terrainGrid[x, y];
     }
 
-    public double getTileDefenceValue(int x, int y)
+    public double getTileDefenceValueMultiplier(int x, int y)
+    {
+            return 1 - (double)getTileDefenceValueInt(x, y) / 100 * defenceMultiplier;
+    }
+
+    public int getTileDefenceValueInt(int x, int y)
     {
         AttributesTile tile;
         if (tileAttributes.TryGetValue(whatTileIsInThisLocation(x, y), out tile))
         {
-            return 1 - (double)tile.defenceValue / 100 * defenceMultiplier;
+            return tile.defenceValue;
         }
         else
         {
-            Debug.LogError($"In combat, tile for bytevalue {whatTileIsInThisLocation(x,y)} not found");
+            Debug.LogError($"Cannot get tile at location {x},{y} for byteValue {whatTileIsInThisLocation(x, y)}");
             return 0;
         }
     }
@@ -439,9 +469,9 @@ public class MasterGrid : MonoBehaviour
     public double getDefenceValueForDefender(BaseUnit defender)
     {
         if (defender.unitType == UnitType.Air)
-            return 0;
+            return 1;
         else
-            return getTileDefenceValue(defender.xPos, defender.yPos);
+            return getTileDefenceValueMultiplier(defender.xPos, defender.yPos);
     }
     
 
@@ -515,6 +545,7 @@ public class MasterGrid : MonoBehaviour
         foreach (BaseUnit attackableUnit in attackableUnits)
         {
             attackableUnit.hideCrosshairs();
+            attackableUnit.hideCombatTooltip();
         }
         attackableUnits.Clear();
     }

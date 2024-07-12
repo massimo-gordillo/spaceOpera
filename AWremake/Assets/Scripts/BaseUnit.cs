@@ -49,6 +49,10 @@ public class BaseUnit : MonoBehaviour
     public bool canFireBack;
 
     public TMP_Text healthTextContainer;
+    public TMP_Text unitNameTextContainer;
+    public TMP_Text defenceValueTextContainer;
+    public TMP_Text damageRangeTextContainer;
+    public GameObject combatTooltip;
     //use healthTextContainer.text= to update text.
 
     void Start()
@@ -71,9 +75,15 @@ public class BaseUnit : MonoBehaviour
         //healthMax = 100;
         //healthCurrent= healthMax;
         setHealth(healthMax);
+        if (unitNameTextContainer != null)
+        {
+            unitNameTextContainer.text = $"P{playerControl}'s {progeny} {unitName}";
+        }
+        else
+            Debug.LogError("No unitNameTextContainerFound");
 
-        
         hideCrosshairs();
+        hideCombatTooltip();
         //setColor(playerControl, nonExhausted);
 
     }
@@ -134,6 +144,20 @@ public class BaseUnit : MonoBehaviour
             crosshairSpriteRenderer.enabled = false;
         }
     }
+    public void hideCombatTooltip()
+    {
+        if (combatTooltip != null)
+        {
+            combatTooltip.SetActive(false);
+        }
+    }
+
+    public void showCombatTooltip(int defence, double floor, double ceiling)
+    {
+        combatTooltip.SetActive(true);
+        defenceValueTextContainer.text = $"Defence: {defence}";
+        damageRangeTextContainer.text = $"{(int)(floor*100)}% - {(int)(ceiling*100)}%";
+    }
 
     public void setHealth(int health)
     {
@@ -148,7 +172,9 @@ public class BaseUnit : MonoBehaviour
 
     public void takeDamage(int damage)
     {
-        if (healthCurrent <= damage){
+        if (damage <= 0)
+            setHealth(healthCurrent);
+        else if (healthCurrent <= damage){
             setHealth(0);
             deleteMe();
         }else if (healthCurrent - damage < 0.1 * healthMax)
