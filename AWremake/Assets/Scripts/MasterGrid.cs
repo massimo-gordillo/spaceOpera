@@ -169,7 +169,7 @@ public class MasterGrid : MonoBehaviour
 
 
         defender.takeDamage((int)finalDamage);
-        Debug.Log($"Unit attacks, dealing {finalDamage} damage with luck factor of {finalDamage/damagePreLuck}");
+        Debug.Log($"Unit attacks with preluck damage {damagePreLuck} dealing {finalDamage} damage with luck factor of {finalDamage/damagePreLuck}");
         if (canUnitAttack(defender, attacker)&&defender.canFireBack)
         {
             double defenderFireBackDamage = getDamageBeforeLuck(defender, attacker, true);
@@ -471,7 +471,12 @@ public class MasterGrid : MonoBehaviour
         if (defender.unitType == UnitType.Air)
             return 1;
         else
-            return getTileDefenceValueMultiplier(defender.xPos, defender.yPos);
+        {
+            double tileMuiltiplier = getTileDefenceValueMultiplier(defender.xPos, defender.yPos);
+
+            Debug.Log($"TileDefenceMultiplier: {tileMuiltiplier}");
+            return tileMuiltiplier;
+        }
     }
     
 
@@ -683,6 +688,9 @@ public class MasterGrid : MonoBehaviour
             if (unit.getPlayerControl() == playerTurn)
             {
                 unit.setNonExhausted(true);
+                unit.oldXPos = null;
+                unit.oldYPos = null;
+
             }
         }
     }
@@ -709,7 +717,7 @@ public class MasterGrid : MonoBehaviour
         {
             gameMaster.selectedStructure = structure;
         }
-        gameMaster.showUnitChoicePanel(attackableUnits.Count != 0, canStructureBeCapturedHere);
+        gameMaster.showUnitChoicePanel(attackableUnits.Count != 0, canStructureBeCapturedHere, !unit.movementNonExhausted);
         if (!unit.movementNonExhausted && attackableUnits.Count == 0 && !canStructureBeCapturedHere)
             exhaustSelectedUnit(unit, true);
     }

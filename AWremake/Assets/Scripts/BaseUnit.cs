@@ -82,6 +82,10 @@ public class BaseUnit : MonoBehaviour
         else
             Debug.LogError("No unitNameTextContainerFound");
 
+        unitNameTextContainer.color = new Color32(255, 0, 0, 255);
+        defenceValueTextContainer.color = new Color32(255, 0, 0, 255);
+        damageRangeTextContainer.color = new Color32(255, 0, 0, 255);
+
         hideCrosshairs();
         hideCombatTooltip();
         //setColor(playerControl, nonExhausted);

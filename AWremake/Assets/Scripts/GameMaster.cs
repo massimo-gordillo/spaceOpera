@@ -45,7 +45,7 @@ public class GameMaster : MonoBehaviour
         tilemapManager.initialize();
 
         //initializes the masterGrid arrays etc with the map size
-        masterGrid.startup(gridX, gridY, tilemapManager.getTilemapByteArray(), gameValues.getAttributesTilesDictionary(),gameValues.getCombatMultiplierDictionary());
+        masterGrid.startup(gridX, gridY, tilemapManager.getTilemapByteArray(), gameValues.getAttributesTilesDictionary(), gameValues.getCombatMultiplierDictionary());
 
         hideChoicePanel();
         playerTurn = 1;
@@ -53,7 +53,7 @@ public class GameMaster : MonoBehaviour
         setPlayerTurnText(playerTurn);
         baseResourcePerTurn = 100;
         structureResourcePerTurn = 1027;
-        playerResources = new int[numPlayers+1];
+        playerResources = new int[numPlayers + 1];
         playerResources[0] = 0;
         for (int i = 1; i <= numPlayers; i++)
             setPlayerResources(i);
@@ -91,7 +91,7 @@ public class GameMaster : MonoBehaviour
     public void structureHasBeenClicked(BaseStructure structure)
     {
         //should probably try/catch if structure is null
-        if(structure.playerControl == playerTurn && structure.structureType == 1)
+        if (structure.playerControl == playerTurn && structure.structureType == 1)
         {
             choicePanel.SetActive(true);
             productionPanel.SetActive(true);
@@ -101,7 +101,7 @@ public class GameMaster : MonoBehaviour
 
     public void captureButtonPressed()
     {
-        if(selectedStructure != null)
+        if (selectedStructure != null)
         {
             masterGrid.captureStructure(selectedStructure);
             hideChoicePanel();
@@ -114,7 +114,7 @@ public class GameMaster : MonoBehaviour
         masterGrid.attackButtonPressed();
         hideChoicePanel();
     }
-    
+
     public void undoMovementButtonPressed()
     {
         masterGrid.undoMovementButtonPressed();
@@ -163,7 +163,7 @@ public class GameMaster : MonoBehaviour
     public void setPlayerTurnText(int playerTurn) //this should probably be combined with BaseUnit.setColor
     {
         playerTurnText.text = "Player Turn: " + (playerTurn);
-        
+
         float hue = ((float)playerTurn / 3.0f) * 360f;
         float saturation = 1.0f;
         float value = 1.0f;
@@ -171,10 +171,10 @@ public class GameMaster : MonoBehaviour
         playerTurnText.color = color;
     }
 
-    public void showUnitChoicePanel(bool attackableUnitsBool, bool capturableStructureBool)
+    public void showUnitChoicePanel(bool attackableUnitsBool, bool capturableStructureBool, bool hasMoved)
     {
         //print(structure);
-        if (attackableUnitsBool || capturableStructureBool)
+        if (attackableUnitsBool || capturableStructureBool )
         {
             choicePanel.SetActive(true);
             unitChoicePanel.SetActive(true);
@@ -183,6 +183,7 @@ public class GameMaster : MonoBehaviour
             //clickableCaptureButton(capturableStructureBool);
             attackButton.interactable = attackableUnitsBool;
             captureButton.interactable = capturableStructureBool;
+            undoMovementButton.interactable = hasMoved;
         }
     }
 

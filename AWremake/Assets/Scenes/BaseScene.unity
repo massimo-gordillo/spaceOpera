@@ -2301,7 +2301,7 @@ MonoBehaviour:
   infantryUnitPrefab: {fileID: 7803690413202824681, guid: 983ef1501268ffe41b8514bfa205ddc5, type: 3}
   attackButton: {fileID: 99806018}
   captureButton: {fileID: 1570366192}
-  undoMovementButton: {fileID: 0}
+  undoMovementButton: {fileID: 1480146372}
   gridX: 30
   gridY: 20
 --- !u!4 &1024135145
