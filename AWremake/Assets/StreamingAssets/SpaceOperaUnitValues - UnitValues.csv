@@ -1,4 +1,4 @@
-unitName,progeny,isResourceUnit,unitType,isInfantry,healthMax,healthType,damageType,weaponType,damageCombined,canAttackGround,canAttackAir,canAttackSea,canFireBack,baseDamage,attackRange,price,movementRange
+unitName,progeny,isResourceUnit,unitType,isInfantry,healthMax,healthType,damageType,weaponType,damageCombined,canAttackLand,canAttackAir,canAttackSea,canFireBack,baseDamage,attackRange,price,movementRange
 Infantry,ertrian,TRUE,land,TRUE,100,light,light,projectile,light projectile,TRUE,TRUE,TRUE,TRUE,60,1,100,3
 GattlingTank,ertrian,FALSE,land,FALSE,400,medium,light,projectile,light projectile,TRUE,TRUE,TRUE,TRUE,300,1,800,6
 LightTank,ertrian,FALSE,land,FALSE,700,medium,heavy,projectile,heavy projectile,TRUE,FALSE,TRUE,TRUE,300,1,700,7

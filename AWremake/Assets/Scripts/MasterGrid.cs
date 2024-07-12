@@ -178,7 +178,7 @@ public class MasterGrid : MonoBehaviour
             attacker.takeDamage((int)defenderFireBackDamage);
             Debug.Log($"Defending Unit fires back with {defenderFireBackDamage}");
         }else
-            Debug.Log($"Defending Unit cannot fire back {defender.canFireBack}");
+            Debug.Log($"Defending Unit can fire back {defender.canFireBack}");
     }
 
     public double getDamageBeforeLuck(BaseUnit attacker, BaseUnit defender, bool firingBack)
@@ -382,7 +382,7 @@ public class MasterGrid : MonoBehaviour
             BaseUnit unitInLocation = null;
             if (xCheck >= 0 && xCheck < gridX && yCheck >= 0 && yCheck < gridY)
                 unitInLocation = whatUnitIsInThisLocation(xCheck, yCheck);
-            if (unitInLocation != null && unitInLocation != selectedUnit && selectedUnit.playerControl != unitInLocation.playerControl)
+            if (unitInLocation != null && unitInLocation != selectedUnit && selectedUnit.playerControl != unitInLocation.playerControl && canUnitAttack(selectedUnit, unitInLocation))
             {
                 setUnitToAttackable(selectedUnit, unitInLocation);
             }

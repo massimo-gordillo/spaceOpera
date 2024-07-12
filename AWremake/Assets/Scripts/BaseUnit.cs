@@ -159,6 +159,14 @@ public class BaseUnit : MonoBehaviour
     public void showCombatTooltip(int defence, double floor, double ceiling)
     {
         combatTooltip.SetActive(true);
+        if (floor > 1)
+            floor = 1;
+        if (ceiling > 1)
+            ceiling = 1;
+        if (floor < 0)
+            floor = 0;
+        if (ceiling < 0)
+            ceiling = 0;
         defenceValueTextContainer.text = $"Defence: {defence}";
         damageRangeTextContainer.text = $"{(int)(floor*100)}% - {(int)(ceiling*100)}%";
     }
@@ -171,7 +179,7 @@ public class BaseUnit : MonoBehaviour
 
     public void updateHealthUI()
     {
-        healthTextContainer.text = healthCurrent.ToString();
+        healthTextContainer.text = ((int)((double)healthCurrent/(double)healthMax *100)).ToString();
     }
 
     public void takeDamage(int damage)
