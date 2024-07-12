@@ -50,6 +50,8 @@ public class MasterGrid : MonoBehaviour
         //transform.position = new Vector2((float)(gridX + 0.5), (float)(gridY + 0.5));
 
         attackLuckRange = 10;
+        defenceMultiplier = 4.0;
+        firebackMultiplier = 0.7;
 
     }
 
@@ -160,8 +162,8 @@ public class MasterGrid : MonoBehaviour
 
     public void unitCombat(BaseUnit attacker, BaseUnit defender)
     {
-        defenceMultiplier = 4.0;
-        firebackMultiplier = 0.7;
+        
+
 
 
         double damagePreLuck = getDamageBeforeLuck(attacker, defender, false);
@@ -219,7 +221,7 @@ public class MasterGrid : MonoBehaviour
     }
 
     //return % damage taken by defending unit (ceiling, + attackLuckRange/2 percentage)
-    public double getAttackLuckCeiling(double damageInput, double health, double maxHealth)
+    public double getAttackLuckCeiling(double damageInput, double maxHealth)
     {
         double attackLuckCeiling = attackLuckRange / 200;
         double ceiling = damageInput * (1 + attackLuckCeiling);
@@ -227,14 +229,14 @@ public class MasterGrid : MonoBehaviour
             return 100;
         else if (ceiling < 0)
             return 0;
-        else if (health - ceiling < 0.1 * maxHealth)
-            return 0;
+        else if (maxHealth - ceiling < 0.1 * maxHealth)
+            return 100;
         else
             return ceiling / maxHealth;
     }
 
     //return % damage taken by defending unit (floor, - attackLuckRange/2 percentage)
-    public double getAttackLuckFloor(double damageInput, double health, double maxHealth)
+    public double getAttackLuckFloor(double damageInput, double maxHealth)
     {
         //the negative side of attackLuckRange
         double attackLuckFloor = (-0.5*attackLuckRange)/100;
@@ -243,8 +245,8 @@ public class MasterGrid : MonoBehaviour
             return 100;
         if (floor < 0)
             return 0;
-        else if (health - floor < 0.1 * maxHealth)
-            return 0;
+        else if (maxHealth - floor < 0.1 * maxHealth)
+            return 100;
         else
             return floor / maxHealth;
     }    
@@ -409,8 +411,8 @@ public class MasterGrid : MonoBehaviour
         defender.drawCrosshairs();
         double damageBeforeLuck = getDamageBeforeLuck(attacker, defender, false);
         int tileDefenceValue = getTileDefenceValueInt(defender.xPos, defender.yPos);
-        double floor = getAttackLuckFloor(damageBeforeLuck, defender.healthCurrent, defender.healthMax);
-        double ceiling = getAttackLuckCeiling(damageBeforeLuck, defender.healthCurrent, defender.healthMax);
+        double floor = getAttackLuckFloor(damageBeforeLuck, defender.healthMax);
+        double ceiling = getAttackLuckCeiling(damageBeforeLuck, defender.healthMax);
         defender.showCombatTooltip(tileDefenceValue, floor, ceiling);
         Debug.Log($"For defender {defender.GetInstanceID()}, Tooltip displays floor: {floor}, ceiling: {ceiling}, base dmg before luck: {damageBeforeLuck}.");
     }
@@ -457,6 +459,7 @@ public class MasterGrid : MonoBehaviour
         AttributesTile tile;
         if (tileAttributes.TryGetValue(whatTileIsInThisLocation(x, y), out tile))
         {
+            Debug.Log($"Tile at location {x},{y} for byteValue {whatTileIsInThisLocation(x, y)} has defenceValue {tile.defenceValue}");
             return tile.defenceValue;
         }
         else
