@@ -1491,6 +1491,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isMouseDownOnClickableObject: 0
+  gridMin: {x: 0, y: 0}
+  gridMax: {x: 0, y: 0}
+  boundaryOffset: 5
+  snapBackSpeed: 5
+  gameMaster: {fileID: 1024135144}
 --- !u!20 &519420031
 Camera:
   m_ObjectHideFlags: 0

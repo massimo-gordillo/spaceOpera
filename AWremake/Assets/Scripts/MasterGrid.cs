@@ -33,21 +33,12 @@ public class MasterGrid : MonoBehaviour
     {
         tileAttributes = inputTileAttributes;
         combatMultipliers = inputCombatMultipliers;
-        /*        foreach (KeyValuePair<byte, AttributesTile> kvp in tileAttributes)
-                {
-                    byte b = kvp.Key;
-                    AttributesTile a = kvp.Value;
-                    Debug.Log($"mastergrid says: byte {b} paired with tile {a.tileName}");
-                }*/
-        //gameMaster = GameObject.FindGameObjectWithTag("GameMasterTag").GetComponent<GameMaster>();
         selectedUnit = null;
         unitGrid = new BaseUnit[gridX, gridY]; //initialize 2D array
         setTerrain(tilemapByteArray);
         structureGrid = new BaseStructure[gridX, gridY]; //initialize 2D array
         attackableUnits = new List<BaseUnit>();
         spriteOffStructures = new List<BaseStructure>();
-        //public GameObject masterGrid = GameObject.FindGameObjectWithTag("MasterGridTag").GetComponent<MasterGrid>();
-        //transform.position = new Vector2((float)(gridX + 0.5), (float)(gridY + 0.5));
 
         attackLuckRange = 10;
         defenceMultiplier = 4.0;
@@ -162,13 +153,8 @@ public class MasterGrid : MonoBehaviour
 
     public void unitCombat(BaseUnit attacker, BaseUnit defender)
     {
-        
-
-
-
         double damagePreLuck = getDamageBeforeLuck(attacker, defender, false);
         double finalDamage = getDamageAfterLuck(damagePreLuck);
-
 
         defender.takeDamage((int)finalDamage);
         Debug.Log($"Unit attacks with preluck damage {damagePreLuck} dealing {finalDamage} damage with luck factor of {finalDamage/damagePreLuck}");
