@@ -26,6 +26,8 @@ public class MasterGrid : MonoBehaviour
     private double firebackMultiplier;
     private double attackLuckRange;
 
+    public Transform movementSquareList;
+
     // Called by GameMaster
     public void startup(int gridX, int gridY, byte[] tilemapByteArray, 
         Dictionary<byte, AttributesTile> inputTileAttributes, 
@@ -122,7 +124,7 @@ public class MasterGrid : MonoBehaviour
                 presentGameActionsAtLocation(unit.xPos, unit.yPos, unit);
 
                 if (unit.movementNonExhausted == true) //if the unit hasn't moved already this turn.
-                    drawMovement(unit.movementRange, (int)unit.transform.position.x, (int)unit.transform.position.y, unit);
+                    drawMovement(unit);
             }
             //if there is a selected unit and you click on a (different) unit
             else if (getSelectedUnit() != unit && getSelectedUnit() != null)
@@ -299,53 +301,186 @@ public class MasterGrid : MonoBehaviour
 
     //MG 24-04-10: this really needs to be a recursive function. It will create the "wrap around an enemy" behaviour.
     public GameObject moveSquare;
-    public void drawMovement(int range, int xpos, int ypos, BaseUnit mTarget)
+    public bool[,] checkedCells;
+
+    Queue<(Vector2Int cell, int range)> cellsToCheck;
+
+    public void drawMovement(BaseUnit mTarget)
     {
+        int range = mTarget.movementRange;
+        int xpos = (int)mTarget.xPos;
+        int ypos = (int)mTarget.yPos;
         if (!drawing)
         {
             drawing = true;
             selectedUnit = mTarget;
 
-            bool[,] checkedCells = new bool[gridX + 2, gridY + 2];
+            checkedCells = new bool[gridX + 2, gridY + 2];
             checkedCells[xpos + 1, ypos + 1] = true;
+            cellsToCheck = new Queue<(Vector2Int, int)>();
+            cellsToCheck.Enqueue((new Vector2Int(xpos + 1, ypos + 1), range));
+            Debug.Log($"Adding cell {xpos},{ypos} to queue with range {range}");
 
-            Queue<Vector2Int> cellsToCheck = new Queue<Vector2Int>();
-            cellsToCheck.Enqueue(new Vector2Int(xpos + 1, ypos + 1));
+            RecursiveDrawMovement(mTarget);
+        }
+    }
 
-            for (int i = 1; i <= range && cellsToCheck.Count > 0; i++)
+    private void RecursiveDrawMovement(BaseUnit mTarget)
+    {
+        Debug.Log($"cellsToCheck size is: {cellsToCheck.Count}");
+        if (cellsToCheck.Count == 0)
+        {
+            return;
+        }
+
+        var cellRangePair = cellsToCheck.Dequeue();
+        Debug.Log($"Removed: {cellRangePair.cell} from cellsToCheck");
+
+        Vector2Int checkingCell = cellRangePair.cell;
+        int range = cellRangePair.range;
+
+        if (range == 0)
+        {
+            return;
+        }
+
+        for (int rad = 0; rad < 4; rad++)
+        {
+            Vector2Int sinDirV = sinDir(rad);
+            int xCheck = checkingCell.x + sinDirV.x;
+            int yCheck = checkingCell.y + sinDirV.y;
+
+            if (xCheck >= 0 && xCheck < gridX + 2 && yCheck >= 0 && yCheck < gridY + 2 && !checkedCells[xCheck, yCheck])
             {
-                int cellsToProcess = cellsToCheck.Count;
+                checkedCells[xCheck, yCheck] = true;
 
-                for (int j = 0; j < cellsToProcess; j++)
+                if (legalMove(xCheck - 1, yCheck - 1, mTarget) >= 1)
                 {
-                    Vector2Int currentCell = cellsToCheck.Dequeue();
-
-                    for (int rad = 0; rad < 4; rad++)
+                    if (!cellsToCheck.Contains((new Vector2Int(xCheck, yCheck), range - 1)))
                     {
-                        int xCheck = currentCell.x + sinDir(rad).x;
-                        int yCheck = currentCell.y + sinDir(rad).y;
+                        cellsToCheck.Enqueue((new Vector2Int(xCheck, yCheck), range - 1));
+                        Debug.Log($"Adding key {xCheck},{yCheck} to queue with range {range - 1}");
+                    }
+                    else
+                    {
+                        Debug.Log($"Key {xCheck},{yCheck} already exists in Queue");
+                    }
 
-                        if (xCheck >= 0 && xCheck < gridX + 2 && yCheck >= 0 && yCheck < gridY + 2 && !checkedCells[xCheck, yCheck])
+                    if (legalMove(xCheck - 1, yCheck - 1, mTarget) == 1)
+                    {
+                        Instantiate(moveSquare, new Vector2(xCheck - 1, yCheck - 1), Quaternion.identity, movementSquareList);
+                    }
+
+                    BaseStructure s = whatStructureIsInThisLocation(xCheck - 1, yCheck - 1);
+                    if (s != null)
+                    {
+                        turnOffStructureCollider(s);
+                    }
+                }
+            }
+        }
+
+        // Continue the recursion
+        RecursiveDrawMovement(mTarget);
+    }
+
+    /*private void RecursiveDrawMovement1(int range, BaseUnit mTarget, Dictionary<Vector2Int, int>() cellsToCheck)
+    {
+        if (range == 0 || cellsToCheck.Count == 0)
+        {
+
+            return;
+        }
+
+        Vector2Int checkingCell = cellsToCheck.Dequeue();
+
+        for (int rad = 0; rad < 4; rad++)
+        {
+            Vector2Int sinDirV = sinDir(rad);
+            int xCheck = checkingCell.x + sinDirV.x;
+            int yCheck = checkingCell.y + sinDirV.y;
+
+            if (!checkedCells[xCheck, yCheck] && xCheck >= 0 && xCheck < gridX + 2 && yCheck >= 0 && yCheck < gridY + 2)
+            {
+                Debug.Log($"Checking legality of cell {xCheck - 1},{yCheck - 1}");
+                if (legalMove(xCheck - 1, yCheck - 1, mTarget) >= 1)
+                {
+                    if (!cellsToCheck.Contains(new Vector2Int(xCheck, yCheck)))
+                        cellsToCheck.Enqueue(new Vector2Int(xCheck, yCheck));
+                    Debug.Log($"Adding cell {xCheck - 1},{yCheck - 1} to queue");
+                    if (legalMove(xCheck - 1, yCheck - 1, mTarget) == 1)
+                    {
+                        Instantiate(moveSquare, new Vector2(xCheck - 1, yCheck - 1), Quaternion.identity, movementSquareList);
+                        Debug.Log($"Instantiating movesquare at {xCheck - 1},{yCheck - 1}!");
+                    }
+
+                    BaseStructure s = whatStructureIsInThisLocation(xCheck - 1, yCheck - 1);
+                    if (s != null)
+                    {
+                        turnOffStructureCollider(s);
+                    }
+
+                    RecursiveDrawMovement1(range - 1, mTarget, cellsToCheck);
+                }
+
+                checkedCells[xCheck, yCheck] = true;
+            }
+        }
+    }*/
+
+
+    //OLD:
+    /*    public void drawMovement(BaseUnit mTarget)
+        {
+
+            int range = mTarget.movementRange;
+            int xpos = (int)mTarget.xPos;
+            int ypos = (int)mTarget.yPos;
+            if (!drawing)
+            {
+                drawing = true;
+                selectedUnit = mTarget;
+
+                bool[,] checkedCells = new bool[gridX + 2, gridY + 2];
+                checkedCells[xpos + 1, ypos + 1] = true;
+
+                Queue<Vector2Int> cellsToCheck = new Queue<Vector2Int>();
+                cellsToCheck.Enqueue(new Vector2Int(xpos + 1, ypos + 1));
+
+                for (int i = 1; i <= range && cellsToCheck.Count > 0; i++)
+                {
+                    int cellsToProcess = cellsToCheck.Count;
+
+                    for (int j = 0; j < cellsToProcess; j++)
+                    {
+                        Vector2Int currentCell = cellsToCheck.Dequeue();
+
+                        for (int rad = 0; rad < 4; rad++)
                         {
-                            checkedCells[xCheck, yCheck] = true;
-                            //if cell is empty or occupied by an allied unit
-                            if (legalMove(xCheck - 1, yCheck - 1, mTarget) >= 1)
+                            int xCheck = currentCell.x + sinDir(rad).x;
+                            int yCheck = currentCell.y + sinDir(rad).y;
+
+                            if (xCheck >= 0 && xCheck < gridX + 2 && yCheck >= 0 && yCheck < gridY + 2 && !checkedCells[xCheck, yCheck])
                             {
-                                //if cell is empty make a movement square.
-                                if (legalMove(xCheck - 1, yCheck - 1, mTarget) == 1)
-                                    Instantiate(moveSquare, new Vector2(xCheck - 1, yCheck - 1), Quaternion.identity);
-                                //  if (BaseStructure s = whatStructureIsInThisLocation(xCheck -1, yCheck - 1) != null) //I wish I could do this.
-                                BaseStructure s = whatStructureIsInThisLocation(xCheck - 1, yCheck - 1);
-                                if(s!=null)
-                                    turnOffStructureCollider(s);
-                                cellsToCheck.Enqueue(new Vector2Int(xCheck, yCheck));
+                                checkedCells[xCheck, yCheck] = true;
+                                //if cell is empty or occupied by an allied unit
+                                if (legalMove(xCheck - 1, yCheck - 1, mTarget) >= 1)
+                                {
+                                    //if cell is empty make a movement square.
+                                    if (legalMove(xCheck - 1, yCheck - 1, mTarget) == 1)
+                                        Instantiate(moveSquare, new Vector2(xCheck - 1, yCheck - 1), Quaternion.identity);
+                                    //  if (BaseStructure s = whatStructureIsInThisLocation(xCheck -1, yCheck - 1) != null) //I wish I could do this.
+                                    BaseStructure s = whatStructureIsInThisLocation(xCheck - 1, yCheck - 1);
+                                    if (s != null)
+                                        turnOffStructureCollider(s);
+                                    cellsToCheck.Enqueue(new Vector2Int(xCheck, yCheck));
+                                }
                             }
                         }
                     }
                 }
             }
-        }
-    }
+        }*/
 
 
 

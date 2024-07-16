@@ -191,6 +191,7 @@ Transform:
   - {fileID: 1002579700}
   - {fileID: 1671993176}
   - {fileID: 1281850839}
+  - {fileID: 1480701702}
   m_Father: {fileID: 450342576}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1203,6 +1204,7 @@ MonoBehaviour:
   allUnits: []
   gameMaster: {fileID: 1024135144}
   playerTurn: 0
+  movementSquareList: {fileID: 1480701702}
   moveSquare: {fileID: 4767315479213016531, guid: 45dd1bafd4332f345914066612cff201, type: 3}
 --- !u!1 &462848101
 GameObject:
@@ -10355,8 +10357,8 @@ Tilemap:
   - first: {x: 24, y: 14, z: 0}
     second:
       serializedVersion: 2
-      m_TileIndex: 4
-      m_TileSpriteIndex: 3
+      m_TileIndex: 2
+      m_TileSpriteIndex: 2
       m_TileMatrixIndex: 0
       m_TileColorIndex: 4
       m_TileObjectToInstantiateIndex: 65535
@@ -10365,8 +10367,8 @@ Tilemap:
   - first: {x: 25, y: 14, z: 0}
     second:
       serializedVersion: 2
-      m_TileIndex: 4
-      m_TileSpriteIndex: 3
+      m_TileIndex: 2
+      m_TileSpriteIndex: 2
       m_TileMatrixIndex: 0
       m_TileColorIndex: 4
       m_TileObjectToInstantiateIndex: 65535
@@ -10765,8 +10767,8 @@ Tilemap:
   - first: {x: 25, y: 15, z: 0}
     second:
       serializedVersion: 2
-      m_TileIndex: 4
-      m_TileSpriteIndex: 3
+      m_TileIndex: 2
+      m_TileSpriteIndex: 2
       m_TileMatrixIndex: 0
       m_TileColorIndex: 4
       m_TileObjectToInstantiateIndex: 65535
@@ -13288,11 +13290,11 @@ Tilemap:
     m_Data: {fileID: 0}
   - m_RefCount: 3
     m_Data: {fileID: 11400000, guid: 2e8f88827f69656448ebb69e7f42be64, type: 2}
-  - m_RefCount: 94
+  - m_RefCount: 97
     m_Data: {fileID: 11400000, guid: 949b31735f65e6749a1d4b5b7e75a8f7, type: 2}
   - m_RefCount: 106
     m_Data: {fileID: 11400000, guid: 907a1b1cc0166974fae021d42c6ddcce, type: 2}
-  - m_RefCount: 743
+  - m_RefCount: 740
     m_Data: {fileID: 11400000, guid: 5f14ecff2438c444a8a2c608274c33f8, type: 2}
   - m_RefCount: 42
     m_Data: {fileID: 11400000, guid: da95326c64a1d2d4081ccd952c08e816, type: 2}
@@ -13303,9 +13305,9 @@ Tilemap:
     m_Data: {fileID: 0}
   - m_RefCount: 3
     m_Data: {fileID: -1493151631, guid: 440d008068578c6408b506eaa894e9e7, type: 3}
-  - m_RefCount: 94
+  - m_RefCount: 97
     m_Data: {fileID: -2116042639, guid: 440d008068578c6408b506eaa894e9e7, type: 3}
-  - m_RefCount: 743
+  - m_RefCount: 740
     m_Data: {fileID: -2118928232, guid: 440d008068578c6408b506eaa894e9e7, type: 3}
   - m_RefCount: 106
     m_Data: {fileID: 1292036205, guid: 440d008068578c6408b506eaa894e9e7, type: 3}
@@ -13738,6 +13740,37 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 1, y: 1}
+--- !u!1 &1480701701
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1480701702}
+  m_Layer: 0
+  m_Name: MoveSquares
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1480701702
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1480701701}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 63701448}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1524738028
 GameObject:
   m_ObjectHideFlags: 0

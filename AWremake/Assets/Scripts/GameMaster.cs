@@ -73,7 +73,7 @@ public class GameMaster : MonoBehaviour
         BaseUnit unit = Instantiate(infantryUnitPrefab, new Vector2(20, 17), Quaternion.identity, unitList);
         unit.playerControl = 1;
 
-        BaseUnit unit2 = Instantiate(infantryUnitPrefab, new Vector2(18, 17), Quaternion.identity, unitList);
+        BaseUnit unit2 = Instantiate(infantryUnitPrefab, new Vector2(14, 14), Quaternion.identity, unitList);
         unit2.playerControl = 2;
         BaseUnit unit3 = Instantiate(infantryUnitPrefab, new Vector2(22, 18), Quaternion.identity, unitList);
         unit3.playerControl = 1;
