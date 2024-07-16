@@ -1205,7 +1205,7 @@ MonoBehaviour:
   gameMaster: {fileID: 1024135144}
   playerTurn: 0
   movementSquareList: {fileID: 1480701702}
-  moveSquare: {fileID: 4767315479213016531, guid: 45dd1bafd4332f345914066612cff201, type: 3}
+  moveSquare: {fileID: 6791101968882301709, guid: 45dd1bafd4332f345914066612cff201, type: 3}
 --- !u!1 &462848101
 GameObject:
   m_ObjectHideFlags: 0

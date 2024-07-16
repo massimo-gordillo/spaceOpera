@@ -299,15 +299,14 @@ public class MasterGrid : MonoBehaviour
             moveTarget((int)selectedUnit.oldXPos, (int)selectedUnit.oldYPos);
     }
 
-    //MG 24-04-10: this really needs to be a recursive function. It will create the "wrap around an enemy" behaviour.
-    public GameObject moveSquare;
+    public MovementSquare moveSquare;
     public bool[,] checkedCells;
-
-    Queue<(Vector2Int cell, int range)> cellsToCheck;
 
     public void drawMovement(BaseUnit mTarget)
     {
-        int range = mTarget.movementRange;
+        int movementRange = mTarget.movementRange;
+        int attackRange = mTarget.attackRange;
+        int totalRange = movementRange + attackRange;
         int xpos = (int)mTarget.xPos;
         int ypos = (int)mTarget.yPos;
         if (!drawing)
@@ -317,24 +316,28 @@ public class MasterGrid : MonoBehaviour
 
             checkedCells = new bool[gridX + 2, gridY + 2];
             checkedCells[xpos + 1, ypos + 1] = true;
-            cellsToCheck = new Queue<(Vector2Int, int)>();
-            cellsToCheck.Enqueue((new Vector2Int(xpos + 1, ypos + 1), range));
-            Debug.Log($"Adding cell {xpos},{ypos} to queue with range {range}");
+            Queue<(Vector2Int cell, int range)>  cellsToCheck = new Queue<(Vector2Int, int)>();
+            cellsToCheck.Enqueue((new Vector2Int(xpos + 1, ypos + 1), totalRange));
+            //Debug.Log($"Adding cell {xpos},{ypos} to queue with range {range}");
 
-            RecursiveDrawMovement(mTarget);
+            RecursiveDrawMovement(mTarget, cellsToCheck);
         }
     }
 
-    private void RecursiveDrawMovement(BaseUnit mTarget)
+    private void RecursiveDrawMovement(BaseUnit mTarget, Queue<(Vector2Int cell, int range)> cellsToCheck)
     {
-        Debug.Log($"cellsToCheck size is: {cellsToCheck.Count}");
+
+        int movementRange = mTarget.movementRange;
+        int attackRange = mTarget.attackRange;
+        int totalRange = movementRange + attackRange;
+        //Debug.Log($"cellsToCheck size is: {cellsToCheck.Count}");
         if (cellsToCheck.Count == 0)
         {
             return;
         }
 
         var cellRangePair = cellsToCheck.Dequeue();
-        Debug.Log($"Removed: {cellRangePair.cell} from cellsToCheck");
+        //Debug.Log($"Removed: {cellRangePair.cell} from cellsToCheck");
 
         Vector2Int checkingCell = cellRangePair.cell;
         int range = cellRangePair.range;
@@ -359,17 +362,18 @@ public class MasterGrid : MonoBehaviour
                     if (!cellsToCheck.Contains((new Vector2Int(xCheck, yCheck), range - 1)))
                     {
                         cellsToCheck.Enqueue((new Vector2Int(xCheck, yCheck), range - 1));
-                        Debug.Log($"Adding key {xCheck},{yCheck} to queue with range {range - 1}");
+                        //Debug.Log($"Adding key {xCheck},{yCheck} to queue with range {range - 1}");
                     }
                     else
                     {
-                        Debug.Log($"Key {xCheck},{yCheck} already exists in Queue");
+                        //Debug.Log($"Key {xCheck},{yCheck} already exists in Queue");
                     }
 
-                    if (legalMove(xCheck - 1, yCheck - 1, mTarget) == 1)
+                    if (legalMove(xCheck - 1, yCheck - 1, mTarget) == 1 && range > totalRange - movementRange)
                     {
-                        Instantiate(moveSquare, new Vector2(xCheck - 1, yCheck - 1), Quaternion.identity, movementSquareList);
-                    }
+                        drawMoveSquare(xCheck - 1, yCheck - 1);
+                    }else if(legalMove(xCheck - 1, yCheck - 1, mTarget) == 1 && range <= totalRange - movementRange)
+                        drawDamageSquare(xCheck - 1, yCheck - 1);
 
                     BaseStructure s = whatStructureIsInThisLocation(xCheck - 1, yCheck - 1);
                     if (s != null)
@@ -381,52 +385,24 @@ public class MasterGrid : MonoBehaviour
         }
 
         // Continue the recursion
-        RecursiveDrawMovement(mTarget);
+        RecursiveDrawMovement(mTarget, cellsToCheck);
     }
 
-    /*private void RecursiveDrawMovement1(int range, BaseUnit mTarget, Dictionary<Vector2Int, int>() cellsToCheck)
+   public void drawMoveSquare(int x, int y)
     {
-        if (range == 0 || cellsToCheck.Count == 0)
-        {
-
-            return;
-        }
-
-        Vector2Int checkingCell = cellsToCheck.Dequeue();
-
-        for (int rad = 0; rad < 4; rad++)
-        {
-            Vector2Int sinDirV = sinDir(rad);
-            int xCheck = checkingCell.x + sinDirV.x;
-            int yCheck = checkingCell.y + sinDirV.y;
-
-            if (!checkedCells[xCheck, yCheck] && xCheck >= 0 && xCheck < gridX + 2 && yCheck >= 0 && yCheck < gridY + 2)
-            {
-                Debug.Log($"Checking legality of cell {xCheck - 1},{yCheck - 1}");
-                if (legalMove(xCheck - 1, yCheck - 1, mTarget) >= 1)
-                {
-                    if (!cellsToCheck.Contains(new Vector2Int(xCheck, yCheck)))
-                        cellsToCheck.Enqueue(new Vector2Int(xCheck, yCheck));
-                    Debug.Log($"Adding cell {xCheck - 1},{yCheck - 1} to queue");
-                    if (legalMove(xCheck - 1, yCheck - 1, mTarget) == 1)
-                    {
-                        Instantiate(moveSquare, new Vector2(xCheck - 1, yCheck - 1), Quaternion.identity, movementSquareList);
-                        Debug.Log($"Instantiating movesquare at {xCheck - 1},{yCheck - 1}!");
-                    }
-
-                    BaseStructure s = whatStructureIsInThisLocation(xCheck - 1, yCheck - 1);
-                    if (s != null)
-                    {
-                        turnOffStructureCollider(s);
-                    }
-
-                    RecursiveDrawMovement1(range - 1, mTarget, cellsToCheck);
-                }
-
-                checkedCells[xCheck, yCheck] = true;
-            }
-        }
-    }*/
+        MovementSquare blueSquare = moveSquare;
+        Color color = new Color(0.678f, 0.847f, 0.902f, 0.6f);
+        blueSquare.setColor(color);
+        Instantiate(blueSquare, new Vector2(x,y), Quaternion.identity, movementSquareList);
+    }
+    
+    public void drawDamageSquare(int x, int y)
+    {
+        MovementSquare redSquare = moveSquare;
+        Color c = new Color(1.0f, 0.6f, 0.6f, 0.6f);
+        redSquare.setColor(c);
+        Instantiate(redSquare, new Vector2(x,y), Quaternion.identity, movementSquareList);
+    }
 
 
     //OLD:
