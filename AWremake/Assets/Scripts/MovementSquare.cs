@@ -6,6 +6,7 @@ public class MovementSquare : ClickableObject
 {
     public MasterGrid mg;
     public SpriteRenderer sr;
+    public Collider2D boxCollider2D;
 
     protected override void Start()
     {

@@ -132,6 +132,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mg: {fileID: 0}
   sr: {fileID: 167291302457465078}
+  boxCollider2D: {fileID: 3278617936891467413}
 --- !u!61 &3278617936891467413
 BoxCollider2D:
   m_ObjectHideFlags: 0

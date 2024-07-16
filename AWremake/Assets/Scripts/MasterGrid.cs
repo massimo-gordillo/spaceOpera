@@ -372,7 +372,7 @@ public class MasterGrid : MonoBehaviour
                     if (legalMove(xCheck - 1, yCheck - 1, mTarget) == 1 && range > totalRange - movementRange)
                     {
                         drawMoveSquare(xCheck - 1, yCheck - 1);
-                    }else if(legalMove(xCheck - 1, yCheck - 1, mTarget) == 1 && range <= totalRange - movementRange)
+                    }else if(range <= totalRange - movementRange)
                         drawDamageSquare(xCheck - 1, yCheck - 1);
 
                     BaseStructure s = whatStructureIsInThisLocation(xCheck - 1, yCheck - 1);
@@ -393,6 +393,7 @@ public class MasterGrid : MonoBehaviour
         MovementSquare blueSquare = moveSquare;
         Color color = new Color(0.678f, 0.847f, 0.902f, 0.6f);
         blueSquare.setColor(color);
+        blueSquare.boxCollider2D.enabled = true;
         Instantiate(blueSquare, new Vector2(x,y), Quaternion.identity, movementSquareList);
     }
     
@@ -401,6 +402,7 @@ public class MasterGrid : MonoBehaviour
         MovementSquare redSquare = moveSquare;
         Color c = new Color(1.0f, 0.6f, 0.6f, 0.6f);
         redSquare.setColor(c);
+        redSquare.boxCollider2D.enabled=false;
         Instantiate(redSquare, new Vector2(x,y), Quaternion.identity, movementSquareList);
     }
 
