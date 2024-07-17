@@ -9,6 +9,7 @@ public class MasterGrid : MonoBehaviour
     public int gridX;
     public int gridY;
     public BaseUnit selectedUnit;
+    public BaseUnit drawMovementUnit;
     //public MasterGrid masterGrid;
     public BaseUnit [,] unitGrid; //2D array
     public BaseStructure[,] structureGrid; //2D array
@@ -19,7 +20,7 @@ public class MasterGrid : MonoBehaviour
     //public List<BaseStructure> resourceStructures;
     public GameObject[] allUnits;
     public GameMaster gameMaster;
-    public int playerTurn;
+    //public int playerTurn;
     private Dictionary<byte, AttributesTile> tileAttributes;
     private Dictionary<string, Dictionary<string, double>> combatMultipliers;
     private double defenceMultiplier;
@@ -124,7 +125,15 @@ public class MasterGrid : MonoBehaviour
                 presentGameActionsAtLocation(unit.xPos, unit.yPos, unit);
 
                 if (unit.movementNonExhausted == true) //if the unit hasn't moved already this turn.
-                    drawMovement(unit);
+                {
+                    if (!drawing)
+                    {
+                        drawing = true;
+                        selectedUnit = unit;
+                        drawMovement(unit);
+                    }
+                }
+                    
             }
             //if there is a selected unit and you click on a (different) unit
             else if (getSelectedUnit() != unit && getSelectedUnit() != null)
@@ -144,6 +153,16 @@ public class MasterGrid : MonoBehaviour
                     //selectedUnit.setNonExhausted(false);
                     exhaustSelectedUnit(selectedUnit, true);
                 }
+            }else if(getSelectedUnit() == null && unit.getPlayerControl() != gameMaster.getPlayerTurn() && !attackableUnits.Contains(unit))
+            {
+                if (!drawing)
+                {
+                    drawing = true;
+                    drawMovement(unit);
+                }
+                else
+                    clearMovement();
+                    
             }
             /*else
             {
@@ -247,14 +266,19 @@ public class MasterGrid : MonoBehaviour
 
     public bool canUnitAttack(BaseUnit attacker, BaseUnit defender)
     {
-        if (defender.unitType == UnitType.Land)
-            return attacker.canAttackLand;
-        else if(defender.unitType == UnitType.Sea)
-            return attacker.canAttackSea;
-        else if (defender.unitType == UnitType.Air)
-            return attacker.canAttackAir;
-        Debug.LogError("No unit Type returned when checking if a unit could attack");
-        return true;
+        if (attacker != null && defender != null)
+        {
+            if (defender.unitType == UnitType.Land)
+                return attacker.canAttackLand;
+            else if (defender.unitType == UnitType.Sea)
+                return attacker.canAttackSea;
+            else if (defender.unitType == UnitType.Air)
+                return attacker.canAttackAir;
+            Debug.LogError("No unit Type returned when checking if a unit could attack");
+            return true;
+        }
+        return false;
+
     }
 
     public double getDamageMultiplier(BaseUnit attacker, BaseUnit defender)
@@ -304,16 +328,17 @@ public class MasterGrid : MonoBehaviour
 
     public void drawMovement(BaseUnit mTarget)
     {
+        drawMovementUnit = mTarget;
         int movementRange = mTarget.movementRange;
         int attackRange = mTarget.attackRange;
         int totalRange = movementRange + attackRange;
         int xpos = (int)mTarget.xPos;
         int ypos = (int)mTarget.yPos;
-        if (!drawing)
+        /*if (!drawing)
         {
             drawing = true;
             selectedUnit = mTarget;
-
+*/
             checkedCells = new bool[gridX + 2, gridY + 2];
             checkedCells[xpos + 1, ypos + 1] = true;
             Queue<(Vector2Int cell, int range)>  cellsToCheck = new Queue<(Vector2Int, int)>();
@@ -321,7 +346,7 @@ public class MasterGrid : MonoBehaviour
             //Debug.Log($"Adding cell {xpos},{ypos} to queue with range {range}");
 
             RecursiveDrawMovement(mTarget, cellsToCheck);
-        }
+        //}
     }
 
     private void RecursiveDrawMovement(BaseUnit mTarget, Queue<(Vector2Int cell, int range)> cellsToCheck)
@@ -371,8 +396,9 @@ public class MasterGrid : MonoBehaviour
 
                     if (legalMove(xCheck - 1, yCheck - 1, mTarget) == 1 && range > totalRange - movementRange)
                     {
-                        drawMoveSquare(xCheck - 1, yCheck - 1);
-                    }else if(range <= totalRange - movementRange)
+                        drawMoveSquare(xCheck - 1, yCheck - 1, mTarget.playerControl == getPlayerTurn());
+                    }
+                    else if (range <= totalRange - movementRange)
                         drawDamageSquare(xCheck - 1, yCheck - 1);
 
                     BaseStructure s = whatStructureIsInThisLocation(xCheck - 1, yCheck - 1);
@@ -381,6 +407,18 @@ public class MasterGrid : MonoBehaviour
                         turnOffStructureCollider(s);
                     }
                 }
+                //if you're not out of bounds
+                else if ((xCheck - 1) < gridX && (xCheck - 1) >= 0 && (yCheck - 1) < gridY && (yCheck - 1) >= 0)
+                {
+                    BaseUnit unitAtLocation = whatUnitIsInThisLocation(xCheck - 1, yCheck - 1);
+                    //and the unit you're drawing movement for isn't controlled by you (active player)
+                    //OR there isn't a unit there
+                    //OR you can't attack that unit
+                    //then draw a movement square.
+                    //Ie if it's not the players turn show all the squares a unit can attack regardless of unit attack legality.
+                    if ((mTarget.playerControl != getPlayerTurn() || unitAtLocation == null || canUnitAttack(mTarget, unitAtLocation)))
+                        drawDamageSquare(xCheck - 1, yCheck - 1);
+                }
             }
         }
 
@@ -388,12 +426,12 @@ public class MasterGrid : MonoBehaviour
         RecursiveDrawMovement(mTarget, cellsToCheck);
     }
 
-   public void drawMoveSquare(int x, int y)
+   public void drawMoveSquare(int x, int y, bool clickable)
     {
         MovementSquare blueSquare = moveSquare;
         Color color = new Color(0.678f, 0.847f, 0.902f, 0.6f);
         blueSquare.setColor(color);
-        blueSquare.boxCollider2D.enabled = true;
+        blueSquare.boxCollider2D.enabled = clickable;
         Instantiate(blueSquare, new Vector2(x,y), Quaternion.identity, movementSquareList);
     }
     
@@ -625,7 +663,7 @@ public class MasterGrid : MonoBehaviour
             return 1;
         else if (whatUnitIsInThisLocation(x, y) == mTarget)
             return -1;
-        else if (whatUnitIsInThisLocation(x, y).playerControl == selectedUnit.playerControl)
+        else if (whatUnitIsInThisLocation(x, y).playerControl == drawMovementUnit.playerControl)
             return 2;
         else
             return 0;
@@ -644,6 +682,7 @@ public class MasterGrid : MonoBehaviour
         for (var i = 0; i < movementSquares.Length; i++)
             Destroy(movementSquares[i]);
         drawing = false;
+        drawMovementUnit = null;
         turnOnAllUncoveredStructureColliders();
     }
 
