@@ -836,6 +836,24 @@ public class MasterGrid : MonoBehaviour
         }
     }
 
+    public void playerWins(int player)
+    {
+        clearAttackableUnits();
+        allUnits = GameObject.FindGameObjectsWithTag("BaseUnitTag");
+        foreach (GameObject go in allUnits)
+        {
+            BaseUnit unit = go.GetComponent<BaseUnit>();
+            if (unit.getPlayerControl() == player)
+            {
+                unit.setNonExhausted(false);
+                unit.oldXPos = null;
+                unit.oldYPos = null;
+            }
+            else
+                unit.deleteMe();
+        }
+    }
+
     public int numCapturedResourceLocations(int player)
     {
         int num=0;

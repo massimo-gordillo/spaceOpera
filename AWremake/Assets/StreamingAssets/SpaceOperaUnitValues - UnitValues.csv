@@ -11,4 +11,4 @@ EVA,ertrian,FALSE,land,FALSE,1400,light,heavy,melee,heavy melee,TRUE,TRUE,FALSE,
 Helicopter,ertrian,FALSE,air,FALSE,120,light,heavy,projectile,heavy projectile,TRUE,TRUE,TRUE,TRUE,250,1,900,6
 AAJet,ertrian,FALSE,air,FALSE,250,light,light,projectile,light projectile,FALSE,TRUE,FALSE,TRUE,1000,1,1800,9
 Bomber,ertrian,FALSE,air,FALSE,500,light,heavy,projectile,heavy projectile,TRUE,FALSE,TRUE,FALSE,1400,1,2000,4
-Battleship,ertrian,FALSE,air,FALSE,1300,heavy,heavy,projectile,heavy projectile,TRUE,TRUE,TRUE,TRUE,1500,2,2500,4
+Battleship,ertrian,FALSE,air,FALSE,1300,heavy,heavy,projectile,heavy projectile,TRUE,TRUE,TRUE,TRUE,1500,1,2500,4

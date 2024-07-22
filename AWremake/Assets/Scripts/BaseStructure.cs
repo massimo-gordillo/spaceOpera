@@ -9,7 +9,7 @@ public class BaseStructure : MonoBehaviour
     public MasterGrid masterGrid;
     public int xPos;
     public int yPos;
-    public int structureType; //Will eventually define different types of structures.
+    public int structureType; //0: resource, 1: production, 2: command
     public BoxCollider2D spriteCollider;
     public GameMaster gameMaster;
     public int captureHealth;
@@ -37,6 +37,8 @@ public class BaseStructure : MonoBehaviour
             spr = Resources.Load<Sprite>("sprites/structureSprite");
         else if (structureType == 1)
             spr = Resources.Load<Sprite>("sprites/factorySprite");
+        else if (structureType == 2)
+            spr = Resources.Load<Sprite>("sprites/commandStructureSprite");
         spriteRenderer.sprite = spr;
         baseColor = spriteRenderer.color;
         if(playerControl != 0)
@@ -76,6 +78,8 @@ public class BaseStructure : MonoBehaviour
 
     public void switchAlliance(int capturePlayerInt)
     {
+        if (structureType == 2 && playerControl != capturePlayerInt)
+            gameMaster.playerLoses(playerControl);
         playerControl = capturePlayerInt;
         resetCaptureHealth();
         setColor(capturePlayerInt);

@@ -17,6 +17,7 @@ public class GameMaster : MonoBehaviour
     public GameObject unitChoicePanel;
     public int playerTurn;
     public int numPlayers;
+    private bool[] playersNotLost;
     public TMP_Text playerTurnText;
     public TMP_Text playerResourceText;
     private int[] playerResources;
@@ -28,6 +29,10 @@ public class GameMaster : MonoBehaviour
     public Button attackButton;
     public Button captureButton;
     public Button undoMovementButton;
+    public Button endTurnButton;
+
+    public GameObject playerWinCard;
+    public TMP_Text playerWinText;
 
     public int gridX = 30;
     public int gridY = 20;
@@ -48,8 +53,15 @@ public class GameMaster : MonoBehaviour
         masterGrid.startup(gridX, gridY, tilemapManager.getTilemapByteArray(), gameValues.getAttributesTilesDictionary(), gameValues.getCombatMultiplierDictionary());
 
         hideChoicePanel();
-        playerTurn = 1;
+        playerWinCard.SetActive(false);
+        playerTurn = 1; //player 0 is neutral
         numPlayers = 2; //will set dynamically later
+        playersNotLost = new bool[numPlayers+1];
+        for (int i = 0; i <= numPlayers; i++)
+        {
+            playersNotLost[i] = true;
+        }
+        playersNotLost[0] = false;
         setPlayerTurnText(playerTurn);
         baseResourcePerTurn = 100;
         structureResourcePerTurn = 1027;
@@ -152,10 +164,18 @@ public class GameMaster : MonoBehaviour
         masterGrid.refreshUnits(playerTurn);
         masterGrid.clearMovement();
         masterGrid.clearSelectedUnit();
-        if (playerTurn >= numPlayers)
-            playerTurn = 1;
-        else
-            playerTurn++;
+        int i = -1;
+        do
+        { //always increment player number once, then check if that player is still in the game. Go next, never repeat more than num players.
+            if (playerTurn >= numPlayers)
+                playerTurn = 1;
+            else
+                playerTurn++;
+            i++;
+        } while (!playersNotLost[playerTurn] && i < numPlayers);
+
+        if (i >= numPlayers)
+            playerWins(-1); //error case
         setPlayerTurnText(playerTurn);
         setPlayerResources(playerTurn);
     }
@@ -219,5 +239,37 @@ public class GameMaster : MonoBehaviour
         int num = masterGrid.numCapturedResourceLocations(playerTurn);
         playerResources[playerTurn] = playerResources[playerTurn] + baseResourcePerTurn + structureResourcePerTurn * num;
         playerResourceText.text = ""+playerResources[playerTurn];
+    }
+
+    public void playerLoses (int player)
+    {
+        playersNotLost[player] = false;
+        int count=0;
+        int playerWinner = -1;
+        for (int i = 1; i <= numPlayers; i++)
+        {
+            if (playersNotLost[i] == true)
+                playerWinner = i;
+            else
+                count++;
+        }
+        if (numPlayers - count <= 1)
+            playerWins(playerWinner);
+    }
+
+    private void playerWins (int player)
+    {
+        if (player == -1)
+            Debug.LogError($"Player {player} has won the game, this is a failcase");
+        else
+            displayWinnerCard(player);
+    }
+
+    private void displayWinnerCard(int player)
+    {
+        playerWinCard.SetActive(true);
+        playerWinText.text = $"Player {player} wins!";
+        endTurnButton.interactable = false;
+        masterGrid.playerWins(player);
     }
 }

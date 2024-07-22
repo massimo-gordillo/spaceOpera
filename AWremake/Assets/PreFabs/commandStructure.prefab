@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4414423372646532119}
   m_Layer: 0
-  m_Name: productionFactory
+  m_Name: commandStructure
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -39,22 +39,18 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 4414423372646532119}
     m_Modifications:
-    - target: {fileID: 487244310135845115, guid: b02aa9d5d64b2414abeba39fe8b377e8, type: 3}
-      propertyPath: m_SpriteTilingProperty.oldSize.y
-      value: 0.16
-      objectReference: {fileID: 0}
     - target: {fileID: 1354807818261213982, guid: b02aa9d5d64b2414abeba39fe8b377e8, type: 3}
       propertyPath: m_Name
       value: baseStructure
       objectReference: {fileID: 0}
     - target: {fileID: 3397026737060665485, guid: b02aa9d5d64b2414abeba39fe8b377e8, type: 3}
       propertyPath: structureType
-      value: 1
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 6254552073860488020, guid: b02aa9d5d64b2414abeba39fe8b377e8, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: 21300000, guid: 0361baa4f541cb84c9e3813aaed66075, type: 3}
+      objectReference: {fileID: 21300000, guid: fe0e49f52c86fe44683706d3919dd92f, type: 3}
     - target: {fileID: 6698203056522933768, guid: b02aa9d5d64b2414abeba39fe8b377e8, type: 3}
       propertyPath: m_RootOrder
       value: 0
