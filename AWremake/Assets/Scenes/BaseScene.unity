@@ -826,7 +826,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4414423372646532119, guid: e441cb52408d99a4db49255a863f50dc, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 28
+      value: 18
       objectReference: {fileID: 0}
     - target: {fileID: 4414423372646532119, guid: e441cb52408d99a4db49255a863f50dc, type: 3}
       propertyPath: m_LocalPosition.y
@@ -1573,6 +1573,8 @@ MonoBehaviour:
   gridMax: {x: 0, y: 0}
   boundaryOffset: 5
   snapBackSpeed: 5
+  isMenuDisplayed: 0
+  menuWidth: 5
   gameMaster: {fileID: 1024135144}
 --- !u!20 &519420031
 Camera:
@@ -13924,8 +13926,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0.00048828125, y: -0.000030517578}
-  m_SizeDelta: {x: 501, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 500, y: 0}
   m_Pivot: {x: 1, y: 0.5}
 --- !u!114 &1454215229
 MonoBehaviour:
