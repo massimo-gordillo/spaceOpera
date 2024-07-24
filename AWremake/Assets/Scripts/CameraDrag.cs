@@ -34,7 +34,7 @@ public class CameraDrag : MonoBehaviour
 
         //get the width of the rhs menu and set that to the allowable extra camera view on rhs when menu is open
         menuWidth = gameMaster.choicePanel.GetComponent<RectTransform>().rect.width * cam.orthographicSize * 2 / Screen.height;
-        Debug.Log($"menuWidth is {menuWidth}");
+        //Debug.Log($"menuWidth is {menuWidth}");
     }
 
     public bool IsDragging()
@@ -166,7 +166,7 @@ public class CameraDrag : MonoBehaviour
 
         // If the object is within the menu's width from the right edge of the camera
         isMenuDisplayed = gameMaster.choicePanel.gameObject.activeSelf;
-        Debug.Log($"object position: {objectPosition.x}, right edge of camera: {rightEdgeOfCamera}, menuWidthInWorldUnits: {menuWidthInWorldUnits}, x position edge {rightEdgeOfCamera - menuWidthInWorldUnits}, is menu displayed: {isMenuDisplayed}");
+        //Debug.Log($"object position: {objectPosition.x}, right edge of camera: {rightEdgeOfCamera}, menuWidthInWorldUnits: {menuWidthInWorldUnits}, x position edge {rightEdgeOfCamera - menuWidthInWorldUnits}, is menu displayed: {isMenuDisplayed}");
         
         if (objectPosition.x > rightEdgeOfCamera - menuWidthInWorldUnits && isMenuDisplayed)
         {
@@ -177,7 +177,7 @@ public class CameraDrag : MonoBehaviour
             //Debug.Log($"old camera position: {cam.transform.position}, new camera position: {newPosition.x}");
             // Clamp the new position to the grid limits
             //newPosition.x = Mathf.Clamp(newPosition.x, gridMin.x + camWidth, gridMax.x - camWidth);
-            Debug.Log($"old camera position: {cam.transform.position}, new camera position: {newPosition.x}");
+            //Debug.Log($"old camera position: {cam.transform.position}, new camera position: {newPosition.x}");
             cam.transform.position = newPosition;
             //cam.transform.position = Vector3.Lerp(cam.transform.position, newPosition, snapBackSpeed/10);// * Time.deltaTime);
         }

@@ -174,6 +174,8 @@ public class BaseUnit : MonoBehaviour
     public void setHealth(int health)
     {
         healthCurrent = health;
+        //round down to the nearest 1% of max health
+        healthCurrent = healthCurrent - healthCurrent % (healthMax / 100);
         updateHealthUI();
     }
 
