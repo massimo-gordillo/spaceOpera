@@ -9,7 +9,7 @@ public class BaseStructure : MonoBehaviour
     public MasterGrid masterGrid;
     public int xPos;
     public int yPos;
-    public int structureType; //0: resource, 1: production, 2: command
+    public int structureType; //0: resource, 1: factory, 2: airport, 5:command
     public BoxCollider2D spriteCollider;
     public GameMaster gameMaster;
     public int captureHealth;

@@ -11,7 +11,7 @@ public class MasterGrid : MonoBehaviour
     public BaseUnit selectedUnit;
     public BaseUnit drawMovementUnit;
     //public MasterGrid masterGrid;
-    public BaseUnit [,] unitGrid; //2D array
+    public BaseUnit[,] unitGrid; //2D array
     public BaseStructure[,] structureGrid; //2D array
     public byte[,] terrainGrid;
     //public TerrainCell terrainCell;
@@ -30,8 +30,8 @@ public class MasterGrid : MonoBehaviour
     public Transform movementSquareList;
 
     // Called by GameMaster
-    public void startup(int gridX, int gridY, byte[] tilemapByteArray, 
-        Dictionary<byte, AttributesTile> inputTileAttributes, 
+    public void startup(int gridX, int gridY, byte[] tilemapByteArray,
+        Dictionary<byte, AttributesTile> inputTileAttributes,
         Dictionary<string, Dictionary<string, double>> inputCombatMultipliers)
     {
         tileAttributes = inputTileAttributes;
@@ -46,7 +46,7 @@ public class MasterGrid : MonoBehaviour
         attackLuckRange = 10;
         defenceMultiplier = 4.0;
         firebackMultiplier = 0.7;
-
+        Dictionary<(byte, byte), UnitStructureInfo> gameStateDict = ConvertGameStateToDictionary();
     }
 
     public void setTerrain(byte[] tilemapByteArray)
@@ -133,7 +133,7 @@ public class MasterGrid : MonoBehaviour
                         drawMovement(unit);
                     }
                 }
-                    
+
             }
             //if there is a selected unit and you click on a (different) unit
             else if (getSelectedUnit() != unit && getSelectedUnit() != null)
@@ -153,7 +153,7 @@ public class MasterGrid : MonoBehaviour
                     //selectedUnit.setNonExhausted(false);
                     exhaustSelectedUnit(selectedUnit, true);
                 }
-            }else if(getSelectedUnit() == null && unit.getPlayerControl() != gameMaster.getPlayerTurn() && !attackableUnits.Contains(unit))
+            } else if (getSelectedUnit() == null && unit.getPlayerControl() != gameMaster.getPlayerTurn() && !attackableUnits.Contains(unit))
             {
                 if (!drawing)
                 {
@@ -162,7 +162,7 @@ public class MasterGrid : MonoBehaviour
                 }
                 else
                     clearMovement();
-                    
+
             }
             /*else
             {
@@ -178,13 +178,13 @@ public class MasterGrid : MonoBehaviour
         double finalDamage = getDamageAfterLuck(damagePreLuck);
 
         defender.takeDamage((int)finalDamage);
-        Debug.Log($"Unit attacks with preluck damage {damagePreLuck} dealing {finalDamage} damage with luck factor of {finalDamage/damagePreLuck}");
-        if (canUnitAttack(defender, attacker)&&defender.canFireBack)
+        Debug.Log($"Unit attacks with preluck damage {damagePreLuck} dealing {finalDamage} damage with luck factor of {finalDamage / damagePreLuck}");
+        if (canUnitAttack(defender, attacker) && defender.canFireBack)
         {
             double defenderFireBackDamage = getDamageBeforeLuck(defender, attacker, true);
             attacker.takeDamage((int)defenderFireBackDamage);
             Debug.Log($"Defending Unit fires back with {defenderFireBackDamage}");
-        }else
+        } else
             Debug.Log($"Defending Unit can fire back {defender.canFireBack}");
     }
 
@@ -198,11 +198,11 @@ public class MasterGrid : MonoBehaviour
         //if they are the same type of unit, they deal a maximum of 70% after type multiplier (defence and luck calculation comes after) 
         if (attacker.unitName == defender.unitName)
         {
-            if(!firingBack && baseDamage * multiplier > defender.healthMax * 0.70)
+            if (!firingBack && baseDamage * multiplier > defender.healthMax * 0.70)
             {
                 baseDamage = defender.healthMax * 0.70;
                 multiplier = 1;
-            }else if (firingBack && baseDamage * multiplier * defenceVal * firebackMultiplier > defender.healthMax * 0.50) //only 50% max if firing back.
+            } else if (firingBack && baseDamage * multiplier * defenceVal * firebackMultiplier > defender.healthMax * 0.50) //only 50% max if firing back.
             {
                 return defender.healthMax * 0.50;
             }
@@ -246,8 +246,8 @@ public class MasterGrid : MonoBehaviour
     public double getAttackLuckFloor(double damageInput, double maxHealth)
     {
         //the negative side of attackLuckRange
-        double attackLuckFloor = (-0.5*attackLuckRange)/100;
-        double floor = damageInput * (1+attackLuckFloor);
+        double attackLuckFloor = (-0.5 * attackLuckRange) / 100;
+        double floor = damageInput * (1 + attackLuckFloor);
         if (floor > maxHealth)
             return 100;
         if (floor < 0)
@@ -256,8 +256,8 @@ public class MasterGrid : MonoBehaviour
             return 100;
         else
             return floor / maxHealth;
-    }    
-    
+    }
+
 
     public double getAttackerBaseDamage(BaseUnit attacker)
     {
@@ -300,12 +300,12 @@ public class MasterGrid : MonoBehaviour
     {
         if (selectedUnit != null)
         {
-            print("capture health: " + structure.captureHealth + "selectedUnithealth " + selectedUnit.healthCurrent);
+            //print("capture health: " + structure.captureHealth + "selectedUnithealth " + selectedUnit.healthCurrent);
             if (selectedUnit.healthCurrent < structure.captureHealth) //do we want to do this math within BaseStructu
                 structure.captureHealth = structure.captureHealth - selectedUnit.healthCurrent;
             else
                 structure.switchAlliance(selectedUnit.getPlayerControl());
-            exhaustSelectedUnit(selectedUnit,true);
+            exhaustSelectedUnit(selectedUnit, true);
         }
         else
             print("attempting to capture structure but no selectedUnit to capture it.");
@@ -315,11 +315,11 @@ public class MasterGrid : MonoBehaviour
     {
 
     }
-    
+
     public void undoMovementButtonPressed()
     {
         selectedUnit.undoingMovement = true;
-        if(selectedUnit.oldXPos != null && selectedUnit.oldYPos != null)
+        if (selectedUnit.oldXPos != null && selectedUnit.oldYPos != null)
             moveTarget((int)selectedUnit.oldXPos, (int)selectedUnit.oldYPos);
     }
 
@@ -339,13 +339,13 @@ public class MasterGrid : MonoBehaviour
             drawing = true;
             selectedUnit = mTarget;
 */
-            checkedCells = new bool[gridX + 2, gridY + 2];
-            checkedCells[xpos + 1, ypos + 1] = true;
-            Queue<(Vector2Int cell, int range)>  cellsToCheck = new Queue<(Vector2Int, int)>();
-            cellsToCheck.Enqueue((new Vector2Int(xpos + 1, ypos + 1), totalRange));
-            //Debug.Log($"Adding cell {xpos},{ypos} to queue with range {range}");
+        checkedCells = new bool[gridX + 2, gridY + 2];
+        checkedCells[xpos + 1, ypos + 1] = true;
+        Queue<(Vector2Int cell, int range)> cellsToCheck = new Queue<(Vector2Int, int)>();
+        cellsToCheck.Enqueue((new Vector2Int(xpos + 1, ypos + 1), totalRange));
+        //Debug.Log($"Adding cell {xpos},{ypos} to queue with range {range}");
 
-            RecursiveDrawMovement(mTarget, cellsToCheck);
+        RecursiveDrawMovement(mTarget, cellsToCheck);
         //}
     }
 
@@ -426,22 +426,22 @@ public class MasterGrid : MonoBehaviour
         RecursiveDrawMovement(mTarget, cellsToCheck);
     }
 
-   public void drawMoveSquare(int x, int y, bool clickable)
+    public void drawMoveSquare(int x, int y, bool clickable)
     {
         MovementSquare blueSquare = moveSquare;
         Color color = new Color(0.678f, 0.847f, 0.902f, 0.6f);
         blueSquare.setColor(color);
         blueSquare.boxCollider2D.enabled = clickable;
-        Instantiate(blueSquare, new Vector2(x,y), Quaternion.identity, movementSquareList);
+        Instantiate(blueSquare, new Vector2(x, y), Quaternion.identity, movementSquareList);
     }
-    
+
     public void drawDamageSquare(int x, int y)
     {
         MovementSquare redSquare = moveSquare;
         Color c = new Color(1.0f, 0.6f, 0.6f, 0.6f);
         redSquare.setColor(c);
-        redSquare.boxCollider2D.enabled=false;
-        Instantiate(redSquare, new Vector2(x,y), Quaternion.identity, movementSquareList);
+        redSquare.boxCollider2D.enabled = false;
+        Instantiate(redSquare, new Vector2(x, y), Quaternion.identity, movementSquareList);
     }
 
 
@@ -507,8 +507,8 @@ public class MasterGrid : MonoBehaviour
         
     }*/
 
-    public void checkEnemiesInRange(int xPos,int yPos, int range) //for now we're gonna assume range is 1 but in future if we want to add ranged units 
-                                                               //We probably want to grab the A* algorithm from DrawMovement and pass a function instead.
+    public void checkEnemiesInRange(int xPos, int yPos, int range) //for now we're gonna assume range is 1 but in future if we want to add ranged units 
+                                                                   //We probably want to grab the A* algorithm from DrawMovement and pass a function instead.
     {
         range = 1;
         for (int rad = 0; rad < 4; rad++)
@@ -525,21 +525,21 @@ public class MasterGrid : MonoBehaviour
             }
         }
 
-                /*
-        //print("checkEnemiesInRange");
-        int k=0;
-        for (int i = 0; i < unitGrid.GetLength(0); i++)
+        /*
+//print("checkEnemiesInRange");
+int k=0;
+for (int i = 0; i < unitGrid.GetLength(0); i++)
+{
+    for (int j = 0; j < unitGrid.GetLength(1); j++)
+    {
+        if (unitGrid[i, j] != null)
         {
-            for (int j = 0; j < unitGrid.GetLength(1); j++)
-            {
-                if (unitGrid[i, j] != null)
-                {
-                    print(i + ", " + j + ": " + unitGrid[i, j]);
-                    k++;
-                }
-            }
+            print(i + ", " + j + ": " + unitGrid[i, j]);
+            k++;
         }
-        print("this many units in the unitGrid: " + k);*/
+    }
+}
+print("this many units in the unitGrid: " + k);*/
     }
 
     public void setUnitToAttackable(BaseUnit attacker, BaseUnit defender)
@@ -566,7 +566,7 @@ public class MasterGrid : MonoBehaviour
             print("Out of Bounds in whatUnit");
             return null;
         }
-            
+
     }
 
     public BaseStructure whatStructureIsInThisLocation(int x, int y)
@@ -588,7 +588,7 @@ public class MasterGrid : MonoBehaviour
 
     public double getTileDefenceValueMultiplier(int x, int y)
     {
-            return 1 - (double)getTileDefenceValueInt(x, y) / 100 * defenceMultiplier;
+        return 1 - (double)getTileDefenceValueInt(x, y) / 100 * defenceMultiplier;
     }
 
     public int getTileDefenceValueInt(int x, int y)
@@ -618,7 +618,7 @@ public class MasterGrid : MonoBehaviour
             return tileMuiltiplier;
         }
     }
-    
+
 
     public bool canUnitMoveToByteValue(BaseUnit unit, byte b)
     {
@@ -699,7 +699,7 @@ public class MasterGrid : MonoBehaviour
     public void moveTarget(int x, int y)
     {
         //print("moveTarget. SelectedUnit is: "+selectedUnit);
-        if (selectedUnit != null&&whatUnitIsInThisLocation(x,y)==null)
+        if (selectedUnit != null && whatUnitIsInThisLocation(x, y) == null)
         {
             clearAttackableUnits();
             selectedUnit.oldXPos = selectedUnit.xPos;
@@ -783,11 +783,11 @@ public class MasterGrid : MonoBehaviour
         unitGrid[x, y] = null;
     }
 
-    
+
 
     public BaseUnit getSelectedUnit()
     {
-         return selectedUnit;
+        return selectedUnit;
     }
 
     public void setSelectedUnit(BaseUnit unit)
@@ -809,7 +809,7 @@ public class MasterGrid : MonoBehaviour
             print("wrong BaseUnit unselected");
             clearSelectedUnit();
         }
-            
+
     }
 
     public void clearSelectedUnit()
@@ -825,7 +825,7 @@ public class MasterGrid : MonoBehaviour
         allUnits = GameObject.FindGameObjectsWithTag("BaseUnitTag");
         foreach (GameObject go in allUnits)
         {
-            BaseUnit unit =  go.GetComponent<BaseUnit>();
+            BaseUnit unit = go.GetComponent<BaseUnit>();
             if (unit.getPlayerControl() == playerTurn)
             {
                 unit.setNonExhausted(true);
@@ -856,9 +856,9 @@ public class MasterGrid : MonoBehaviour
 
     public int numCapturedResourceLocations(int player)
     {
-        int num=0;
-        for (int i=0; i < gridX; i++)
-            for (int j=0; j < gridY; j++)
+        int num = 0;
+        for (int i = 0; i < gridX; i++)
+            for (int j = 0; j < gridY; j++)
                 if (structureGrid[i, j] != null)
                     if (structureGrid[i, j].playerControl == player)
                         num++;
@@ -895,8 +895,8 @@ public class MasterGrid : MonoBehaviour
     {
         s.turnOffCollider();
         spriteOffStructures.Add(s);
-    }    
-    
+    }
+
     public void turnOnAllUncoveredStructureColliders()
     {
         List<BaseStructure> tempSpriteOffStructures = new List<BaseStructure>();
@@ -923,5 +923,57 @@ public class MasterGrid : MonoBehaviour
     private string CombineCombatEnums(DamageType damageType, WeaponType weaponType)
     {
         return $"{damageType} {weaponType}";
+    }
+
+    public struct UnitStructureInfo
+    {
+        //this unitName should later be turned into a unitByte value, every unit should have a specific byte value.
+        public string unitName; // Type of the unit/structure
+        public byte playerID; // Player ID (0 for neutral, 1 for player 1, etc.)
+        public byte healthPercent; //% health the unit has
+    }
+
+    public struct GridData
+    {
+        public byte x;
+        public byte y;
+        public UnitStructureInfo info;
+    }
+
+    public Dictionary<(byte, byte), UnitStructureInfo> ConvertGameStateToDictionary()
+    {
+        Dictionary<(byte, byte), UnitStructureInfo> gameStateDict = new Dictionary<(byte, byte), UnitStructureInfo>();
+
+        for (int x = 0; x < gridX; x++)
+        {
+            for (int y = 0; y < gridY; y++)
+            {
+                BaseUnit unit = whatUnitIsInThisLocation(x, y);
+                if (unit != null)
+                {
+                    UnitStructureInfo info = new UnitStructureInfo
+                    {
+                        unitName = unit.unitName,
+                        playerID = (byte)unit.playerControl,
+                        healthPercent = (byte)((double)unit.healthCurrent / unit.healthMax)
+                    };
+                    gameStateDict.Add(((byte)x, (byte)y), info);
+                }
+
+                BaseStructure structure = whatStructureIsInThisLocation(x, y);
+                if (structure != null)
+                {
+                    UnitStructureInfo info = new UnitStructureInfo
+                    {
+                        unitName = structure.structureType.ToString(),
+                        playerID = (byte)structure.playerControl,
+                        healthPercent = (byte)structure.captureHealth
+                    };
+                    gameStateDict.Add(((byte)x, (byte)y), info);
+                }
+            }
+        }
+
+        return gameStateDict;
     }
 }
