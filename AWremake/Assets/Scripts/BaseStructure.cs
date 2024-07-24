@@ -38,6 +38,8 @@ public class BaseStructure : MonoBehaviour
         else if (structureType == 1)
             spr = Resources.Load<Sprite>("sprites/factorySprite");
         else if (structureType == 2)
+            spr = Resources.Load<Sprite>("sprites/airportSprite");
+        else if (structureType == 5)
             spr = Resources.Load<Sprite>("sprites/commandStructureSprite");
         spriteRenderer.sprite = spr;
         baseColor = spriteRenderer.color;

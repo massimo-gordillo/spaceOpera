@@ -7,7 +7,9 @@ public class MenuProductionPanel : MonoBehaviour
 {
     public GameValuesSO gameValuesSO;
     public MenuProductionButton productionButton;
-    public Transform productionContent;
+    public Transform prodListProgeny0Land;
+    public Transform prodListProgeny0Air;
+    public Transform prodListProgeny0Sea;
     public PrefabManager prefabManager = new PrefabManager();
     private List<AttributesBaseUnit> attributesBaseUnits;
     // Start is called before the first frame update
@@ -23,7 +25,12 @@ public class MenuProductionPanel : MonoBehaviour
             nextProductionButton.unitPrefab = prefabManager.getPrefab(attributesBaseUnit.prefabPath);
             //I want to set the size of the sprite ahead of time. Maybe I should do this at startup as well??
             //nextProductionButton.sprite.GetComponent<RectTransform>().sizeDelta = new Vector2(5, 5);
-            Instantiate(nextProductionButton, new Vector2(0, 0), Quaternion.identity, productionContent);
+            if (attributesBaseUnit.unitType == UnitType.Land)
+                Instantiate(nextProductionButton, new Vector2(0, 0), Quaternion.identity, prodListProgeny0Land);
+            else if (attributesBaseUnit.unitType == UnitType.Air)
+                Instantiate(nextProductionButton, new Vector2(0, 0), Quaternion.identity, prodListProgeny0Air);
+            else if (attributesBaseUnit.unitType == UnitType.Sea)
+                Instantiate(nextProductionButton, new Vector2(0, 0), Quaternion.identity, prodListProgeny0Sea);
         }
     }
 
@@ -31,5 +38,20 @@ public class MenuProductionPanel : MonoBehaviour
     void Update()
     {
 
+    }
+
+    public void presentProdList(int structNum)
+    {
+        prodListProgeny0Land.gameObject.SetActive(false);
+        prodListProgeny0Air.gameObject.SetActive(false);
+        prodListProgeny0Sea.gameObject.SetActive(false);
+        if (structNum == 1)
+            prodListProgeny0Land.gameObject.SetActive(true);
+        else if (structNum == 2)
+            prodListProgeny0Air.gameObject.SetActive(true);
+        else if (structNum == 3)
+            prodListProgeny0Sea.gameObject.SetActive(true);
+        else
+            Debug.LogError("Production List requested but Struct not correct type.");
     }
 }

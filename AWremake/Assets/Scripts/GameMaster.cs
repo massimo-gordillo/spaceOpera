@@ -13,7 +13,7 @@ public class GameMaster : MonoBehaviour
     public Canvas canvas;
     public BaseStructure selectedStructure;
     public GameObject choicePanel;
-    public GameObject productionPanel;
+    public MenuProductionPanel productionPanel;
     public GameObject unitChoicePanel;
     public int playerTurn;
     public int numPlayers;
@@ -103,10 +103,11 @@ public class GameMaster : MonoBehaviour
     public void structureHasBeenClicked(BaseStructure structure)
     {
         //should probably try/catch if structure is null
-        if (structure.playerControl == playerTurn && structure.structureType == 1)
+        if (structure.playerControl == playerTurn && structure.structureType != 0)
         {
             choicePanel.SetActive(true);
-            productionPanel.SetActive(true);
+            productionPanel.gameObject.SetActive(true);
+            productionPanel.presentProdList(structure.structureType);
             selectedStructure = structure;
         }
     }
@@ -226,7 +227,7 @@ public class GameMaster : MonoBehaviour
     public void hideAllSubPanels()
     {
         unitChoicePanel.SetActive(false);
-        productionPanel.SetActive(false);
+        productionPanel.gameObject.SetActive(false);
     }
 
     public int getPlayerTurn()

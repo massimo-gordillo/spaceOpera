@@ -10,8 +10,8 @@ public enum Progeny
 public enum UnitType
 {
     Land,
-    Sea,
-    Air
+    Air,
+    Sea
 }
 
 public enum HealthType
