@@ -9,6 +9,7 @@ public class GameMaster : MonoBehaviour
 
     public MasterGrid masterGrid;
     public TilemapManager tilemapManager;
+    public PrefabManager prefabManager;
 
     public Canvas canvas;
     public BaseStructure selectedStructure;
@@ -24,6 +25,7 @@ public class GameMaster : MonoBehaviour
     private int baseResourcePerTurn;
     private int structureResourcePerTurn;
     public Transform unitList;
+    public Transform structureList;
     public GameValuesSO gameValues;
     public BaseUnit infantryUnitPrefab;
     public Button attackButton;
@@ -272,5 +274,80 @@ public class GameMaster : MonoBehaviour
         playerWinText.text = $"Player {player} wins!";
         endTurnButton.interactable = false;
         masterGrid.playerWins(player);
+    }
+
+    public List<GamePieceInfo> ConvertGameStateToList()
+    {
+        List<GamePieceInfo> gameStateList = new List<GamePieceInfo>();
+
+        // Iterate through the grid to find units and structures
+        for (int x = 0; x < gridX; x++)
+        {
+            for (int y = 0; y < gridY; y++)
+            {
+                BaseUnit unit = masterGrid.whatUnitIsInThisLocation(x, y);
+                if (unit != null)
+                {
+                    GamePieceInfo info = new GamePieceInfo
+                    {
+                        x = (byte)x,
+                        y = (byte)y,
+                        typeNum = unit.baseUnitVariantIdentifier,
+                        playerID = (byte)unit.playerControl,
+                        healthVal = (byte)((double)unit.healthCurrent / (double)unit.healthMax * 100)
+                    };
+                    gameStateList.Add(info);
+                }
+
+                BaseStructure structure = masterGrid.whatStructureIsInThisLocation(x, y);
+                if (structure != null)
+                {
+                    GamePieceInfo info = new GamePieceInfo
+                    {
+                        x = (byte)x,
+                        y = (byte)y,
+                        typeNum = (byte)(200 + structure.structureType),
+                        playerID = (byte)structure.playerControl,
+                        healthVal = (byte)structure.captureHealth
+                    };
+                    gameStateList.Add(info);
+                }
+            }
+        }
+
+        return gameStateList;
+    }
+
+
+    public void ConvertListToGameState(List<GamePieceInfo> gameStateList)
+    {
+        foreach (var pieceInfo in gameStateList)
+        {
+            if (pieceInfo.typeNum < 200)
+            {
+                int x = pieceInfo.x;
+                int y = pieceInfo.y;
+                AttributesBaseUnit data = gameValues.GetUnitDataByByte(pieceInfo.typeNum);
+
+                BaseUnit unit = prefabManager.getUnitFromPrefab(data.prefabPath);
+                Instantiate(unit, new Vector2(x, y), Quaternion.identity, unitList);
+                unit.playerControl = pieceInfo.playerID;
+                unit.setHealth((int)((double)(pieceInfo.healthVal*unit.healthMax)/100));
+                unit.xPos = x;
+                unit.yPos = y;
+                masterGrid.setUnitInGrid(x, y, unit);
+            }
+            else if (pieceInfo.typeNum >= 200 && pieceInfo.typeNum < 255)
+            {
+                int x = pieceInfo.x;
+                int y = pieceInfo.y;
+                BaseStructure structure = Instantiate(new BaseStructure(), new Vector2(x, y), Quaternion.identity, structureList);
+                structure.playerControl = pieceInfo.playerID;
+                structure.captureHealth = pieceInfo.healthVal;
+                structure.xPos = x;
+                structure.yPos = y;
+                masterGrid.setStructureInGrid(x, y, structure);
+            }
+        }
     }
 }

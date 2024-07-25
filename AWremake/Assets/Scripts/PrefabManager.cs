@@ -20,7 +20,18 @@ public class PrefabManager
         return prefab;
     }
 
-   public void modifyPrefab(string prefabPath, AttributesBaseUnit unitData)
+    public BaseUnit getUnitFromPrefab(string prefabPath)
+    {
+        BaseUnit prefab = Resources.Load<BaseUnit>(prefabPath.Replace("Assets/Resources/", "").Replace(".prefab", ""));
+        if (prefab == null)
+        {
+            Debug.LogError("Prefab not found at path: " + prefabPath);
+        }
+        return prefab;
+    }
+
+
+    public void modifyPrefab(string prefabPath, AttributesBaseUnit unitData)
     {
         //Debug.Log($"Attempting to modify prefab at path: {prefabPath}");
 

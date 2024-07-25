@@ -46,7 +46,7 @@ public class MasterGrid : MonoBehaviour
         attackLuckRange = 10;
         defenceMultiplier = 4.0;
         firebackMultiplier = 0.7;
-        Dictionary<(byte, byte), UnitStructureInfo> gameStateDict = ConvertGameStateToDictionary();
+        //Dictionary<(byte, byte), GamePieceInfo> gameStateDict = ConvertGameStateToList();
     }
 
     public void setTerrain(byte[] tilemapByteArray)
