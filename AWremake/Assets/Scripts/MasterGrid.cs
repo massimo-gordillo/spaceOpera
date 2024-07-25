@@ -924,56 +924,5 @@ print("this many units in the unitGrid: " + k);*/
     {
         return $"{damageType} {weaponType}";
     }
-
-    public struct UnitStructureInfo
-    {
-        //this unitName should later be turned into a unitByte value, every unit should have a specific byte value.
-        public string unitName; // Type of the unit/structure
-        public byte playerID; // Player ID (0 for neutral, 1 for player 1, etc.)
-        public byte healthPercent; //% health the unit has
-    }
-
-    public struct GridData
-    {
-        public byte x;
-        public byte y;
-        public UnitStructureInfo info;
-    }
-
-    public Dictionary<(byte, byte), UnitStructureInfo> ConvertGameStateToDictionary()
-    {
-        Dictionary<(byte, byte), UnitStructureInfo> gameStateDict = new Dictionary<(byte, byte), UnitStructureInfo>();
-
-        for (int x = 0; x < gridX; x++)
-        {
-            for (int y = 0; y < gridY; y++)
-            {
-                BaseUnit unit = whatUnitIsInThisLocation(x, y);
-                if (unit != null)
-                {
-                    UnitStructureInfo info = new UnitStructureInfo
-                    {
-                        unitName = unit.unitName,
-                        playerID = (byte)unit.playerControl,
-                        healthPercent = (byte)((double)unit.healthCurrent / unit.healthMax)
-                    };
-                    gameStateDict.Add(((byte)x, (byte)y), info);
-                }
-
-                BaseStructure structure = whatStructureIsInThisLocation(x, y);
-                if (structure != null)
-                {
-                    UnitStructureInfo info = new UnitStructureInfo
-                    {
-                        unitName = structure.structureType.ToString(),
-                        playerID = (byte)structure.playerControl,
-                        healthPercent = (byte)structure.captureHealth
-                    };
-                    gameStateDict.Add(((byte)x, (byte)y), info);
-                }
-            }
-        }
-
-        return gameStateDict;
-    }
+    
 }

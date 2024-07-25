@@ -2,64 +2,33 @@ using System;
 using System.Collections.Generic;
 using MessagePack;
 
-public class NetworkingManager 
-{ 
+[Serializable]
+public struct GamePieceInfo
+{
+    public byte x;          // X-coordinate on the grid
+    public byte y;          // Y-coordinate on the grid
+    public byte typeNum;    // Type of the unit/structure. Structures are 200+
+    public byte playerID;   // Player ID (0 for neutral, 1 for player 1, etc.)
+    public byte healthVal;  // % health the unit has, number 1-200 for structure health
+}
 
-    [Serializable]
-    public struct UnitStructureInfo
-    {
-        //this unitName should later be turned into a unitByte value, every unit should have a specific byte value.
-        public string unitName; // Type of the unit/structure
-        public byte playerID; // Player ID (0 for neutral, 1 for player 1, etc.)
-        public byte healthPercent; //% health the unit has
-    }
-
-    [Serializable]
-    public struct GridData
-    {
-        public byte x;
-        public byte y;
-        public UnitStructureInfo info;
-    }
+public class NetworkingManager
+{
     // Start is called before the first frame update
     void Start()
     {
-        
+
     }
 
-/*    public Dictionary<(byte, byte), UnitStructureInfo> ConvertGameStateToDictionary()
+    // Convert a list of game pieces to a byte array for network transmission
+    public byte[] SerializeGameState(List<GamePieceInfo> gameStateList)
     {
-
-    }*/
-
-    public List<GridData> SerializeGameStateDictionary(Dictionary<(byte, byte), UnitStructureInfo> grid)
-    {
-        List<GridData> state = new List<GridData>();
-
-        foreach (var kvp in grid)
-        {
-            state.Add(new GridData
-            {
-                x = kvp.Key.Item1,
-                y = kvp.Key.Item2,
-                info = kvp.Value
-            });
-        }
-
-        return state;
+        return MessagePackSerializer.Serialize(gameStateList);
     }
 
-    public Dictionary<(byte, byte), UnitStructureInfo> DeserializeGameStateFromDictionary(List<GridData> state)
+    // Convert a byte array received over the network back to a list of game pieces
+    public List<GamePieceInfo> DeserializeGameState(byte[] data)
     {
-        var grid = new Dictionary<(byte, byte), UnitStructureInfo>();
-
-        foreach (var gridData in state)
-        {
-            grid[(gridData.x, gridData.y)] = gridData.info;
-        }
-
-        return grid;
+        return MessagePackSerializer.Deserialize<List<GamePieceInfo>>(data);
     }
-
-
 }
