@@ -8,7 +8,7 @@ using System;
 [CreateAssetMenu(fileName = "UnitData", menuName = "ScriptableObjects/UnitData", order = 1)]
 public class GameValuesSO : ScriptableObject
 {
-    private List<AttributesBaseUnit> attributesBaseUnits;
+    private Dictionary<byte, AttributesBaseUnit> attributesBaseUnits;
     //private List<AttributesTile> attributesTiles;
     private string[] unitTypes;
     private PrefabManager prefabManager = new PrefabManager();
@@ -18,7 +18,7 @@ public class GameValuesSO : ScriptableObject
     public void initialize()
     {
         Debug.Log("GameValuesSO OnEnable called.");
-        attributesBaseUnits = new List<AttributesBaseUnit>();
+        attributesBaseUnits = new Dictionary<byte, AttributesBaseUnit>();
         //attributesTiles = new List<AttributesTile>();
 
         LoadUnitsFromCSV("Assets/StreamingAssets/SpaceOperaUnitValues - UnitValues.csv");
@@ -90,9 +90,9 @@ public class GameValuesSO : ScriptableObject
             }
 
             unit.prefabPath = generatePrefabLocationString(unit.unitName, unit.progeny);
-
+            unit.baseUnitVariantIdentifier = (byte)(i - 1);
             //add unit attributes to list of attributesBaseUnit.
-            attributesBaseUnits.Add(unit);
+            attributesBaseUnits.Add(unit.baseUnitVariantIdentifier, unit);
 
             //Assets/Resources/UnitPrefabs/progeny1/BasePrefab.prefab
             string basePrefabPath = "UnitPrefabs/BaseUnitBasePrefab";
@@ -189,8 +189,10 @@ public class GameValuesSO : ScriptableObject
     public AttributesBaseUnit GetUnitDataByTitle(string unitName)
     {
         // Iterate through each AttributesBaseUnit in the list
-        foreach (AttributesBaseUnit unitData in attributesBaseUnits)
+        //foreach (AttributesBaseUnit unitData in attributesBaseUnits)
+        foreach (var kvp in attributesBaseUnits)
         {
+            AttributesBaseUnit unitData = kvp.Value;
             // Log the unit name being checked
             Debug.Log($"Checking unit: {unitData.unitName}");
 
@@ -209,8 +211,22 @@ public class GameValuesSO : ScriptableObject
         return null;
         //return attributesBaseUnit.Find(AttributesBaseUnit => AttributesBaseUnit.unitName == unitName);
     }
+    
 
-    public List<AttributesBaseUnit> getAttributesBaseUnits()
+    public AttributesBaseUnit GetUnitDataByByte(byte b)
+    {
+        try
+        {
+            return attributesBaseUnits[b];
+        }
+        catch (KeyNotFoundException)
+        {
+            Debug.LogError($"Key not found for byte {b} in AttributesBaseUnits");
+            return null;
+        }
+    }
+
+    public Dictionary<byte, AttributesBaseUnit> getAttributesBaseUnits()
     {
         return attributesBaseUnits;
     }    
@@ -264,7 +280,7 @@ public class GameValuesSO : ScriptableObject
         unit.sprite = Resources.Load<Sprite>($"sprites/{unit.unitName.ToLower().Replace(" ", "")}Sprite");
 
         unit.prefabPath = generatePrefabLocationString(unit.unitName, unit.progeny);
-        attributesBaseUnits.Add(unit);
+        attributesBaseUnits.Add(unit.baseUnitVariantIdentifier, unit);
         prefabManager.modifyPrefab(unit.prefabPath, unit);
     }
 

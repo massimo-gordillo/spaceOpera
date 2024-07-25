@@ -10,6 +10,7 @@ public class BaseUnit : MonoBehaviour
 
     //in future this values will be pulled from a UnitValues table/function.
     public string unitName;
+    public byte baseUnitVariantIdentifier;
 
     //enums as defined in AttributesBaseUnit
     public Progeny progeny; 

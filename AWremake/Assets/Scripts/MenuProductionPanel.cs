@@ -11,14 +11,15 @@ public class MenuProductionPanel : MonoBehaviour
     public Transform prodListProgeny0Air;
     public Transform prodListProgeny0Sea;
     public PrefabManager prefabManager = new PrefabManager();
-    private List<AttributesBaseUnit> attributesBaseUnits;
+    private Dictionary<byte, AttributesBaseUnit> attributesBaseUnits;
     // Start is called before the first frame update
     void Start()
     {
         attributesBaseUnits = gameValuesSO.getAttributesBaseUnits();
         Debug.Log("size: " + attributesBaseUnits.Count);
-        foreach (AttributesBaseUnit attributesBaseUnit in attributesBaseUnits)
+        foreach (var kvp in attributesBaseUnits)
         {
+            AttributesBaseUnit attributesBaseUnit = kvp.Value;
             MenuProductionButton nextProductionButton = productionButton;
             nextProductionButton.buttonText.text = attributesBaseUnit.unitName + "\n"+attributesBaseUnit.price;
             nextProductionButton.sprite.sprite = attributesBaseUnit.sprite;
