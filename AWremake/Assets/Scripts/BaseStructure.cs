@@ -30,11 +30,11 @@ public class BaseStructure : MonoBehaviour
         masterGrid.setStructureInGrid((int)transform.position.x, (int)transform.position.y, this);
         xPos = (int)transform.position.x;
         yPos = (int)transform.position.y;
-
+        
         //set sprite. 
         Sprite spr = null;
         if (structureType == 0)
-            spr = Resources.Load<Sprite>("sprites/structureSprite");
+            spr = Resources.Load<Sprite>("sprites/BismuthV1/BismuthTilev1.1");
         else if (structureType == 1)
             spr = Resources.Load<Sprite>("sprites/factorySprite");
         else if (structureType == 2)
@@ -45,6 +45,8 @@ public class BaseStructure : MonoBehaviour
         baseColor = spriteRenderer.color;
         if(playerControl != 0)
             setColor(playerControl);
+        if (masterGrid.whatUnitIsInThisLocation(xPos, yPos) != null)
+            turnOffCollider();
 
         //healthTextContainer = GetComponentInChildren<TextMeshProUGUI>();
 

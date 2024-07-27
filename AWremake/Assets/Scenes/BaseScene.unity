@@ -876,6 +876,14 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: -0.625
       objectReference: {fileID: 0}
+    - target: {fileID: 4455794299311834309, guid: d9822efbdbc263d4087119e151b866a1, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4455794299311834309, guid: d9822efbdbc263d4087119e151b866a1, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.5
+      objectReference: {fileID: 0}
     - target: {fileID: 4547516352761179574, guid: d9822efbdbc263d4087119e151b866a1, type: 3}
       propertyPath: m_Sprite
       value: 
@@ -2677,6 +2685,7 @@ MonoBehaviour:
   playerTurnText: {fileID: 2010402610}
   playerResourceText: {fileID: 1998717953}
   unitList: {fileID: 472514404}
+  structureList: {fileID: 0}
   gameValues: {fileID: 11400000, guid: 78e3fa714feb6dc49b40450b2814e1e1, type: 2}
   infantryUnitPrefab: {fileID: 7803690413202824681, guid: 983ef1501268ffe41b8514bfa205ddc5, type: 3}
   attackButton: {fileID: 99806018}
@@ -14833,6 +14842,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2926555870844649852, guid: acf7d7acace017745b703bfd8b0177ea, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: 166222a3bc93cf140b5d19599fbd0ff4, type: 3}
+    - target: {fileID: 2926555870844649852, guid: acf7d7acace017745b703bfd8b0177ea, type: 3}
       propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
@@ -14892,6 +14905,10 @@ PrefabInstance:
       propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8891161244872224208, guid: acf7d7acace017745b703bfd8b0177ea, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: 166222a3bc93cf140b5d19599fbd0ff4, type: 3}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: acf7d7acace017745b703bfd8b0177ea, type: 3}
 --- !u!1 &1671993175
