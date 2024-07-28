@@ -58,10 +58,11 @@ public class BaseUnit : MonoBehaviour
 
     void Start()
     {
-
+        xPos = (int)transform.position.x;
+        yPos = (int)transform.position.y;
         //print("BaseUnit initiated. xPos: " + transform.position.x + "ypos: " + transform.position.y +"instanceID: "+this.GetInstanceID());
         masterGrid = GameObject.FindGameObjectWithTag("MasterGridTag").GetComponent<MasterGrid>();
-        masterGrid.setUnitInGrid((int)transform.position.x, (int)transform.position.y, this);
+        masterGrid.setUnitInGrid(xPos, yPos, this);
 
         baseColor = unitSpriteRenderer.color;
 
@@ -71,8 +72,7 @@ public class BaseUnit : MonoBehaviour
             setNonExhausted(true);
 
         //playerControl = 1; //will have to set dynamically later
-        xPos = (int)transform.position.x;
-        yPos = (int)transform.position.y;
+
         //healthMax = 100;
         //healthCurrent= healthMax;
         setHealth(healthMax);

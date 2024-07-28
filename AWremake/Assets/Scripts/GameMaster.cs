@@ -72,6 +72,9 @@ public class GameMaster : MonoBehaviour
         for (int i = 1; i <= numPlayers; i++)
             setPlayerResources(i);
         startupInstantiateUnits();
+        List<GamePieceInfo> gameState = ConvertGameStateToList();
+        ConvertListToGameState(gameState);
+
     }
 
     private void startupInstantiateUnits()
@@ -321,33 +324,41 @@ public class GameMaster : MonoBehaviour
 
     public void ConvertListToGameState(List<GamePieceInfo> gameStateList)
     {
-        foreach (var pieceInfo in gameStateList)
+        if (gameStateList != null && gameStateList.Count != 0)
         {
-            if (pieceInfo.typeNum < 200)
+            int i = 0;
+            foreach (var pieceInfo in gameStateList)
             {
-                int x = pieceInfo.x;
-                int y = pieceInfo.y;
-                AttributesBaseUnit data = gameValues.GetUnitDataByByte(pieceInfo.typeNum);
+                i++;
+                Debug.Log($"gameState item #{i}, x: {pieceInfo.x}, y: {pieceInfo.y}, bytenum: {pieceInfo.typeNum}, health: {pieceInfo.healthVal}");
+                if (pieceInfo.typeNum < 200)
+                {
+                    int x = pieceInfo.x;
+                    int y = pieceInfo.y;
+                    AttributesBaseUnit data = gameValues.GetUnitDataByByte(pieceInfo.typeNum);
 
-                BaseUnit unit = prefabManager.getUnitFromPrefab(data.prefabPath);
-                Instantiate(unit, new Vector2(x, y), Quaternion.identity, unitList);
-                unit.playerControl = pieceInfo.playerID;
-                unit.setHealth((int)((double)(pieceInfo.healthVal*unit.healthMax)/100));
-                unit.xPos = x;
-                unit.yPos = y;
-                masterGrid.setUnitInGrid(x, y, unit);
-            }
-            else if (pieceInfo.typeNum >= 200 && pieceInfo.typeNum < 255)
-            {
-                int x = pieceInfo.x;
-                int y = pieceInfo.y;
-                BaseStructure structure = Instantiate(new BaseStructure(), new Vector2(x, y), Quaternion.identity, structureList);
-                structure.playerControl = pieceInfo.playerID;
-                structure.captureHealth = pieceInfo.healthVal;
-                structure.xPos = x;
-                structure.yPos = y;
-                masterGrid.setStructureInGrid(x, y, structure);
+                    BaseUnit unit = prefabManager.getUnitFromPrefab(data.prefabPath);
+                    Instantiate(unit, new Vector2(x, y), Quaternion.identity, unitList);
+                    unit.playerControl = pieceInfo.playerID;
+                    unit.setHealth((int)((double)(pieceInfo.healthVal * unit.healthMax) / 100));
+                    unit.xPos = x;
+                    unit.yPos = y;
+                    masterGrid.setUnitInGrid(x, y, unit);
+                }
+                else if (pieceInfo.typeNum >= 200 && pieceInfo.typeNum < 255)
+                {
+                    int x = pieceInfo.x;
+                    int y = pieceInfo.y;
+                    BaseStructure structure = Instantiate(new BaseStructure(), new Vector2(x, y), Quaternion.identity, structureList);
+                    structure.playerControl = pieceInfo.playerID;
+                    structure.captureHealth = pieceInfo.healthVal;
+                    structure.xPos = x;
+                    structure.yPos = y;
+                    masterGrid.setStructureInGrid(x, y, structure);
+                }
             }
         }
+        else
+            Debug.LogError("gameStateList is empty!");
     }
 }

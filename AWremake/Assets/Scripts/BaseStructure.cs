@@ -22,14 +22,15 @@ public class BaseStructure : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        xPos = (int)transform.position.x;
+        yPos = (int)transform.position.y;
         //private GameObject boxColliderComponent;
         gameMaster = GameObject.FindGameObjectWithTag("GameMasterTag").GetComponent<GameMaster>();
         maxCaptureHealth = 200;
         captureHealth = maxCaptureHealth;
         masterGrid = GameObject.FindGameObjectWithTag("MasterGridTag").GetComponent<MasterGrid>();
-        masterGrid.setStructureInGrid((int)transform.position.x, (int)transform.position.y, this);
-        xPos = (int)transform.position.x;
-        yPos = (int)transform.position.y;
+        masterGrid.setStructureInGrid(xPos, yPos, this);
+        
         
         //set sprite. 
         Sprite spr = null;

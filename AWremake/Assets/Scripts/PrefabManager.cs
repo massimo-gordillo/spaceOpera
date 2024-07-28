@@ -74,8 +74,6 @@ public class PrefabManager
 
                     if (property.Name == "sprite" && unitScript.unitSpriteRenderer != null)
                         unitScript.unitSpriteRenderer.sprite = (Sprite)value;
-                    if (property.Name == "canAttackLand")
-                        Debug.Log($"can {unitData.unitName} attack ground? {value}");
                 }
 
                 // Optional: Debug log to verify properties
@@ -85,7 +83,7 @@ public class PrefabManager
             UnityEditor.EditorUtility.SetDirty(tempInstance);  // Ensure Unity knows the prefab has been modified
             string fullPath = "Assets/Resources/" + prefabPath.Replace("Assets/Resources/", "").Replace(".prefab", "") + ".prefab";
             UnityEditor.PrefabUtility.SaveAsPrefabAsset(tempInstance, fullPath);
-            Debug.Log("Prefab saved successfully: " + fullPath);
+            //Debug.Log("Prefab saved successfully: " + fullPath);
 #endif
             }
             else
@@ -119,7 +117,7 @@ public class PrefabManager
 #if UNITY_EDITOR
         string fullPath = "Assets/Resources/" + newPrefabPath.Replace("Assets/Resources/", "").Replace(".prefab", "") + ".prefab";
         UnityEditor.PrefabUtility.SaveAsPrefabAsset(newPrefabInstance, fullPath);
-        Debug.Log("New prefab saved successfully: " + fullPath);
+        //Debug.Log("New prefab saved successfully: " + fullPath);
 #endif
 
         Object.DestroyImmediate(newPrefabInstance);

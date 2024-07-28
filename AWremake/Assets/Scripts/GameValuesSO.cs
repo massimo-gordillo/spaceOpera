@@ -17,7 +17,7 @@ public class GameValuesSO : ScriptableObject
 
     public void initialize()
     {
-        Debug.Log("GameValuesSO OnEnable called.");
+        //Debug.Log("GameValuesSO OnEnable called.");
         attributesBaseUnits = new Dictionary<byte, AttributesBaseUnit>();
         //attributesTiles = new List<AttributesTile>();
 
@@ -77,17 +77,17 @@ public class GameValuesSO : ScriptableObject
 
             // Handle sprite loading separately
             string unitSpritePath = $"sprites/progeny{GetEnumIndex(unit.progeny)}/{unit.unitName.ToLower().Replace(" ", "")}Sprite";
-            Debug.Log($"Attempting to load sprite from path: {unitSpritePath}");
+            //Debug.Log($"Attempting to load sprite from path: {unitSpritePath}");
             unit.sprite = Resources.Load<Sprite>(unitSpritePath);
 
             if (unit.sprite == null)
             {
                 Debug.LogError($"Failed to load sprite at path: {unitSpritePath}");
             }
-            else
+/*            else
             {
                 Debug.Log($"Successfully loaded sprite: {unit.sprite.name}");
-            }
+            }*/
 
             unit.prefabPath = generatePrefabLocationString(unit.unitName, unit.progeny);
             unit.baseUnitVariantIdentifier = (byte)(i - 1);
@@ -194,14 +194,14 @@ public class GameValuesSO : ScriptableObject
         {
             AttributesBaseUnit unitData = kvp.Value;
             // Log the unit name being checked
-            Debug.Log($"Checking unit: {unitData.unitName}");
+            //Debug.Log($"Checking unit: {unitData.unitName}");
 
             // Check if the current unit's name matches the given unitName
             if (unitData.unitName == unitName)
             {
                 // Log and return the matching unit
                 printToLogs(unitData);
-                Debug.Log($"Found unit: {unitData.unitName} it has prefabPath data : **{unitData.prefabPath}**");
+                //Debug.Log($"Found unit: {unitData.unitName} it has prefabPath data : **{unitData.prefabPath}**");
                 return unitData;
             }
         }
