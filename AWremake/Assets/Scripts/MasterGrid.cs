@@ -47,7 +47,26 @@ public class MasterGrid : MonoBehaviour
         defenceMultiplier = 4.0;
         firebackMultiplier = 0.7;
         //Dictionary<(byte, byte), GamePieceInfo> gameStateDict = ConvertGameStateToList();
+        //printUnitGrid();
     }
+
+/*    public void printUnitGrid()
+    {
+        //print("checkEnemiesInRange");
+        int k = 0;
+        for (int i = 0; i < unitGrid.GetLength(0); i++)
+        {
+            for (int j = 0; j < unitGrid.GetLength(1); j++)
+            {
+                if (unitGrid[i, j] != null)
+                {
+                    print(i + ", " + j + ": " + unitGrid[i, j]);
+                    k++;
+                }
+            }
+        }
+        print("this many units in the unitGrid: " + k);
+    }*/
 
     public void setTerrain(byte[] tilemapByteArray)
     {
@@ -524,22 +543,6 @@ public class MasterGrid : MonoBehaviour
                 setUnitToAttackable(selectedUnit, unitInLocation);
             }
         }
-
-        /*
-//print("checkEnemiesInRange");
-int k=0;
-for (int i = 0; i < unitGrid.GetLength(0); i++)
-{
-    for (int j = 0; j < unitGrid.GetLength(1); j++)
-    {
-        if (unitGrid[i, j] != null)
-        {
-            print(i + ", " + j + ": " + unitGrid[i, j]);
-            k++;
-        }
-    }
-}
-print("this many units in the unitGrid: " + k);*/
     }
 
     public void setUnitToAttackable(BaseUnit attacker, BaseUnit defender)
