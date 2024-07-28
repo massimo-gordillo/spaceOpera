@@ -5,6 +5,19 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 using MessagePack;
 
+[MessagePackObject]
+public struct TilemapData
+{
+    [Key(0)]
+    public int Width { get; set; }
+
+    [Key(1)]
+    public int Height { get; set; }
+
+    [Key(2)]
+    public byte[] TileBytes { get; set; }
+}
+
 public class TilemapManager : MonoBehaviour
 {
     public Tilemap tilemap; // Reference to the Tilemap component
@@ -26,6 +39,8 @@ public class TilemapManager : MonoBehaviour
     public int gridWidthWithTrim;
     public int gridHeightWithTrim;
 
+    private string mapFileLocation;
+
     //receives a list of all the attributesTile each of which contain the rules for each tile type (defined as a byte)
     public void initialize()
     {
@@ -38,14 +53,16 @@ public class TilemapManager : MonoBehaviour
         gridTrimOffset = 5;
         gridWidthWithTrim = gridWidth + gridTrimOffset * 2;
         gridHeightWithTrim = gridHeight + gridTrimOffset * 2;
+        mapFileLocation = "InitializationData/Maps/Map1";
 
         InitializeTileDictionaries();
 
+        //uncomment the appropriate function for testing.
         
-        //SaveTilemapToFile("myTilemap.dat");
-        //LoadTilemapFromFile("myTilemap.dat");
-        byte[] data = ExportTilemapToBytes(gridWidth, gridHeight);
-        ImportTilemapFromBytes(data, gridWidth, gridHeight);
+        //SaveTilemapToFile("TestTilemap.dat");
+        LoadTilemapFromFile("TestTilemap.dat");
+        //byte[] data = ExportTilemapToBytes(gridWidth, gridHeight);
+        //ImportTilemapFromBytes(data, gridWidth, gridHeight);
     }
 
 /*    private void InitializeTileDictionaries()
@@ -246,26 +263,42 @@ public class TilemapManager : MonoBehaviour
 
     public void SaveTilemapToFile(string fileName)
     {
-        string directoryPath = Path.Combine(Application.dataPath, "Resources/SavedMapsTemp");
+        string directoryPath = Path.Combine(Application.dataPath, mapFileLocation);
         if (!Directory.Exists(directoryPath))
         {
             Directory.CreateDirectory(directoryPath);
         }
 
         string filePath = Path.Combine(directoryPath, fileName);
-        byte[] data = ExportTilemapToBytes(gridWidth, gridHeight);
-        File.WriteAllBytes(filePath, data);
+        byte[] byteData = ExportTilemapToBytes(gridWidth, gridHeight);
+        TilemapData dataFile = new TilemapData
+        {
+            Width = (byte)gridWidth,
+            Height = (byte)gridHeight,
+            TileBytes = byteData
+        };
+
+        // Serialize the TilemapData object using MessagePack
+        byte[] serializedData = MessagePackSerializer.Serialize(dataFile);
+
+        // Write the serialized data to a file
+        File.WriteAllBytes(filePath, serializedData);
         Debug.Log($"Tilemap saved to file: {filePath}");
     }
 
     public void LoadTilemapFromFile(string fileName)
     {
-        string filePath = Path.Combine(Application.dataPath, "Resources/SavedMapsTemp", fileName);
+        string filePath = Path.Combine(Application.dataPath, mapFileLocation, fileName);
 
         if (File.Exists(filePath))
         {
-            byte[] data = File.ReadAllBytes(filePath);
-            ImportTilemapFromBytes(data, gridWidth, gridHeight);
+            // Read the file bytes
+            byte[] serializedData = File.ReadAllBytes(filePath);
+
+            // Deserialize the byte array into a TilemapData object using MessagePack
+            TilemapData dataFile = MessagePackSerializer.Deserialize<TilemapData>(serializedData);
+
+            ImportTilemapFromBytes(dataFile.TileBytes, (int)dataFile.Width, (int)dataFile.Height);
             Debug.Log($"Tilemap loaded from file: {filePath}");
         }
         else
@@ -273,4 +306,42 @@ public class TilemapManager : MonoBehaviour
             Debug.LogError($"File not found: {filePath}");
         }
     }
+
+
+
+    /*public void SaveTilemapToFile(string fileName)
+    {
+        string directoryPath = Path.Combine(Application.dataPath, "InitializationData/Maps/Map1");
+        if (!Directory.Exists(directoryPath))
+        {
+            Directory.CreateDirectory(directoryPath);
+        }
+
+        string filePath = Path.Combine(directoryPath, fileName);
+        byte[] byteData = ExportTilemapToBytes(gridWidth, gridHeight);
+        TilemapData dataFile = new TilemapData
+        {
+            Width = (byte)gridWidth,
+            Height = (byte)gridHeight,
+            TileBytes = byteData
+        };
+        File.WriteAllBytes(filePath, dataFile);
+        Debug.Log($"Tilemap saved to file: {filePath}");
+    }
+
+    public void LoadTilemapFromFile(string fileName)
+    {
+        string filePath = Path.Combine(Application.dataPath, "InitializationData/Maps/Map1", fileName);
+
+        if (File.Exists(filePath))
+        {
+            TilemapData dataFile = File.ReadAllBytes(filePath);
+            ImportTilemapFromBytes(dataFile.TileBytes, (int)dataFile.Width, (int)dataFile.Height);
+            Debug.Log($"Tilemap loaded from file: {filePath}");
+        }
+        else
+        {
+            Debug.LogError($"File not found: {filePath}");
+        }
+    }*/
 }

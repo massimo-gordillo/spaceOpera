@@ -2,14 +2,19 @@ using System;
 using System.Collections.Generic;
 using MessagePack;
 
-[Serializable]
+[MessagePackObject]
 public struct GamePieceInfo
 {
-    public byte x;          // X-coordinate on the grid
-    public byte y;          // Y-coordinate on the grid
-    public byte typeNum;    // Type of the unit/structure. Structures are 200+
-    public byte playerID;   // Player ID (0 for neutral, 1 for player 1, etc.)
-    public byte healthVal;  // % health the unit has, number 1-200 for structure health
+    [Key(0)]
+    public byte x;
+    [Key(1)]
+    public byte y;
+    [Key(2)]
+    public byte typeNum; // Type of the unit/structure. Structures are 200+
+    [Key(3)]
+    public byte playerID; // Player ID (0 for neutral, 1 for player 1, etc.)
+    [Key(4)]
+    public byte healthVal; // % health the unit has, number 1-200 for structure health
 }
 
 public class NetworkingManager

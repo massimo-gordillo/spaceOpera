@@ -5,7 +5,7 @@ using TMPro;
 
 public class BaseStructure : MonoBehaviour
 {
-    public int playerControl;
+    public byte playerControl;
     public MasterGrid masterGrid;
     public int xPos;
     public int yPos;
@@ -16,7 +16,12 @@ public class BaseStructure : MonoBehaviour
     public int maxCaptureHealth;
     public TextMeshProUGUI healthTextContainer;
     private Color baseColor;
-    public SpriteRenderer spriteRenderer;
+    public SpriteRenderer neutralSpriteRenderer;
+    public SpriteRenderer progeny0SpriteRenderer;
+    public SpriteRenderer progeny1SpriteRenderer;
+    public SpriteRenderer progeny2SpriteRenderer;
+
+
 
 
     // Start is called before the first frame update
@@ -32,7 +37,7 @@ public class BaseStructure : MonoBehaviour
         masterGrid.setStructureInGrid(xPos, yPos, this);
         
         
-        //set sprite. 
+/*        //set sprite. 
         Sprite spr = null;
         if (structureType == 0)
             spr = Resources.Load<Sprite>("sprites/BismuthV1/BismuthTilev1.1");
@@ -42,10 +47,15 @@ public class BaseStructure : MonoBehaviour
             spr = Resources.Load<Sprite>("sprites/airportSprite");
         else if (structureType == 5)
             spr = Resources.Load<Sprite>("sprites/commandStructureSprite");
-        spriteRenderer.sprite = spr;
-        baseColor = spriteRenderer.color;
-        if(playerControl != 0)
+        neutralSpriteRenderer.sprite = spr;*/
+        baseColor = neutralSpriteRenderer.color;
+        if (playerControl == 0)
+            turnOffCaptureSprites();
+        if (playerControl != 0)
+        {
             setColor(playerControl);
+
+        }
         if (masterGrid.whatUnitIsInThisLocation(xPos, yPos) != null)
             turnOffCollider();
 
@@ -71,7 +81,7 @@ public class BaseStructure : MonoBehaviour
         float saturation = 1.0f;
         float value = 1.0f;
         Color color = Color.HSVToRGB(hue / 360f, saturation, value);
-        spriteRenderer.color = color;
+        neutralSpriteRenderer.color = color;
     }
 
     public bool isCapturableBy(BaseUnit unit)
@@ -83,11 +93,31 @@ public class BaseStructure : MonoBehaviour
 
     public void switchAlliance(int capturePlayerInt)
     {
-        if (structureType == 2 && playerControl != capturePlayerInt)
+        if (structureType == 5 && playerControl != capturePlayerInt)
             gameMaster.playerLoses(playerControl);
-        playerControl = capturePlayerInt;
+        playerControl = (byte)capturePlayerInt;
         resetCaptureHealth();
         setColor(capturePlayerInt);
+    }
+
+    public void setCaptureSprite(byte progeny)
+    {
+        turnOffCaptureSprites();
+        if (gameMaster.playerProgeny[playerControl] == 0)
+            progeny0SpriteRenderer.gameObject.SetActive(true);
+        else if (gameMaster.playerProgeny[playerControl] == 1)
+            progeny1SpriteRenderer.gameObject.SetActive(true);
+        else if (gameMaster.playerProgeny[playerControl] == 2)
+            progeny2SpriteRenderer.gameObject.SetActive(true);
+        else
+            Debug.LogError($"No progeny for byte value {progeny} found, unable to set capture sprite");
+    }
+
+    public void turnOffCaptureSprites()
+    {
+        progeny0SpriteRenderer.gameObject.SetActive(false);
+        progeny1SpriteRenderer.gameObject.SetActive(false);
+        progeny2SpriteRenderer.gameObject.SetActive(false);
     }
 
     public void staticSpriteHasBeenClicked()

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System.IO;
+using MessagePack;
 
 public class GameMaster : MonoBehaviour
 {
@@ -19,6 +21,7 @@ public class GameMaster : MonoBehaviour
     public int playerTurn;
     public int numPlayers;
     private bool[] playersNotLost;
+    public byte[] playerProgeny;
     public TMP_Text playerTurnText;
     public TMP_Text playerResourceText;
     private int[] playerResources;
@@ -39,7 +42,12 @@ public class GameMaster : MonoBehaviour
     public int gridX = 30;
     public int gridY = 20;
 
-    public BaseStructure baseStructurePrefab;
+    public BaseStructure commandStructurePrefab;
+    public BaseStructure productionAirportStructurePrefab;
+    public BaseStructure productionFactoryStructurePrefab;
+    public BaseStructure resourceStructurePrefab;
+    private string gameStateFilePath = "Assets/InitializationData/Maps/Map1/TestGameState.dat";
+    
 
     // Start is called before the first frame update
     void Awake()
@@ -61,9 +69,11 @@ public class GameMaster : MonoBehaviour
         playerTurn = 1; //player 0 is neutral
         numPlayers = 2; //will set dynamically later
         playersNotLost = new bool[numPlayers+1];
+        playerProgeny = new byte[numPlayers + 1];
         for (int i = 0; i <= numPlayers; i++)
         {
             playersNotLost[i] = true;
+            playerProgeny[i] = 0;
         }
         playersNotLost[0] = false;
         setPlayerTurnText(playerTurn);
@@ -73,14 +83,15 @@ public class GameMaster : MonoBehaviour
         playerResources[0] = 0;
         for (int i = 1; i <= numPlayers; i++)
             setPlayerResources(i);
-        startupInstantiateUnits();
+        //startupInstantiateUnits();
 
     }
 
     void Start()
     {
         // Start the coroutine to call ConvertGameStateToList
-        StartCoroutine(CallConvertGameStateToList());
+        //StartCoroutine(CallConvertGameStateToList());
+        ConvertFileToGameState();
     }
 
     private IEnumerator CallConvertGameStateToList()
@@ -88,8 +99,8 @@ public class GameMaster : MonoBehaviour
         // Wait until the next frame to ensure all Start() methods are called
         yield return null;
         // Now it is safe to call ConvertGameStateToList
-        List<GamePieceInfo> gameState = ConvertGameStateToList();
-        ConvertListToGameState(gameState);
+        SaveGameStateListToFile(ConvertGameStateToList());
+        //ConvertListToGameState(gameState);
     }
 
     private void startupInstantiateUnits()
@@ -337,6 +348,12 @@ public class GameMaster : MonoBehaviour
         return gameStateList;
     }
 
+    private void SaveGameStateListToFile(List<GamePieceInfo> gameStateList)
+    {
+        byte[] bytes = MessagePackSerializer.Serialize(gameStateList);
+        File.WriteAllBytes(gameStateFilePath, bytes);
+        Debug.Log("Game state saved to " + gameStateFilePath);
+    }
 
     public void ConvertListToGameState(List<GamePieceInfo> gameStateList)
     {
@@ -365,7 +382,17 @@ public class GameMaster : MonoBehaviour
                 {
                     int x = pieceInfo.x;
                     int y = pieceInfo.y;
-                    BaseStructure structure = baseStructurePrefab.GetComponent<BaseStructure>();
+                    BaseStructure structure = new BaseStructure();
+                    if (pieceInfo.typeNum == 200)
+                        structure = resourceStructurePrefab.GetComponent<BaseStructure>();
+                    else if (pieceInfo.typeNum == 201)
+                        structure = productionFactoryStructurePrefab.GetComponent<BaseStructure>();
+                    else if (pieceInfo.typeNum == 202)
+                        structure = productionAirportStructurePrefab.GetComponent<BaseStructure>();
+                    else if (pieceInfo.typeNum == 205)
+                        structure = resourceStructurePrefab.GetComponent<BaseStructure>();
+                    else
+                        Debug.LogError($"No structure for byte value {pieceInfo.typeNum} found.");
                     structure.playerControl = pieceInfo.playerID;
                     structure.captureHealth = pieceInfo.healthVal;
                     structure.xPos = x;
@@ -377,5 +404,19 @@ public class GameMaster : MonoBehaviour
         }
         else
             Debug.LogError("gameStateList is empty!");
+    }
+
+    public void ConvertFileToGameState()
+    {
+        if (File.Exists(gameStateFilePath))
+        {
+            byte[] bytes = File.ReadAllBytes(gameStateFilePath);
+            List<GamePieceInfo> gameStateList = MessagePackSerializer.Deserialize<List<GamePieceInfo>>(bytes);
+            ConvertListToGameState(gameStateList);
+        }
+        else
+        {
+            Debug.LogError("Game state file not found at " + gameStateFilePath);
+        }
     }
 }
