@@ -102,6 +102,14 @@ public class GameMaster : MonoBehaviour
         SaveGameStateListToFile(ConvertGameStateToList());
         //ConvertListToGameState(gameState);
     }
+/*    private IEnumerator CallConvertGameStateToList()
+    {
+        // Wait until the next frame to ensure all Start() methods are called
+        yield return null;
+        // Now it is safe to call ConvertGameStateToList
+        SaveGameStateListToFile(ConvertGameStateToList());
+        //ConvertListToGameState(gameState);
+    }*/
 
     private void startupInstantiateUnits()
     {
@@ -382,7 +390,7 @@ public class GameMaster : MonoBehaviour
                 {
                     int x = pieceInfo.x;
                     int y = pieceInfo.y;
-                    BaseStructure structure = new BaseStructure();
+                    BaseStructure structure = null;
                     if (pieceInfo.typeNum == 200)
                         structure = resourceStructurePrefab.GetComponent<BaseStructure>();
                     else if (pieceInfo.typeNum == 201)
@@ -390,7 +398,7 @@ public class GameMaster : MonoBehaviour
                     else if (pieceInfo.typeNum == 202)
                         structure = productionAirportStructurePrefab.GetComponent<BaseStructure>();
                     else if (pieceInfo.typeNum == 205)
-                        structure = resourceStructurePrefab.GetComponent<BaseStructure>();
+                        structure = commandStructurePrefab.GetComponent<BaseStructure>();
                     else
                         Debug.LogError($"No structure for byte value {pieceInfo.typeNum} found.");
                     structure.playerControl = pieceInfo.playerID;

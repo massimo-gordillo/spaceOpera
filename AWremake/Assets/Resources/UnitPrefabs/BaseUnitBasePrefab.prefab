@@ -1162,6 +1162,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   unitName: Infantry
+  baseUnitVariantIdentifier: 0
   progeny: 0
   unitType: 0
   healthType: 0
@@ -1176,7 +1177,7 @@ MonoBehaviour:
   attackRange: 1
   price: 100
   movementRange: 3
-  playerControl: 1
+  playerControl: 0
   team: 0
   orientation: 3
   xPos: 0
