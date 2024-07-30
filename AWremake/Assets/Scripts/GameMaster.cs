@@ -363,6 +363,12 @@ public class GameMaster : MonoBehaviour
         Debug.Log("Game state saved to " + gameStateFilePath);
     }
 
+    //need error checking here.
+    //Cannot have two units on the same hex.
+    //Cannot hvae two structures on the same hex.
+    //Structure can only be placed on grass
+    //units must be placed on a legal square
+    //units and structures must not be outside of boundaries
     public void ConvertListToGameState(List<GamePieceInfo> gameStateList)
     {
         if (gameStateList != null && gameStateList.Count != 0)

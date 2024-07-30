@@ -418,7 +418,7 @@ public class MasterGrid : MonoBehaviour
                         drawMoveSquare(xCheck - 1, yCheck - 1, mTarget.playerControl == getPlayerTurn());
                     }
                     else if (range <= totalRange - movementRange)
-                        drawDamageSquare(xCheck - 1, yCheck - 1);
+                        drawDamageSquare(xCheck - 1, yCheck - 1, mTarget.playerControl == getPlayerTurn());
 
                     BaseStructure s = whatStructureIsInThisLocation(xCheck - 1, yCheck - 1);
                     if (s != null)
@@ -436,7 +436,7 @@ public class MasterGrid : MonoBehaviour
                     //then draw a movement square.
                     //Ie if it's not the players turn show all the squares a unit can attack regardless of unit attack legality.
                     if ((mTarget.playerControl != getPlayerTurn() || unitAtLocation == null || canUnitAttack(mTarget, unitAtLocation)))
-                        drawDamageSquare(xCheck - 1, yCheck - 1);
+                        drawDamageSquare(xCheck - 1, yCheck - 1, mTarget.playerControl == getPlayerTurn());
                 }
             }
         }
@@ -445,21 +445,25 @@ public class MasterGrid : MonoBehaviour
         RecursiveDrawMovement(mTarget, cellsToCheck);
     }
 
-    public void drawMoveSquare(int x, int y, bool clickable)
+    public void drawMoveSquare(int x, int y, bool isControllersTurn)
     {
         MovementSquare blueSquare = moveSquare;
         Color color = new Color(0.678f, 0.847f, 0.902f, 0.6f);
         blueSquare.setColor(color);
-        blueSquare.boxCollider2D.enabled = clickable;
+        blueSquare.boxCollider2D.enabled = isControllersTurn;
+        blueSquare.stripeSprite.gameObject.SetActive(!isControllersTurn);
+        //Debug.Log($"Is controllers turn for blue square? {isControllersTurn}");
         Instantiate(blueSquare, new Vector2(x, y), Quaternion.identity, movementSquareList);
     }
 
-    public void drawDamageSquare(int x, int y)
+    public void drawDamageSquare(int x, int y, bool isControllersTurn)
     {
         MovementSquare redSquare = moveSquare;
         Color c = new Color(1.0f, 0.6f, 0.6f, 0.6f);
         redSquare.setColor(c);
         redSquare.boxCollider2D.enabled = false;
+        redSquare.stripeSprite.gameObject.SetActive(!isControllersTurn);
+        //Debug.Log($"Is controllers turn for red square? {isControllersTurn}");
         Instantiate(redSquare, new Vector2(x, y), Quaternion.identity, movementSquareList);
     }
 

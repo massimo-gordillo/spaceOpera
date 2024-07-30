@@ -54,7 +54,7 @@ public class BaseStructure : MonoBehaviour
         if (playerControl != 0)
         {
             setColor(playerControl);
-
+            setCaptureSprite(gameMaster.playerProgeny[playerControl]);
         }
         if (masterGrid.whatUnitIsInThisLocation(xPos, yPos) != null)
             turnOffCollider();

@@ -7,6 +7,7 @@ public class MovementSquare : ClickableObject
     public MasterGrid mg;
     public SpriteRenderer sr;
     public Collider2D boxCollider2D;
+    public SpriteRenderer stripeSprite;
 
     protected override void Start()
     {
@@ -16,6 +17,7 @@ public class MovementSquare : ClickableObject
         Color color = sr.color;
         setColor(new Color(color.r, color.b, color.g, 0.8f));
         sr.sortingLayerID = SortingLayer.NameToID("Drawing");
+        //stripeSprite.gameObject.SetActive(false);
     }
 
     public override void HandleClick()
