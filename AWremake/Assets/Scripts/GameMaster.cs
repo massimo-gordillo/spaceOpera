@@ -79,8 +79,8 @@ public class GameMaster : MonoBehaviour
         }
         playersNotLost[0] = false;
         setPlayerTurnText(playerTurn);
-        baseResourcePerTurn = 100;
-        structureResourcePerTurn = 1027;
+        baseResourcePerTurn = 200;
+        structureResourcePerTurn = 100;
         playerResources = new int[numPlayers + 1];
         playerResources[0] = 0;
         for (int i = 1; i <= numPlayers; i++)
@@ -92,8 +92,8 @@ public class GameMaster : MonoBehaviour
     void Start()
     {
         // Start the coroutine to call ConvertGameStateToList
-        StartCoroutine(CallConvertGameStateToList());
-        //ConvertFileToGameState();
+        //StartCoroutine(CallConvertGameStateToList());
+        ConvertFileToGameState();
     }
 
     private IEnumerator CallConvertGameStateToList()
@@ -144,7 +144,7 @@ public class GameMaster : MonoBehaviour
     public void structureHasBeenClicked(BaseStructure structure)
     {
         //should probably try/catch if structure is null
-        if (structure.playerControl == playerTurn && structure.structureType != 0)
+        if (structure.playerControl == playerTurn && structure.structureType != 0 && structure.structureType != 5)
         {
             choicePanel.SetActive(true);
             productionPanel.gameObject.SetActive(true);
