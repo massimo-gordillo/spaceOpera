@@ -8,12 +8,44 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 487244310135845115, guid: b02aa9d5d64b2414abeba39fe8b377e8, type: 3}
+      propertyPath: m_SpriteTilingProperty.oldSize.x
+      value: 0.9375
+      objectReference: {fileID: 0}
+    - target: {fileID: 487244310135845115, guid: b02aa9d5d64b2414abeba39fe8b377e8, type: 3}
       propertyPath: m_SpriteTilingProperty.oldSize.y
-      value: 0.5
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 811462958065211588, guid: b02aa9d5d64b2414abeba39fe8b377e8, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 811462958065211588, guid: b02aa9d5d64b2414abeba39fe8b377e8, type: 3}
+      propertyPath: m_WasSpriteAssigned
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1354807818261213982, guid: b02aa9d5d64b2414abeba39fe8b377e8, type: 3}
       propertyPath: m_Name
-      value: productionFactoryV
+      value: productionFactory
+      objectReference: {fileID: 0}
+    - target: {fileID: 1924189638857087420, guid: b02aa9d5d64b2414abeba39fe8b377e8, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 1924189638857087420, guid: b02aa9d5d64b2414abeba39fe8b377e8, type: 3}
+      propertyPath: m_WasSpriteAssigned
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2637392255310505224, guid: b02aa9d5d64b2414abeba39fe8b377e8, type: 3}
+      propertyPath: m_Size.y
+      value: 1.03125
+      objectReference: {fileID: 0}
+    - target: {fileID: 2637392255310505224, guid: b02aa9d5d64b2414abeba39fe8b377e8, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 2637392255310505224, guid: b02aa9d5d64b2414abeba39fe8b377e8, type: 3}
+      propertyPath: m_WasSpriteAssigned
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3397026737060665485, guid: b02aa9d5d64b2414abeba39fe8b377e8, type: 3}
       propertyPath: structureType
