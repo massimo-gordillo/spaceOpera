@@ -39,19 +39,21 @@ public class GameMaster : MonoBehaviour
     public GameObject playerWinCard;
     public TMP_Text playerWinText;
 
-    public int gridX = 30;
-    public int gridY = 20;
+    public int gridX = 20;
+    public int gridY = 10;
 
     public BaseStructure commandStructurePrefab;
     public BaseStructure productionAirportStructurePrefab;
     public BaseStructure productionFactoryStructurePrefab;
     public BaseStructure resourceStructurePrefab;
-    private string gameStateFilePath = "Assets/InitializationData/Maps/Map1/TestGameState.dat";
+    private string gameStateFilePath = "Assets/InitializationData/Maps/Map2/Map2GameState.dat";
     
 
     // Start is called before the first frame update
     void Awake()
     {
+        gridX = 21;
+        gridY = 11;
         //gameValues = AssetDatabase.LoadAssetAtPath<GameValuesSO>("Assets/Scripts/Assets/Scripts/GameValuesSO.cs.cs");
 
         //initializes all unit values, modifies their prefab and sprites.
@@ -90,8 +92,8 @@ public class GameMaster : MonoBehaviour
     void Start()
     {
         // Start the coroutine to call ConvertGameStateToList
-        //StartCoroutine(CallConvertGameStateToList());
-        ConvertFileToGameState();
+        StartCoroutine(CallConvertGameStateToList());
+        //ConvertFileToGameState();
     }
 
     private IEnumerator CallConvertGameStateToList()

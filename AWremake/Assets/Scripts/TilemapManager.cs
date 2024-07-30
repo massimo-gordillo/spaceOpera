@@ -41,27 +41,32 @@ public class TilemapManager : MonoBehaviour
 
     private string mapFileLocation;
 
+    //private string tilemapFilePath;
+
     //receives a list of all the attributesTile each of which contain the rules for each tile type (defined as a byte)
     public void initialize()
     {
+        //tilemapFilePath = "Assets/InitializationData/Maps/Map2";
         //byteToAttributesTileDictionary = inputAttributesTilesDictionary;
         // Log the tilemap reference
         Debug.Log($"Initializing TilemapManager with tilemap: {tilemap.name}");
 
-        gridWidth = 30;
-        gridHeight = 20;
+        gridWidth = 21;
+        gridHeight = 11;
+        gridTrimOffset = 5;
         gridTrimOffset = 5;
         gridWidthWithTrim = gridWidth + gridTrimOffset * 2;
         gridHeightWithTrim = gridHeight + gridTrimOffset * 2;
-        mapFileLocation = "InitializationData/Maps/Map1";
+        mapFileLocation = "InitializationData/Maps/Map2";
 
         InitializeTileDictionaries();
 
         //uncomment the appropriate function for testing.
         
-        //SaveTilemapToFile("TestTilemap.dat");
-        LoadTilemapFromFile("TestTilemap.dat");
-        //byte[] data = ExportTilemapToBytes(gridWidth, gridHeight);
+        byte[] data = ExportTilemapToBytes(gridWidth, gridHeight);
+        //SaveTilemapToFile("Map2Tilemap.dat");
+        LoadTilemapFromFile("Map2Tilemap.dat");
+        
         //ImportTilemapFromBytes(data, gridWidth, gridHeight);
     }
 
@@ -247,8 +252,14 @@ public class TilemapManager : MonoBehaviour
     {
         if (tilemapByteArray == null || tilemapByteArray.Length == 0)
         {
-            Debug.LogWarning("Tilemap byte array is null or empty. Returning null.");
-            return null;
+            byte[] data = ExportTilemapToBytes(gridWidth, gridHeight);
+            if (data == null || data.Length == 0)
+            {
+                Debug.LogWarning("Tilemap byte array is null or empty. Returning null.");
+                return null;
+            }
+            else
+                return data;
         }
 
         int expectedMinSize = gridWidth * gridHeight;

@@ -30,10 +30,13 @@ public class MasterGrid : MonoBehaviour
     public Transform movementSquareList;
 
     // Called by GameMaster
-    public void startup(int gridX, int gridY, byte[] tilemapByteArray,
+    public void startup(int x, int y, byte[] tilemapByteArray,
         Dictionary<byte, AttributesTile> inputTileAttributes,
         Dictionary<string, Dictionary<string, double>> inputCombatMultipliers)
     {
+
+        gridX = x;
+        gridY = y;
         tileAttributes = inputTileAttributes;
         combatMultipliers = inputCombatMultipliers;
         selectedUnit = null;
