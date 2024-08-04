@@ -50,3 +50,13 @@ Sentus
     erthus = shock
     herthus = garden
     */
+
+
+FIRST RUN USER TEST
+
+Bug #1: 700 resources for player2 on T1.
+Bug #2: menu not showing when maximized. Likely sprite not recording a click.
+BUG #3: Can't consistently click on production structures
+
+Bug #4: Capturing infantry cannot unselect
+Bug #5: Undo unit movement makes it unselectable    
