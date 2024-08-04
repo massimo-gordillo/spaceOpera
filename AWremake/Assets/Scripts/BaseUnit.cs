@@ -39,7 +39,7 @@ public class BaseUnit : MonoBehaviour
     public bool undoingMovement = false;
     public int? oldXPos = null;
     public int? oldYPos = null;
-    public Sprite sprite; //will need to kill this value eventually. Just for data initialization PoC.
+    //public Sprite sprite; //will need to kill this value eventually. Just for data initialization PoC.
     public SpriteRenderer crosshairSpriteRenderer;
     public SpriteRenderer unitSpriteRenderer;
     public MasterGrid masterGrid;
@@ -121,7 +121,7 @@ public class BaseUnit : MonoBehaviour
             baseDamage = data.baseDamage;
             attackRange = data.attackRange;
             movementRange = data.movementRange;
-            sprite = data.sprite;
+            unitSpriteRenderer.sprite = data.sprite;
             progeny = data.progeny;
             price = data.price;
         }

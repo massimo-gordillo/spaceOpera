@@ -589,7 +589,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4548533291501861208}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &1408094258978992015
 SpriteRenderer:
@@ -986,7 +986,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &4548533290679335253
 Transform:
   m_ObjectHideFlags: 0
@@ -1143,6 +1143,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4548533290679335253}
+  - {fileID: 1884353508394188129}
   - {fileID: 480454219139180204}
   - {fileID: 5959277192361299510}
   - {fileID: 1798495883849624493}
@@ -1187,7 +1188,7 @@ MonoBehaviour:
   undoingMovement: 0
   sprite: {fileID: 21300000, guid: e6ca168bcac83744286bdb102995a022, type: 3}
   crosshairSpriteRenderer: {fileID: 1408094258978992015}
-  unitSpriteRenderer: {fileID: 4548533290679335252}
+  unitSpriteRenderer: {fileID: 7015816639260356803}
   masterGrid: {fileID: 0}
   prefabPath: unitPrefabs/progeny1/InfantryPrefab
   canAttackLand: 0
@@ -1308,7 +1309,7 @@ RectTransform:
   m_Children:
   - {fileID: 8176964375972455744}
   m_Father: {fileID: 4548533291501861208}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -1389,5 +1390,72 @@ Transform:
   m_Children:
   - {fileID: 4075927327848357223}
   m_Father: {fileID: 4548533291501861208}
-  m_RootOrder: 3
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &6019608442127820656
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 4548533291501861208}
+    m_Modifications:
+    - target: {fileID: 5309568537644243473, guid: c2e422a15d75ee247b51de88af605484, type: 3}
+      propertyPath: m_RootOrder
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5309568537644243473, guid: c2e422a15d75ee247b51de88af605484, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5309568537644243473, guid: c2e422a15d75ee247b51de88af605484, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5309568537644243473, guid: c2e422a15d75ee247b51de88af605484, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5309568537644243473, guid: c2e422a15d75ee247b51de88af605484, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5309568537644243473, guid: c2e422a15d75ee247b51de88af605484, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5309568537644243473, guid: c2e422a15d75ee247b51de88af605484, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5309568537644243473, guid: c2e422a15d75ee247b51de88af605484, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5309568537644243473, guid: c2e422a15d75ee247b51de88af605484, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5309568537644243473, guid: c2e422a15d75ee247b51de88af605484, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5309568537644243473, guid: c2e422a15d75ee247b51de88af605484, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6644371550061788981, guid: c2e422a15d75ee247b51de88af605484, type: 3}
+      propertyPath: m_Name
+      value: infantrySpritePrefab
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: c2e422a15d75ee247b51de88af605484, type: 3}
+--- !u!4 &1884353508394188129 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 5309568537644243473, guid: c2e422a15d75ee247b51de88af605484, type: 3}
+  m_PrefabInstance: {fileID: 6019608442127820656}
+  m_PrefabAsset: {fileID: 0}
+--- !u!212 &7015816639260356803 stripped
+SpriteRenderer:
+  m_CorrespondingSourceObject: {fileID: 3662765650668672947, guid: c2e422a15d75ee247b51de88af605484, type: 3}
+  m_PrefabInstance: {fileID: 6019608442127820656}
+  m_PrefabAsset: {fileID: 0}
