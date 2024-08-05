@@ -377,6 +377,7 @@ public class MasterGrid : MonoBehaviour
         int movementRange = mTarget.movementRange;
         int attackRange = mTarget.attackRange;
         int totalRange = movementRange + attackRange;
+        
         //Debug.Log($"cellsToCheck size is: {cellsToCheck.Count}");
         if (cellsToCheck.Count == 0)
         {
@@ -466,7 +467,7 @@ public class MasterGrid : MonoBehaviour
         redSquare.setColor(c);
         redSquare.boxCollider2D.enabled = false;
         redSquare.stripeSprite.gameObject.SetActive(!isControllersTurn);
-        //Debug.Log($"Is controllers turn for red square? {isControllersTurn}");
+        Debug.Log($"DrawDamageSquare at {x},{y}");
         Instantiate(redSquare, new Vector2(x, y), Quaternion.identity, movementSquareList);
     }
 
