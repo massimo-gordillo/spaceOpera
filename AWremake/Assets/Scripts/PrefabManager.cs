@@ -71,9 +71,13 @@ public class PrefabManager
                         targetField.SetValue(unitScript, value);
                     else
                         Debug.LogWarning($"For unit {unitData.unitName}, field {property.Name} not found in BaseUnit.");
+                        
 
                     if (property.Name == "sprite" && unitScript.unitSpriteRenderer != null)
+                    {
                         unitScript.unitSpriteRenderer.sprite = (Sprite)value;
+                        //Debug.LogWarning($"For unit {unitData.unitName}, value is {value} as sprite {(Sprite)value} .");
+                    }
                 }
 
                 // Optional: Debug log to verify properties
