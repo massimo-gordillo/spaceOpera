@@ -73,10 +73,15 @@ public class PrefabManager
                         Debug.LogWarning($"For unit {unitData.unitName}, field {property.Name} not found in BaseUnit.");
                         
 
-                    if (property.Name == "sprite" && unitScript.unitSpriteRenderer != null)
+                    if (property.Name == "sprite" && unitScript.spriteFillSR != null)
                     {
-                        unitScript.unitSpriteRenderer.sprite = (Sprite)value;
-                        //Debug.LogWarning($"For unit {unitData.unitName}, value is {value} as sprite {(Sprite)value} .");
+                        unitScript.spriteFillSR.sprite = (Sprite)value;
+                        Debug.Log($"For unit {unitData.unitName}, value is {value} as sprite {(Sprite)value} .");
+                    }
+                    if (property.Name == "spriteAtlasPath" && unitScript.spriteFillSR != null)
+                    {
+                        unitScript.setSpritesFromSpriteAtlas((string)value);
+                        //Debug.Log($"For unit {unitData.unitName}, value is {value} as sprite {(Sprite)value} .");
                     }
                 }
 

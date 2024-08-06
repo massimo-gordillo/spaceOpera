@@ -301,8 +301,8 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2964242857926442344}
-  - {fileID: 5834535030309291147}
   - {fileID: 4834507153719527309}
+  - {fileID: 5834535030309291147}
   m_Father: {fileID: 4548533291501861208}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -830,7 +830,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 2296386549408688322}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &4417168471245874654
 SpriteRenderer:
@@ -1346,9 +1346,12 @@ MonoBehaviour:
   undoingMovement: 0
   sprite: {fileID: 21300000, guid: e6ca168bcac83744286bdb102995a022, type: 3}
   crosshairSpriteRenderer: {fileID: 1408094258978992015}
-  unitSpriteRenderer: {fileID: 8214861592441515969}
+  spriteFillSR: {fileID: 8214861592441515969}
+  spriteTrimSR: {fileID: 2574618888157518857}
+  spriteLightsSR: {fileID: 4417168471245874654}
   masterGrid: {fileID: 0}
   prefabPath: unitPrefabs/progeny1/InfantryPrefab
+  spriteAtlasPath: 
   canAttackLand: 0
   canAttackAir: 0
   canAttackSea: 0
@@ -1369,7 +1372,7 @@ GameObject:
   - component: {fileID: 2964242857926442344}
   - component: {fileID: 8214861592441515969}
   m_Layer: 0
-  m_Name: Core Colour
+  m_Name: Core Colour Fill
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1632,7 +1635,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 2296386549408688322}
-  m_RootOrder: 2
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &2574618888157518857
 SpriteRenderer:

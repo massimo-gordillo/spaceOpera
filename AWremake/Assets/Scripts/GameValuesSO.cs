@@ -79,15 +79,15 @@ public class GameValuesSO : ScriptableObject
             string unitSpritePath = $"sprites/progeny{GetEnumIndex(unit.progeny)}/{unit.unitName.ToLower().Replace(" ", "")}Sprite";
             //Debug.Log($"Attempting to load sprite from path: {unitSpritePath}");
             unit.sprite = Resources.Load<Sprite>(unitSpritePath);
+            unit.spriteAtlasPath = $"sprites/progeny{GetEnumIndex(unit.progeny)}/{unit.unitName.ToLower().Replace(" ", "")}SpriteAtlas.spriteatlas";
+
 
             if (unit.sprite == null)
             {
                 Debug.LogError($"Failed to load sprite at path: {unitSpritePath}");
             }
-/*            else
-            {
-                Debug.Log($"Successfully loaded sprite: {unit.sprite.name}");
-            }*/
+
+
 
             unit.prefabPath = generatePrefabLocationString(unit.unitName, unit.progeny);
             unit.baseUnitVariantIdentifier = (byte)(i - 1);

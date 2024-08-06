@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.U2D;
 using TMPro;
 
 public class BaseUnit : MonoBehaviour
@@ -41,9 +42,12 @@ public class BaseUnit : MonoBehaviour
     public int? oldYPos = null;
     public Sprite sprite; //MG 24-08-04: You cannot kill this var. It is used by AttributesBaseUnit, GameValuesSO and PrefabManager to work with the sprite values.
     public SpriteRenderer crosshairSpriteRenderer;
-    public SpriteRenderer unitSpriteRenderer;
+    public SpriteRenderer spriteFillSR;
+    public SpriteRenderer spriteTrimSR;
+    public SpriteRenderer spriteLightsSR;
     public MasterGrid masterGrid;
     public string prefabPath;
+    public string spriteAtlasPath;
     public bool canAttackLand;
     public bool canAttackAir;
     public bool canAttackSea;
@@ -64,7 +68,7 @@ public class BaseUnit : MonoBehaviour
         masterGrid = GameObject.FindGameObjectWithTag("MasterGridTag").GetComponent<MasterGrid>();
         masterGrid.setUnitInGrid(xPos, yPos, this);
 
-        baseColor = unitSpriteRenderer.color;
+        baseColor = spriteFillSR.color;
 
         if (playerControl == masterGrid.getPlayerTurn())
             setNonExhausted(false);
@@ -108,7 +112,7 @@ public class BaseUnit : MonoBehaviour
         }*/
     }
 
-    public void startupPopulateValues(AttributesBaseUnit data)
+/*    public void startupPopulateValues(AttributesBaseUnit data)
     {
         if (data != null)
         {
@@ -121,13 +125,13 @@ public class BaseUnit : MonoBehaviour
             baseDamage = data.baseDamage;
             attackRange = data.attackRange;
             movementRange = data.movementRange;
-            unitSpriteRenderer.sprite = data.sprite;
+            spriteFillSR.sprite = data.sprite;
             progeny = data.progeny;
             price = data.price;
         }
         else
             print("nodata found");
-    }
+    }*/
 
     public void staticSpriteHasBeenClicked()
     {
@@ -227,7 +231,7 @@ public class BaseUnit : MonoBehaviour
         Color newColor = new Color((float)(player / 9), (float)(player/9), (float)(player / 9), color.a);
         //Color newColor = new Color(0.5f,0f,0f, 1f);
         print(newColor);
-        unitSpriteRenderer.color = newColor;
+        spriteFillSR.color = newColor;
     }
 
     public void setColour(int player, bool nonExhausted)
@@ -239,8 +243,25 @@ public class BaseUnit : MonoBehaviour
             nonExhaustInt = 1;
         float t = Mathf.InverseLerp(1, 3, player);
         Color finalColor = Color.Lerp(Color.red, Color.blue, t);
-        unitSpriteRenderer.color = finalColor;
+        spriteFillSR.color = finalColor;
     }*/
+
+    public void setSpritesFromSpriteAtlas(string atlasPath)
+    {       
+        SpriteAtlas spriteAtlas = Resources.Load<SpriteAtlas>(atlasPath);
+        string name = unitName.ToLower().Replace(" ", "");
+        if (spriteAtlas != null)
+        {
+            // Assign sprites from the atlas to the SpriteRenderers
+            spriteFillSR.sprite = spriteAtlas.GetSprite($"{name}Sprite_Fill");
+            spriteTrimSR.sprite = spriteAtlas.GetSprite($"{name}Sprite_Trim");
+            spriteLightsSR.sprite = spriteAtlas.GetSprite($"{name}Sprite_Lights");
+        }
+        else
+        {
+            Debug.LogWarning($"Failed to load spriteAtlas for {unitName} at path: {atlasPath}");
+        }
+    }
 
     public void setColor(int player, bool nonExhausted)
     {
@@ -248,7 +269,7 @@ public class BaseUnit : MonoBehaviour
         float saturation = nonExhausted ? 1.0f : 0.3f;
         float value = 1.0f;
         Color color = Color.HSVToRGB(hue / 360f, saturation, value);
-        unitSpriteRenderer.color = color;
+        spriteFillSR.color = color;
     }
 
     public int getPlayerControl()

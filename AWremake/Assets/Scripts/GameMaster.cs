@@ -379,7 +379,7 @@ public class GameMaster : MonoBehaviour
             foreach (var pieceInfo in gameStateList)
             {
                 i++;
-                Debug.Log($"gameState item #{i}, x: {pieceInfo.x}, y: {pieceInfo.y}, bytenum: {pieceInfo.typeNum}, health: {pieceInfo.healthVal}");
+                //Debug.Log($"gameState item #{i}, x: {pieceInfo.x}, y: {pieceInfo.y}, bytenum: {pieceInfo.typeNum}, health: {pieceInfo.healthVal}");
                 if (pieceInfo.typeNum < 200)
                 {
                     int x = pieceInfo.x;
