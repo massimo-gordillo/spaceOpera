@@ -7,7 +7,7 @@ using TMPro;
 public class MenuProductionButton : MonoBehaviour
 {
     public TMP_Text buttonText;
-    public SpriteRenderer sprite;
+    public StaticSprite spritePrefab;
     public GameObject unitPrefab;
     public GameMaster gameMaster;
 

@@ -76,16 +76,16 @@ public class GameValuesSO : ScriptableObject
             //unit.sprite = Resources.Load<Sprite>($"sprites/{unit.unitName.ToLower().Replace(" ", "")}Sprite");*/
 
             // Handle sprite loading separately
-            string unitSpritePath = $"sprites/progeny{GetEnumIndex(unit.progeny)}/{unit.unitName.ToLower().Replace(" ", "")}Sprite";
+            //string unitSpritePath = $"sprites/progeny{GetEnumIndex(unit.progeny)}/{unit.unitName.ToLower().Replace(" ", "")}Sprite";
             //Debug.Log($"Attempting to load sprite from path: {unitSpritePath}");
-            unit.sprite = Resources.Load<Sprite>(unitSpritePath);
+            //unit.sprite = Resources.Load<Sprite>(unitSpritePath);
             unit.spriteAtlasPath = $"sprites/progeny{GetEnumIndex(unit.progeny)}/{unit.unitName.ToLower().Replace(" ", "")}SpriteAtlas.spriteatlas";
 
 
-            if (unit.sprite == null)
+            /*if (unit.sprite == null)
             {
                 Debug.LogError($"Failed to load sprite at path: {unitSpritePath}");
-            }
+            }*/
 
 
 
@@ -255,7 +255,7 @@ public class GameValuesSO : ScriptableObject
         Debug.Log($"attackRange: {unitData.attackRange}");
         Debug.Log($".price: {unitData.price}");
         Debug.Log($"movementRange: {unitData.movementRange}");
-        Debug.Log($".sprite: {unitData.sprite}");
+        //Debug.Log($".sprite: {unitData.sprite}");
         Debug.Log($"prefabPath: {unitData.prefabPath}");
     }
 
@@ -271,18 +271,18 @@ public class GameValuesSO : ScriptableObject
         return prefabPath;
     }
 
-    private void finalizePopulateGameValues(AttributesBaseUnit unit)
+/*    private void finalizePopulateGameValues(AttributesBaseUnit unit)
     {
         //requires the sprite in the inspector to be in Resources/Sprites and named aaaaSprite
 
-/*        string spritePath = ("sprites/" + unit.unitName.ToLower().Replace(" ", "") + "Sprite"));
-        unit.sprite = Resources.Load<Sprite>(spritePath);*/
+*//*        string spritePath = ("sprites/" + unit.unitName.ToLower().Replace(" ", "") + "Sprite"));
+        unit.sprite = Resources.Load<Sprite>(spritePath);*//*
         unit.sprite = Resources.Load<Sprite>($"sprites/{unit.unitName.ToLower().Replace(" ", "")}Sprite");
 
         unit.prefabPath = generatePrefabLocationString(unit.unitName, unit.progeny);
         attributesBaseUnits.Add(unit.baseUnitVariantIdentifier, unit);
         prefabManager.modifyPrefab(unit.prefabPath, unit);
-    }
+    }*/
 
     public static int GetEnumIndex<TEnum>(TEnum value) where TEnum : Enum
     {

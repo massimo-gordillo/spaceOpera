@@ -56,7 +56,7 @@ public class AttributesBaseUnit
     public bool canFireBack { get; set; }
     public int price { get; set; }
     public int movementRange { get; set; }
-    public Sprite sprite { get; set; }
+    //public Sprite sprite { get; set; }
     public string spriteAtlasPath { get; set; }
     public string prefabPath { get; set; }
 }

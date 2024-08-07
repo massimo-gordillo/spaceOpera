@@ -1525,6 +1525,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0f3d2a09ca23d1947822607598e4e193, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  fillSR: {fileID: 0}
+  trimSR: {fileID: 0}
+  lightsSR: {fileID: 0}
 --- !u!50 &350041783
 Rigidbody2D:
   serializedVersion: 4
@@ -2703,6 +2706,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0f3d2a09ca23d1947822607598e4e193, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  fillSR: {fileID: 0}
+  trimSR: {fileID: 0}
+  lightsSR: {fileID: 0}
 --- !u!50 &580983544
 Rigidbody2D:
   serializedVersion: 4
@@ -3472,6 +3478,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0f3d2a09ca23d1947822607598e4e193, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  fillSR: {fileID: 0}
+  trimSR: {fileID: 0}
+  lightsSR: {fileID: 0}
 --- !u!50 &869400660
 Rigidbody2D:
   serializedVersion: 4
@@ -4090,11 +4099,13 @@ MonoBehaviour:
   movementNonExhausted: 0
   nonExhausted: 0
   undoingMovement: 0
-  sprite: {fileID: 0}
   crosshairSpriteRenderer: {fileID: 1834689752}
-  unitSpriteRenderer: {fileID: 580983546}
+  spriteFillSR: {fileID: 0}
+  spriteTrimSR: {fileID: 0}
+  spriteLightsSR: {fileID: 0}
   masterGrid: {fileID: 0}
   prefabPath: 
+  spriteAtlasPath: 
   canAttackLand: 0
   canAttackAir: 0
   canAttackSea: 0
@@ -20314,11 +20325,13 @@ MonoBehaviour:
   movementNonExhausted: 0
   nonExhausted: 0
   undoingMovement: 0
-  sprite: {fileID: 0}
   crosshairSpriteRenderer: {fileID: 492674986}
-  unitSpriteRenderer: {fileID: 869400662}
+  spriteFillSR: {fileID: 0}
+  spriteTrimSR: {fileID: 0}
+  spriteLightsSR: {fileID: 0}
   masterGrid: {fileID: 0}
   prefabPath: 
+  spriteAtlasPath: 
   canAttackLand: 0
   canAttackAir: 0
   canAttackSea: 0
@@ -20773,11 +20786,13 @@ MonoBehaviour:
   movementNonExhausted: 0
   nonExhausted: 0
   undoingMovement: 0
-  sprite: {fileID: 0}
   crosshairSpriteRenderer: {fileID: 462398237}
-  unitSpriteRenderer: {fileID: 350041785}
+  spriteFillSR: {fileID: 0}
+  spriteTrimSR: {fileID: 0}
+  spriteLightsSR: {fileID: 0}
   masterGrid: {fileID: 0}
   prefabPath: 
+  spriteAtlasPath: 
   canAttackLand: 0
   canAttackAir: 0
   canAttackSea: 0

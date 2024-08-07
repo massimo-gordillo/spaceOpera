@@ -7,6 +7,9 @@ public class StaticSprite : ClickableObject
     private GameObject parentGameObject;
     private BaseUnit parentComponentBaseUnit;
     private BaseStructure parentComponentBaseStructure;
+    public SpriteRenderer fillSR;
+    public SpriteRenderer trimSR;
+    public SpriteRenderer lightsSR;
     // Start is called before the first frame update
     protected override void Start()
     {

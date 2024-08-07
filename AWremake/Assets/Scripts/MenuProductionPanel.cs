@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.U2D;
 
 public class MenuProductionPanel : MonoBehaviour
 {
@@ -22,7 +23,13 @@ public class MenuProductionPanel : MonoBehaviour
             AttributesBaseUnit attributesBaseUnit = kvp.Value;
             MenuProductionButton nextProductionButton = productionButton;
             nextProductionButton.buttonText.text = attributesBaseUnit.unitName + "\n"+attributesBaseUnit.price;
-            nextProductionButton.sprite.sprite = attributesBaseUnit.sprite;
+
+            setSpritesFromSpriteAtlas(attributesBaseUnit.unitName, attributesBaseUnit.spriteAtlasPath, nextProductionButton.spritePrefab);
+            
+
+            
+
+            
             nextProductionButton.unitPrefab = prefabManager.getPrefab(attributesBaseUnit.prefabPath);
             //I want to set the size of the sprite ahead of time. Maybe I should do this at startup as well??
             //nextProductionButton.sprite.GetComponent<RectTransform>().sizeDelta = new Vector2(5, 5);
@@ -54,5 +61,25 @@ public class MenuProductionPanel : MonoBehaviour
             prodListProgeny0Sea.gameObject.SetActive(true);
         else
             Debug.LogError("Production List requested but Struct not correct type.");
+    }
+
+    //MG 24-08-07: NOTE! This is a duplicate function from BaseUnit! Terrible practice. Presumably you want to put this in Prefab Manager and pass the object you're modifying
+    public void setSpritesFromSpriteAtlas(string unitName, string atlasPath, StaticSprite spritePrefab)
+    {
+        SpriteAtlas spriteAtlas = Resources.Load<SpriteAtlas>(atlasPath);
+        string name = unitName.ToLower().Replace(" ", "");
+        if (spriteAtlas != null)
+        {
+            // Assign sprites from the atlas to the SpriteRenderers
+            spritePrefab.fillSR.sprite = spriteAtlas.GetSprite($"{name}Sprite_Fill");
+            spritePrefab.trimSR.sprite = spriteAtlas.GetSprite($"{name}Sprite_Trim");
+            spritePrefab.lightsSR.sprite = spriteAtlas.GetSprite($"{name}Sprite_Lights");
+        }
+        else
+        {
+            Debug.LogWarning($"For menuproduction panel: Failed to load spriteAtlas for {unitName} at path: {atlasPath}");
+        }
+
+         
     }
 }

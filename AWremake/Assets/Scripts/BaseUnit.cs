@@ -40,7 +40,7 @@ public class BaseUnit : MonoBehaviour
     public bool undoingMovement = false;
     public int? oldXPos = null;
     public int? oldYPos = null;
-    public Sprite sprite; //MG 24-08-04: You cannot kill this var. It is used by AttributesBaseUnit, GameValuesSO and PrefabManager to work with the sprite values.
+    //public Sprite sprite; //MG 24-08-04: You cannot kill this var. It is used by AttributesBaseUnit, GameValuesSO and PrefabManager to work with the sprite values.
     public SpriteRenderer crosshairSpriteRenderer;
     public SpriteRenderer spriteFillSR;
     public SpriteRenderer spriteTrimSR;
