@@ -42,6 +42,7 @@ public class BaseUnit : MonoBehaviour
     public int? oldYPos = null;
     //public Sprite sprite; //MG 24-08-04: You cannot kill this var. It is used by AttributesBaseUnit, GameValuesSO and PrefabManager to work with the sprite values.
     public SpriteRenderer crosshairSpriteRenderer;
+    public StaticSprite spriteContainer;
     public SpriteRenderer spriteFillSR;
     public SpriteRenderer spriteTrimSR;
     public SpriteRenderer spriteLightsSR;
@@ -246,7 +247,7 @@ public class BaseUnit : MonoBehaviour
         spriteFillSR.color = finalColor;
     }*/
 
-    public void setSpritesFromSpriteAtlas(string atlasPath)
+/*    public void setSpritesFromSpriteAtlas(string atlasPath)
     {       
         SpriteAtlas spriteAtlas = Resources.Load<SpriteAtlas>(atlasPath);
         string name = unitName.ToLower().Replace(" ", "");
@@ -262,7 +263,7 @@ public class BaseUnit : MonoBehaviour
             Debug.LogWarning($"Failed to load spriteAtlas for {unitName} at path: {atlasPath}");
         }
     }
-
+*/
     public void setColor(int player, bool nonExhausted)
     {
         float hue = ((float)player / 3.0f) * 360f;

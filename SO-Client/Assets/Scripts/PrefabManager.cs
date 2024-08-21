@@ -1,5 +1,7 @@
 using UnityEngine;
 using System.Reflection;
+using UnityEngine.U2D;
+//using System.Diagnostics;
 
 public class PrefabManager
 {
@@ -79,7 +81,7 @@ public class PrefabManager
                     }*/
                     if (property.Name == "spriteAtlasPath" && unitScript.spriteFillSR != null)
                     {
-                        unitScript.setSpritesFromSpriteAtlas((string)value);
+                        setSpritesFromSpriteAtlas(unitScript.unitName,(string)value,unitScript.spriteContainer);
                         //Debug.Log($"For unit {unitData.unitName}, value is {value} as sprite {(Sprite)value} .");
                     }
                 }
@@ -129,6 +131,55 @@ public class PrefabManager
 #endif
 
         Object.DestroyImmediate(newPrefabInstance);
+    }
+
+    public void setSpritesFromSpriteAtlas(string unitName, string atlasPath, StaticSprite spritePrefab)
+    {
+        SpriteAtlas spriteAtlas = Resources.Load<SpriteAtlas>(atlasPath);
+        string name = unitName.ToLower().Replace(" ", "");
+
+        if (spriteAtlas != null)
+        {
+            // Assign sprites from the atlas to the SpriteRenderers
+            // Check if the sprite exists in the sprite atlas
+            if (spriteAtlas.GetSprite($"{name}Sprite_Fill") != null)
+            {
+                spritePrefab.fillSR.sprite = spriteAtlas.GetSprite($"{name}Sprite_Fill");
+            }
+            else
+            {
+                UnityEngine.Debug.LogWarning($"Sprite {name}Sprite_Fill not found in the sprite atlas.");
+            }
+
+            if (spriteAtlas.GetSprite($"{name}Sprite_Trim") != null)
+            {
+                spritePrefab.trimSR.sprite = spriteAtlas.GetSprite($"{name}Sprite_Trim");
+            }
+            else
+            {
+                UnityEngine.Debug.LogWarning($"Sprite {name}Sprite_Trim not found in the sprite atlas.");
+            }
+
+            if (spriteAtlas.GetSprite($"{name}Sprite_Lights") != null)
+            {
+                spritePrefab.lightsSR.sprite = spriteAtlas.GetSprite($"{name}Sprite_Lights");
+            }
+            else
+            {
+                UnityEngine.Debug.LogWarning($"Sprite {name}Sprite_Lights not found in the sprite atlas.");
+            }
+            //spritePrefab.fillSR.sprite = Resources.Load<Sprite>("Sprites/progeny0/infantrySprite");
+            /*spritePrefab.fillSR.sprite = Resources.Load<Sprite>("Sprites/progeny0/infantrySprites/infantrySprite_Fill");
+            spritePrefab.trimSR.sprite = Resources.Load<Sprite>("Sprites/progeny0/infantrySprites/infantrySprite_Lights");
+            spritePrefab.lightsSR.sprite = Resources.Load<Sprite>("Sprites/progeny0/infantrySprites/infantrySprite_Trim");
+            */
+        }
+        else
+        {
+            UnityEngine.Debug.LogWarning($"Failed to load spriteAtlas for {unitName} at path: {atlasPath}");
+        }
+
+
     }
 
 

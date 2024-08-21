@@ -24,7 +24,7 @@ public class MenuProductionPanel : MonoBehaviour
             MenuProductionButton nextProductionButton = productionButton;
             nextProductionButton.buttonText.text = attributesBaseUnit.unitName + "\n"+attributesBaseUnit.price;
 
-            setSpritesFromSpriteAtlas(attributesBaseUnit.unitName, attributesBaseUnit.spriteAtlasPath, nextProductionButton.spritePrefab);
+            prefabManager.setSpritesFromSpriteAtlas(attributesBaseUnit.unitName, attributesBaseUnit.spriteAtlasPath, nextProductionButton.spritePrefab);
             
 
             
@@ -63,23 +63,4 @@ public class MenuProductionPanel : MonoBehaviour
             Debug.LogError("Production List requested but Struct not correct type.");
     }
 
-    //MG 24-08-07: NOTE! This is a duplicate function from BaseUnit! Terrible practice. Presumably you want to put this in Prefab Manager and pass the object you're modifying
-    public void setSpritesFromSpriteAtlas(string unitName, string atlasPath, StaticSprite spritePrefab)
-    {
-        SpriteAtlas spriteAtlas = Resources.Load<SpriteAtlas>(atlasPath);
-        string name = unitName.ToLower().Replace(" ", "");
-        if (spriteAtlas != null)
-        {
-            // Assign sprites from the atlas to the SpriteRenderers
-            spritePrefab.fillSR.sprite = spriteAtlas.GetSprite($"{name}Sprite_Fill");
-            spritePrefab.trimSR.sprite = spriteAtlas.GetSprite($"{name}Sprite_Trim");
-            spritePrefab.lightsSR.sprite = spriteAtlas.GetSprite($"{name}Sprite_Lights");
-        }
-        else
-        {
-            Debug.LogWarning($"For menuproduction panel: Failed to load spriteAtlas for {unitName} at path: {atlasPath}");
-        }
-
-         
-    }
 }
