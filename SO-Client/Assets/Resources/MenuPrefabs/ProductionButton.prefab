@@ -149,7 +149,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   buttonText: {fileID: 7751100590271051732}
-  spritePrefab: {fileID: 3045942380889575232}
+  spritePrefab: {fileID: 2052840346396024540}
   unitPrefab: {fileID: 376317532261410512, guid: c9dd9b125f0255f418f3c22071c6030c, type: 3}
   gameMaster: {fileID: 0}
 --- !u!1 &7751100590271051734
@@ -346,11 +346,17 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 88268c20a16956b4c9b0579543f1d861, type: 3}
---- !u!1 &3045942380889575232 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 6644371550061788981, guid: 88268c20a16956b4c9b0579543f1d861, type: 3}
+--- !u!114 &2052840346396024540 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7642036437564108457, guid: 88268c20a16956b4c9b0579543f1d861, type: 3}
   m_PrefabInstance: {fileID: 8534550875943727221}
   m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0f3d2a09ca23d1947822607598e4e193, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!4 &4602591655411837540 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5309568537644243473, guid: 88268c20a16956b4c9b0579543f1d861, type: 3}
