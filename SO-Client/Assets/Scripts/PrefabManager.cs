@@ -83,8 +83,9 @@ public class PrefabManager
                                         }*/
                     if (property.Name == "spriteAtlasPath" && unitScript.spriteFillSR != null)
                     {
-                        setSpritesFromSpriteAtlas(unitScript.unitName, (string)value, unitScript.spriteContainer);
+                        //setSpritesFromSpriteAtlas(unitScript.unitName, (string)value, unitScript.spriteContainer);
                         //UnityEngine.Debug.Log($"For unit {unitData.unitName}, value is {value} as sprite {(Sprite)value} .");
+                        setSprites(unitData, unitScript.spriteContainer);
                     }
                 }
 
@@ -183,7 +184,7 @@ public class PrefabManager
 
     }*/
 
-    public void setSpritesFromSpriteAtlas(string unitName, string atlasPath, StaticSprite spritePrefab)
+    /*public void setSpritesFromSpriteAtlas(string unitName, string atlasPath, StaticSprite spritePrefab)
     {
         SpriteAtlas spriteAtlas = Resources.Load<SpriteAtlas>(atlasPath);
         if (spriteAtlas == null)
@@ -235,5 +236,76 @@ public class PrefabManager
         {
             UnityEngine.Debug.LogWarning($"Sprite {name}Sprite_Lights not found in the sprite atlas.");
         }
+
+
+        //UnityEngine.Debug.Log($"NAME: Prefab modified with sprite: {spritePrefab.fillSR.sprite.name}");
+    }*/
+
+    //need to separate StaticSprite from AttributesBaseUnit because MenuProductionPanel passes a different sprite.
+    //need to separate StaticSprite from AttributesBaseUnit because MenuProductionPanel passes a different sprite.
+    public void setSprites(AttributesBaseUnit attributes, StaticSprite spritePrefab)
+    {
+        // Check for null parameters
+        if (attributes == null)
+        {
+            UnityEngine.Debug.LogError("AttributesBaseUnit is null.");
+            return;
+        }
+
+        if (spritePrefab == null)
+        {
+            UnityEngine.Debug.LogError("StaticSprite prefab is null.");
+            return;
+        }
+
+        // Validate enum conversion
+        int progenyIndex;
+        try
+        {
+            progenyIndex = GameValuesSO.GetEnumIndex(attributes.progeny);
+        }
+        catch (Exception ex)
+        {
+            UnityEngine.Debug.LogError($"Error converting progeny enum to index: {ex.Message}");
+            return;
+        }
+
+        // Construct paths
+        string basePath = $"Sprites/progeny{progenyIndex}/{attributes.unitName.ToLower().Replace(" ", "")}Sprites/{attributes.unitName.ToLower().Replace(" ", "")}";
+        string fillSpritePath = $"{basePath}Sprite_Fill";
+        string lightsSpritePath = $"{basePath}Sprite_Lights";
+        string trimSpritePath = $"{basePath}Sprite_Trim";
+
+        // Load sprites and check for errors
+        Sprite fillSprite = Resources.Load<Sprite>(fillSpritePath);
+        if (fillSprite == null)
+        {
+            UnityEngine.Debug.LogError($"Failed to load fill sprite from path: {fillSpritePath}");
+        }
+        else
+        {
+            spritePrefab.fillSR.sprite = fillSprite;
+        }
+
+        Sprite lightsSprite = Resources.Load<Sprite>(lightsSpritePath);
+        if (lightsSprite == null)
+        {
+            UnityEngine.Debug.LogError($"Failed to load lights sprite from path: {lightsSpritePath}");
+        }
+        else
+        {
+            spritePrefab.lightsSR.sprite = lightsSprite;
+        }
+
+        Sprite trimSprite = Resources.Load<Sprite>(trimSpritePath);
+        if (trimSprite == null)
+        {
+            UnityEngine.Debug.LogError($"Failed to load trim sprite from path: {trimSpritePath}");
+        }
+        else
+        {
+            spritePrefab.trimSR.sprite = trimSprite;
+        }
     }
+
 }

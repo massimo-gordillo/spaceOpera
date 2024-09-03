@@ -24,7 +24,8 @@ public class MenuProductionPanel : MonoBehaviour
             MenuProductionButton nextProductionButton = productionButton;
             nextProductionButton.buttonText.text = attributesBaseUnit.unitName + "\n"+attributesBaseUnit.price;
 
-            prefabManager.setSpritesFromSpriteAtlas(attributesBaseUnit.unitName, attributesBaseUnit.spriteAtlasPath, nextProductionButton.spritePrefab);
+            //prefabManager.setSpritesFromSpriteAtlas(attributesBaseUnit.unitName, attributesBaseUnit.spriteAtlasPath, nextProductionButton.spritePrefab);
+            prefabManager.setSprites(attributesBaseUnit, nextProductionButton.spritePrefab);
             
 
             
