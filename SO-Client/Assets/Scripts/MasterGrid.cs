@@ -29,7 +29,7 @@ public class MasterGrid : MonoBehaviour
 
     public Transform movementSquareList;
     public MovementSquare moveSquare;
-    public bool[,] checkedCells;
+    //public bool[,] checkedCells;
     public GameObject rangeOutlineSprite;
 
     // Called by GameMaster
@@ -372,24 +372,26 @@ public class MasterGrid : MonoBehaviour
                 RecursiveDrawMovement(mTarget, cellsToCheck);*/
 
         Queue<(Vector2Int cell, int range)> cellsToCheck = new Queue<(Vector2Int, int)>();
-        
-        checkedCells = new bool[gridX + 2, gridY + 2];
+
+        bool[,] checkedCells = new bool[gridX + 2, gridY + 2];
         checkedCells[xpos + 1, ypos + 1] = true;
         if (mTarget.canMoveAndAttack)
         {
+            Debug.Log("Can move and attack.");
             cellsToCheck.Enqueue((new Vector2Int(xpos + 1, ypos + 1), totalRange));
-            List<Queue<Vector2Int>> squareQueuesList = AStarSearchRecursive(mTarget, movementRange, attackRange, cellsToCheck, new List<Queue<Vector2Int>> { new Queue<Vector2Int>(), new Queue<Vector2Int>(), new Queue<Vector2Int>() });
+            List<Queue<Vector2Int>> squareQueuesList = AStarSearchRecursive(mTarget, movementRange, attackRange, cellsToCheck, checkedCells, new List<Queue<Vector2Int>> { new Queue<Vector2Int>(), new Queue<Vector2Int>(), new Queue<Vector2Int>() });
             DrawSquaresFromSearch(squareQueuesList);
         }
         else
         {
+            Debug.Log("Can't move and attack.");
             cellsToCheck.Enqueue((new Vector2Int(xpos + 1, ypos + 1), movementRange));
-            List<Queue<Vector2Int>> movementSquareQueuesList = AStarSearchRecursive(mTarget, movementRange, 0, cellsToCheck, new List<Queue<Vector2Int>> { new Queue<Vector2Int>(), new Queue<Vector2Int>(), new Queue<Vector2Int>() });
+            List<Queue<Vector2Int>> movementSquareQueuesList = AStarSearchRecursive(mTarget, movementRange, 0, cellsToCheck, checkedCells, new List<Queue<Vector2Int>> { new Queue<Vector2Int>(), new Queue<Vector2Int>(), new Queue<Vector2Int>() });
             DrawSquaresFromSearch(movementSquareQueuesList);
 
-            cellsToCheck = new Queue<(Vector2Int, int)>();
-            cellsToCheck.Enqueue((new Vector2Int(xpos + 1, ypos + 1), attackRange));
-            List<Queue<Vector2Int>> attackOutlineLocationsQueuesList = AStarSearchRecursive(mTarget, 0, attackRange, cellsToCheck, new List<Queue<Vector2Int>> { new Queue<Vector2Int>(), new Queue<Vector2Int>(), new Queue<Vector2Int>() });
+            //cellsToCheck = new Queue<(Vector2Int, int)>();
+            //cellsToCheck.Enqueue((new Vector2Int(xpos + 1, ypos + 1), attackRange));
+            List<Queue<Vector2Int>> attackOutlineLocationsQueuesList = AStarSearchRecursive(mTarget, 0, attackRange, cellsToCheck, checkedCells, new List<Queue<Vector2Int>> { new Queue<Vector2Int>(), new Queue<Vector2Int>(), new Queue<Vector2Int>() });
             DrawAttackOutline(attackOutlineLocationsQueuesList, mTarget);
         }
     }
@@ -475,6 +477,7 @@ public class MasterGrid : MonoBehaviour
     int movementRange,
     int attackRange,
     Queue<(Vector2Int cell, int range)> cellsToCheck,
+    bool[,] checkedCells,
     List<Queue<Vector2Int>> squareQueuesList)
     {
         int totalRange = movementRange + attackRange;
@@ -550,7 +553,7 @@ public class MasterGrid : MonoBehaviour
 
         //Debug.Log("Recursing to next iteration.");
         // Continue the recursion
-        return AStarSearchRecursive(mTarget, movementRange, attackRange, cellsToCheck, squareQueuesList);
+        return AStarSearchRecursive(mTarget, movementRange, attackRange, cellsToCheck, checkedCells, squareQueuesList);
     }
 
     void DrawSquaresFromSearch(List<Queue<Vector2Int>> squareQueuesList)
