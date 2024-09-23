@@ -28,6 +28,9 @@ public class MasterGrid : MonoBehaviour
     private double attackLuckRange;
 
     public Transform movementSquareList;
+    public MovementSquare moveSquare;
+    public bool[,] checkedCells;
+    public GameObject rangeOutlineSprite;
 
     // Called by GameMaster
     public void startup(int x, int y, byte[] tilemapByteArray,
@@ -345,8 +348,7 @@ public class MasterGrid : MonoBehaviour
             moveTarget((int)selectedUnit.oldXPos, (int)selectedUnit.oldYPos);
     }
 
-    public MovementSquare moveSquare;
-    public bool[,] checkedCells;
+
 
     public void drawMovement(BaseUnit mTarget)
     {
@@ -370,154 +372,103 @@ public class MasterGrid : MonoBehaviour
                 RecursiveDrawMovement(mTarget, cellsToCheck);*/
 
         Queue<(Vector2Int cell, int range)> cellsToCheck = new Queue<(Vector2Int, int)>();
-        //cellsToCheck = new Queue<(Vector2Int, int)>();
-        cellsToCheck.Enqueue((new Vector2Int(xpos + 1, ypos + 1), totalRange));
+        
         checkedCells = new bool[gridX + 2, gridY + 2];
         checkedCells[xpos + 1, ypos + 1] = true;
-        List<Queue<Vector2Int>> squareQueuesList = AStarSearchRecursive(mTarget, movementRange, attackRange, cellsToCheck, new List<Queue<Vector2Int>> { new Queue<Vector2Int>(), new Queue<Vector2Int>(), new Queue<Vector2Int>() });
-        //DebugLogQueueSizes(squareQueuesList);
-        DrawSquaresFromSearch(squareQueuesList);
+        if (mTarget.canMoveAndAttack)
+        {
+            cellsToCheck.Enqueue((new Vector2Int(xpos + 1, ypos + 1), totalRange));
+            List<Queue<Vector2Int>> squareQueuesList = AStarSearchRecursive(mTarget, movementRange, attackRange, cellsToCheck, new List<Queue<Vector2Int>> { new Queue<Vector2Int>(), new Queue<Vector2Int>(), new Queue<Vector2Int>() });
+            DrawSquaresFromSearch(squareQueuesList);
+        }
+        else
+        {
+            cellsToCheck.Enqueue((new Vector2Int(xpos + 1, ypos + 1), movementRange));
+            List<Queue<Vector2Int>> movementSquareQueuesList = AStarSearchRecursive(mTarget, movementRange, 0, cellsToCheck, new List<Queue<Vector2Int>> { new Queue<Vector2Int>(), new Queue<Vector2Int>(), new Queue<Vector2Int>() });
+            DrawSquaresFromSearch(movementSquareQueuesList);
+
+            cellsToCheck = new Queue<(Vector2Int, int)>();
+            cellsToCheck.Enqueue((new Vector2Int(xpos + 1, ypos + 1), attackRange));
+            List<Queue<Vector2Int>> attackOutlineLocationsQueuesList = AStarSearchRecursive(mTarget, 0, attackRange, cellsToCheck, new List<Queue<Vector2Int>> { new Queue<Vector2Int>(), new Queue<Vector2Int>(), new Queue<Vector2Int>() });
+            DrawAttackOutline(attackOutlineLocationsQueuesList, mTarget);
+        }
     }
-
-/*    void DebugLogQueueSizes(List<Queue<Vector2Int>> squareQueuesList)
+    
+    public void DrawAttackOutline(List<Queue<Vector2Int>> attackOutlineSquareQueuesList, BaseUnit mTarget)
     {
         // Ensure the list has exactly 3 queues
-        if (squareQueuesList == null || squareQueuesList.Count != 3)
+        if (attackOutlineSquareQueuesList == null || attackOutlineSquareQueuesList.Count != 3)
         {
-            Debug.LogError("The squareQueuesList does not contain exactly 3 queues.");
+            Debug.LogError("The attackOutlineSquareQueuesList does not contain exactly 3 queues.");
             return;
         }
 
-        // Deconstruct the list into individual queues
-        Queue<Vector2Int> movementQueue = squareQueuesList[0];
-        Queue<Vector2Int> attackQueue = squareQueuesList[1];
-        Queue<Vector2Int> structureQueue = squareQueuesList[2];
+        Queue<Vector2Int> attackQueue = attackOutlineSquareQueuesList[1];
 
-        // Print the count of items in each queue
-        Debug.Log($"Movement Queue Size: {movementQueue.Count}");
-        Debug.Log($"Attack Queue Size: {attackQueue.Count}");
-        Debug.Log($"Structure Queue Size: {structureQueue.Count}");
-    }*/
-
-   void DrawSquaresFromSearch(List<Queue<Vector2Int>> squareQueuesList)
-    {
-        // Ensure the list has exactly 3 queues
-        if (squareQueuesList == null || squareQueuesList.Count != 3)
+        if(attackQueue.Count == 0)
         {
-            Debug.LogError("The squareQueuesList does not contain exactly 3 queues.");
+            Debug.Log("No attack locations to draw outline for.");
             return;
         }
 
-        // Deconstruct the list into individual queues
-        Queue<Vector2Int> movementQueue = squareQueuesList[0];
-        Queue<Vector2Int> attackQueue = squareQueuesList[1];
-        Queue<Vector2Int> structureQueue = squareQueuesList[2];
-
-        // Draw movement squares
-        while (movementQueue.Count > 0)
-        {
-            Vector2Int cell = movementQueue.Dequeue();
-            drawMoveSquare(cell.x-1, cell.y-1, drawMovementUnit.playerControl == getPlayerTurn());
-        }
-
-        // Draw attack squares
+        
         while (attackQueue.Count > 0)
         {
             Vector2Int cell = attackQueue.Dequeue();
-            drawDamageSquare(cell.x-1, cell.y-1, drawMovementUnit.playerControl == getPlayerTurn());
-        }
-
-        // Turn off structure colliders
-        while (structureQueue.Count > 0)
-        {
-            Vector2Int cell = structureQueue.Dequeue();
-            BaseStructure s = whatStructureIsInThisLocation(cell.x - 1, cell.y - 1);
-            if (s != null)
+            //if there's a unit at this location, mark it with an attack square
+            BaseUnit unitAtLocation = whatUnitIsInThisLocation(cell.x - 1, cell.y - 1);
+            if (unitAtLocation != null && unitAtLocation.playerControl != getPlayerTurn())
             {
-                turnOffStructureCollider(s);
+                drawDamageSquare(cell.x - 1, cell.y - 1, drawMovementUnit.playerControl == getPlayerTurn());
+                //if there's a structure at this location, turn off its collider
+                BaseStructure s = whatStructureIsInThisLocation(cell.x - 1, cell.y - 1);
+                if (s != null)
+                {
+                    turnOffStructureCollider(s);
+                }
             }
+
+            Vector2Int unitLocation = new Vector2Int(mTarget.xPos, mTarget.yPos);
+            Vector2Int attackLocation = new Vector2Int(cell.x - 1, cell.y - 1);
+            int xDiff = attackLocation.x - unitLocation.x;
+            int yDiff = attackLocation.y - unitLocation.y;
+
+            Debug.Log($"Unit Location: {unitLocation}");
+            Debug.Log($"Attack Location: {attackLocation}");
+            Debug.Log($"xDiff: {xDiff}, yDiff: {yDiff}");
+
+            //GameObject attackOutline = new RangeOutlineSprite();
+
+            if (Mathf.Abs(xDiff) + Mathf.Abs(yDiff) == mTarget.attackRange)
+            {
+                if (xDiff == 0)
+                    Instantiate(rangeOutlineSprite, new Vector2(attackLocation.x, (float)(attackLocation.y-0.5)), Quaternion.identity, movementSquareList);
+            }
+
         }
 
     }
 
-    /*private void RecursiveDrawMovement(BaseUnit mTarget, Queue<(Vector2Int cell, int range)> cellsToCheck)
-    {
 
-        int movementRange = mTarget.movementRange;
-        int attackRange = mTarget.attackRange;
-        int totalRange = movementRange + attackRange;
-        
-        //Debug.Log($"cellsToCheck size is: {cellsToCheck.Count}");
-        if (cellsToCheck.Count == 0)
+    /*    void DebugLogQueueSizes(List<Queue<Vector2Int>> squareQueuesList)
         {
-            return;
-        }
-
-        var cellRangePair = cellsToCheck.Dequeue();
-        //Debug.Log($"Removed: {cellRangePair.cell} from cellsToCheck");
-
-        Vector2Int checkingCell = cellRangePair.cell;
-        int range = cellRangePair.range;
-
-        if (range == 0)
-        {
-            return;
-        }
-
-        for (int rad = 0; rad < 4; rad++)
-        {
-            Vector2Int sinDirV = sinDir(rad);
-            int xCheck = checkingCell.x + sinDirV.x;
-            int yCheck = checkingCell.y + sinDirV.y;
-
-            if (xCheck >= 0 && xCheck < gridX + 2 && yCheck >= 0 && yCheck < gridY + 2 && !checkedCells[xCheck, yCheck])
+            // Ensure the list has exactly 3 queues
+            if (squareQueuesList == null || squareQueuesList.Count != 3)
             {
-                checkedCells[xCheck, yCheck] = true;
-
-                if (legalMove(xCheck - 1, yCheck - 1, mTarget) >= 1)
-                {
-                    if (!cellsToCheck.Contains((new Vector2Int(xCheck, yCheck), range - 1)))
-                    {
-                        cellsToCheck.Enqueue((new Vector2Int(xCheck, yCheck), range - 1));
-                        //Debug.Log($"Adding key {xCheck},{yCheck} to queue with range {range - 1}");
-                    }
-                    else
-                    {
-                        //Debug.Log($"Key {xCheck},{yCheck} already exists in Queue");
-                    }
-
-                    if (legalMove(xCheck - 1, yCheck - 1, mTarget) == 1 && range > totalRange - movementRange)
-                    {
-                        drawMoveSquare(xCheck - 1, yCheck - 1, mTarget.playerControl == getPlayerTurn());
-                    }
-                    else if (range <= totalRange - movementRange)
-                        drawDamageSquare(xCheck - 1, yCheck - 1, mTarget.playerControl == getPlayerTurn());
-
-                    BaseStructure s = whatStructureIsInThisLocation(xCheck - 1, yCheck - 1);
-                    if (s != null)
-                    {
-                        turnOffStructureCollider(s);
-                    }
-                }
-                //if it's not a legal move OR there's an allied unit there
-                //and if you're not out of bounds
-                else if ((xCheck - 1) < gridX && (xCheck - 1) >= 0 && (yCheck - 1) < gridY && (yCheck - 1) >= 0)
-                {
-                    BaseUnit unitAtLocation = whatUnitIsInThisLocation(xCheck - 1, yCheck - 1);
-                    //and the unit you're drawing movement for isn't controlled by you (active player)
-                    //OR there isn't a unit there
-                    //OR you can't attack that unit
-                    //then draw a movement square.
-                    //Ie if it's not the players turn show all the squares a unit can attack regardless of unit attack legality.
-                    if ((mTarget.playerControl != getPlayerTurn() || unitAtLocation == null || canUnitAttack(mTarget, unitAtLocation)))
-                        drawDamageSquare(xCheck - 1, yCheck - 1, mTarget.playerControl == getPlayerTurn());
-                }
+                Debug.LogError("The squareQueuesList does not contain exactly 3 queues.");
+                return;
             }
-        }
 
-        // Continue the recursion
-        RecursiveDrawMovement(mTarget, cellsToCheck);
-    }*/
+            // Deconstruct the list into individual queues
+            Queue<Vector2Int> movementQueue = squareQueuesList[0];
+            Queue<Vector2Int> attackQueue = squareQueuesList[1];
+            Queue<Vector2Int> structureQueue = squareQueuesList[2];
+
+            // Print the count of items in each queue
+            Debug.Log($"Movement Queue Size: {movementQueue.Count}");
+            Debug.Log($"Attack Queue Size: {attackQueue.Count}");
+            Debug.Log($"Structure Queue Size: {structureQueue.Count}");
+        }*/
 
     public List<Queue<Vector2Int>> AStarSearchRecursive(
     BaseUnit mTarget,
@@ -530,7 +481,7 @@ public class MasterGrid : MonoBehaviour
 
         if (cellsToCheck.Count == 0)
         {
-            Debug.Log("Terminating: cellsToCheck is empty.");
+            //Debug.Log("Terminating: cellsToCheck is empty.");
             return squareQueuesList;
         }
 
@@ -540,7 +491,7 @@ public class MasterGrid : MonoBehaviour
 
         if (range == 0)
         {
-            Debug.Log($"Terminating: Range is 0. Checking cell: {checkingCell}");
+            //Debug.Log($"Terminating: Range is 0. Checking cell: {checkingCell}");
             return squareQueuesList;
         }
 
@@ -569,7 +520,7 @@ public class MasterGrid : MonoBehaviour
                     }
                     else if (range <= totalRange - movementRange)
                     {
-                        Debug.Log($"Adding to Attack Queue: ({xCheck}, {yCheck})");
+                        //Debug.Log($"Adding to Attack Queue: ({xCheck}, {yCheck})");
                         squareQueuesList[1].Enqueue(new Vector2Int(xCheck, yCheck)); // Attack square
                     }
 
@@ -582,7 +533,8 @@ public class MasterGrid : MonoBehaviour
                 }
                 //if it's not a legal move OR there's an allied unit there
                 //and if you're not out of bounds
-                else if ((xCheck - 1) < gridX && (xCheck - 1) >= 0 && (yCheck - 1) < gridY && (yCheck - 1) >= 0)
+                //and the unit can move and attack
+                else if ((xCheck - 1) < gridX && (xCheck - 1) >= 0 && (yCheck - 1) < gridY && (yCheck - 1) >= 0 && mTarget.canMoveAndAttack)
                 {
                     BaseUnit unitAtLocation = whatUnitIsInThisLocation(xCheck - 1, yCheck - 1);
                     //and the unit you're drawing movement for isn't controlled by you (active player)
@@ -596,11 +548,51 @@ public class MasterGrid : MonoBehaviour
             }
         }
 
-        Debug.Log("Recursing to next iteration.");
+        //Debug.Log("Recursing to next iteration.");
         // Continue the recursion
         return AStarSearchRecursive(mTarget, movementRange, attackRange, cellsToCheck, squareQueuesList);
     }
 
+    void DrawSquaresFromSearch(List<Queue<Vector2Int>> squareQueuesList)
+    {
+        // Ensure the list has exactly 3 queues
+        if (squareQueuesList == null || squareQueuesList.Count != 3)
+        {
+            Debug.LogError("The squareQueuesList does not contain exactly 3 queues.");
+            return;
+        }
+
+        // Deconstruct the list into individual queues
+        Queue<Vector2Int> movementQueue = squareQueuesList[0];
+        Queue<Vector2Int> attackQueue = squareQueuesList[1];
+        Queue<Vector2Int> structureQueue = squareQueuesList[2];
+
+        // Draw movement squares
+        while (movementQueue.Count > 0)
+        {
+            Vector2Int cell = movementQueue.Dequeue();
+            drawMoveSquare(cell.x - 1, cell.y - 1, drawMovementUnit.playerControl == getPlayerTurn());
+        }
+
+        // Draw attack squares
+        while (attackQueue.Count > 0)
+        {
+            Vector2Int cell = attackQueue.Dequeue();
+            drawDamageSquare(cell.x - 1, cell.y - 1, drawMovementUnit.playerControl == getPlayerTurn());
+        }
+
+        // Turn off structure colliders
+        while (structureQueue.Count > 0)
+        {
+            Vector2Int cell = structureQueue.Dequeue();
+            BaseStructure s = whatStructureIsInThisLocation(cell.x - 1, cell.y - 1);
+            if (s != null)
+            {
+                turnOffStructureCollider(s);
+            }
+        }
+
+    }
 
 
 
@@ -612,7 +604,6 @@ public class MasterGrid : MonoBehaviour
         blueSquare.setColor(color);
         blueSquare.boxCollider2D.enabled = isControllersTurn;
         blueSquare.stripeSprite.gameObject.SetActive(!isControllersTurn);
-        //Debug.Log($"Is controllers turn for blue square? {isControllersTurn}");
         Instantiate(blueSquare, new Vector2(x, y), Quaternion.identity, movementSquareList);
     }
 
@@ -625,69 +616,6 @@ public class MasterGrid : MonoBehaviour
         redSquare.stripeSprite.gameObject.SetActive(!isControllersTurn);
         Instantiate(redSquare, new Vector2(x, y), Quaternion.identity, movementSquareList);
     }
-
-
-    //OLD:
-    /*    public void drawMovement(BaseUnit mTarget)
-        {
-
-            int range = mTarget.movementRange;
-            int xpos = (int)mTarget.xPos;
-            int ypos = (int)mTarget.yPos;
-            if (!drawing)
-            {
-                drawing = true;
-                selectedUnit = mTarget;
-
-                bool[,] checkedCells = new bool[gridX + 2, gridY + 2];
-                checkedCells[xpos + 1, ypos + 1] = true;
-
-                Queue<Vector2Int> cellsToCheck = new Queue<Vector2Int>();
-                cellsToCheck.Enqueue(new Vector2Int(xpos + 1, ypos + 1));
-
-                for (int i = 1; i <= range && cellsToCheck.Count > 0; i++)
-                {
-                    int cellsToProcess = cellsToCheck.Count;
-
-                    for (int j = 0; j < cellsToProcess; j++)
-                    {
-                        Vector2Int currentCell = cellsToCheck.Dequeue();
-
-                        for (int rad = 0; rad < 4; rad++)
-                        {
-                            int xCheck = currentCell.x + sinDir(rad).x;
-                            int yCheck = currentCell.y + sinDir(rad).y;
-
-                            if (xCheck >= 0 && xCheck < gridX + 2 && yCheck >= 0 && yCheck < gridY + 2 && !checkedCells[xCheck, yCheck])
-                            {
-                                checkedCells[xCheck, yCheck] = true;
-                                //if cell is empty or occupied by an allied unit
-                                if (legalMove(xCheck - 1, yCheck - 1, mTarget) >= 1)
-                                {
-                                    //if cell is empty make a movement square.
-                                    if (legalMove(xCheck - 1, yCheck - 1, mTarget) == 1)
-                                        Instantiate(moveSquare, new Vector2(xCheck - 1, yCheck - 1), Quaternion.identity);
-                                    //  if (BaseStructure s = whatStructureIsInThisLocation(xCheck -1, yCheck - 1) != null) //I wish I could do this.
-                                    BaseStructure s = whatStructureIsInThisLocation(xCheck - 1, yCheck - 1);
-                                    if (s != null)
-                                        turnOffStructureCollider(s);
-                                    cellsToCheck.Enqueue(new Vector2Int(xCheck, yCheck));
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }*/
-
-
-
-    /*public IEnumerator testingWaitFunction(GameObject moveSquare, Vector2 vec)
-    {
-        yield return new WaitForSeconds(3);
-        Instantiate(moveSquare, vec , new Quaternion(0, 0, 0, 0));
-        
-    }*/
 
     public void checkEnemiesInRange(int xPos, int yPos, int range) //for now we're gonna assume range is 1 but in future if we want to add ranged units 
                                                                    //We probably want to grab the A* algorithm from DrawMovement and pass a function instead.
@@ -1090,5 +1018,84 @@ public class MasterGrid : MonoBehaviour
     {
         return $"{damageType} {weaponType}";
     }
-    
+
+
+    /*private void RecursiveDrawMovement(BaseUnit mTarget, Queue<(Vector2Int cell, int range)> cellsToCheck)
+    {
+
+        int movementRange = mTarget.movementRange;
+        int attackRange = mTarget.attackRange;
+        int totalRange = movementRange + attackRange;
+        
+        //Debug.Log($"cellsToCheck size is: {cellsToCheck.Count}");
+        if (cellsToCheck.Count == 0)
+        {
+            return;
+        }
+
+        var cellRangePair = cellsToCheck.Dequeue();
+        //Debug.Log($"Removed: {cellRangePair.cell} from cellsToCheck");
+
+        Vector2Int checkingCell = cellRangePair.cell;
+        int range = cellRangePair.range;
+
+        if (range == 0)
+        {
+            return;
+        }
+
+        for (int rad = 0; rad < 4; rad++)
+        {
+            Vector2Int sinDirV = sinDir(rad);
+            int xCheck = checkingCell.x + sinDirV.x;
+            int yCheck = checkingCell.y + sinDirV.y;
+
+            if (xCheck >= 0 && xCheck < gridX + 2 && yCheck >= 0 && yCheck < gridY + 2 && !checkedCells[xCheck, yCheck])
+            {
+                checkedCells[xCheck, yCheck] = true;
+
+                if (legalMove(xCheck - 1, yCheck - 1, mTarget) >= 1)
+                {
+                    if (!cellsToCheck.Contains((new Vector2Int(xCheck, yCheck), range - 1)))
+                    {
+                        cellsToCheck.Enqueue((new Vector2Int(xCheck, yCheck), range - 1));
+                        //Debug.Log($"Adding key {xCheck},{yCheck} to queue with range {range - 1}");
+                    }
+                    else
+                    {
+                        //Debug.Log($"Key {xCheck},{yCheck} already exists in Queue");
+                    }
+
+                    if (legalMove(xCheck - 1, yCheck - 1, mTarget) == 1 && range > totalRange - movementRange)
+                    {
+                        drawMoveSquare(xCheck - 1, yCheck - 1, mTarget.playerControl == getPlayerTurn());
+                    }
+                    else if (range <= totalRange - movementRange)
+                        drawDamageSquare(xCheck - 1, yCheck - 1, mTarget.playerControl == getPlayerTurn());
+
+                    BaseStructure s = whatStructureIsInThisLocation(xCheck - 1, yCheck - 1);
+                    if (s != null)
+                    {
+                        turnOffStructureCollider(s);
+                    }
+                }
+                //if it's not a legal move OR there's an allied unit there
+                //and if you're not out of bounds
+                else if ((xCheck - 1) < gridX && (xCheck - 1) >= 0 && (yCheck - 1) < gridY && (yCheck - 1) >= 0)
+                {
+                    BaseUnit unitAtLocation = whatUnitIsInThisLocation(xCheck - 1, yCheck - 1);
+                    //and the unit you're drawing movement for isn't controlled by you (active player)
+                    //OR there isn't a unit there
+                    //OR you can't attack that unit
+                    //then draw a movement square.
+                    //Ie if it's not the players turn show all the squares a unit can attack regardless of unit attack legality.
+                    if ((mTarget.playerControl != getPlayerTurn() || unitAtLocation == null || canUnitAttack(mTarget, unitAtLocation)))
+                        drawDamageSquare(xCheck - 1, yCheck - 1, mTarget.playerControl == getPlayerTurn());
+                }
+            }
+        }
+
+        // Continue the recursion
+        RecursiveDrawMovement(mTarget, cellsToCheck);
+    }*/
 }

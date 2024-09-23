@@ -53,6 +53,8 @@ public class BaseUnit : MonoBehaviour
     public bool canAttackAir;
     public bool canAttackSea;
     public bool canFireBack;
+    public bool canMoveAndAttack;
+    public int minimumAttackRangeDistance;
 
     public TMP_Text healthTextContainer;
     public TMP_Text unitNameTextContainer;
