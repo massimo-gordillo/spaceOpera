@@ -379,8 +379,29 @@ public class MasterGrid : MonoBehaviour
         {
             cellsToCheck.Enqueue((new Vector2Int(xpos + 1, ypos + 1), totalRange));
             //List<Queue<Vector2Int>> squareQueuesList = AStarSearchRecursive(mTarget, movementRange, attackRange, cellsToCheck, checkedCells, new List<Queue<Vector2Int>> { new Queue<Vector2Int>(), new Queue<Vector2Int>(), new Queue<Vector2Int>() }, true);
-            List<Queue<Vector2Int>> squareQueuesList = AStarSearchRecursive(mTarget, movementRange, attackRange, cellsToCheck, checkedCells, new List<Queue<Vector2Int>> { new Queue<Vector2Int>(), new Queue<Vector2Int>(), new Queue<Vector2Int>() });
+            List<Queue<Vector2Int>> squareQueuesList = null;
+            if (attackRange > 0)
+                squareQueuesList = AStarSearchRecursive(mTarget, movementRange, 1, cellsToCheck, checkedCells, new List<Queue<Vector2Int>> { new Queue<Vector2Int>(), new Queue<Vector2Int>(), new Queue<Vector2Int>() });
+            else
+                squareQueuesList = AStarSearchRecursive(mTarget, movementRange, 0, cellsToCheck, checkedCells, new List<Queue<Vector2Int>> { new Queue<Vector2Int>(), new Queue<Vector2Int>(), new Queue<Vector2Int>() });
+            if (attackRange > 1)
+            {
+                cellsToCheck.Clear();
+                if (squareQueuesList.Count > 1)
+                {
+                    foreach (var cell in squareQueuesList[1])
+                    {
+                        cellsToCheck.Enqueue((cell, attackRange)); //make cellsToCheck the attack locations
+                    }
+                }
+
+                List<Queue<Vector2Int>> squareQueuesList2 = AStarSearchRecursive(mTarget, 0, attackRange, cellsToCheck, checkedCells, new List<Queue<Vector2Int>> { new Queue<Vector2Int>(), new Queue<Vector2Int>(), new Queue<Vector2Int>() });
+                DrawSquaresFromSearch(squareQueuesList2);
+            }
             DrawSquaresFromSearch(squareQueuesList);
+            
+
+            
         }
         else
         {
@@ -398,6 +419,93 @@ public class MasterGrid : MonoBehaviour
             //DebugLogQueueSizes(attackOutlineLocationsQueuesList);
             DrawAttackOutline(attackOutlineLocationsQueuesList, mTarget);
         }
+    }
+
+    
+
+    public List<Queue<Vector2Int>> AStarSearchRecursive(
+    BaseUnit mTarget,
+    int movementRange,
+    int attackRange,
+    Queue<(Vector2Int cell, int range)> cellsToCheck,
+    bool[,] checkedCells,
+    List<Queue<Vector2Int>> squareQueuesList)
+    {
+        // Total range (movement + attack)
+        int totalRange = movementRange + attackRange;
+
+        // Base case: no more cells to check
+        if (cellsToCheck.Count == 0)
+            return squareQueuesList;
+
+        // Dequeue the next cell to check
+        var (checkingCell, range) = cellsToCheck.Dequeue();
+
+        // Base case: out of range
+        if (range == 0)
+            return squareQueuesList;
+
+        // Explore all 4 directions
+        for (int direction = 0; direction < 4; direction++)
+        {
+            Vector2Int adjacentCell = checkingCell + sinDir(direction);
+            int xCheck = adjacentCell.x;
+            int yCheck = adjacentCell.y;
+
+            // Check grid bounds and if the cell is already checked
+            if (xCheck >= 0 && xCheck < gridX + 2 && yCheck >= 0 && yCheck < gridY + 2 && !checkedCells[xCheck, yCheck])
+            {
+                // Mark cell as checked
+                checkedCells[xCheck, yCheck] = true;
+
+                // Legal move validation
+                if (legalMove(xCheck - 1, yCheck - 1, mTarget) >= 1 && movementRange > 0) //if its a legal move AND the unit isn't only searching for additional attack locations
+                {
+                    // Enqueue the cell with updated range if not already in the queue
+                    if (!cellsToCheck.Contains((new Vector2Int(xCheck, yCheck), range - 1)))
+                        cellsToCheck.Enqueue((new Vector2Int(xCheck, yCheck), range - 1));
+
+                    // Differentiate between movement and attack squares based on range
+                    if (legalMove(xCheck - 1, yCheck - 1, mTarget) == 1 && range > totalRange - movementRange)
+                    {
+                        squareQueuesList[0].Enqueue(new Vector2Int(xCheck, yCheck)); // Movement square
+                    }
+                    else if (range <= totalRange - movementRange)
+                    { 
+                        squareQueuesList[1].Enqueue(new Vector2Int(xCheck, yCheck)); // Attack square
+                    }
+
+                    // Handle structures in the current cell
+                    BaseStructure structure = whatStructureIsInThisLocation(xCheck - 1, yCheck - 1);
+                    if (structure != null)
+                        squareQueuesList[2].Enqueue(new Vector2Int(xCheck, yCheck)); // Structure square
+                }
+                else if (IsCellInBounds(xCheck, yCheck) && mTarget.canMoveAndAttack)
+                {
+                    BaseUnit unitAtLocation = whatUnitIsInThisLocation(xCheck - 1, yCheck - 1);
+
+                    // If it's not the player's turn or the unit can be attacked, mark as attack square
+                    if (mTarget.playerControl != getPlayerTurn() || unitAtLocation == null || canUnitAttack(mTarget, unitAtLocation))
+                        squareQueuesList[1].Enqueue(new Vector2Int(xCheck, yCheck)); // Attack square
+
+                    if(range>attackRange)
+                        range = attackRange; //if it's not a legal move, reset the range to attack range
+
+                    //enqueue the cell if the unit still has additional attack range
+                    if (range > 1)
+                        cellsToCheck.Enqueue((new Vector2Int(xCheck, yCheck), range - 1));
+                }
+            }
+        }
+
+        // Recursion
+        return AStarSearchRecursive(mTarget, movementRange, attackRange, cellsToCheck, checkedCells, squareQueuesList);
+    }
+
+    // Helper function to check if a cell is in bounds
+    private bool IsCellInBounds(int x, int y)
+    {
+        return (x - 1) < gridX && (x - 1) >= 0 && (y - 1) < gridY && (y - 1) >= 0;
     }
 
     /*public List<Queue<Vector2Int>> AStarSearchRecursive(
@@ -458,84 +566,6 @@ public class MasterGrid : MonoBehaviour
         //return AStarSearchRecursive(mTarget, movementRange, attackRange, cellsToCheck, checkedCells, squareQueuesList);
         return AStarSearchRecursive(mTarget, reduceMovementRange ? movementRange - 1 : movementRange, reduceAttackRange ? attackRange - 1 : attackRange, cellsToCheck, checkedCells, squareQueuesList);
     }*/
-
-    public List<Queue<Vector2Int>> AStarSearchRecursive(
-    BaseUnit mTarget,
-    int movementRange,
-    int attackRange,
-    Queue<(Vector2Int cell, int range)> cellsToCheck,
-    bool[,] checkedCells,
-    List<Queue<Vector2Int>> squareQueuesList)
-    {
-        // Total range (movement + attack)
-        int totalRange = movementRange + attackRange;
-
-        // Base case: no more cells to check
-        if (cellsToCheck.Count == 0)
-            return squareQueuesList;
-
-        // Dequeue the next cell to check
-        var (checkingCell, range) = cellsToCheck.Dequeue();
-
-        // Base case: out of range
-        if (range == 0)
-            return squareQueuesList;
-
-        // Explore all 4 directions
-        for (int direction = 0; direction < 4; direction++)
-        {
-            Vector2Int adjacentCell = checkingCell + sinDir(direction);
-            int xCheck = adjacentCell.x;
-            int yCheck = adjacentCell.y;
-
-            // Check grid bounds and if the cell is already checked
-            if (xCheck >= 0 && xCheck < gridX + 2 && yCheck >= 0 && yCheck < gridY + 2 && !checkedCells[xCheck, yCheck])
-            {
-                // Mark cell as checked
-                checkedCells[xCheck, yCheck] = true;
-
-                // Legal move validation
-                if (legalMove(xCheck - 1, yCheck - 1, mTarget) >= 1)
-                {
-                    // Enqueue the cell with updated range if not already in the queue
-                    if (!cellsToCheck.Contains((new Vector2Int(xCheck, yCheck), range - 1)))
-                        cellsToCheck.Enqueue((new Vector2Int(xCheck, yCheck), range - 1));
-
-                    // Differentiate between movement and attack squares based on range
-                    if (legalMove(xCheck - 1, yCheck - 1, mTarget) == 1 && range > totalRange - movementRange)
-                    {
-                        squareQueuesList[0].Enqueue(new Vector2Int(xCheck, yCheck)); // Movement square
-                    }
-                    else if (range <= totalRange - movementRange)
-                    {
-                        squareQueuesList[1].Enqueue(new Vector2Int(xCheck, yCheck)); // Attack square
-                    }
-
-                    // Handle structures in the current cell
-                    BaseStructure structure = whatStructureIsInThisLocation(xCheck - 1, yCheck - 1);
-                    if (structure != null)
-                        squareQueuesList[2].Enqueue(new Vector2Int(xCheck, yCheck)); // Structure square
-                }
-                else if (IsCellInBounds(xCheck, yCheck) && mTarget.canMoveAndAttack)
-                {
-                    BaseUnit unitAtLocation = whatUnitIsInThisLocation(xCheck - 1, yCheck - 1);
-
-                    // If it's not the player's turn or the unit can be attacked, mark as attack square
-                    if (mTarget.playerControl != getPlayerTurn() || unitAtLocation == null || canUnitAttack(mTarget, unitAtLocation))
-                        squareQueuesList[1].Enqueue(new Vector2Int(xCheck, yCheck)); // Attack square
-                }
-            }
-        }
-
-        // Recursion
-        return AStarSearchRecursive(mTarget, movementRange, attackRange, cellsToCheck, checkedCells, squareQueuesList);
-    }
-
-    // Helper function to check if a cell is in bounds
-    private bool IsCellInBounds(int x, int y)
-    {
-        return (x - 1) < gridX && (x - 1) >= 0 && (y - 1) < gridY && (y - 1) >= 0;
-    }
 
 
 
