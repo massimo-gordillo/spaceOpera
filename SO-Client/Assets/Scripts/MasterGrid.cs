@@ -416,22 +416,22 @@ public class MasterGrid : MonoBehaviour
 
 
         }
-        /*        else
-                {
-                    cellsToCheck.Enqueue((new Vector2Int(xpos + 1, ypos + 1), movementRange));
-                    //List<Queue<Vector2Int>> movementSquareQueuesList = AStarSearchRecursive(mTarget, movementRange, 0, cellsToCheck, checkedCells, new List<Queue<Vector2Int>> { new Queue<Vector2Int>(), new Queue<Vector2Int>(), new Queue<Vector2Int>()}, true);
-                    List<Queue<Vector2Int>> movementSquareQueuesList = AStarSearchRecursive(mTarget, movementRange, 0, cellsToCheck, checkedCells, new List<Queue<Vector2Int>> { new Queue<Vector2Int>(), new Queue<Vector2Int>(), new Queue<Vector2Int>()});
-                    DrawSquaresFromSearch(movementSquareQueuesList);
+        else //unit can't move and attack
+        {
+            cellsToCheck.Enqueue((new Vector2Int(xpos + 1, ypos + 1), movementRange));
+            //List<Queue<Vector2Int>> movementSquareQueuesList = AStarSearchRecursive(mTarget, movementRange, 0, cellsToCheck, checkedCells, new List<Queue<Vector2Int>> { new Queue<Vector2Int>(), new Queue<Vector2Int>(), new Queue<Vector2Int>()}, true);
+            List<Queue<Vector2Int>> movementSquareQueuesList = AStarSearchRecursive(mTarget, movementRange, 0, cellsToCheck, checkedCells, new List<Queue<Vector2Int>> { new Queue<Vector2Int>(), new Queue<Vector2Int>(), new Queue<Vector2Int>()});
+            DrawSquaresFromSearch(movementSquareQueuesList);
 
-                    cellsToCheck = new Queue<(Vector2Int, int)>();
-                    cellsToCheck.Enqueue((new Vector2Int(xpos + 1, ypos + 1), attackRange));
-                    checkedCells = new bool[gridX + 2, gridY + 2];
-                    checkedCells[xpos + 1, ypos + 1] = true;
-                    //List<Queue<Vector2Int>> attackOutlineLocationsQueuesList = AStarSearchRecursive(mTarget, 0, attackRange, cellsToCheck, checkedCells, new List<Queue<Vector2Int>> { new Queue<Vector2Int>(), new Queue<Vector2Int>(), new Queue<Vector2Int>()}, true);
-                    List<Queue<Vector2Int>> attackOutlineLocationsQueuesList = AStarSearchRecursive(mTarget, 0, attackRange, cellsToCheck, checkedCells, new List<Queue<Vector2Int>> { new Queue<Vector2Int>(), new Queue<Vector2Int>(), new Queue<Vector2Int>()});
-                    //ManualTestAndPrintLogQueueSizes(attackOutlineLocationsQueuesList);
-                    DrawAttackOutline(attackOutlineLocationsQueuesList, mTarget);
-                }*/
+            cellsToCheck = new Queue<(Vector2Int, int)>();
+            cellsToCheck.Enqueue((new Vector2Int(xpos + 1, ypos + 1), attackRange));
+            checkedCells = new bool[gridX + 2, gridY + 2];
+            checkedCells[xpos + 1, ypos + 1] = true;
+            //List<Queue<Vector2Int>> attackOutlineLocationsQueuesList = AStarSearchRecursive(mTarget, 0, attackRange, cellsToCheck, checkedCells, new List<Queue<Vector2Int>> { new Queue<Vector2Int>(), new Queue<Vector2Int>(), new Queue<Vector2Int>()}, true);
+            List<Queue<Vector2Int>> attackOutlineLocationsQueuesList = AStarSearchRecursive(mTarget, 0, attackRange, cellsToCheck, checkedCells, new List<Queue<Vector2Int>> { new Queue<Vector2Int>(), new Queue<Vector2Int>(), new Queue<Vector2Int>()});
+            ManualTestAndPrintLogQueueSizes(attackOutlineLocationsQueuesList);
+            DrawAttackOutline(attackOutlineLocationsQueuesList, mTarget);
+        }
     }
 
 
@@ -493,13 +493,17 @@ public class MasterGrid : MonoBehaviour
                     if (structure != null)
                         squareQueuesList[2].Enqueue(new Vector2Int(xCheck, yCheck)); // Structure square
                 }
-                else if (IsCellInBounds(xCheck, yCheck) && mTarget.canMoveAndAttack)
+                else if (IsCellInBounds(xCheck, yCheck))
                 {
                     BaseUnit unitAtLocation = whatUnitIsInThisLocation(xCheck - 1, yCheck - 1);
 
-                    // If it's not the player's turn or the unit can be attacked, mark as attack square
-                    if (mTarget.playerControl != getPlayerTurn() || unitAtLocation == null || canUnitAttack(mTarget, unitAtLocation))
+                    // If it's not the player's turn or the unit can be attacked, mark as attack square. Also, if there's no unit there and you can attack and move.
+                    if ((mTarget.playerControl != getPlayerTurn() || canUnitAttack(mTarget, unitAtLocation) || unitAtLocation == null) && mTarget.canMoveAndAttack)
                         squareQueuesList[1].Enqueue(new Vector2Int(xCheck, yCheck)); // Attack square
+
+                    //if it can't move and attack then add the attack square always 
+                    if(!mTarget.canMoveAndAttack)
+                        squareQueuesList[1].Enqueue(new Vector2Int(xCheck, yCheck)); 
 
 
                     //enqueue the cell if the unit still has additional attack range
@@ -904,19 +908,22 @@ public class MasterGrid : MonoBehaviour
         else if (whatUnitIsInThisLocation(x, y) == mTarget)
             return -1;
         else if (drawMovementUnit != null && drawing) //if we're drawing movement squares
-        { 
+        {
             if (whatUnitIsInThisLocation(x, y).playerControl == drawMovementUnit.playerControl)
                 return 2;
             else
-                return 0; //this is fine so long as future returns are all 0.
+                return 0; //true as long as future conditions also return 0. Might become a headache if that's not the case.
         }
-        else if (drawMovementUnit == null) //if we're simply doing a nearby search without drawing.
+        else if (drawMovementUnit == null || !drawing) //if we're simply doing a nearby search without drawing movement, legality doesn't matter.
         {
-            Debug.Log($"DrawMovementUnit is null. Returning 0 for unit at location {x},{y}.");
+            //Debug.Log($"DrawMovementUnit is null. Returning 0 for unit at location {x},{y}.");
             return 0;
         }
-        else
-            return 0;
+        else {
+            Debug.LogWarning($"LegalMove returned 0 as default, no accurate conditions were met.");
+            return 0; 
+        }
+        
     }
 
     public Vector2Int sinDir(int d)//0 up, 1 right, 2 down, 3 left
