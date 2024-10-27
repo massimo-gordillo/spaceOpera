@@ -153,7 +153,7 @@ public class MasterGrid : MonoBehaviour
                 {
                     if (!drawing)
                     {
-                        drawing = true;
+                        //drawing = true;
                         selectedUnit = unit;
                         drawMovement(unit);
                     }
@@ -178,11 +178,12 @@ public class MasterGrid : MonoBehaviour
                     //selectedUnit.setNonExhausted(false);
                     exhaustSelectedUnit(selectedUnit, true);
                 }
+                // if there is no selected unit and its NOT controlled by active player AND its not in the list of attackable units, display its movement range
             } else if (getSelectedUnit() == null && unit.getPlayerControl() != gameMaster.getPlayerTurn() && !attackableUnits.Contains(unit))
             {
                 if (!drawing)
                 {
-                    drawing = true;
+                    //drawing = true;
                     drawMovement(unit);
                 }
                 else
@@ -353,6 +354,8 @@ public class MasterGrid : MonoBehaviour
 
     public void drawMovement(BaseUnit mTarget)
     {
+        drawing = true;
+        Debug.Log($"Setting {mTarget} as drawMovementUnit");
         drawMovementUnit = mTarget;
         int movementRange = mTarget.movementRange;
         int attackRange = mTarget.attackRange;
@@ -900,13 +903,14 @@ public class MasterGrid : MonoBehaviour
             return 1;
         else if (whatUnitIsInThisLocation(x, y) == mTarget)
             return -1;
-        else if (drawMovementUnit != null) {
+        else if (drawMovementUnit != null && drawing) //if we're drawing movement squares
+        { 
             if (whatUnitIsInThisLocation(x, y).playerControl == drawMovementUnit.playerControl)
                 return 2;
             else
-                return 0;
+                return 0; //this is fine so long as future returns are all 0.
         }
-        else if (drawMovementUnit == null)
+        else if (drawMovementUnit == null) //if we're simply doing a nearby search without drawing.
         {
             Debug.Log($"DrawMovementUnit is null. Returning 0 for unit at location {x},{y}.");
             return 0;
