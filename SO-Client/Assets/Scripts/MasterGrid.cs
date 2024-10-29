@@ -501,8 +501,9 @@ public class MasterGrid : MonoBehaviour
                     if ((mTarget.playerControl != getPlayerTurn() || canUnitAttack(mTarget, unitAtLocation) || unitAtLocation == null) && mTarget.canMoveAndAttack)
                         squareQueuesList[1].Enqueue(new Vector2Int(xCheck, yCheck)); // Attack square
 
-                    //if it can't move and attack then add the attack square always 
-                    if(!mTarget.canMoveAndAttack)
+                    //if it can't move and attack and we're doing a ranged search only (ie, no movement ability), then add it to the attack squares.
+                    //MG 24-10-29: This solution only works if you're doing the movementRange 0 solution for finding ranged attacks. If this behaviour changes in the future this check will need to be modified.
+                    if(!mTarget.canMoveAndAttack && movementRange == 0)
                         squareQueuesList[1].Enqueue(new Vector2Int(xCheck, yCheck)); 
 
 
@@ -696,11 +697,11 @@ public class MasterGrid : MonoBehaviour
             if (unitAtLocation != null && unitAtLocation.playerControl != getPlayerTurn())
             {
                 drawDamageSquare(cell.x - 1, cell.y - 1, drawMovementUnit.playerControl == getPlayerTurn());
-                BaseStructure s = whatStructureIsInThisLocation(cell.x - 1, cell.y - 1);
+/*                BaseStructure s = whatStructureIsInThisLocation(cell.x - 1, cell.y - 1);
                 if (s != null)
                 {
                     turnOffStructureCollider(s);
-                }
+                }*/
             }
 
             Vector2Int unitLocation = new Vector2Int(mTarget.xPos, mTarget.yPos);
