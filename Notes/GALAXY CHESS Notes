@@ -55,8 +55,19 @@ Sentus
 FIRST RUN USER TEST
 
 Bug #1: 700 resources for player2 on T1.
-Bug #2: menu not showing when maximized. Likely sprite not recording a click.
-BUG #3: Can't consistently click on production structures
+fixed Bug #2: menu not showing when maximized. Likely sprite not recording a click.
+fixed BUG #3: Can't consistently click on production structures
 
 Bug #4: Capturing infantry cannot unselect
 Bug #5: Undo unit movement makes it unselectable    
+
+
+
+ART NOTES:
+red 1: 223,32,32,1
+red 2: 149,21,21,1
+red 3: 112,16,16,1
+
+Light Colour:   255,255,255,1
+Med Colour:     157,157,157,1
+Dark Colour:    115,115,115,1

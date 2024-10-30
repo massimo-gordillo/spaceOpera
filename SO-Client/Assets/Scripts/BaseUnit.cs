@@ -34,7 +34,8 @@ public class BaseUnit : MonoBehaviour
     public int orientation = 1;
     public int xPos;
     public int yPos;
-    private Color baseColor;
+    private Color baseColor; //currently unused.
+    private Color originalLightsColor;
     public bool movementNonExhausted;
     public bool nonExhausted;
     public bool undoingMovement = false;
@@ -72,6 +73,7 @@ public class BaseUnit : MonoBehaviour
         masterGrid.setUnitInGrid(xPos, yPos, this);
 
         baseColor = spriteFillSR.color;
+        originalLightsColor = spriteLightsSR.color;
 
         if (playerControl == masterGrid.getPlayerTurn())
             setNonExhausted(false);
@@ -249,31 +251,40 @@ public class BaseUnit : MonoBehaviour
         spriteFillSR.color = finalColor;
     }*/
 
-/*    public void setSpritesFromSpriteAtlas(string atlasPath)
-    {       
-        SpriteAtlas spriteAtlas = Resources.Load<SpriteAtlas>(atlasPath);
-        string name = unitName.ToLower().Replace(" ", "");
-        if (spriteAtlas != null)
-        {
-            // Assign sprites from the atlas to the SpriteRenderers
-            spriteFillSR.sprite = spriteAtlas.GetSprite($"{name}Sprite_Fill");
-            spriteTrimSR.sprite = spriteAtlas.GetSprite($"{name}Sprite_Trim");
-            spriteLightsSR.sprite = spriteAtlas.GetSprite($"{name}Sprite_Lights");
+    /*    public void setSpritesFromSpriteAtlas(string atlasPath)
+        {       
+            SpriteAtlas spriteAtlas = Resources.Load<SpriteAtlas>(atlasPath);
+            string name = unitName.ToLower().Replace(" ", "");
+            if (spriteAtlas != null)
+            {
+                // Assign sprites from the atlas to the SpriteRenderers
+                spriteFillSR.sprite = spriteAtlas.GetSprite($"{name}Sprite_Fill");
+                spriteTrimSR.sprite = spriteAtlas.GetSprite($"{name}Sprite_Trim");
+                spriteLightsSR.sprite = spriteAtlas.GetSprite($"{name}Sprite_Lights");
+            }
+            else
+            {
+                Debug.LogWarning($"Failed to load spriteAtlas for {unitName} at path: {atlasPath}");
+            }
         }
-        else
-        {
-            Debug.LogWarning($"Failed to load spriteAtlas for {unitName} at path: {atlasPath}");
-        }
-    }
-*/
+    */
     public void setColor(int player, bool nonExhausted)
     {
         float hue = ((float)player / 3.0f) * 360f;
-        float saturation = nonExhausted ? 1.0f : 0.3f;
-        float value = 1.0f;
+        float saturation = nonExhausted ? 0.9f : 0.6f; // Medium difference in saturation
+        float value = nonExhausted ? 0.95f : 0.75f;    // Slightly more noticeable difference in brightness
         Color color = Color.HSVToRGB(hue / 360f, saturation, value);
         spriteFillSR.color = color;
+
+        // Use originalLightsColor to adjust brightness based on exhaustion
+        float lightsHue, lightsSaturation, lightsValue;
+        Color.RGBToHSV(originalLightsColor, out lightsHue, out lightsSaturation, out lightsValue);
+
+        float adjustedLightsValue = nonExhausted ? lightsValue : lightsValue * 0.7f; // Darken when exhausted
+        Color lightsColor = Color.HSVToRGB(lightsHue, lightsSaturation, adjustedLightsValue);
+        spriteLightsSR.color = lightsColor;
     }
+
 
     public int getPlayerControl()
     {

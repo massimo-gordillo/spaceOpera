@@ -280,7 +280,7 @@ public class PrefabManager
         Sprite fillSprite = Resources.Load<Sprite>(fillSpritePath);
         if (fillSprite == null)
         {
-            //UnityEngine.Debug.LogError($"Failed to load fill sprite from path: {fillSpritePath}");
+            UnityEngine.Debug.Log($"Failed to load fill sprite from path: {fillSpritePath}");
         }
         else
         {
@@ -290,7 +290,8 @@ public class PrefabManager
         Sprite lightsSprite = Resources.Load<Sprite>(lightsSpritePath);
         if (lightsSprite == null)
         {
-            //UnityEngine.Debug.LogError($"Failed to load lights sprite from path: {lightsSpritePath}");
+            UnityEngine.Debug.Log($"Failed to load lights sprite from path: {lightsSpritePath}");
+            spritePrefab.lightsSR.sprite = null;
         }
         else
         {
@@ -300,7 +301,7 @@ public class PrefabManager
         Sprite trimSprite = Resources.Load<Sprite>(trimSpritePath);
         if (trimSprite == null)
         {
-            //UnityEngine.Debug.LogError($"Failed to load trim sprite from path: {trimSpritePath}");
+            UnityEngine.Debug.Log($"Failed to load trim sprite from path: {trimSpritePath}");
         }
         else
         {
