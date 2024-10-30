@@ -21,27 +21,56 @@ public class MenuProductionPanel : MonoBehaviour
         foreach (var kvp in attributesBaseUnits)
         {
             AttributesBaseUnit attributesBaseUnit = kvp.Value;
-            MenuProductionButton nextProductionButton = productionButton;
-            nextProductionButton.buttonText.text = attributesBaseUnit.unitName + "\n"+attributesBaseUnit.price;
+            MenuProductionButton nextProductionButton = new MenuProductionButton();
+            nextProductionButton.buttonText.text = attributesBaseUnit.unitName + "\n" + attributesBaseUnit.price;
 
             //prefabManager.setSpritesFromSpriteAtlas(attributesBaseUnit.unitName, attributesBaseUnit.spriteAtlasPath, nextProductionButton.spritePrefab);
             prefabManager.setSprites(attributesBaseUnit, nextProductionButton.spritePrefab);
-            
 
-            
 
-            
+
+
+
             nextProductionButton.unitPrefab = prefabManager.getPrefab(attributesBaseUnit.prefabPath);
             //I want to set the size of the sprite ahead of time. Maybe I should do this at startup as well??
-            //nextProductionButton.sprite.GetComponent<RectTransform>().sizeDelta = new Vector2(5, 5);
-            if (attributesBaseUnit.unitType == UnitType.Land)
-                Instantiate(nextProductionButton, new Vector2(0, 0), Quaternion.identity, prodListProgeny0Land);
-            else if (attributesBaseUnit.unitType == UnitType.Air)
-                Instantiate(nextProductionButton, new Vector2(0, 0), Quaternion.identity, prodListProgeny0Air);
-            else if (attributesBaseUnit.unitType == UnitType.Sea)
-                Instantiate(nextProductionButton, new Vector2(0, 0), Quaternion.identity, prodListProgeny0Sea);
+            // Determine the parent based on unit type
+            Transform parent = attributesBaseUnit.unitType == UnitType.Land ? prodListProgeny0Land
+                               : attributesBaseUnit.unitType == UnitType.Air ? prodListProgeny0Air
+                               : prodListProgeny0Sea;
+
+            // Instantiate the button under the selected parent
+            Instantiate(nextProductionButton, Vector2.zero, Quaternion.identity, parent);
         }
     }
+    /*void Start()
+    {
+        // Load attributes from the ScriptableObject
+        attributesBaseUnits = gameValuesSO.getAttributesBaseUnits();
+        Debug.Log("size: " + attributesBaseUnits.Count);
+
+        // Create and populate buttons based on the count of attributesBaseUnits
+        foreach (var kvp in attributesBaseUnits)
+        {
+            AttributesBaseUnit attributesBaseUnit = kvp.Value;
+
+            // Instantiate a new MenuProductionButton once per unit
+            MenuProductionButton nextProductionButton = Instantiate(productionButton);
+
+            // Assign unit data to the button
+            nextProductionButton.buttonText.text = attributesBaseUnit.unitName + "\n" + attributesBaseUnit.price;
+
+            // Set up sprites for the button using prefabManager
+            prefabManager.setSprites(attributesBaseUnit, nextProductionButton.spritePrefab);
+
+            // Assign the button’s parent based on unit type
+            Transform parent = attributesBaseUnit.unitType == UnitType.Land ? prodListProgeny0Land
+                           : attributesBaseUnit.unitType == UnitType.Air ? prodListProgeny0Air
+                           : prodListProgeny0Sea;
+
+            // Parent the button to the appropriate list container
+            nextProductionButton.transform.SetParent(parent, false);
+        }
+    }*/
 
     // Update is called once per frame
     void Update()

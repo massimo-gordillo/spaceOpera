@@ -242,9 +242,9 @@ public class PrefabManager
     }*/
 
     //need to separate StaticSprite from AttributesBaseUnit because MenuProductionPanel passes a different sprite.
-    //need to separate StaticSprite from AttributesBaseUnit because MenuProductionPanel passes a different sprite.
     public void setSprites(AttributesBaseUnit attributes, StaticSprite spritePrefab)
     {
+        UnityEngine.Debug.Log($"Setting sprites for: {attributes.unitName}");
         // Check for null parameters
         if (attributes == null)
         {
