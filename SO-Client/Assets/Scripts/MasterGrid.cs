@@ -713,10 +713,32 @@ public class MasterGrid : MonoBehaviour
             Debug.Log($"Calculated range: {Mathf.Abs(xDiff) + Mathf.Abs(yDiff)}, Target attack range: {mTarget.attackRange}");
 
             // Check if the difference matches the attack range, and allow both horizontal and vertical placements
-            if (Mathf.Abs(xDiff) + Mathf.Abs(yDiff) == mTarget.attackRange && (xDiff == 0 || yDiff == 0))
+            if (Mathf.Abs(xDiff) + Mathf.Abs(yDiff) == mTarget.attackRange)
             {
-                Instantiate(rangeOutlineSprite, new Vector2(attackLocation.x, (float)(attackLocation.y - 0.5)), Quaternion.identity, movementSquareList);
+                //  Instantiate(rangeOutlineSprite, new Vector2(attackLocation.x, (float)(attackLocation.y - 0.5)), Quaternion.identity, movementSquareList);
+                //if diff is below 0, draw neg dir, if above 0, draw pos dir
+                if (xDiff != 0)
+                    Instantiate(rangeOutlineSprite, new Vector2((float)(attackLocation.x + xDiff / Mathf.Abs(xDiff) * 0.5), attackLocation.y), Quaternion.identity, movementSquareList);
+                else
+                {
+                    Instantiate(rangeOutlineSprite, new Vector2((float)(attackLocation.x + 0.5), attackLocation.y), Quaternion.identity, movementSquareList);
+                    Instantiate(rangeOutlineSprite, new Vector2((float)(attackLocation.x - 0.5), attackLocation.y), Quaternion.identity, movementSquareList);
+                }
+                Quaternion rotation = Quaternion.Euler(0, 0, 90);
+                if (yDiff != 0)
+                    Instantiate(rangeOutlineSprite, new Vector2(attackLocation.x, (float)(attackLocation.y + yDiff / Mathf.Abs(yDiff) * 0.5)), rotation, movementSquareList);
+                else
+                {
+                    Instantiate(rangeOutlineSprite, new Vector2(attackLocation.x, (float)(attackLocation.y + 0.5)), rotation, movementSquareList);
+                    Instantiate(rangeOutlineSprite, new Vector2(attackLocation.x, (float)(attackLocation.y - 0.5)), rotation, movementSquareList);
+                }
+
             }
+            if (attackLocation.x == 0 || attackLocation.x == gridX - 1)
+                Instantiate(rangeOutlineSprite, new Vector2((float)(attackLocation.x + xDiff / Mathf.Abs(xDiff) * 0.5), attackLocation.y), Quaternion.identity, movementSquareList);
+
+            if (attackLocation.y == 0 || attackLocation.y == gridY - 1)
+                Instantiate(rangeOutlineSprite, new Vector2(attackLocation.x, (float)(attackLocation.y + yDiff / Mathf.Abs(yDiff) * 0.5)), Quaternion.Euler(0, 0, 90), movementSquareList);
         }
     }
 
@@ -744,8 +766,7 @@ public class MasterGrid : MonoBehaviour
         Instantiate(redSquare, new Vector2(x, y), Quaternion.identity, movementSquareList);
     }
 
-    public void checkEnemiesInRange(BaseUnit unit) //for now we're gonna assume range is 1 but in future if we want to add ranged units 
-                                                   //We probably want to grab the A* algorithm from DrawMovement and pass a function instead.
+    public void checkEnemiesInRange(BaseUnit unit) 
     {
         int xPos = (int)unit.xPos;
         int yPos = (int)unit.yPos;
@@ -1127,7 +1148,7 @@ public class MasterGrid : MonoBehaviour
 
     public void presentGameActionsAtLocation(int x, int y, BaseUnit unit)
     {
-        if(unit.canMoveAndAttack || unit.nonExhausted)
+        if(unit.canMoveAndAttack || unit.movementNonExhausted)
             checkEnemiesInRange(unit);
         BaseStructure structure = manageStructureAtLocation(unit.xPos, unit.yPos);
         bool canStructureBeCapturedHere = (structure != null && structure.isCapturableBy(unit));
