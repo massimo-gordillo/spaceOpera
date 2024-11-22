@@ -152,6 +152,7 @@ MonoBehaviour:
   buttonText: {fileID: 7751100590271051732}
   spritePrefab: {fileID: 1074648208377312717, guid: edb02daa5bdd29b4c816da9fd4659b0d, type: 3}
   unitPrefab: {fileID: 376317532261410512, guid: c9dd9b125f0255f418f3c22071c6030c, type: 3}
+  spritePrefabUIVariant: {fileID: 8412141517621325099}
   gameMaster: {fileID: 0}
 --- !u!114 &1398659707516554253
 MonoBehaviour:
@@ -482,3 +483,14 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 3737977924034485653, guid: edb02daa5bdd29b4c816da9fd4659b0d, type: 3}
   m_PrefabInstance: {fileID: 8814675859655137510}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &8412141517621325099 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1074648208377312717, guid: edb02daa5bdd29b4c816da9fd4659b0d, type: 3}
+  m_PrefabInstance: {fileID: 8814675859655137510}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0f3d2a09ca23d1947822607598e4e193, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

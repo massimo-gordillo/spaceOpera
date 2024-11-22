@@ -9,10 +9,12 @@ public class MenuProductionButton : MonoBehaviour
     public TMP_Text buttonText;
     public StaticSprite spritePrefab;
     public GameObject unitPrefab;
+    public StaticSprite spritePrefabUIVariant;
     public GameMaster gameMaster;
 
     public void Start()
     {
+        //spritePrefabUIVariant = new StaticSprite();
         gameMaster = GameObject.FindGameObjectWithTag("GameMasterTag").GetComponent<GameMaster>();
     }
 

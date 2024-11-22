@@ -184,67 +184,13 @@ public class PrefabManager
 
     }*/
 
-    /*public void setSpritesFromSpriteAtlas(string unitName, string atlasPath, StaticSprite spritePrefab)
-    {
-        SpriteAtlas spriteAtlas = Resources.Load<SpriteAtlas>(atlasPath);
-        if (spriteAtlas == null)
-        {
-            UnityEngine.Debug.LogError($"Failed to load spriteAtlas at path: {atlasPath}");
-            return;
-        }
 
-        string name = unitName.ToLower().Replace(" ", "");
-        UnityEngine.Debug.Log($"Looking for sprites with base name: {name}");
-
-        if (spritePrefab == null)
-        {
-            UnityEngine.Debug.LogError("spritePrefab is null.");
-            return;
-        }
-        if (spritePrefab.fillSR == null || spritePrefab.trimSR == null || spritePrefab.lightsSR == null)
-        {
-            UnityEngine.Debug.LogError("One or more SpriteRenderers in spritePrefab are null.");
-            return;
-        }
-
-        Sprite fillSprite = spriteAtlas.GetSprite($"{name}Sprite_Fill");
-        if (fillSprite != null)
-        {
-            spritePrefab.fillSR.sprite = fillSprite;
-        }
-        else
-        {
-            UnityEngine.Debug.LogWarning($"Sprite {name}Sprite_Fill not found in the sprite atlas.");
-        }
-
-        Sprite trimSprite = spriteAtlas.GetSprite($"{name}Sprite_Trim");
-        if (trimSprite != null)
-        {
-            spritePrefab.trimSR.sprite = trimSprite;
-        }
-        else
-        {
-            UnityEngine.Debug.LogWarning($"Sprite {name}Sprite_Trim not found in the sprite atlas.");
-        }
-
-        Sprite lightsSprite = spriteAtlas.GetSprite($"{name}Sprite_Lights");
-        if (lightsSprite != null)
-        {
-            spritePrefab.lightsSR.sprite = lightsSprite;
-        }
-        else
-        {
-            UnityEngine.Debug.LogWarning($"Sprite {name}Sprite_Lights not found in the sprite atlas.");
-        }
-
-
-        //UnityEngine.Debug.Log($"NAME: Prefab modified with sprite: {spritePrefab.fillSR.sprite.name}");
-    }*/
 
     //need to separate StaticSprite from AttributesBaseUnit because MenuProductionPanel passes a different sprite.
     public void setSprites(AttributesBaseUnit attributes, StaticSprite spritePrefab)
     {
-        UnityEngine.Debug.Log($"Setting sprites for: {attributes.unitName}");
+        
+
         // Check for null parameters
         if (attributes == null)
         {
@@ -257,6 +203,8 @@ public class PrefabManager
             UnityEngine.Debug.LogError("StaticSprite prefab is null.");
             return;
         }
+
+        //UnityEnginer.Debug.LogError($"Setting sprites for {attributes.unitName}.");
 
         // Validate enum conversion
         int progenyIndex;
@@ -276,11 +224,15 @@ public class PrefabManager
         string lightsSpritePath = $"{basePath}Sprite_Lights";
         string trimSpritePath = $"{basePath}Sprite_Trim";
 
+        //UnityEngine.Debug.Log($"Setting sprites for: {attributes.unitName}");
+        UnityEngine.Debug.Log($"spritePrefab instance ID: {spritePrefab.GetInstanceID()} for unit: {attributes.unitName}");
+        UnityEngine.Debug.Log($"spritePrefab path: {basePath} for unit: {attributes.unitName}");
+
         // Load sprites and check for errors
         Sprite fillSprite = Resources.Load<Sprite>(fillSpritePath);
         if (fillSprite == null)
         {
-            UnityEngine.Debug.Log($"Failed to load fill sprite from path: {fillSpritePath}");
+            //UnityEngine.Debug.Log($"Failed to load fill sprite from path: {fillSpritePath}");
         }
         else
         {
@@ -290,7 +242,7 @@ public class PrefabManager
         Sprite lightsSprite = Resources.Load<Sprite>(lightsSpritePath);
         if (lightsSprite == null)
         {
-            UnityEngine.Debug.Log($"Failed to load lights sprite from path: {lightsSpritePath}");
+            //UnityEngine.Debug.Log($"Failed to load lights sprite from path: {lightsSpritePath}");
             spritePrefab.lightsSR.sprite = null;
         }
         else
@@ -301,7 +253,7 @@ public class PrefabManager
         Sprite trimSprite = Resources.Load<Sprite>(trimSpritePath);
         if (trimSprite == null)
         {
-            UnityEngine.Debug.Log($"Failed to load trim sprite from path: {trimSpritePath}");
+            //UnityEngine.Debug.Log($"Failed to load trim sprite from path: {trimSpritePath}");
         }
         else
         {

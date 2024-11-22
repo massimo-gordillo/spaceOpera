@@ -14,9 +14,17 @@ public class StaticSprite : ClickableObject
     protected override void Start()
     {
         base.Start(); //call the start function in ClickableObject class this inherets from.
-        parentGameObject = transform.parent.gameObject;
-        parentComponentBaseUnit = parentGameObject.GetComponent<BaseUnit>();
-        parentComponentBaseStructure = parentGameObject.GetComponent<BaseStructure>();
+        if (transform.parent != null)
+        {
+            parentGameObject = transform.parent.gameObject;
+            //parentGameObject = transform.parent.gameObject;
+            parentComponentBaseUnit = parentGameObject.GetComponent<BaseUnit>();
+            parentComponentBaseStructure = parentGameObject.GetComponent<BaseStructure>();
+        }
+        else
+        {
+            Debug.Log("No parent found for StaticSprite " + this.GetInstanceID());
+        }
     }
 
     // Update is called once per frame
