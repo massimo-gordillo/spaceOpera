@@ -68,6 +68,10 @@ red 1: 223,32,32,1
 red 2: 149,21,21,1
 red 3: 112,16,16,1
 
-Light Colour:   255,255,255,1
-Med Colour:     157,157,157,1
-Dark Colour:    115,115,115,1
+Light Grey:     137,137,137,1   #898989
+Med Grey:       69,69,69,1      #454545
+Dark Grey:      46,46,46,1      #2e2e2e
+
+Light Colour:   255,255,255,1   #ffffff
+Med Colour:     157,157,157,1   #9d9d9d
+Dark Colour:    115,115,115,1   #737373
