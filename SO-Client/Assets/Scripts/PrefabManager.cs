@@ -225,8 +225,8 @@ public class PrefabManager
         string trimSpritePath = $"{basePath}Sprite_Trim";
 
         //UnityEngine.Debug.Log($"Setting sprites for: {attributes.unitName}");
-        UnityEngine.Debug.Log($"spritePrefab instance ID: {spritePrefab.GetInstanceID()} for unit: {attributes.unitName}");
-        UnityEngine.Debug.Log($"spritePrefab path: {basePath} for unit: {attributes.unitName}");
+        //UnityEngine.Debug.Log($"spritePrefab instance ID: {spritePrefab.GetInstanceID()} for unit: {attributes.unitName}");
+        //UnityEngine.Debug.Log($"spritePrefab path: {basePath} for unit: {attributes.unitName}");
 
         // Load sprites and check for errors
         Sprite fillSprite = Resources.Load<Sprite>(fillSpritePath);
