@@ -51,8 +51,10 @@ public class TilemapManager : MonoBehaviour
         // Log the tilemap reference
         Debug.Log($"Initializing TilemapManager with tilemap: {tilemap.name}");
 
-        gridWidth = 21;
-        gridHeight = 11;
+        (Vector2Int bounds , Vector2Int deltaFromZero) = GetTilemapBounds();
+        gridWidth = bounds.x + deltaFromZero.x;
+        gridHeight = bounds.y + deltaFromZero.y;
+
         gridTrimOffset = 5;
         gridTrimOffset = 5;
         gridWidthWithTrim = gridWidth + gridTrimOffset * 2;
@@ -60,12 +62,14 @@ public class TilemapManager : MonoBehaviour
         mapFileLocation = "InitializationData/Maps/Map2";
 
         InitializeTileDictionaries();
+        
+
 
         //uncomment the appropriate function for testing.
-        
-        byte[] data = ExportTilemapToBytes(gridWidth, gridHeight);
+
+        byte[] data = ExportTilemapToBytes(bounds, deltaFromZero);
         //SaveTilemapToFile("Map2Tilemap.dat");
-        LoadTilemapFromFile("Map2Tilemap.dat");
+        //LoadTilemapFromFile("Map2Tilemap.dat");
         
         //ImportTilemapFromBytes(data, gridWidth, gridHeight);
     }
@@ -137,10 +141,12 @@ public class TilemapManager : MonoBehaviour
         }
     }
 
-    public byte[] ExportTilemapToBytes(int width, int height)
+    public byte[] ExportTilemapToBytes(Vector2Int bounds, Vector2Int delta)
     {
+        int width = bounds.x + delta.x;
+        int height = bounds.y + delta.y;
         byte[] tilemapByteArray = new byte[width * height];
-        BoundsInt bounds = tilemap.cellBounds;
+        //BoundsInt bounds = tilemap.cellBounds;
 
         for (int y = 0; y < height; y++)
         {
@@ -252,7 +258,7 @@ public class TilemapManager : MonoBehaviour
     {
         if (tilemapByteArray == null || tilemapByteArray.Length == 0)
         {
-            byte[] data = ExportTilemapToBytes(gridWidth, gridHeight);
+            byte[] data = ExportTilemapToBytes(new Vector2Int(gridWidth, gridHeight), Vector2Int.zero);
             if (data == null || data.Length == 0)
             {
                 Debug.LogWarning("Tilemap byte array is null or empty. Returning null.");
@@ -281,7 +287,7 @@ public class TilemapManager : MonoBehaviour
         }
 
         string filePath = Path.Combine(directoryPath, fileName);
-        byte[] byteData = ExportTilemapToBytes(gridWidth, gridHeight);
+        byte[] byteData = ExportTilemapToBytes(new Vector2Int(gridWidth, gridHeight), Vector2Int.zero);
         TilemapData dataFile = new TilemapData
         {
             Width = (byte)gridWidth,
@@ -315,6 +321,56 @@ public class TilemapManager : MonoBehaviour
         else
         {
             Debug.LogError($"File not found: {filePath}");
+        }
+    }
+
+    public (Vector2Int dimensions, Vector2Int deltas) GetTilemapBounds()
+    {
+        if (tilemap != null)
+        {
+            // Get the bounds of the tilemap in cell space
+            BoundsInt bounds = tilemap.cellBounds;
+
+            // Calculate the width and height of the tilemap
+            int width = bounds.size.x;  // Number of tiles in the X direction
+            int height = bounds.size.y; // Number of tiles in the Y direction
+
+            Debug.Log($"Tilemap Dimensions: Width = {width}, Height = {height}, xMax = {bounds.xMax}, yMax = {bounds.yMax}, xMin = {bounds.xMin}, yMin = {bounds.yMin}");
+
+            for (int x = bounds.xMin; x < bounds.xMax; x++)
+            {
+                for (int y = bounds.yMin; y < bounds.yMax; y++)
+                {
+                    Vector3Int position = new Vector3Int(x, y, 0);
+                    if (tilemap.HasTile(position)) //&& (y>11 || x>21))
+                    {
+                        //Debug.Log($"Tile found at: {position}");
+                    }
+                }
+            }
+
+            // Get the edges of the tilemap
+            int minX = bounds.xMin; // Left edge
+            int maxX = bounds.xMax - 1; // Right edge
+            int minY = bounds.yMin; // Bottom edge
+            int maxY = bounds.yMax - 1; // Top edge
+
+            // Calculate deltaX and deltaY for the closest edge
+            int deltaX = (Mathf.Abs(minX) <= Mathf.Abs(maxX)) ? minX : maxX;
+            int deltaY = (Mathf.Abs(minY) <= Mathf.Abs(maxY)) ? minY : maxY;
+
+            Debug.Log($"deltaX: {deltaX}, deltaY: {deltaY}");
+
+            return (new Vector2Int(width, height), new Vector2Int(deltaX, deltaY));
+        }
+        else
+        {
+            Debug.LogError("Tilemap is not assigned!");
+            // Option 1: Throw an exception
+            throw new System.InvalidOperationException("Tilemap is not assigned!");
+
+            // Option 2: Return a default value (uncomment this line if you prefer this option)
+            // return Vector2Int.zero;
         }
     }
 
