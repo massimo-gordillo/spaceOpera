@@ -84,7 +84,7 @@ public class MasterGrid : MonoBehaviour
         }
 
         // Check if terrainGrid dimensions are compatible with tilemapByteArray
-        if (gridX <= 0 || gridY <= 0 || gridX * gridY != tilemapByteArray.Length)
+        if (gridX <= 0 || gridY <= 0 || (gridX+1) * gridY+2 != tilemapByteArray.Length)
         {
             Debug.LogError($"Terrain grid dimensions ({gridX}, {gridY}) are incompatible with tilemap byte array length ({tilemapByteArray.Length}). Cannot set terrain.");
             return;

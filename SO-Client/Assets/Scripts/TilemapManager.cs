@@ -52,8 +52,8 @@ public class TilemapManager : MonoBehaviour
         Debug.Log($"Initializing TilemapManager with tilemap: {tilemap.name}");
 
         (Vector2Int bounds , Vector2Int deltaFromZero) = GetTilemapBounds();
-        gridWidth = bounds.x + deltaFromZero.x;
-        gridHeight = bounds.y + deltaFromZero.y;
+        gridWidth = bounds.x;// + deltaFromZero.x;
+        gridHeight = bounds.y;// + deltaFromZero.y;
 
         gridTrimOffset = 5;
         gridTrimOffset = 5;
@@ -143,8 +143,8 @@ public class TilemapManager : MonoBehaviour
 
     public byte[] ExportTilemapToBytes(Vector2Int bounds, Vector2Int delta)
     {
-        int width = bounds.x + delta.x;
-        int height = bounds.y + delta.y;
+        int width = bounds.x;// + delta.x;
+        int height = bounds.y;// + delta.y;
         byte[] tilemapByteArray = new byte[width * height];
         //BoundsInt bounds = tilemap.cellBounds;
 
@@ -328,8 +328,10 @@ public class TilemapManager : MonoBehaviour
     {
         if (tilemap != null)
         {
+            
             // Get the bounds of the tilemap in cell space
             BoundsInt bounds = tilemap.cellBounds;
+            //OnDrawGizmos();
 
             // Calculate the width and height of the tilemap
             int width = bounds.size.x;  // Number of tiles in the X direction
@@ -337,17 +339,17 @@ public class TilemapManager : MonoBehaviour
 
             Debug.Log($"Tilemap Dimensions: Width = {width}, Height = {height}, xMax = {bounds.xMax}, yMax = {bounds.yMax}, xMin = {bounds.xMin}, yMin = {bounds.yMin}");
 
-            for (int x = bounds.xMin; x < bounds.xMax; x++)
+/*            for (int x = bounds.xMin-1; x < bounds.xMax+1; x++)
             {
-                for (int y = bounds.yMin; y < bounds.yMax; y++)
+                for (int y = bounds.yMin-1; y < bounds.yMax+1; y++)
                 {
                     Vector3Int position = new Vector3Int(x, y, 0);
                     if (tilemap.HasTile(position)) //&& (y>11 || x>21))
                     {
-                        //Debug.Log($"Tile found at: {position}");
+                        Debug.Log($"Tile found at: {position}");
                     }
                 }
-            }
+            }*/
 
             // Get the edges of the tilemap
             int minX = bounds.xMin; // Left edge
@@ -374,6 +376,62 @@ public class TilemapManager : MonoBehaviour
         }
     }
 
+
+    //initialize it too early to draw Gizmos
+    /*private Vector2Int cachedTilemapBounds = Vector2Int.zero;
+    // Method to draw the Gizmos
+    void OnDrawGizmos()
+    {
+        // Ensure tilemap is valid
+        if (tilemap != null)
+        {
+            // Call the GetTilemapDimensions function to get the dimensions based on active tiles
+            Vector2Int tilemapDimensions = GetTilemapDimensionsForGizmos();
+
+            // Now you can draw Gizmos using the calculated dimensions (tilemapDimensions)
+            Gizmos.color = Color.green; // Set the Gizmo color
+            Gizmos.DrawWireCube(new Vector3(tilemapDimensions.x / 2f, tilemapDimensions.y / 2f, 0), new Vector3(tilemapDimensions.x, tilemapDimensions.y, 1));
+        }
+    }
+    // Function to calculate the dimensions of the tilemap based on the furthest set tiles
+    public Vector2Int GetTilemapDimensionsForGizmos()
+    {
+        if (tilemap == null)
+        {
+            Debug.LogError("Tilemap is not assigned!");
+            return Vector2Int.zero; // Return zero if tilemap is not assigned
+        }
+
+        // Get the bounds of the tilemap in cell space
+        BoundsInt bounds = tilemap.cellBounds;
+
+        // Initialize min and max values
+        int minX = bounds.xMin;
+        int maxX = bounds.xMax;
+        int minY = bounds.yMin;
+        int maxY = bounds.yMax;
+
+        // Iterate through all tiles in the tilemap and track the furthest set tile positions
+        foreach (var position in bounds.allPositionsWithin)
+        {
+            // If the tile at the current position is not null, update the min/max values
+            if (tilemap.GetTile(position) != null)
+            {
+                minX = Mathf.Min(minX, position.x);
+                maxX = Mathf.Max(maxX, position.x);
+                minY = Mathf.Min(minY, position.y);
+                maxY = Mathf.Max(maxY, position.y);
+            }
+        }
+
+        // Calculate the width and height of the tilemap based on the furthest tiles
+        int width = maxX - minX + 1;
+        int height = maxY - minY + 1;
+
+        // Return the dimensions as a Vector2Int
+        Debug.Log($"Tilemap Dimensions: Width = {width}, Height = {height}");
+        return new Vector2Int(width, height);
+    }*/
 
 
     /*public void SaveTilemapToFile(string fileName)
