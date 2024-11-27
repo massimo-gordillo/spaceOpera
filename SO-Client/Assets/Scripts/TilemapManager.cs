@@ -185,8 +185,11 @@ public class TilemapManager : MonoBehaviour
             }
             //Debug.Log(debug);
         }
-
-        return MessagePackSerializer.Serialize(tilemapByteArray);
+        Debug.Log($"Tilemap exported to byte array with size {tilemapByteArray.Length}.");
+        byte[] debugByteArray = MessagePackSerializer.Serialize(tilemapByteArray);
+        Debug.Log($"Debug byte array size: {debugByteArray.Length}");
+        return debugByteArray;
+        //return MessagePackSerializer.Serialize(tilemapByteArray);
     }
 
     public void ImportTilemapFromBytes(byte[] serializedData, int width, int height)
@@ -265,14 +268,18 @@ public class TilemapManager : MonoBehaviour
     {
         if (tilemapByteArray == null || tilemapByteArray.Length == 0)
         {
-            byte[] data = ExportTilemapToBytes(new Vector2Int(gridWidth, gridHeight), Vector2Int.zero);
+            byte[] data = MessagePackSerializer.Deserialize<byte[]>(ExportTilemapToBytes(new Vector2Int(gridWidth, gridHeight), Vector2Int.zero));
             if (data == null || data.Length == 0)
             {
                 Debug.LogWarning("Tilemap byte array is null or empty. Returning null.");
                 return null;
             }
             else
+            {
+                Debug.Log($"TilemapData has size {data.Length}.");
                 return data;
+            }
+                
         }
 
         int expectedMinSize = gridWidth * gridHeight;
@@ -294,7 +301,8 @@ public class TilemapManager : MonoBehaviour
         }
 
         string filePath = Path.Combine(directoryPath, fileName);
-        byte[] byteData = ExportTilemapToBytes(new Vector2Int(gridWidth, gridHeight), Vector2Int.zero);
+        byte[] byteData = MessagePackSerializer.Deserialize<byte[]>(ExportTilemapToBytes(new Vector2Int(gridWidth, gridHeight), Vector2Int.zero));
+
         TilemapData dataFile = new TilemapData
         {
             Width = (byte)gridWidth,

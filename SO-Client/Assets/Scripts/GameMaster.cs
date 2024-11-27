@@ -89,9 +89,9 @@ public class GameMaster : MonoBehaviour
 
     void Start()
     {
-        // Start the coroutine to call ConvertGameStateToList
+        //Comment to perform appropriate action. Start the coroutine to call ConvertGameStateToList
         //StartCoroutine(CallConvertGameStateToList());
-        ConvertFileToGameState();
+        //ConvertFileToGameState();
     }
 
     private IEnumerator CallConvertGameStateToList()
