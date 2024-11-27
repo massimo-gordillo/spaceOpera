@@ -44,7 +44,7 @@ public class TilemapManager : MonoBehaviour
     //private string tilemapFilePath;
 
     //receives a list of all the attributesTile each of which contain the rules for each tile type (defined as a byte)
-    public void initialize()
+    public (int, int) initialize()
     {
         //tilemapFilePath = "Assets/InitializationData/Maps/Map2";
         //byteToAttributesTileDictionary = inputAttributesTilesDictionary;
@@ -55,8 +55,8 @@ public class TilemapManager : MonoBehaviour
         gridWidth = bounds.x;// + deltaFromZero.x;
         gridHeight = bounds.y;// + deltaFromZero.y;
 
-        gridTrimOffset = 5;
-        gridTrimOffset = 5;
+        gridTrimOffset = 2;
+        gridTrimOffset = 2;
         gridWidthWithTrim = gridWidth + gridTrimOffset * 2;
         gridHeightWithTrim = gridHeight + gridTrimOffset * 2;
         mapFileLocation = "InitializationData/Maps/Map2";
@@ -72,6 +72,8 @@ public class TilemapManager : MonoBehaviour
         //LoadTilemapFromFile("Map2Tilemap.dat");
         
         //ImportTilemapFromBytes(data, gridWidth, gridHeight);
+
+        return (gridWidth, gridHeight);
     }
 
 /*    private void InitializeTileDictionaries()
@@ -165,8 +167,10 @@ public class TilemapManager : MonoBehaviour
                     if (tile == t)
                         Debug.Log("They're the same picture");
                 }*/
-                //Debug.Log($"What is tile: {tile} and am I getting anything out of the dictionary: { tileNameToByteDictionary.TryGetValue(tile, out byte tileByteTest)}");
-                //Debug.Log($"What is tile: {tile} with name {tile.name} and gameID {tile.GetInstanceID()}");
+                /*Debug.Log($"checking location {x},{y} for a tile");
+                Debug.Log($"What is tile: {tile.name} and am I getting anything out of the dictionary: { tileNameToByteDictionary.TryGetValue(tile.name, out byte tileByteTest)}");
+                Debug.Log($"What is tile with name: {tile.name} and gameID {tile.GetInstanceID()} at location {x},{y}");
+                */
                 if (tile != null && tileNameToByteDictionary.TryGetValue(tile.name, out byte tileByte))
                 {
                     tilemapByteArray[y * width + x] = tileByte;
@@ -189,6 +193,9 @@ public class TilemapManager : MonoBehaviour
     {
         tilemapByteArray = MessagePackSerializer.Deserialize<byte[]>(serializedData);
         tilemap.ClearAllTiles();
+
+        gridWidth = width;
+        gridHeight = height;
 
         for (int y = -1 * gridTrimOffset; y < height + gridTrimOffset; y++)
         {

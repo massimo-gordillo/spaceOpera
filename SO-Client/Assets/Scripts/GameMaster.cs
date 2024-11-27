@@ -39,8 +39,8 @@ public class GameMaster : MonoBehaviour
     public GameObject playerWinCard;
     public TMP_Text playerWinText;
 
-    public int gridX = 20;
-    public int gridY = 10;
+    public int gridX;
+    public int gridY;
 
     public BaseStructure commandStructurePrefab;
     public BaseStructure productionAirportStructurePrefab;
@@ -52,8 +52,6 @@ public class GameMaster : MonoBehaviour
     // Start is called before the first frame update
     void Awake()
     {
-        gridX = 21;
-        gridY = 11;
         //gameValues = AssetDatabase.LoadAssetAtPath<GameValuesSO>("Assets/Scripts/Assets/Scripts/GameValuesSO.cs.cs");
 
         //initializes all unit values, modifies their prefab and sprites.
@@ -61,7 +59,7 @@ public class GameMaster : MonoBehaviour
         gameValues.initialize();
 
         //initializes the TilemapManager
-        tilemapManager.initialize();
+        (gridX, gridY) = tilemapManager.initialize();
 
         //initializes the masterGrid arrays etc with the map size
         masterGrid.startup(gridX, gridY, tilemapManager.getTilemapByteArray(), gameValues.getAttributesTilesDictionary(), gameValues.getCombatMultiplierDictionary());
