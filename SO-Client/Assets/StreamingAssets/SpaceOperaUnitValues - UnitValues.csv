@@ -2,7 +2,7 @@ unitName,progeny,isResourceUnit,unitType,isInfantry,healthMax,healthType,damageT
 Infantry,ertrian,TRUE,land,TRUE,100,light,light,projectile,light projectile,TRUE,TRUE,TRUE,TRUE,60,1,100,3,TRUE,0
 GattlingTank,ertrian,FALSE,land,FALSE,400,medium,light,projectile,light projectile,TRUE,TRUE,TRUE,TRUE,300,1,800,6,TRUE,0
 LightTank,ertrian,FALSE,land,FALSE,700,medium,heavy,projectile,heavy projectile,TRUE,FALSE,TRUE,TRUE,300,1,700,7,TRUE,0
-Artillery,ertrian,FALSE,land,FALSE,300,medium,heavy,projectile,heavy projectile,TRUE,FALSE,TRUE,FALSE,400,3,600,4,FALSE,1
+Artillery,ertrian,FALSE,land,FALSE,300,medium,heavy,projectile,heavy projectile,TRUE,FALSE,TRUE,FALSE,400,3,600,5,FALSE,1
 Rockets,ertrian,FALSE,land,FALSE,200,medium,light,projectile,light projectile,TRUE,TRUE,TRUE,FALSE,400,5,1500,4,FALSE,1
 APC,ertrian,FALSE,land,FALSE,500,heavy,none,none,none,FALSE,FALSE,FALSE,FALSE,0,0,500,7,FALSE,0
 Electos,ertrian,FALSE,land,FALSE,350,light,light,melee,light melee,TRUE,FALSE,FALSE,TRUE,300,1,600,4,TRUE,0

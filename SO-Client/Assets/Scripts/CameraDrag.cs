@@ -29,7 +29,7 @@ public class CameraDrag : MonoBehaviour
         cam = Camera.main;
 
         //set the camera min and max
-        gridMin = new Vector2(-1, -1);
+        gridMin = new Vector2(-1, -3);
         gridMax = new Vector2(gameMaster.gridX + 1, gameMaster.gridY + 1);
 
         //get the width of the rhs menu and set that to the allowable extra camera view on rhs when menu is open

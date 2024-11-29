@@ -55,11 +55,10 @@ public class TilemapManager : MonoBehaviour
         gridWidth = bounds.x;// + deltaFromZero.x;
         gridHeight = bounds.y;// + deltaFromZero.y;
 
-        gridTrimOffset = 2;
-        gridTrimOffset = 2;
+        gridTrimOffset = 5;
         gridWidthWithTrim = gridWidth + gridTrimOffset * 2;
         gridHeightWithTrim = gridHeight + gridTrimOffset * 2;
-        mapFileLocation = "InitializationData/Maps/Map2";
+        mapFileLocation = "InitializationData/Maps/Map3";
 
         InitializeTileDictionaries();
         
@@ -68,10 +67,10 @@ public class TilemapManager : MonoBehaviour
         //uncomment the appropriate function for testing.
 
         byte[] data = ExportTilemapToBytes(bounds, deltaFromZero);
-        //SaveTilemapToFile("Map2Tilemap.dat");
-        //LoadTilemapFromFile("Map2Tilemap.dat");
+        //SaveTilemapToFile("Map3Tilemap.dat");
+        //LoadTilemapFromFile("Map3Tilemap.dat");
         
-        //ImportTilemapFromBytes(data, gridWidth, gridHeight);
+        ImportTilemapFromBytes(data, gridWidth, gridHeight);
 
         return (gridWidth, gridHeight);
     }
