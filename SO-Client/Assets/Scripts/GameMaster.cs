@@ -46,7 +46,7 @@ public class GameMaster : MonoBehaviour
     public BaseStructure productionAirportStructurePrefab;
     public BaseStructure productionFactoryStructurePrefab;
     public BaseStructure resourceStructurePrefab;
-    private string gameStateFilePath = "Assets/InitializationData/Maps/Map2/Map2GameState.dat";
+    private string gameStateFilePath = "Assets/InitializationData/Maps/Map3/Map3GameState.dat";
     
 
     // Start is called before the first frame update

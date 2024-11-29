@@ -5492,6 +5492,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: commandStructure (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 8663485981121422305, guid: 71e7db29bb8159048a60acdf62cc9b4f, type: 3}
+      propertyPath: playerControl
+      value: 2
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 71e7db29bb8159048a60acdf62cc9b4f, type: 3}
 --- !u!1001 &1146053042

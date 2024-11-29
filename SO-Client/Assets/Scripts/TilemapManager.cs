@@ -5,19 +5,6 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 using MessagePack;
 
-[MessagePackObject]
-public struct TilemapData
-{
-    [Key(0)]
-    public int Width { get; set; }
-
-    [Key(1)]
-    public int Height { get; set; }
-
-    [Key(2)]
-    public byte[] TileBytes { get; set; }
-}
-
 public class TilemapManager : MonoBehaviour
 {
     public Tilemap tilemap; // Reference to the Tilemap component
@@ -51,7 +38,7 @@ public class TilemapManager : MonoBehaviour
         // Log the tilemap reference
         Debug.Log($"Initializing TilemapManager with tilemap: {tilemap.name}");
 
-        (Vector2Int bounds , Vector2Int deltaFromZero) = GetTilemapBounds();
+        (Vector2Int bounds, Vector2Int deltaFromZero) = GetTilemapBounds();
         gridWidth = bounds.x;// + deltaFromZero.x;
         gridHeight = bounds.y;// + deltaFromZero.y;
 
@@ -61,32 +48,33 @@ public class TilemapManager : MonoBehaviour
         mapFileLocation = "InitializationData/Maps/Map3";
 
         InitializeTileDictionaries();
-        
+
 
 
         //uncomment the appropriate function for testing.
 
-        byte[] data = ExportTilemapToBytes(bounds, deltaFromZero);
+        //TilemapData byteData = ExportTilemapToBytes(bounds, deltaFromZero);
+        //ImportTilemapFromBytes(byteData);
+
         //SaveTilemapToFile("Map3Tilemap.dat");
         //LoadTilemapFromFile("Map3Tilemap.dat");
-        
-        ImportTilemapFromBytes(data, gridWidth, gridHeight);
+
 
         return (gridWidth, gridHeight);
     }
 
-/*    private void InitializeTileDictionaries()
-    {
-        byteToTileDictionary = new Dictionary<byte, TileBase>();
-        tileNameToByteDictionary = new Dictionary<TileBase, byte>();
-
-        for (byte i = 0; i < tileAssets.Count; i++)
+    /*    private void InitializeTileDictionaries()
         {
-            byteToTileDictionary.Add(i, tileAssets[i]);
-            tileNameToByteDictionary.Add(tileAssets[i], i);
-        }
-    }  */  
-    
+            byteToTileDictionary = new Dictionary<byte, TileBase>();
+            tileNameToByteDictionary = new Dictionary<TileBase, byte>();
+
+            for (byte i = 0; i < tileAssets.Count; i++)
+            {
+                byteToTileDictionary.Add(i, tileAssets[i]);
+                tileNameToByteDictionary.Add(tileAssets[i], i);
+            }
+        }  */
+
     private void InitializeTileDictionaries()
     {
         string basePath = "Tilemap/Tiles/DynamicTilemapTest";
@@ -104,7 +92,7 @@ public class TilemapManager : MonoBehaviour
                 string folderPath = $"{basePath}/{folderName}";
                 //for each tile in that folder, add it to the total tileAssets list
                 //add it to the a list of tiles (the list goes into its own dictionary matched the byte value)
-                foreach (TileBase tile in Resources.LoadAll<TileBase>(folderPath)) 
+                foreach (TileBase tile in Resources.LoadAll<TileBase>(folderPath))
                 {
                     tileAssets.Add(tile);
                     tileNameToByteDictionary.Add(tile.name, byteNumber);
@@ -117,10 +105,10 @@ public class TilemapManager : MonoBehaviour
                 }
 
 
-/*                if (tileNameToByteDictionary == null || tileNameToByteDictionary.Count == 0)
-                {
-                    Debug.Log("tileNameToByteDictionary is empty or null.");
-                }*/
+                /*                if (tileNameToByteDictionary == null || tileNameToByteDictionary.Count == 0)
+                                {
+                                    Debug.Log("tileNameToByteDictionary is empty or null.");
+                                }*/
 
 
             }
@@ -142,7 +130,7 @@ public class TilemapManager : MonoBehaviour
         }
     }
 
-    public byte[] ExportTilemapToBytes(Vector2Int bounds, Vector2Int delta)
+    public TilemapData ExportTilemapToBytes(Vector2Int bounds, Vector2Int delta)
     {
         int width = bounds.x;// + delta.x;
         int height = bounds.y;// + delta.y;
@@ -180,57 +168,90 @@ public class TilemapManager : MonoBehaviour
                     tilemapByteArray[y * width + x] = 255; // Use 255 for empty or unrecognized tiles
                     //debug = debug + "X, ";
                 }
-                
+
             }
             //Debug.Log(debug);
         }
-        Debug.Log($"Tilemap exported to byte array with size {tilemapByteArray.Length}.");
-        byte[] debugByteArray = MessagePackSerializer.Serialize(tilemapByteArray);
-        Debug.Log($"Debug byte array size: {debugByteArray.Length}");
-        return debugByteArray;
-        //return MessagePackSerializer.Serialize(tilemapByteArray);
+        //Debug.Log($"Tilemap exported to byte array with size {tilemapByteArray.Length}.");
+        //byte[] debugByteArray = MessagePackSerializer.Serialize(tilemapByteArray);
+        //Debug.Log($"Debug byte array size: {debugByteArray.Length}");
+
+        //TilemapData tilemapData = new TilemapData(width, height, tilemapByteArray);
+        //return tilemapData;
+        return new TilemapData(width, height, tilemapByteArray);
     }
 
-    public void ImportTilemapFromBytes(byte[] serializedData, int width, int height)
+    public void ImportTilemapFromBytes(TilemapData tilemapData)
     {
-        tilemapByteArray = MessagePackSerializer.Deserialize<byte[]>(serializedData);
-        tilemap.ClearAllTiles();
-
-        gridWidth = width;
-        gridHeight = height;
-
-        for (int y = -1 * gridTrimOffset; y < height + gridTrimOffset; y++)
+        try
         {
-            for (int x = -1 * gridTrimOffset; x < width + gridTrimOffset; x++)
+/*            // Deserialize from the raw byte array
+            TilemapData tilemapDataDeserialized = MessagePackSerializer.Deserialize<TilemapData>(tilemapData);
+
+            // Validate the deserialized data
+            if (tilemapDataDeserialized == null)
             {
-                if (y < 0 || y >= height || x < 0 || x >= width)
+                throw new Exception("Tilemap data deserialization failed: the data is null.");
+            }
+
+            if (tilemapDataDeserialized.Width <= 0 || tilemapDataDeserialized.Height <= 0)
+            {
+                throw new Exception("Tilemap data validation failed: Width and Height must be greater than zero.");
+            }*/
+
+            if(tilemapData == null)
+            {
+                throw new Exception("Tilemap data import failed: the data is null.");
+            }
+
+            byte[] tilemapByteArray = tilemapData.TileBytes;
+
+            if (tilemapByteArray == null || tilemapByteArray.Length != tilemapData.Width * tilemapData.Height)
+            {
+                throw new Exception("Tilemap data validation failed: tilemapByteArray is null or its size does not match the expected dimensions.");
+            }
+
+            //modify the global vars
+            tilemap.ClearAllTiles();
+            gridWidth = tilemapData.Width;
+            gridHeight = tilemapData.Height;
+
+            for (int y = -1 * gridTrimOffset; y < gridHeight + gridTrimOffset; y++)
+            {
+                for (int x = -1 * gridTrimOffset; x < gridWidth + gridTrimOffset; x++)
                 {
-                    Vector3Int pos = new Vector3Int(x, y, 0);
-                    tilemap.SetTile(pos, baseEdgeTile);
-                }
-                else
-                {
-                    byte tileByte = tilemapByteArray[y * width + x];
-                    //if (tileByte != 255 && getTile(tileByte, null) is TileBase tile) //MG:24-07-02 this is how you define a var in an if statement
-                    TileBase tile = getTile(tileByte, null);
-                    if (tileByte != 255 && tile != null)
+                    if (y < 0 || y >= gridHeight || x < 0 || x >= gridWidth)
                     {
                         Vector3Int pos = new Vector3Int(x, y, 0);
-                        tilemap.SetTile(pos, tile);
+                        tilemap.SetTile(pos, baseEdgeTile);
                     }
                     else
                     {
-                        Debug.Log("Tilemap failed to find in byteToTileDict.");
+                        byte tileByte = tilemapByteArray[y * gridWidth + x];
+                        TileBase tile = getTile(tileByte, null);
+                        if (tileByte != 255 && tile != null)
+                        {
+                            Vector3Int pos = new Vector3Int(x, y, 0);
+                            tilemap.SetTile(pos, tile);
+                        }
+                        else
+                        {
+                            Debug.Log("Tilemap failed to find in byteToTileDict.");
+                        }
                     }
                 }
             }
-        }
 
-        Debug.Log("Tilemap imported from byte array.");
+            Debug.Log("Tilemap imported from byte array.");
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"Failed to import tilemap: {ex.Message}");
+        }
     }
 
-    //if index is null return a random tile from Tilelist with byte b
-    public TileBase getTile(byte b, int? index = null)
+        //if index is null return a random tile from Tilelist with byte b
+        public TileBase getTile(byte b, int? index = null)
     {
         if (byteToTilesListDictionary.TryGetValue(b, out List<TileBase> tiles))
         {
@@ -267,16 +288,16 @@ public class TilemapManager : MonoBehaviour
     {
         if (tilemapByteArray == null || tilemapByteArray.Length == 0)
         {
-            byte[] data = MessagePackSerializer.Deserialize<byte[]>(ExportTilemapToBytes(new Vector2Int(gridWidth, gridHeight), Vector2Int.zero));
-            if (data == null || data.Length == 0)
+            TilemapData data = ExportTilemapToBytes(new Vector2Int(gridWidth, gridHeight), Vector2Int.zero);
+            if (data == null || data.TileBytes.Length == 0)
             {
                 Debug.LogWarning("Tilemap byte array is null or empty. Returning null.");
                 return null;
             }
             else
             {
-                Debug.Log($"TilemapData has size {data.Length}.");
-                return data;
+                Debug.Log($"TilemapData has size {data.TileBytes.Length}.");
+                return data.TileBytes;
             }
                 
         }
@@ -300,20 +321,13 @@ public class TilemapManager : MonoBehaviour
         }
 
         string filePath = Path.Combine(directoryPath, fileName);
-        byte[] byteData = MessagePackSerializer.Deserialize<byte[]>(ExportTilemapToBytes(new Vector2Int(gridWidth, gridHeight), Vector2Int.zero));
+        //byte[] byteData = MessagePackSerializer.Deserialize<byte[]>(ExportTilemapToBytes(new Vector2Int(gridWidth, gridHeight), Vector2Int.zero));
 
-        TilemapData dataFile = new TilemapData
-        {
-            Width = (byte)gridWidth,
-            Height = (byte)gridHeight,
-            TileBytes = byteData
-        };
 
-        // Serialize the TilemapData object using MessagePack
-        byte[] serializedData = MessagePackSerializer.Serialize(dataFile);
+        TilemapData dataFile = ExportTilemapToBytes(new Vector2Int(gridWidth, gridHeight), Vector2Int.zero);
 
         // Write the serialized data to a file
-        File.WriteAllBytes(filePath, serializedData);
+        File.WriteAllBytes(filePath, TilemapData.Serialize(dataFile));
         Debug.Log($"Tilemap saved to file: {filePath}");
     }
 
@@ -323,14 +337,21 @@ public class TilemapManager : MonoBehaviour
 
         if (File.Exists(filePath))
         {
-            // Read the file bytes
-            byte[] serializedData = File.ReadAllBytes(filePath);
+            /*            // Read the file bytes
+                        //byte[] serializedData = File.ReadAllBytes(filePath);
 
-            // Deserialize the byte array into a TilemapData object using MessagePack
-            TilemapData dataFile = MessagePackSerializer.Deserialize<TilemapData>(serializedData);
+                        // Deserialize the byte array into a TilemapData object using MessagePack
+                        //TilemapData dataFile = MessagePackSerializer.Deserialize<TilemapData>(serializedData);
+                        //ImportTilemapFromBytes(dataFile.TileBytes, (int)dataFile.Width, (int)dataFile.Height);
+                        ImportTilemapFromBytes(File.ReadAllBytes(filePath));
+                        Debug.Log($"Tilemap loaded from file: {filePath}");*/
 
-            ImportTilemapFromBytes(dataFile.TileBytes, (int)dataFile.Width, (int)dataFile.Height);
-            Debug.Log($"Tilemap loaded from file: {filePath}");
+            // Read the raw data from the file
+            //byte[] serializedTilemapData = File.ReadAllBytes(filePath);
+
+            // Pass the serialized data to ImportTilemapFromBytes
+            //ImportTilemapFromBytes(TilemapData.Deserialize(serializedTilemapData));
+            ImportTilemapFromBytes(TilemapData.Deserialize(File.ReadAllBytes(filePath)));
         }
         else
         {
