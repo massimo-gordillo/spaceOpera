@@ -57,7 +57,7 @@ public class TilemapManager : MonoBehaviour
         //ImportTilemapFromBytes(byteData);
 
         //SaveTilemapToFile("Map3Tilemap.dat");
-        //LoadTilemapFromFile("Map3Tilemap.dat");
+        LoadTilemapFromFile("Map3Tilemap.dat");
 
 
         return (gridWidth, gridHeight);
