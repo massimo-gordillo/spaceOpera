@@ -22,7 +22,7 @@ public class NetworkingManager
     // Start is called before the first frame update
     void Start()
     {
-
+        
     }
 
     // Convert a list of game pieces to a byte array for network transmission
@@ -36,4 +36,8 @@ public class NetworkingManager
     {
         return MessagePackSerializer.Deserialize<List<GamePieceInfo>>(data);
     }
+
+
+
+
 }

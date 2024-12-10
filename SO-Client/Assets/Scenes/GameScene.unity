@@ -2172,7 +2172,7 @@ Transform:
   - {fileID: 472514404}
   - {fileID: 533859703}
   m_Father: {fileID: 1024135145}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &450342577
 MonoBehaviour:
@@ -2785,7 +2785,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1024135145}
-  m_RootOrder: 0
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &533414763
 PrefabInstance:
@@ -3726,7 +3726,7 @@ Transform:
   m_Children:
   - {fileID: 471929087}
   m_Father: {fileID: 1024135145}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &789746528 stripped
 Transform:
@@ -4458,6 +4458,7 @@ MonoBehaviour:
   gridTrimOffset: 0
   gridWidthWithTrim: 0
   gridHeightWithTrim: 0
+  playFabManager: {fileID: 1718293607}
 --- !u!1001 &1012535649
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4682,12 +4683,12 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 1718293606}
   - {fileID: 519420032}
   - {fileID: 450342576}
   - {fileID: 783286229}
   - {fileID: 1089601035}
   - {fileID: 1056431368}
-  - {fileID: 1718293606}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -4867,7 +4868,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1024135145}
-  m_RootOrder: 4
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1060012710
 PrefabInstance:
@@ -5119,7 +5120,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1024135145}
-  m_RootOrder: 3
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1089601036
 MonoBehaviour:
@@ -10847,7 +10848,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1024135145}
-  m_RootOrder: 5
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1718293607
 MonoBehaviour:

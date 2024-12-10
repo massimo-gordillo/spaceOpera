@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 using MessagePack;
 
+
 public class TilemapManager : MonoBehaviour
 {
     public Tilemap tilemap; // Reference to the Tilemap component
@@ -57,7 +58,10 @@ public class TilemapManager : MonoBehaviour
         //ImportTilemapFromBytes(byteData);
 
         //SaveTilemapToFile("Map3Tilemap.dat");
-        LoadTilemapFromFile("Map3Tilemap.dat");
+        //LoadTilemapFromFile("Map3Tilemap.dat");
+
+
+
 
 
         return (gridWidth, gridHeight);
@@ -412,7 +416,7 @@ public class TilemapManager : MonoBehaviour
     }
 
 
-    //initialize it too early to draw Gizmos
+    //initialize is too early to draw Gizmos
     /*private Vector2Int cachedTilemapBounds = Vector2Int.zero;
     // Method to draw the Gizmos
     void OnDrawGizmos()
@@ -504,4 +508,5 @@ public class TilemapManager : MonoBehaviour
             Debug.LogError($"File not found: {filePath}");
         }
     }*/
+
 }
