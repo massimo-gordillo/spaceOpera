@@ -207,10 +207,11 @@ public class GameMaster : MonoBehaviour
     public void endTurnButtonPressed()
     {
         hideChoicePanel();
-        masterGrid.refreshUnits(playerTurn);
-        masterGrid.clearMovement();
-        masterGrid.clearSelectedUnit();
-        masterGrid.turnActionCount = 0;
+        List <GameAction> gameActions = masterGrid.endTurn(playerTurn);
+
+        //serialize and send turnActions list to the server.
+
+
         int i = -1;
         do
         { //always increment player number once, then check if that player is still in the game. Go next, never repeat more than num players.

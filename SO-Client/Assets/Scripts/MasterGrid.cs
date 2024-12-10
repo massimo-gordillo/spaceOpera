@@ -1316,4 +1316,15 @@ public class MasterGrid : MonoBehaviour
         gameActions.Add(gameAction);
     }
 
+    public List<GameAction> endTurn(int playerNum)
+    {
+        refreshUnits(playerNum);
+        clearMovement();
+        clearSelectedUnit();
+        turnActionCount = 0;
+        if(gameActions.Count==0)
+            Debug.LogError("FLAG: No game actions to return.");
+        return gameActions;
+    }
+
 }

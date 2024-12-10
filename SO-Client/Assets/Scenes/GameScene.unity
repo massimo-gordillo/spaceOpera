@@ -2197,6 +2197,7 @@ MonoBehaviour:
   movementSquareList: {fileID: 1480701702}
   moveSquare: {fileID: 6791101968882301709, guid: 45dd1bafd4332f345914066612cff201, type: 3}
   rangeOutlineSprite: {fileID: 4103190339462976243, guid: a83075add6286d147827284276d39395, type: 3}
+  turnActionCount: 0
 --- !u!1 &462398235
 GameObject:
   m_ObjectHideFlags: 0
@@ -4575,7 +4576,6 @@ MonoBehaviour:
   isInfantry: 0
   healthMax: 0
   healthCurrent: 0
-  type: 0
   baseDamage: 50
   attackRange: 1
   price: 100
@@ -4650,6 +4650,7 @@ MonoBehaviour:
   unitChoicePanel: {fileID: 1781273296}
   playerTurn: 0
   numPlayers: 0
+  turnNumber: 0
   playerProgeny: 
   playerTurnText: {fileID: 2010402610}
   playerResourceText: {fileID: 1998717953}
@@ -4686,6 +4687,7 @@ Transform:
   - {fileID: 783286229}
   - {fileID: 1089601035}
   - {fileID: 1056431368}
+  - {fileID: 1718293606}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -10815,6 +10817,50 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 579629524903404737, guid: ddb92d03861e68e40a31738e120ba8ac, type: 3}
   m_PrefabInstance: {fileID: 1689468344}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1718293605
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1718293606}
+  - component: {fileID: 1718293607}
+  m_Layer: 0
+  m_Name: PlayFab init
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1718293606
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1718293605}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1024135145}
+  m_RootOrder: 5
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1718293607
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1718293605}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8deaf8ba53d69741b49d8c753ff09d8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1719835402
 GameObject:
   m_ObjectHideFlags: 0
@@ -11513,7 +11559,6 @@ MonoBehaviour:
   isInfantry: 0
   healthMax: 0
   healthCurrent: 0
-  type: 0
   baseDamage: 50
   attackRange: 1
   price: 100
@@ -11977,7 +12022,6 @@ MonoBehaviour:
   isInfantry: 0
   healthMax: 0
   healthCurrent: 0
-  type: 0
   baseDamage: 50
   attackRange: 1
   price: 100
