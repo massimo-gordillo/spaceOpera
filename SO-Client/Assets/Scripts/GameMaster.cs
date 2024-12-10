@@ -20,6 +20,7 @@ public class GameMaster : MonoBehaviour
     public GameObject unitChoicePanel;
     public int playerTurn;
     public int numPlayers;
+    public short turnNumber;
     private bool[] playersNotLost;
     public byte[] playerProgeny;
     public TMP_Text playerTurnText;
@@ -47,11 +48,12 @@ public class GameMaster : MonoBehaviour
     public BaseStructure productionFactoryStructurePrefab;
     public BaseStructure resourceStructurePrefab;
     private string gameStateFilePath = "Assets/InitializationData/Maps/Map3/Map3GameState.dat";
-    
+
 
     // Start is called before the first frame update
     void Awake()
     {
+        turnNumber = 0;
         //gameValues = AssetDatabase.LoadAssetAtPath<GameValuesSO>("Assets/Scripts/Assets/Scripts/GameValuesSO.cs.cs");
 
         //initializes all unit values, modifies their prefab and sprites.
@@ -183,6 +185,8 @@ public class GameMaster : MonoBehaviour
             unit.playerControl = playerTurn;
             //need a way to set to exhausted from here so the units don't have to start exhausted on the 1st turn.
             Instantiate(unit, new Vector2(selectedStructure.xPos, selectedStructure.yPos), Quaternion.identity, unitList);
+            //3 is produce a unit
+            masterGrid.addGameAction(3, (byte)unit.unitType, (byte)selectedStructure.xPos, (byte)selectedStructure.yPos, (byte)unit.xPos, (byte)unit.yPos, (byte)playerTurn);
             playerResourceText.text = "" + playerResources[playerTurn];
             selectedStructure.turnOffCollider();
             hideChoicePanel();
@@ -193,8 +197,10 @@ public class GameMaster : MonoBehaviour
 
     public void exitButtonPressed()
     {
-        if (masterGrid.selectedUnit != null)
+        if (masterGrid.selectedUnit != null && masterGrid.selectedUnit.movementNonExhausted == false)
+        {
             masterGrid.exhaustSelectedUnit(masterGrid.selectedUnit, true);
+        }
         hideChoicePanel();
     }
 
@@ -204,6 +210,7 @@ public class GameMaster : MonoBehaviour
         masterGrid.refreshUnits(playerTurn);
         masterGrid.clearMovement();
         masterGrid.clearSelectedUnit();
+        masterGrid.turnActionCount = 0;
         int i = -1;
         do
         { //always increment player number once, then check if that player is still in the game. Go next, never repeat more than num players.
@@ -216,6 +223,8 @@ public class GameMaster : MonoBehaviour
 
         if (i >= numPlayers)
             playerWins(-1); //error case
+        turnNumber++;
+
         setPlayerTurnText(playerTurn);
         setPlayerResources(playerTurn);
     }

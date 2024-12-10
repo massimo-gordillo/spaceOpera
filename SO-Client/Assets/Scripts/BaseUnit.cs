@@ -24,7 +24,7 @@ public class BaseUnit : MonoBehaviour
     public bool isInfantry;
     public int healthMax;
     public int healthCurrent;
-    public int type;
+    //public int type;
     public int baseDamage = 50;
     public int attackRange = 1;
     public int price = 999;

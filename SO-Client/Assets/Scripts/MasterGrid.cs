@@ -1,6 +1,39 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using MessagePack;
+
+[MessagePackObject]
+public class GameAction
+{
+    [Key(7)]
+    public short turnNumber { get; set; }
+
+    [Key(8)]
+    public short actionNumber { get; set; }
+
+    // 0 = move, 1 = attack, 2 = capture, 3 = produce
+    [Key(0)]
+    public byte actionType { get; set; }
+
+    [Key(1)]
+    public byte unitType { get; set; }
+
+    [Key(2)]
+    public byte fromLocationX { get; set; }
+
+    [Key(3)]
+    public byte fromLocationY { get; set; }
+
+    [Key(4)]
+    public byte toLocationX { get; set; }
+
+    [Key(5)]
+    public byte toLocationY { get; set; }
+
+    [Key(6)]
+    public byte playerID { get; set; }
+}
 
 public class MasterGrid : MonoBehaviour
 {
@@ -31,6 +64,9 @@ public class MasterGrid : MonoBehaviour
     public MovementSquare moveSquare;
     //public bool[,] checkedCells;
     public GameObject rangeOutlineSprite;
+
+    List<GameAction> gameActions = new List<GameAction>();
+    public short turnActionCount = 0;
 
     // Called by GameMaster
     public void startup(int x, int y, byte[] tilemapByteArray,
@@ -175,6 +211,7 @@ public class MasterGrid : MonoBehaviour
                     unit.hideCrosshairs();
                     unit.hideCombatTooltip();
                     //unit.takeDamage(getSelectedUnit().baseDamage); //expand, obviously.
+
                     unitCombat(getSelectedUnit(), unit);
                     //selectedUnit.setNonExhausted(false);
                     exhaustSelectedUnit(selectedUnit, true);
@@ -199,8 +236,43 @@ public class MasterGrid : MonoBehaviour
         }
     }
 
+
     public void unitCombat(BaseUnit attacker, BaseUnit defender)
     {
+        //0 is move
+        addGameAction(0, (byte)attacker.unitType, (byte)attacker.oldXPos, (byte)attacker.oldYPos, (byte)attacker.xPos, (byte)attacker.yPos, (byte)attacker.playerControl);
+        /*        turnActionCount++;
+                GameAction gameActionMove = new GameAction
+                {
+                    actionType = 0,
+                    unitType = (byte)attacker.unitType,
+                    fromLocationX = (byte)attacker.oldXPos,
+                    fromLocationY = (byte)attacker.oldYPos,
+                    toLocationX = (byte)attacker.xPos,
+                    toLocationY = (byte)attacker.yPos,
+                    playerID = (byte)attacker.playerControl
+                    turnNumber = gameMaster.turnNumber,
+
+                };
+                gameActions.Add(gameActionMove);*/
+
+        //1 is attack
+        addGameAction(1, (byte)attacker.unitType, (byte)attacker.xPos, (byte)attacker.yPos, (byte)defender.xPos, (byte)defender.yPos, (byte)attacker.playerControl);
+/*        GameAction gameActionAttack = new GameAction
+        {
+            actionType = 1,
+            unitType = (byte)attacker.unitType,
+            fromLocationX = (byte)attacker.xPos,
+            fromLocationY = (byte)attacker.yPos,
+            toLocationX = (byte)defender.xPos,
+            toLocationY = (byte)defender.yPos,
+            playerID = (byte)attacker.playerControl
+        };
+        gameActions.Add(gameActionAttack);*/
+
+
+
+
         double damagePreLuck = getDamageBeforeLuck(attacker, defender, false);
         double finalDamage = getDamageAfterLuck(damagePreLuck);
 
@@ -333,6 +405,7 @@ public class MasterGrid : MonoBehaviour
                 structure.captureHealth = structure.captureHealth - selectedUnit.healthCurrent;
             else
                 structure.switchAlliance(selectedUnit.getPlayerControl());
+            addGameAction(2, (byte)selectedUnit.unitType, (byte)selectedUnit.xPos, (byte)selectedUnit.yPos, (byte)structure.xPos, (byte)structure.yPos, (byte)selectedUnit.playerControl);
             exhaustSelectedUnit(selectedUnit, true);
         }
         else
@@ -962,8 +1035,8 @@ public class MasterGrid : MonoBehaviour
         for (var i = 0; i < movementSquares.Length; i++)
             Destroy(movementSquares[i]);
         drawing = false;
-        if(drawMovementUnit != null)
-            Debug.Log($"Removing unit {drawMovementUnit.GetInstanceID()} from drawMovementUnit");
+/*        if(drawMovementUnit != null)
+            Debug.Log($"Removing unit {drawMovementUnit.GetInstanceID()} from drawMovementUnit");*/
         drawMovementUnit = null;
         turnOnAllUncoveredStructureColliders();
     }
@@ -994,7 +1067,11 @@ public class MasterGrid : MonoBehaviour
                 oldStructure.resetCaptureHealth();
             }
             selectedUnit.transform.position = new Vector2(x, y); //you can't define this as a Vector2Int bc the game engine requires conversion to Vector3
-            //removeUnitInGrid((int)selectedUnit.transform.position.x, (int)selectedUnit.transform.position.y);
+
+            // if you're undoing movement, don't add it to the action list
+            if (!selectedUnit.undoingMovement)
+                addGameAction(0, (byte)selectedUnit.unitType, (byte)selectedUnit.xPos, (byte)selectedUnit.yPos, (byte)x, (byte)y, (byte)selectedUnit.playerControl);
+
             removeUnitInGrid(selectedUnit.xPos, selectedUnit.yPos);
             setUnitInGrid(x, y, selectedUnit);
 
@@ -1026,6 +1103,12 @@ public class MasterGrid : MonoBehaviour
                 selectedUnit.oldXPos = null;
                 selectedUnit.oldYPos = null;
                 exhaustSelectedUnit(selectedUnit, false);
+                if (gameActions.Count > 0 && gameActions[gameActions.Count - 1].actionNumber == turnActionCount)
+                {
+                    gameActions.RemoveAt(gameActions.Count - 1);
+                    turnActionCount--;
+                }
+
             }
 
             clearMovement();
@@ -1207,82 +1290,30 @@ public class MasterGrid : MonoBehaviour
     }
 
 
-    /*private void RecursiveDrawMovement(BaseUnit mTarget, Queue<(Vector2Int cell, int range)> cellsToCheck)
+    public void addGameAction(
+        byte actionType,
+        byte unitType,
+        byte fromLocationX,
+        byte fromLocationY,
+        byte toLocationX,
+        byte toLocationY,
+        byte playerID)
     {
-
-        int movementRange = mTarget.movementRange;
-        int attackRange = mTarget.attackRange;
-        int totalRange = movementRange + attackRange;
-        
-        //Debug.Log($"cellsToCheck size is: {cellsToCheck.Count}");
-        if (cellsToCheck.Count == 0)
+        turnActionCount++;
+        GameAction gameAction = new GameAction
         {
-            return;
-        }
+            turnNumber = gameMaster.turnNumber,
+            actionNumber = turnActionCount,
+            actionType = actionType,
+            unitType = unitType,
+            fromLocationX = fromLocationX,
+            fromLocationY = fromLocationY,
+            toLocationX = toLocationX,
+            toLocationY = toLocationY,
+            playerID = playerID
+        };
+        Debug.Log($"Adding game action {turnActionCount} of type {actionType} to the game actions list.");
+        gameActions.Add(gameAction);
+    }
 
-        var cellRangePair = cellsToCheck.Dequeue();
-        //Debug.Log($"Removed: {cellRangePair.cell} from cellsToCheck");
-
-        Vector2Int checkingCell = cellRangePair.cell;
-        int range = cellRangePair.range;
-
-        if (range == 0)
-        {
-            return;
-        }
-
-        for (int rad = 0; rad < 4; rad++)
-        {
-            Vector2Int sinDirV = sinDir(rad);
-            int xCheck = checkingCell.x + sinDirV.x;
-            int yCheck = checkingCell.y + sinDirV.y;
-
-            if (xCheck >= 0 && xCheck < gridX + 2 && yCheck >= 0 && yCheck < gridY + 2 && !checkedCells[xCheck, yCheck])
-            {
-                checkedCells[xCheck, yCheck] = true;
-
-                if (legalMove(xCheck - 1, yCheck - 1, mTarget) >= 1)
-                {
-                    if (!cellsToCheck.Contains((new Vector2Int(xCheck, yCheck), range - 1)))
-                    {
-                        cellsToCheck.Enqueue((new Vector2Int(xCheck, yCheck), range - 1));
-                        //Debug.Log($"Adding key {xCheck},{yCheck} to queue with range {range - 1}");
-                    }
-                    else
-                    {
-                        //Debug.Log($"Key {xCheck},{yCheck} already exists in Queue");
-                    }
-
-                    if (legalMove(xCheck - 1, yCheck - 1, mTarget) == 1 && range > totalRange - movementRange)
-                    {
-                        drawMoveSquare(xCheck - 1, yCheck - 1, mTarget.playerControl == getPlayerTurn());
-                    }
-                    else if (range <= totalRange - movementRange)
-                        drawDamageSquare(xCheck - 1, yCheck - 1, mTarget.playerControl == getPlayerTurn());
-
-                    BaseStructure s = whatStructureIsInThisLocation(xCheck - 1, yCheck - 1);
-                    if (s != null)
-                    {
-                        turnOffStructureCollider(s);
-                    }
-                }
-                //if it's not a legal move OR there's an allied unit there
-                //and if you're not out of bounds
-                else if ((xCheck - 1) < gridX && (xCheck - 1) >= 0 && (yCheck - 1) < gridY && (yCheck - 1) >= 0)
-                {
-                    BaseUnit unitAtLocation = whatUnitIsInThisLocation(xCheck - 1, yCheck - 1);
-                    //and the unit you're drawing movement for isn't controlled by you (active player)
-                    //OR there isn't a unit there
-                    //OR you can't attack that unit
-                    //then draw a movement square.
-                    //Ie if it's not the players turn show all the squares a unit can attack regardless of unit attack legality.
-                    if ((mTarget.playerControl != getPlayerTurn() || unitAtLocation == null || canUnitAttack(mTarget, unitAtLocation)))
-                        drawDamageSquare(xCheck - 1, yCheck - 1, mTarget.playerControl == getPlayerTurn());
-                }
-            }
-        }
-
-        // Continue the recursion
-        RecursiveDrawMovement(mTarget, cellsToCheck);
-    }*/
 }
