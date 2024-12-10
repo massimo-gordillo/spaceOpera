@@ -1,0 +1,97 @@
+const PlayFab = require("playfab-sdk/Scripts/PlayFab/PlayFab");
+const PlayFabAdmin = require("playfab-sdk/Scripts/PlayFab/PlayFabAdmin");
+
+PlayFab.settings.titleId = "YOUR_TITLE_ID";
+PlayFab.settings.developerSecretKey = "YOUR_DEVELOPER_SECRET_KEY";
+
+const fs = require('fs');
+const path = require('path');
+const express = require('express');
+const bodyParser = require('body-parser');
+
+function saveMap(map, callback) {
+    // Save the terrain array to a file
+    const filePath = path.join(__dirname, 'terrain.dat');
+    saveTerrainArrayToFile(map, filePath, (err) => {
+        if (err) {
+            return callback(err);
+        }
+
+        // Read the file as a buffer
+        fs.readFile(filePath, (err, data) => {
+            if (err) {
+                return callback(err);
+            }
+
+            // Upload the file to PlayFab
+            const request = {
+                ProfileId: "ADMIN_PROFILE_ID", // Replace with the administrator's profile ID
+                FileName: "terrain.dat",
+                FileContents: data.toString('base64')
+            };
+
+            PlayFabAdmin.AdminUploadPlayerFile(request, (error, result) => {
+                if (error) {
+                    return callback(error);
+                }
+                callback(null, result);
+            });
+        });
+    });
+}
+
+// Example usage
+const map = [
+    // Your terrain matrix here
+];
+
+saveMap(map, (err, result) => {
+    if (err) {
+        console.error("Error saving map:", err);
+    } else {
+        console.log("Map saved successfully:", result);
+    }
+});
+const app = express();
+
+app.use(bodyParser.json());
+
+app.post('/uploadMap', (req, res) => {
+    const map = req.body.map;
+    const mapName = req.body.mapName;
+
+    if (!map || !mapName) {
+        return res.status(400).send('Map data and map name are required.');
+    }
+
+    const filePath = path.join(__dirname, `${mapName}.dat`);
+    saveTerrainArrayToFile(map, filePath, (err) => {
+        if (err) {
+            return res.status(500).send('Error saving terrain array to file.');
+        }
+
+        fs.readFile(filePath, (err, data) => {
+            if (err) {
+                return res.status(500).send('Error reading terrain file.');
+            }
+
+            const request = {
+                ProfileId: "ADMIN_PROFILE_ID", // Replace with the administrator's profile ID
+                FileName: `${mapName}.dat`,
+                FileContents: data.toString('base64')
+            };
+
+            PlayFabAdmin.AdminUploadPlayerFile(request, (error, result) => {
+                if (error) {
+                    return res.status(500).send('Error uploading file to PlayFab.');
+                }
+                res.status(200).send('Map uploaded successfully.');
+            });
+        });
+    });
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+});
