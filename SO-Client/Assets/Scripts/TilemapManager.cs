@@ -26,7 +26,6 @@ public class TilemapManager : MonoBehaviour
     public int gridTrimOffset;
     public int gridWidthWithTrim;
     public int gridHeightWithTrim;
-
     private string mapFileLocation;
 
     //private string tilemapFilePath;
@@ -54,7 +53,7 @@ public class TilemapManager : MonoBehaviour
 
         //uncomment the appropriate function for testing.
 
-        //TilemapData byteData = ExportTilemapToBytes(bounds, deltaFromZero);
+        //TilemapData byteData = ExportTilemapToBytes();
         //ImportTilemapFromBytes(byteData);
 
         //SaveTilemapToFile("Map3Tilemap.dat");
@@ -134,8 +133,9 @@ public class TilemapManager : MonoBehaviour
         }
     }
 
-    public TilemapData ExportTilemapToBytes(Vector2Int bounds, Vector2Int delta)
+    public TilemapData ExportTilemapToBytes()
     {
+        (Vector2Int bounds, Vector2Int deltaFromZero) = GetTilemapBounds();
         int width = bounds.x;// + delta.x;
         int height = bounds.y;// + delta.y;
         byte[] tilemapByteArray = new byte[width * height];
@@ -292,7 +292,7 @@ public class TilemapManager : MonoBehaviour
     {
         if (tilemapByteArray == null || tilemapByteArray.Length == 0)
         {
-            TilemapData data = ExportTilemapToBytes(new Vector2Int(gridWidth, gridHeight), Vector2Int.zero);
+            TilemapData data = ExportTilemapToBytes();
             if (data == null || data.TileBytes.Length == 0)
             {
                 Debug.LogWarning("Tilemap byte array is null or empty. Returning null.");
@@ -328,7 +328,7 @@ public class TilemapManager : MonoBehaviour
         //byte[] byteData = MessagePackSerializer.Deserialize<byte[]>(ExportTilemapToBytes(new Vector2Int(gridWidth, gridHeight), Vector2Int.zero));
 
 
-        TilemapData dataFile = ExportTilemapToBytes(new Vector2Int(gridWidth, gridHeight), Vector2Int.zero);
+        TilemapData dataFile = ExportTilemapToBytes();
 
         // Write the serialized data to a file
         File.WriteAllBytes(filePath, TilemapData.Serialize(dataFile));
