@@ -4,16 +4,54 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Networking;
 using MessagePack;
+using System.Collections;
+using System.Collections.Generic;
 
-public class SupabaseManager
+public class SupabaseManager : MonoBehaviour
 {
-    private readonly string _supabaseUrl;
-    private readonly string _supabaseKey;
+    private readonly string _supabaseUrl = "SUPABASE_SERVER_URL";
 
-    public SupabaseManager(string supabaseUrl, string supabaseKey)
+    private readonly string _supabaseKey = "SUPABASE_SERVER_KEY";
+
+/*    public SupabaseManager(string supabaseUrl, string supabaseKey)
     {
         _supabaseUrl = supabaseUrl;
         _supabaseKey = supabaseKey;
+    }*/
+
+    private void Start()
+    {
+        StartCoroutine(CallHelloWorldFunction());
+    }
+
+    private IEnumerator CallHelloWorldFunction()
+    {
+        // The URL for the edge function
+        string functionUrl = $"{_supabaseUrl}/functions/hello-world";
+
+        // Set up the web request
+        UnityWebRequest request = new UnityWebRequest(functionUrl, "GET");
+        request.downloadHandler = new DownloadHandlerBuffer();
+
+        // Add the Supabase key to the header
+        request.SetRequestHeader("apikey", _supabaseKey);
+        request.SetRequestHeader("Authorization", $"Bearer {_supabaseKey}");
+
+        Debug.Log($"Function URL: {functionUrl}");
+        Debug.Log($"Headers: apikey={_supabaseKey}");
+
+        // Send the request
+        yield return request.SendWebRequest();
+
+        // Handle the response
+        if (request.result == UnityWebRequest.Result.Success)
+        {
+            Debug.Log($"Success: {request.downloadHandler.text}");
+        }
+        else
+        {
+            Debug.LogError($"Error: {request.error}");
+        }
     }
 
     public async Task SaveMapToServer(object mapObject, string mapName, int width, int height)

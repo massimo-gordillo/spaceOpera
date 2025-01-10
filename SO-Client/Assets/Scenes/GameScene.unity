@@ -4458,7 +4458,6 @@ MonoBehaviour:
   gridTrimOffset: 0
   gridWidthWithTrim: 0
   gridHeightWithTrim: 0
-  playFabManager: {fileID: 1718293607}
 --- !u!1001 &1012535649
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -10828,8 +10827,9 @@ GameObject:
   m_Component:
   - component: {fileID: 1718293606}
   - component: {fileID: 1718293607}
+  - component: {fileID: 1718293608}
   m_Layer: 0
-  m_Name: PlayFab init
+  m_Name: Server init
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -10857,9 +10857,21 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1718293605}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e8deaf8ba53d69741b49d8c753ff09d8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1718293608
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1718293605}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cbed1db3716e56646b7283a83792b8cb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &1719835402
