@@ -2,6 +2,7 @@ using System;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.Networking;
 using MessagePack;
 using System.Collections;
@@ -14,8 +15,15 @@ public class SupabaseManager : MonoBehaviour
     public TMP_Text serverResponseOutputViewer;
     public GameMaster _gameMaster;
 
+    public Button loginButton;
+    //public TMP_Text loginButtonText;
+    public Button executeFunctionButton;
+
+
     private protected string _supabaseUrl;
     private protected string _supabaseAnonKey;
+    [SerializeField] private TMP_InputField emailInput;
+    [SerializeField] private TMP_InputField passwordInput;
 
     //private readonly string _supabaseLocalUrl = 127.0.0.1;
 
@@ -40,15 +48,51 @@ public class SupabaseManager : MonoBehaviour
             _supabaseUrl = "SUPABASE_LOCAL_URL";
             _supabaseKey = "SUPABASE_LOCAL_KEY";
         }*/
-        _supabaseUrl = "127.0.0.1";
+        _supabaseUrl = "http://127.0.0.1:54321";
         _supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0";
-
+        loginButton.onClick.AddListener(HandleLogin);
+        executeFunctionButton.onClick.AddListener(HandleHelloWorld);
+        executeFunctionButton.interactable = false;
 
     }
 
-    public void CallHelloWorldFunctionButton()
+    public async void HandleLogin()
     {
-        String result = await CallHelloWorldBOLT();
+        loginButton.interactable = false;
+        serverResponseOutputViewer.text = "Logging in...";
+
+        var success = await SupabaseClient.Instance.SignInWithEmail(
+            emailInput.text,
+            passwordInput.text
+        );
+
+        if (success)
+        {
+            serverResponseOutputViewer.text = "Login successful!";
+            Debug.Log("Login successful!");
+            executeFunctionButton.interactable = true;
+        }
+        else
+        {
+            serverResponseOutputViewer.text = "Login failed!";
+            loginButton.interactable = true;
+        }
+    }
+
+    private async void HandleHelloWorld()
+    {
+        executeFunctionButton.interactable = false;
+        serverResponseOutputViewer.text = "Calling Hello World...";
+
+        var response = await SupabaseClient.Instance.CallHelloWorld();
+        serverResponseOutputViewer.text = response;
+        Debug.Log(response);
+        executeFunctionButton.interactable = true;
+    }
+
+    public async void CallHelloWorldFunctionButton()
+    {
+        string result = await CallHelloWorldBOLT();
     }
 
     public async Task<string> CallHelloWorldBOLT()
@@ -58,6 +102,7 @@ public class SupabaseManager : MonoBehaviour
             request.downloadHandler = new DownloadHandlerBuffer();
             request.SetRequestHeader("apikey", _supabaseAnonKey);
             request.SetRequestHeader("Content-Type", "application/json");
+
 
             var operation = request.SendWebRequest();
             while (!operation.isDone)
