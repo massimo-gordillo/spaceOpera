@@ -83,3 +83,4 @@ Dark Colour:    115,115,115,1   #737373
 
 massimogordillo@hotmail.com
 
+I'm building a 2D asynchronous Unity strategy game with Supabase as my backend service. I'm currently able to send map data to the db and want to be able to retrieve that data via http request. I have a maps table and want to receive width, height and grid_data columns. Write me a serverside .js function which will receive this request and send back this data.

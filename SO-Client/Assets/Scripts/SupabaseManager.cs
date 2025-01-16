@@ -168,18 +168,10 @@ public class SupabaseManager : MonoBehaviour
         }
 
 
-        /*        // Prepare the payload
-        var payload = new
-        {
-            name = mapName,
-            data = serializedMapData,
-            width = width,
-            height = height,
-            init_piece_data = serializedPieceData,
-            compression_method = 0.01
-        };*/
 
-        var payload = new JSONPayloadSendMapData(serializedMapData, serializedPieceData);
+
+        var payload = new JSONPayloadSendMapData(mapName, serializedMapData, width, height, serializedPieceData);
+        //var payload = new JSONPayloadSendMapData(serializedMapData, serializedPieceData);
 
         string jsonPayload = JsonUtility.ToJson(payload);
         Debug.Log("JSON Payload: " + jsonPayload); // Debug log for payload

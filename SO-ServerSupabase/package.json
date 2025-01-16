@@ -1,7 +1,7 @@
 {
   "dependencies": {
     "@supabase/functions-js": "^2.4.4",
-    "@supabase/supabase-js": "^2.47.10"
+    "@supabase/supabase-js": "^2.47.15"
   },
   "devDependencies": {
     "supabase": "^2.2.1"
