@@ -336,13 +336,13 @@ public class GameMaster : MonoBehaviour
                 if (unit != null)
                 {
                     GamePieceInfo info = new GamePieceInfo
-                    {
-                        x = (byte)x,
-                        y = (byte)y,
-                        typeNum = unit.baseUnitVariantIdentifier,
-                        playerID = (byte)unit.playerControl,
-                        healthVal = (byte)((double)unit.healthCurrent / (double)unit.healthMax * 100)
-                    };
+                    (
+                        (byte)x,
+                        (byte)y,
+                        unit.baseUnitVariantIdentifier,
+                        (byte)unit.playerControl,
+                        (byte)((double)unit.healthCurrent / (double)unit.healthMax * 100)
+                    );
                     Debug.Log($"Added baseUnit to GameStateList x: {info.x}, y: {info.y}, bytenum: {info.typeNum}, health: {info.healthVal}");
                     gameStateList.Add(info);
                 }
@@ -350,14 +350,13 @@ public class GameMaster : MonoBehaviour
                 BaseStructure structure = masterGrid.whatStructureIsInThisLocation(x, y);
                 if (structure != null)
                 {
-                    GamePieceInfo info = new GamePieceInfo
-                    {
-                        x = (byte)x,
-                        y = (byte)y,
-                        typeNum = (byte)(200 + structure.structureType),
-                        playerID = (byte)structure.playerControl,
-                        healthVal = (byte)structure.captureHealth
-                    };
+                    GamePieceInfo info = new GamePieceInfo(
+                        (byte)x,
+                        (byte)y,
+                        (byte)(200 + structure.structureType),
+                        (byte)structure.playerControl,
+                        (byte)structure.captureHealth
+                    );
                     gameStateList.Add(info);
                 }
             }

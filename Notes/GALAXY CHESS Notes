@@ -61,6 +61,10 @@ fixed BUG #3: Can't consistently click on production structures
 Bug #4: Capturing infantry cannot unselect
 Bug #5: Undo unit movement makes it unselectable    
 
+TO DO, DON'T FORGET:
+Turn on Email Auth for Supabase
+Debug tilemap exportBytesToFile and importFileToBytes. I modified the serialization so I need to confirm it's not broken. For later.
+
 
 
 ART NOTES:
@@ -75,4 +79,7 @@ Dark Grey:      46,46,46,1      #2e2e2e
 Light Colour:   255,255,255,1   #ffffff
 Med Colour:     157,157,157,1   #9d9d9d
 Dark Colour:    115,115,115,1   #737373
+
+
+massimogordillo@hotmail.com
 

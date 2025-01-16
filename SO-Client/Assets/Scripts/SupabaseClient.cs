@@ -79,34 +79,7 @@ public class SupabaseClient
         }
     }
 
-    public async Task<T> SendRequestAsyncGPT<T>(string endpoint, HttpMethod method, object payload)
-    {
-        try
-        {
-            endpoint = _supabaseUrl + endpoint;
-            var request = new HttpRequestMessage(method, endpoint);
-
-            if (payload != null)
-            {
-                string jsonPayload = JsonConvert.SerializeObject(payload);
-                request.Content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
-            }
-
-            var response = await _httpClient.SendAsync(request);
-
-            response.EnsureSuccessStatusCode();
-
-            string responseBody = await response.Content.ReadAsStringAsync();
-            return JsonConvert.DeserializeObject<T>(responseBody);
-        }
-        catch (Exception ex)
-        {
-            Debug.LogError($"Request error: {ex.Message}");
-            return default;
-        }
-    }
-
-    public async Task<T> SendRequestGenericBOLT<T>(string endpoint, HttpMethod method, object data = null)
+    public async Task<T> SendRequest<T>(string endpoint, HttpMethod method, object data = null)
     {
         try
         {
@@ -160,7 +133,7 @@ public class SupabaseClient
 
 
 
-    public async Task<string> CallHelloWorld()
+/*    public async Task<string> CallHelloWorld()
     {
         //_httpClient.DefaultRequestHeaders.Add("Content-Type", "application/json");
         try
@@ -196,5 +169,5 @@ public class SupabaseClient
             return $"Error: {ex.Message}";
         }
     
-    }
+    }*/
 }

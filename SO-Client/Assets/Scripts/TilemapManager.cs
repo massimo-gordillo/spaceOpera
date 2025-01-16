@@ -148,20 +148,6 @@ public class TilemapManager : MonoBehaviour
             {
                 Vector3Int pos = new Vector3Int(x, y, 0);
                 TileBase tile = tilemap.GetTile(pos); //this is a built in tilemap function
-                /*foreach (var kvp in tileNameToByteDictionary)
-                {
-                    TileBase t = kvp.Key;
-                    byte b = kvp.Value;
-                    Debug.Log($"HELLO WORLD ITS ME I WAS WONDERING IF YOU Loaded tile {t} from tileNameToByteDictionary with bytevalue {b}");
-                    Debug.Log($"tile t has type: {t.GetType()}, tile from TileMap has type {tile.GetType()}");
-
-                    if (tile == t)
-                        Debug.Log("They're the same picture");
-                }*/
-                /*Debug.Log($"checking location {x},{y} for a tile");
-                Debug.Log($"What is tile: {tile.name} and am I getting anything out of the dictionary: { tileNameToByteDictionary.TryGetValue(tile.name, out byte tileByteTest)}");
-                Debug.Log($"What is tile with name: {tile.name} and gameID {tile.GetInstanceID()} at location {x},{y}");
-                */
                 if (tile != null && tileNameToByteDictionary.TryGetValue(tile.name, out byte tileByte))
                 {
                     tilemapByteArray[y * width + x] = tileByte;
@@ -176,12 +162,6 @@ public class TilemapManager : MonoBehaviour
             }
             //Debug.Log(debug);
         }
-        //Debug.Log($"Tilemap exported to byte array with size {tilemapByteArray.Length}.");
-        //byte[] debugByteArray = MessagePackSerializer.Serialize(tilemapByteArray);
-        //Debug.Log($"Debug byte array size: {debugByteArray.Length}");
-
-        //TilemapData tilemapData = new TilemapData(width, height, tilemapByteArray);
-        //return tilemapData;
         return new TilemapData(width, height, tilemapByteArray);
     }
 
@@ -332,6 +312,9 @@ public class TilemapManager : MonoBehaviour
 
         // Write the serialized data to a file
         File.WriteAllBytes(filePath, TilemapData.Serialize(dataFile));
+
+        //Messagepack implementation
+        //File.WriteAllBytes(filePath, TilemapData.SerializeMP(dataFile));
         Debug.Log($"Tilemap saved to file: {filePath}");
     }
 
@@ -354,8 +337,10 @@ public class TilemapManager : MonoBehaviour
             //byte[] serializedTilemapData = File.ReadAllBytes(filePath);
 
             // Pass the serialized data to ImportTilemapFromBytes
-            //ImportTilemapFromBytes(TilemapData.Deserialize(serializedTilemapData));
             ImportTilemapFromBytes(TilemapData.Deserialize(File.ReadAllBytes(filePath)));
+
+            //MessagePack implementation
+            //ImportTilemapFromBytes(TilemapData.DeserializeMP(File.ReadAllBytes(filePath)));
         }
         else
         {

@@ -39,10 +39,10 @@ Deno.serve(async (req) => {
       );
     }
 
-    const { name, data, width, height, compression_method} = parsedBody;
+    const { name, grid_data, width, height, init_piece_data, compression_method} = parsedBody;
 
-    if (!name || !data || !width || !height || width <= 0 || height <= 0 || compression_method <= 0) {
-      log("Invalid input data:", { name, data, width, height, compression_method});
+    if (!name || !grid_data || !width || !height || width <= 0 || height <= 0 || !init_piece_data || compression_method <= 0) {
+      log("Invalid input data:", { name, grid_data, width, height, init_piece_data, compression_method});
       return new Response(
         JSON.stringify({ error: "Invalid input", logs }),
         { status: 400, headers: { "Content-Type": "application/json" } }
@@ -71,7 +71,7 @@ Deno.serve(async (req) => {
         apikey: SUPABASE_KEY,
         Authorization: `Bearer ${SUPABASE_KEY}`,
       },
-      body: JSON.stringify({ name, data, width, height, compression_method}),
+      body: JSON.stringify({ name, grid_data, width, height, init_piece_data, compression_method}),
     });
 
     log("Supabase response status:", supabaseResponse.status);
