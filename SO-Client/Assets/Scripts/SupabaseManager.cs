@@ -8,11 +8,14 @@ using MessagePack;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using System.Net.Http;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 public class SupabaseManager : MonoBehaviour
 {
     public TilemapManager _tilemapManager;
-    public TMP_Text serverResponseOutputViewer;
+    public TextMeshProUGUI serverResponseOutputViewer;
     public GameMaster _gameMaster;
 
     public Button loginButton;
@@ -24,6 +27,8 @@ public class SupabaseManager : MonoBehaviour
     private protected string _supabaseAnonKey;
     [SerializeField] private TMP_InputField emailInput;
     [SerializeField] private TMP_InputField passwordInput;
+
+    //SupabaseClient supabaseClient = new SupabaseClient();
 
     //private readonly string _supabaseLocalUrl = 127.0.0.1;
 
@@ -52,14 +57,14 @@ public class SupabaseManager : MonoBehaviour
         _supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0";
         loginButton.onClick.AddListener(HandleLogin);
         executeFunctionButton.onClick.AddListener(HandleHelloWorld);
-        executeFunctionButton.interactable = false;
+        executeFunctionButton.interactable = true;
 
     }
 
     public async void HandleLogin()
     {
         loginButton.interactable = false;
-        serverResponseOutputViewer.text = "Logging in...";
+        serverResponseOutputViewer.text += "\nLogging in...";
 
         var success = await SupabaseClient.Instance.SignInWithEmail(
             emailInput.text,
@@ -68,13 +73,13 @@ public class SupabaseManager : MonoBehaviour
 
         if (success)
         {
-            serverResponseOutputViewer.text = "Login successful!";
+            serverResponseOutputViewer.text += "\nLogin successful!";
             Debug.Log("Login successful!");
             executeFunctionButton.interactable = true;
         }
         else
         {
-            serverResponseOutputViewer.text = "Login failed!";
+            serverResponseOutputViewer.text += "\nLogin failed!";
             loginButton.interactable = true;
         }
     }
@@ -84,109 +89,31 @@ public class SupabaseManager : MonoBehaviour
         executeFunctionButton.interactable = false;
         serverResponseOutputViewer.text = "Calling Hello World...";
 
-        var response = await SupabaseClient.Instance.CallHelloWorld();
-        serverResponseOutputViewer.text = response;
-        Debug.Log(response);
-        executeFunctionButton.interactable = true;
-    }
-
-    public async void CallHelloWorldFunctionButton()
-    {
-        string result = await CallHelloWorldBOLT();
-    }
-
-    public async Task<string> CallHelloWorldBOLT()
-    {
-        using (UnityWebRequest request = new UnityWebRequest($"{_supabaseUrl}/functions/v1/hello-world2", "POST"))
+        try
         {
-            request.downloadHandler = new DownloadHandlerBuffer();
-            request.SetRequestHeader("apikey", _supabaseAnonKey);
-            request.SetRequestHeader("Content-Type", "application/json");
+            var payload = new { name = "Functions" };
 
+            var response = await SupabaseClient.Instance.SendRequestGenericBOLT<string>(
+                "/functions/v1/hello-world2",
+                HttpMethod.Post,
+                payload
+            );
 
-            var operation = request.SendWebRequest();
-            while (!operation.isDone)
-                await Task.Yield();
-
-            if (request.result == UnityWebRequest.Result.Success)
-            {
-                return request.downloadHandler.text;
-            }
-            else
-            {
-                Debug.LogError($"Error: {request.error}");
-                return $"Error: {request.error}";
-            }
+            serverResponseOutputViewer.text = response;
         }
-    }
-
-    private IEnumerator CallHelloWorldFunctionCHATGPT()
-    {
-        // The URL for the edge function
-        string functionUrl = $"{_supabaseUrl}/functions/v1/hello-world2";
-
-        // Create the JSON data you want to send in the body
-        string jsonData = "{\"name\":\"Functions\"}";
-
-        // Create a UnityWebRequest for POST
-        UnityWebRequest request = new UnityWebRequest(functionUrl, "POST");
-
-        // Set the body and content type
-        byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(jsonData);
-        request.uploadHandler = new UploadHandlerRaw(bodyRaw);
-        request.downloadHandler = new DownloadHandlerBuffer();
-
-        // Set request headers
-        request.SetRequestHeader("Authorization", $"Bearer {_supabaseAnonKey}");
-        request.SetRequestHeader("Content-Type", "application/json");
-
-        Debug.Log($"Function URL: {functionUrl}");
-        Debug.Log($"Headers: Authorization=Bearer {_supabaseAnonKey}");
-
-        // Send the request
-        yield return request.SendWebRequest();
-
-        // Handle the response
-        if (request.result == UnityWebRequest.Result.Success)
+        catch (System.Exception ex)
         {
-            Debug.Log($"Success: {request.downloadHandler.text}");
+            serverResponseOutputViewer.text = $"Error: {ex.Message}";
         }
-        else
+        finally
         {
-            Debug.LogError($"Error: {request.error}");
+            executeFunctionButton.interactable = true;
         }
     }
 
 
-    /* private IEnumerator CallHelloWorldFunction()
-     {
-         // The URL for the edge function
-         string functionUrl = $"{_supabaseUrl}/functions/v1/hello-world2";
 
-         // Set up the web request
-         UnityWebRequest request = new UnityWebRequest(functionUrl, "GET");
-         request.downloadHandler = new DownloadHandlerBuffer();
 
-         // Add the Supabase key to the header
-         request.SetRequestHeader("apikey", _supabaseKey);
-         request.SetRequestHeader("Authorization", $"Bearer {_supabaseKey}");
-
-         Debug.Log($"Function URL: {functionUrl}");
-         Debug.Log($"Headers: apikey={_supabaseKey}");
-
-         // Send the request
-         yield return request.SendWebRequest();
-
-         // Handle the response
-         if (request.result == UnityWebRequest.Result.Success)
-         {
-             Debug.Log($"Success: {request.downloadHandler.text}");
-         }
-         else
-         {
-             Debug.LogError($"Error: {request.error}");
-         }
-     }*/
 
     public void sendCurrentMapToServer()
     {
@@ -236,7 +163,8 @@ public class SupabaseManager : MonoBehaviour
             data = Convert.ToBase64String(serializedMapData),
             width = width,
             height = height,
-            init_piece_data = Convert.ToBase64String(serializedPieceData)
+            init_piece_data = Convert.ToBase64String(serializedPieceData),
+            compression_method = 0.01
         };
         string jsonPayload = JsonUtility.ToJson(payload);
 

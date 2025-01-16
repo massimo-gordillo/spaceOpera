@@ -6,6 +6,7 @@ using UnityEngine;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
+
 public class SupabaseClient
 {
     private static SupabaseClient _instance;
@@ -14,7 +15,7 @@ public class SupabaseClient
 
     private protected string _supabaseUrl = "http://127.0.0.1:54321";
     private protected string _supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0";
-        
+
 
     public static SupabaseClient Instance
     {
@@ -62,8 +63,8 @@ public class SupabaseClient
                 _accessToken = json["access_token"].ToString();
                 Debug.Log($"Access token: {_accessToken}");
                 _httpClient.DefaultRequestHeaders.Remove("Authorization");
-                _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {_accessToken}");
-                //_httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {_supabaseAnonKey}");
+                //_httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {_accessToken}");
+                _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {_supabaseAnonKey}");
 
                 return true;
             }
@@ -77,6 +78,87 @@ public class SupabaseClient
             return false;
         }
     }
+
+    public async Task<T> SendRequestAsyncGPT<T>(string endpoint, HttpMethod method, object payload)
+    {
+        try
+        {
+            endpoint = _supabaseUrl + endpoint;
+            var request = new HttpRequestMessage(method, endpoint);
+
+            if (payload != null)
+            {
+                string jsonPayload = JsonConvert.SerializeObject(payload);
+                request.Content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
+            }
+
+            var response = await _httpClient.SendAsync(request);
+
+            response.EnsureSuccessStatusCode();
+
+            string responseBody = await response.Content.ReadAsStringAsync();
+            return JsonConvert.DeserializeObject<T>(responseBody);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"Request error: {ex.Message}");
+            return default;
+        }
+    }
+
+    public async Task<T> SendRequestGenericBOLT<T>(string endpoint, HttpMethod method, object data = null)
+    {
+        try
+        {
+            using (var request = new HttpRequestMessage(method, endpoint))
+            {
+                // Add Authorization header
+                request.Headers.Add("Authorization",
+                    _accessToken != null ? $"Bearer {_accessToken}" : $"Bearer {_supabaseAnonKey}");
+
+                // Serialize data if provided
+                if (data != null)
+                {
+                    if (data is HttpContent content)
+                    {
+                        request.Content = content; // Use provided HttpContent directly
+                    }
+                    else
+                    {
+                        var json = JsonConvert.SerializeObject(data);
+                        request.Content = new StringContent(json, Encoding.UTF8, "application/json");
+                    }
+                }
+
+                // Send the request and handle response
+                var response = await _httpClient.SendAsync(request);
+                var responseBody = await response.Content.ReadAsStringAsync();
+
+                Debug.Log($"Response Body: {responseBody}"); // Log the response body
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    Debug.LogError($"Request failed: {responseBody}");
+                    throw new Exception($"Request failed: {response.StatusCode}");
+                }
+
+                // Handle plain text responses
+                if (typeof(T) == typeof(string))
+                {
+                    return (T)(object)responseBody;
+                }
+
+                return JsonConvert.DeserializeObject<T>(responseBody);
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"Request error: {ex.Message}");
+            throw;
+        }
+    }
+
+
 
     public async Task<string> CallHelloWorld()
     {
@@ -113,5 +195,6 @@ public class SupabaseClient
             Debug.LogError($"Hello World call error: {ex.Message}");
             return $"Error: {ex.Message}";
         }
+    
     }
 }
