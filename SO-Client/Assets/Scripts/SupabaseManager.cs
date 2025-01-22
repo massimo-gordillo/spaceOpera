@@ -23,8 +23,11 @@ public class SupabaseManager : MonoBehaviour
     public Button executeFunctionButton;
 
 
-    private readonly string _supabaseUrl = "http://127.0.0.1:54321";
-    private readonly string _supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0";
+    //private readonly string _supabaseUrl = "http://127.0.0.1:54321";
+    private readonly string _supabaseUrl = "https://ezmafonauvkpalwjpaer.supabase.co";
+    private readonly string _supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV6bWFmb25hdXZrcGFsd2pwYWVyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzYxMDE5NjUsImV4cCI6MjA1MTY3Nzk2NX0.i3E8rSHoMV1ThEWctZNU25oV_DfTjBu_jsQXQZiLO0s";
+
+    //private readonly string _supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0";
     [SerializeField] private TMP_InputField emailInput;
     [SerializeField] private TMP_InputField passwordInput;
 
@@ -37,7 +40,8 @@ public class SupabaseManager : MonoBehaviour
         
         
         loginButton.onClick.AddListener(HandleLogin);
-        executeFunctionButton.onClick.AddListener(sendCurrentMapToServer);
+        //executeFunctionButton.onClick.AddListener(SendCurrentMapToServer);
+        executeFunctionButton.onClick.AddListener(HandleRetrieveInitialStateFromServer);
         executeFunctionButton.interactable = true;
 
     }
@@ -92,11 +96,7 @@ public class SupabaseManager : MonoBehaviour
         }
     }
 
-
-
-
-
-    public async void sendCurrentMapToServer()  // Change to async Task for better error handling and await usage
+    public async void SendCurrentMapToServer()  // Change to async Task for better error handling and await usage
     {
         try
         {
@@ -114,33 +114,115 @@ public class SupabaseManager : MonoBehaviour
         }
     }
 
+    public async Task SaveGameInitialStateToServer(TilemapData mapObject, string mapName, List<GamePieceInfo> initPieceData)
+    {
+        if (mapObject.Width <= 0 || mapObject.Height <= 0)
+        {
+            Debug.LogError("Width and height must be greater than 0.");
+            return;
+        }
 
-    public async Task SaveGameInitialStateToServer(TilemapData mapObject, string mapName, List<GamePieceInfo> init_piece_data)
+        // Serialize map data to JSON
+        string serializedMapData;
+        try
+        {
+            serializedMapData = JsonUtility.ToJson(mapObject);
+            Debug.Log("Serialized map data: " + serializedMapData);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"Error serializing map data: {ex.Message}");
+            return;
+        }
+
+        // Serialize initial piece data to JSON
+        string serializedPieceData;
+        try
+        {
+            GamePieceList gamePieceList = new GamePieceList(initPieceData);
+            serializedPieceData = JsonUtility.ToJson(gamePieceList);
+            Debug.Log("Serialized piece data: " + serializedPieceData);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"Error serializing piece data: {ex.Message}");
+            return;
+        }
+
+        // Construct JSON payload
+        var payload = new
+        {
+            map_name = mapName,
+            grid_data = serializedMapData,
+            width = mapObject.Width,
+            height = mapObject.Height,
+            init_piece_data = serializedPieceData,
+            compression_method = 0.01
+    };
+
+        string jsonPayload;
+        try
+        {
+            jsonPayload = JsonConvert.SerializeObject(payload);
+            Debug.Log("JSON Payload: " + jsonPayload);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"Error creating JSON payload: {ex.Message}");
+            return;
+        }
+
+        // Send payload to server
+        string url = $"{_supabaseUrl}/rest/v1/maps";
+        using UnityWebRequest request = new UnityWebRequest(url, "POST")
+        {
+            uploadHandler = new UploadHandlerRaw(Encoding.UTF8.GetBytes(jsonPayload)),
+            downloadHandler = new DownloadHandlerBuffer(),
+            method = UnityWebRequest.kHttpVerbPOST
+        };
+
+        request.SetRequestHeader("Content-Type", "application/json");
+        request.SetRequestHeader("apikey", _supabaseAnonKey);
+
+        try
+        {
+            var operation = request.SendWebRequest();
+            while (!operation.isDone)
+            {
+                await Task.Yield();
+            }
+
+            if (request.result == UnityWebRequest.Result.Success)
+            {
+                Debug.Log($"Map saved successfully: {request.downloadHandler.text}");
+            }
+            else
+            {
+                Debug.LogError($"Error saving map: {request.error}\nResponse: {request.downloadHandler.text}");
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"Exception occurred while saving map: {ex.Message}");
+        }
+    }
+
+
+    //for sending data in bytea format
+    /*public async Task SaveGameInitialStateToServer(TilemapData mapObject, string mapName, List<GamePieceInfo> init_piece_data)
     {
         int width = mapObject.Width;
         int height = mapObject.Height;
-
-        //string init_piece_data_base64 = SerializeGamePieceInfoListToBase64(init_piece_data);
-/*
-        List<string> base64PieceList = new List<string>();
-
-        foreach (var piece in init_piece_data)
-        {
-            base64PieceList.Add(piece.ToBase64String());
-        }*/
-
         GamePieceList gamePieceList = new GamePieceList(init_piece_data);
-
-        Debug.Log($"mapObject: {mapObject.TileBytesBase64}");
+        *//*Debug.Log($"mapObject: {mapObject.TileBytesBase64}");
         Debug.Log($"init_piece_data: {gamePieceList}");
-        Debug.Log($"mapName: {mapName}, width: {width}, height: {height}");
+        Debug.Log($"mapName: {mapName}, width: {width}, height: {height}");*//*
 
         if (width <= 0 || height <= 0)
         {
             Debug.LogError("Width and height must be greater than 0.");
             return;
         }
-
         // Serialize the map object to JSON
         string serializedMapData;
         try
@@ -166,18 +248,14 @@ public class SupabaseManager : MonoBehaviour
             Debug.LogError($"Error serializing game piece data: {ex.Message}");
             return;
         }
-
-
-
-
+        //create JSON payload
         var payload = new JSONPayloadSendMapData(mapName, serializedMapData, width, height, serializedPieceData);
-        //var payload = new JSONPayloadSendMapData(serializedMapData, serializedPieceData);
-
         string jsonPayload = JsonUtility.ToJson(payload);
-        Debug.Log("JSON Payload: " + jsonPayload); // Debug log for payload
+        Debug.Log("JSON Payload: " + jsonPayload); 
 
         // Construct the request
-        string url = $"{_supabaseUrl}/functions/v1/save-map";
+        string url = $"{_supabaseUrl}/rest/v1/maps";
+        //string url = $"{_supabaseUrl}/functions/v1/save-map";
         using UnityWebRequest request = new UnityWebRequest(url, "POST");
         request.SetRequestHeader("Content-Type", "application/json");
         request.SetRequestHeader("apikey", _supabaseAnonKey);
@@ -194,8 +272,9 @@ public class SupabaseManager : MonoBehaviour
 
             if (request.result == UnityWebRequest.Result.Success)
             {
-                Debug.Log("Map saved successfully.");
+                //Debug.Log("Map saved successfully.");
                 serverResponseOutputViewer.text = $"Map saved successfully: \n Response:{request.downloadHandler.text}";
+                Debug.Log($"Map saved successfully: \n Response:\n{request.downloadHandler.text}");
             }
             else
             {
@@ -208,7 +287,155 @@ public class SupabaseManager : MonoBehaviour
             Debug.LogError($"Exception occurred while saving map: {ex.Message}");
             serverResponseOutputViewer.text = $"Client: Exception occurred while saving map: {ex.Message}";
         }
+    }*/
+
+    public async void HandleRetrieveInitialStateFromServer()
+    {
+        try
+        {
+            // Directly await the RetrieveGameInitialStateFromServer method
+            await RetrieveGameInitialStateFromServer("testMap3");
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"Error retrieving map from server: {ex.Message}");
+            serverResponseOutputViewer.text = $"Error retrieving map from server: {ex.Message}";
+        }
     }
+
+    /*public async Task RetrieveGameInitialStateFromServer(string mapName)
+    {
+        // Construct the request
+        string url = $"{_supabaseUrl}/rest/v1/maps";
+        using UnityWebRequest request = new UnityWebRequest(url, "GET");
+        request.SetRequestHeader("Content-Type", "application/json");
+        request.SetRequestHeader("apikey", _supabaseAnonKey);
+        request.uploadHandler = new UploadHandlerRaw(Encoding.UTF8.GetBytes($"{{\"mapName\":\"{mapName}\"}}"));
+        request.downloadHandler = new DownloadHandlerBuffer();
+
+        try
+        {
+            var operation = request.SendWebRequest();
+            while (!operation.isDone)
+            {
+                await Task.Yield();
+            }
+
+            if (request.result == UnityWebRequest.Result.Success)
+            {
+                Debug.Log("Map retrieved successfully.");
+                serverResponseOutputViewer.text = $"Map retrieved successfully: \n Response:{request.downloadHandler.text}";
+
+                // Deserialize the response using JObject
+                JObject response = JObject.Parse(request.downloadHandler.text);
+                string mapData = response["grid_data"]?.ToString();
+                string pieceData = response["init_piece_data"]?.ToString();
+
+                TilemapData mapObject = JsonUtility.FromJson<TilemapData>(mapData);
+                GamePieceList gamePieceList = JsonUtility.FromJson<GamePieceList>(pieceData);
+
+                Debug.Log($"mapObject and gamepiecelist deserialized:\n ${mapObject}\n%%%%\n ${gamePieceList}");
+                // Import the map object
+                //_tilemapManager.ImportTilemapFromBytes(mapObject);
+
+                // Import the game state
+                //_gameMaster.ImportGameStateFromList(gamePieceList.gamePieceList);
+            }
+            else
+            {
+                Debug.LogError($"Error retrieving map: {request.error}\nResponse: {request.downloadHandler.text}");
+                serverResponseOutputViewer.text = $"Error retrieving map: {request.error}\nResponse: {request.downloadHandler.text}";
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"Exception occurred while retrieving map: {ex.Message}");
+            serverResponseOutputViewer.text = $"Client: Exception occurred while retrieving map: {ex.Message}";
+        }
+    }*/
+
+    public async Task RetrieveGameInitialStateFromServer(string mapName)
+    {
+        string url = $"{_supabaseUrl}/rest/v1/maps";
+        using UnityWebRequest request = new UnityWebRequest(url, "GET");
+        request.SetRequestHeader("Content-Type", "application/json");
+        request.SetRequestHeader("apikey", _supabaseAnonKey);
+        request.uploadHandler = new UploadHandlerRaw(Encoding.UTF8.GetBytes($"{{\"mapName\":\"{mapName}\"}}"));
+        request.downloadHandler = new DownloadHandlerBuffer();
+
+        try
+        {
+            var operation = request.SendWebRequest();
+            while (!operation.isDone)
+            {
+                await Task.Yield();
+            }
+            Debug.Log($"Raw server response: {request.downloadHandler.text}");
+            if (request.result == UnityWebRequest.Result.Success)
+            {
+                Debug.Log("Map retrieved successfully.");
+                serverResponseOutputViewer.text = $"Map retrieved successfully: \nResponse: {request.downloadHandler.text}";
+
+                // Deserialize the response as an array
+                JArray responseArray = JArray.Parse(request.downloadHandler.text);
+                if (responseArray.Count > 0)
+                {
+                    JObject mapDataObject = (JObject)responseArray[0];
+                    string mapData = mapDataObject["grid_data"]?.ToString();
+                    string pieceData = mapDataObject["init_piece_data"]?.ToString();
+
+                    Debug.Log($"Raw map data: {mapData}");
+                    Debug.Log($"Raw piece data: {pieceData}");
+
+                    try
+                    {
+                        TilemapData mapObjectx = JsonConvert.DeserializeObject<TilemapData>(mapData);
+                        Debug.Log($"Deserialized TilemapData: {mapObjectx}");
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.LogError($"Error deserializing TilemapData: {ex.Message}");
+                    }
+
+                    try
+                    {
+                        GamePieceList gamePieceListx = JsonConvert.DeserializeObject<GamePieceList>(pieceData);
+                        Debug.Log($"Deserialized GamePieceList: {gamePieceListx}");
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.LogError($"Error deserializing GamePieceList: {ex.Message}");
+                    }
+
+                    TilemapData mapObject = JsonUtility.FromJson<TilemapData>(mapData);
+                    GamePieceList gamePieceList = JsonUtility.FromJson<GamePieceList>(pieceData);
+
+                    Debug.Log($"mapObject and gamePieceList deserialized:\n{mapObject}\n%%%%\n{gamePieceList}");
+                    // Import the map object
+                    //_tilemapManager.ImportTilemapFromBytes(mapObject);
+
+                    // Import the game state
+                    //_gameMaster.ImportGameStateFromList(gamePieceList.gamePieceList);
+                }
+                else
+                {
+                    Debug.LogError("No map data found.");
+                    serverResponseOutputViewer.text = "No map data found.";
+                }
+            }
+            else
+            {
+                Debug.LogError($"Error retrieving map: {request.error}\nResponse: {request.downloadHandler.text}");
+                serverResponseOutputViewer.text = $"Error retrieving map: {request.error}\nResponse: {request.downloadHandler.text}";
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"Exception occurred while retrieving map: {ex.Message}");
+            serverResponseOutputViewer.text = $"Client: Exception occurred while retrieving map: {ex.Message}";
+        }
+    }
+
 
     public static string SerializeGamePieceInfoListToBase64(List<GamePieceInfo> pieces)
     {

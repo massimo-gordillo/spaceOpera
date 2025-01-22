@@ -13,8 +13,10 @@ public class SupabaseClient
     private readonly HttpClient _httpClient;
     private string _accessToken;
 
-    private protected string _supabaseUrl = "http://127.0.0.1:54321";
-    private protected string _supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0";
+    private protected string _supabaseUrl = "https://ezmafonauvkpalwjpaer.supabase.co";
+    //private protected string _supabaseUrl = "http://127.0.0.1:54321";
+    //private protected string _supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0";
+    private protected string _supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV6bWFmb25hdXZrcGFsd2pwYWVyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzYxMDE5NjUsImV4cCI6MjA1MTY3Nzk2NX0.i3E8rSHoMV1ThEWctZNU25oV_DfTjBu_jsQXQZiLO0s";
 
 
     public static SupabaseClient Instance
@@ -103,6 +105,7 @@ public class SupabaseClient
                     }
                 }
 
+                Debug.Log($"Sending Request..."); 
                 // Send the request and handle response
                 var response = await _httpClient.SendAsync(request);
                 var responseBody = await response.Content.ReadAsStringAsync();

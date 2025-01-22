@@ -83,4 +83,22 @@ Dark Colour:    115,115,115,1   #737373
 
 massimogordillo@hotmail.com
 
+
+PROMPTS:
 I'm building a 2D asynchronous Unity strategy game with Supabase as my backend service. I'm currently able to send map data to the db and want to be able to retrieve that data via http request. I have a maps table and want to receive width, height and grid_data columns. Write me a serverside .js function which will receive this request and send back this data.
+
+
+Ok I think it's best we just start fresh. Let me explain my project and what I'm hoping to accomplish.
+
+I'm building a 2D turn-based Unity game. My MVP is very simple. I want two players to be playing on one map, taking turns moving their game pieces. Imagine it's like a correspondence chess game where one player moves all their pieces, creates more, and then passes the turn to player 2 who does the same.
+
+The MVP implementation is very light. Player 1 will send the moves they performed on their turn, and a hash of the gamestate at the end of their turn to the server. The server will validate those game moves are legal and that the end state matches the hash it also generates, and upon confirming both of those checks only then will pass the information to Player 2. The game actions performed by player 1 will be replayed visually for player 2 and then player 2 can then begin their turn from the new gamestate. There are some nuances here, primarily that there needs to be random number seed management so ther server can confirm the gamestate after receving it from a player (there is a chance/luck component).
+
+We agreed to use Supabase as our backend service. Note that there is no concurrency required, the two user clients do not need to be connected, only pushes to the server and either a polling or push system to send the new gamestate information to the other player.
+
+Some details for the db setup:
+
+a single game can contain 100s of moves so it's best to make a turn_moves table which collects all the moves in a given turn.
+the game will have many maps, different grid setups upon which to intialize and play the game. On the front end I've designed each map to be converted into a serialized list of bytes (using messagepack).
+While I dont need this for the MVP imlementation, in the future I will want new users be able to create a profile, and create a game for another user to join. This requires account creation, forgot password, key management, login, logout, etc.
+Please let me know if you need any additional information before setup.
