@@ -105,7 +105,7 @@ public class SupabaseManager : MonoBehaviour
             List<GamePieceInfo> initPieceInfo = _gameMaster.ConvertGameStateToList();
 
             // Directly await the SaveGameInitialStateToServer method
-            await SaveGameInitialStateToServer(tilemapData, "testMap3", initPieceInfo);
+            await SaveGameInitialStateToServer(tilemapData, "testMap4", initPieceInfo);
         }
         catch (Exception ex)
         {
@@ -294,7 +294,7 @@ public class SupabaseManager : MonoBehaviour
         try
         {
             // Directly await the RetrieveGameInitialStateFromServer method
-            await RetrieveGameInitialStateFromServer("testMap3");
+            await RetrieveGameInitialStateFromServer("testMap4");
         }
         catch (Exception ex)
         {
@@ -360,7 +360,7 @@ public class SupabaseManager : MonoBehaviour
         using UnityWebRequest request = new UnityWebRequest(url, "GET");
         request.SetRequestHeader("Content-Type", "application/json");
         request.SetRequestHeader("apikey", _supabaseAnonKey);
-        request.uploadHandler = new UploadHandlerRaw(Encoding.UTF8.GetBytes($"{{\"mapName\":\"{mapName}\"}}"));
+        request.uploadHandler = new UploadHandlerRaw(Encoding.UTF8.GetBytes($"{{\"map_name\":\"{mapName}\"}}"));
         request.downloadHandler = new DownloadHandlerBuffer();
 
         try
@@ -387,10 +387,24 @@ public class SupabaseManager : MonoBehaviour
                     Debug.Log($"Raw map data: {mapData}");
                     Debug.Log($"Raw piece data: {pieceData}");
 
+/*                    try
+                    {
+                        TilemapData incomingTilemapData = new TilemapData(1, 2, null);
+                        incomingTilemapData.tileBytesBase64 = JsonConvert.DeserializeObject<String>(mapData);
+                        Debug.Log($"Deserialized TilemapData via drop: {incomingTilemapData.tileBytesBase64}");
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.LogError($"Error dropping into TilemapData: {ex.Message}");
+                    }*/
+
+                    TilemapData mapObject = new TilemapData();
+                    GamePieceList gamePieceList = new GamePieceList(new List<GamePieceInfo>());
+
                     try
                     {
-                        TilemapData mapObjectx = JsonConvert.DeserializeObject<TilemapData>(mapData);
-                        Debug.Log($"Deserialized TilemapData: {mapObjectx}");
+                        mapObject = JsonUtility.FromJson<TilemapData>(mapData); ;
+                        Debug.Log($"Deserialized TilemapData: {mapObject}");
                     }
                     catch (Exception ex)
                     {
@@ -399,23 +413,53 @@ public class SupabaseManager : MonoBehaviour
 
                     try
                     {
-                        GamePieceList gamePieceListx = JsonConvert.DeserializeObject<GamePieceList>(pieceData);
-                        Debug.Log($"Deserialized GamePieceList: {gamePieceListx}");
+                       gamePieceList = JsonUtility.FromJson<GamePieceList>(pieceData);
+                       Debug.Log($"Deserialized GamePieceList: {gamePieceList}");
+                       
                     }
                     catch (Exception ex)
                     {
                         Debug.LogError($"Error deserializing GamePieceList: {ex.Message}");
                     }
 
-                    TilemapData mapObject = JsonUtility.FromJson<TilemapData>(mapData);
-                    GamePieceList gamePieceList = JsonUtility.FromJson<GamePieceList>(pieceData);
+                    /*                    TilemapData mapObject = JsonUtility.FromJson<TilemapData>(mapData);
+                                        GamePieceList gamePieceList = JsonUtility.FromJson<GamePieceList>(pieceData);*/
 
-                    Debug.Log($"mapObject and gamePieceList deserialized:\n{mapObject}\n%%%%\n{gamePieceList}");
+                   /*Debug.Log($"mapObject and gamePieceList deserialized:\nmap: {mapObject.TileBytes.Length}\n%%%%\nfirst list obj: {gamePieceList.gamePieceInfos.Count}");
+
+
+                    Debug.Log("Printing map data row by row:");
+
+                    for (int y = 0; y < mapObject.Height; y++)
+                    {
+                        string row = "";
+                        for (int x = 0; x < mapObject.Width; x++)
+                        {
+                            // Calculate the index in the byte array
+                            int index = y * mapObject.Width + x;
+                            row += $"{mapObject.TileBytes[index]} ";
+                        }
+                        Debug.Log(row.TrimEnd());
+                    }
+
+                    Debug.Log("Printing game piece info:");
+
+                    for (int i = 0; i < gamePieceList.gamePieceInfos.Count; i++)
+                    {
+                        GamePieceInfo gamePiece = gamePieceList.gamePieceInfos[i];
+                        Debug.Log($"Game Piece {i}: {gamePiece.x}, {gamePiece.y}");
+
+                        // If gamePiece has specific properties, print them (example below)
+                        // Debug.Log($"ID: {gamePiece.ID}, Position: {gamePiece.Position}, Type: {gamePiece.Type}");
+                    }*/
+
+
+                    //Debug.Log($"mapObject and gamePieceList deserialized:\nmap: {mapObject.TileBytes}\n%%%%\nfirst list obj: {gamePieceList.gamePieceInfos[0].ToByteArray()}");
                     // Import the map object
-                    //_tilemapManager.ImportTilemapFromBytes(mapObject);
+                    _tilemapManager.ImportTilemapFromBytes(mapObject);
 
                     // Import the game state
-                    //_gameMaster.ImportGameStateFromList(gamePieceList.gamePieceList);
+                    _gameMaster.ConvertListToGameState(gamePieceList.gamePieceInfos);
                 }
                 else
                 {

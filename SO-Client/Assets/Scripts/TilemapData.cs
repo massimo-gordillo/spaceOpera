@@ -5,34 +5,36 @@ using System.IO;
 [System.Serializable]
 public class TilemapData
 {
-    public int Width { get; set; }
-    public int Height { get; set; }
+    public int Width;
+    public int Height;
+    public string tileBytesBase64;
 
-    [SerializeField]
-    private string tileBytesBase64;
-
-    // Public property to access TileBytes as byte[]
     public byte[] TileBytes
     {
         get
         {
-            // Convert from base64 string back to byte[]
-            return Convert.FromBase64String(tileBytesBase64);
+            try
+            {
+                return Convert.FromBase64String(tileBytesBase64);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"TileBytes error: {ex.Message}");
+                return null;
+            }
         }
-        set
-        {
-            // Convert byte[] to base64 string for serialization
-            tileBytesBase64 = Convert.ToBase64String(value);
-        }
+        set => tileBytesBase64 = Convert.ToBase64String(value);
     }
 
-    // Constructor for easy instantiation
     public TilemapData(int width, int height, byte[] tileBytes)
     {
         Width = width;
         Height = height;
         TileBytes = tileBytes;
     }
+
+    public TilemapData() { }
+
 
     // Serialize method to convert TilemapData to byte[] for storage (using JSON)
     public static byte[] Serialize(TilemapData data)
