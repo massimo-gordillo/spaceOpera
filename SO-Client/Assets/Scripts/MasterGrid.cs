@@ -1,9 +1,34 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using MessagePack;
+//using MessagePack
+//using System.Text.Json.Serialization;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
-[MessagePackObject]
+public class GameAction
+{
+    public short turnNumber { get; set; }
+
+    public short actionNumber { get; set; }
+
+    // 0 = move, 1 = attack, 2 = capture, 3 = produce
+    public byte actionType { get; set; }
+
+    public byte unitType { get; set; }
+
+    public byte fromLocationX { get; set; }
+
+    public byte fromLocationY { get; set; }
+
+    public byte toLocationX { get; set; }
+
+    public byte toLocationY { get; set; }
+
+    public byte playerID { get; set; }
+}
+
+/*[MessagePackObject]
 public class GameAction
 {
     [Key(7)]
@@ -33,7 +58,9 @@ public class GameAction
 
     [Key(6)]
     public byte playerID { get; set; }
-}
+}*/
+
+
 
 public class MasterGrid : MonoBehaviour
 {
@@ -184,7 +211,7 @@ public class MasterGrid : MonoBehaviour
             else if (getSelectedUnit() == null && unit.getNonExhausted() && unit.getPlayerControl() == gameMaster.getPlayerTurn()) //what if you don't control this unit?
             {
                 setSelectedUnit(unit);
-                presentGameActionsAtLocation(unit.xPos, unit.yPos, unit);
+                presentChoicesAtLocation(unit.xPos, unit.yPos, unit);
 
                 if (unit.movementNonExhausted == true) //if the unit hasn't moved already this turn.
                 {
@@ -241,35 +268,9 @@ public class MasterGrid : MonoBehaviour
     {
         //0 is move
         addGameAction(0, (byte)attacker.unitType, (byte)attacker.oldXPos, (byte)attacker.oldYPos, (byte)attacker.xPos, (byte)attacker.yPos, (byte)attacker.playerControl);
-        /*        turnActionCount++;
-                GameAction gameActionMove = new GameAction
-                {
-                    actionType = 0,
-                    unitType = (byte)attacker.unitType,
-                    fromLocationX = (byte)attacker.oldXPos,
-                    fromLocationY = (byte)attacker.oldYPos,
-                    toLocationX = (byte)attacker.xPos,
-                    toLocationY = (byte)attacker.yPos,
-                    playerID = (byte)attacker.playerControl
-                    turnNumber = gameMaster.turnNumber,
-
-                };
-                gameActions.Add(gameActionMove);*/
 
         //1 is attack
         addGameAction(1, (byte)attacker.unitType, (byte)attacker.xPos, (byte)attacker.yPos, (byte)defender.xPos, (byte)defender.yPos, (byte)attacker.playerControl);
-/*        GameAction gameActionAttack = new GameAction
-        {
-            actionType = 1,
-            unitType = (byte)attacker.unitType,
-            fromLocationX = (byte)attacker.xPos,
-            fromLocationY = (byte)attacker.yPos,
-            toLocationX = (byte)defender.xPos,
-            toLocationY = (byte)defender.yPos,
-            playerID = (byte)attacker.playerControl
-        };
-        gameActions.Add(gameActionAttack);*/
-
 
 
 
@@ -1077,7 +1078,7 @@ public class MasterGrid : MonoBehaviour
 
             /*if (selectedUnit is BaseUnit) //why is this check here? MG: 24-05-08
             {
-                presentGameActionsAtLocation(x, y, selectedUnit);
+                presentChoicesAtLocation(x, y, selectedUnit);
                 //checkEnemiesInRange(selectedUnit.xPos, selectedUnit.yPos, selectedUnit.attackRange);
                 //structure = manageStructureAtLocation(selectedUnit.xPos, selectedUnit.yPos);
             }
@@ -1094,7 +1095,7 @@ public class MasterGrid : MonoBehaviour
             if (!selectedUnit.undoingMovement)
             {
                 selectedUnit.movementNonExhausted = false;
-                presentGameActionsAtLocation(x, y, selectedUnit);
+                presentChoicesAtLocation(x, y, selectedUnit);
             }
             else
             {
@@ -1230,7 +1231,7 @@ public class MasterGrid : MonoBehaviour
         return num;
     }
 
-    public void presentGameActionsAtLocation(int x, int y, BaseUnit unit)
+    public void presentChoicesAtLocation(int x, int y, BaseUnit unit)
     {
         if(unit.canMoveAndAttack || unit.movementNonExhausted)
             checkEnemiesInRange(unit);

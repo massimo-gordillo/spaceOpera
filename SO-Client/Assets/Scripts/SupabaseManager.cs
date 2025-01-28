@@ -41,7 +41,8 @@ public class SupabaseManager : MonoBehaviour
         loginButton.onClick.AddListener(HandleLogin);
         //executeFunctionButton.onClick.AddListener(SendCurrentMapToServer);
         //executeFunctionButton.onClick.AddListener(HandleRetrieveInitialStateFromServer);
-        executeFunctionButton.onClick.AddListener(() => HandleAsyncCall(() => RetrieveGameInitialStateFromServer("573a4f2f-378f-4159-ab77-899c407ba5be")));
+        executeFunctionButton.onClick.AddListener(() => HandleAsyncCall(() => CreateMatchAsync("aa2e6df3-4200-4469-8353-dd41d2a28781", "d0172820-32bc-4fc7-870f-be940517c008", "96fe6e44-5362-49a4-9d59-0cf04e353d0b")));
+        //executeFunctionButton.onClick.AddListener(() => HandleAsyncCall(() => RetrieveGameInitialStateFromServer("96fe6e44-5362-49a4-9d59-0cf04e353d0b")));
 
         executeFunctionButton.interactable = true;
 
@@ -188,6 +189,8 @@ public class SupabaseManager : MonoBehaviour
 
         // Use the specific map endpoint with the ID in the URL
         //string url = $"{_supabaseUrl}/rest/v1/maps?id=eq.96fe6e44-5362-49a4-9d59-0cf04e353d0b";
+
+        //MG:25-01-28 modify this to use the generic sendRequest method
         string url = $"{_supabaseUrl}/rest/v1/maps?id=eq.{mapId}";
 
         using UnityWebRequest request = new UnityWebRequest(url, "GET");
@@ -281,6 +284,102 @@ public class SupabaseManager : MonoBehaviour
             serverResponseOutputViewer.text = $"Client: Exception occurred while retrieving map: {ex.Message}";
         }
     }
+
+
+    //send gameActionsList to server for verification
+    public async Task SendGameActionsListToServer(List<GameAction> gameActionsList)
+    {
+        // Serialize the game actions list to JSON
+        string serializedGameActionsList;
+        try
+        {
+            serializedGameActionsList = JsonUtility.ToJson(gameActionsList);
+            Debug.Log("Serialized game actions list: " + serializedGameActionsList);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"Error serializing game actions list: {ex.Message}");
+            return;
+        }
+
+        // Construct JSON payload
+        var payload = new
+        {
+            game_actions_list = serializedGameActionsList
+        };
+
+        string jsonPayload;
+        try
+        {
+            jsonPayload = JsonConvert.SerializeObject(payload);
+            Debug.Log("JSON Payload: " + jsonPayload);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"Error creating JSON payload: {ex.Message}");
+            return;
+        }
+
+        //send the payload to the server using SupabaseClient.sendRequest
+        try
+        {
+            var response = await SupabaseClient.Instance.SendRequest<string>(
+                "/rest/v1/game_actions",
+                HttpMethod.Post,
+                payload
+            );
+
+            Debug.Log($"Game actions list sent successfully: {response}");
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"Error sending game actions list: {ex.Message}");
+        }
+
+    }
+
+
+    public async Task CreateMatchAsync(string playerAId, string playerBId, string mapId)
+    {
+        try
+        {
+            // Define the endpoint for creating a match
+            string endpoint = $"{_supabaseUrl}/rest/v1/game/matches";
+
+            // Prepare the request data
+            var requestData = new
+            {
+                playerAId,
+                playerBId,
+                mapId
+            };
+
+/*            // Use the generic SendRequest method to call the server
+            MatchData match = await SupabaseClient.Instance.Functions.Invoke<MatchData>(
+                endpoint,
+                requestData,
+                new Supabase.Functions.FunctionsRequestOptions { Method = HttpMethod.Post }
+            );*/
+
+            var response = await SupabaseClient.Instance.SendRequest<string>(endpoint, HttpMethod.Post, requestData);
+            Debug.Log("Match creation request sent successfully.");
+
+            //Debug.Log("Match created successfully.");
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"Error creating match: {ex.Message}");
+            throw;
+        }
+    }
+
+
+
+
+
+    /// ///////////////////////////////////////////////////////
+
+
 
     //is this still needed?
     public static string SerializeGamePieceInfoListToBase64(List<GamePieceInfo> pieces)

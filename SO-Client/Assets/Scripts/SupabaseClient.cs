@@ -65,8 +65,8 @@ public class SupabaseClient
                 _accessToken = json["access_token"].ToString();
                 Debug.Log($"Access token: {_accessToken}");
                 _httpClient.DefaultRequestHeaders.Remove("Authorization");
-                //_httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {_accessToken}");
-                _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {_supabaseAnonKey}");
+                _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {_accessToken}");
+                //_httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {_supabaseAnonKey}");
 
                 return true;
             }
