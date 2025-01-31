@@ -102,3 +102,67 @@ a single game can contain 100s of moves so it's best to make a turn_moves table 
 the game will have many maps, different grid setups upon which to intialize and play the game. On the front end I've designed each map to be converted into a serialized list of bytes (using messagepack).
 While I dont need this for the MVP imlementation, in the future I will want new users be able to create a profile, and create a game for another user to join. This requires account creation, forgot password, key management, login, logout, etc.
 Please let me know if you need any additional information before setup.
+
+Let's expand our db implementation:
+
+A players table, users. Two players are paired in a match.
+
+A matches table will contain a list of matches between two players. It will contain:
+- matchID
+- the player Ids
+- the map name and id (from the maps table)
+- who's turn it currently is
+- the current gamestate (jsonb format, a list of game pieces)
+- whether the match is completed or not
+- a 2D array called unitGrid
+- a 2D array called structureGrid
+- a 2D array called terrainGrid
+- creation time
+- match end time (populated when match is complete)
+- winner (populated when match is complete)
+
+The three 2D array items need to be readable and writable serverside for computation and validation. Only the player who's turn it is should be able to send data to the server regarding this game. 
+
+A matchMoves table which contains the following items:
+- movesListId
+- the matchID the moves are being implemented in
+- the player that sent those moves
+- A Jsonb list of game actions. This should be parsable by the serverside for move validation
+- the time those moves were received by the server
+- an isValid flag, to be set by validation service
+
+Please provide me which any suggestions you feel I might be missing.
+
+
+
+
+Ok great. I have a structural question I'd like to ask you. The game takes place on a 2D grid. Effectively, the game engine runs off of 3x 2D arrays. 
+The first array is the grid_data, this is the map terrain which effects unit movement, damage multipliers etc. 
+The second array is the unit_grid, this is where each unit is recorded, only one unit can be at any one index at any time. A given unit has a list of characteristics, unit type, health, ownership, etc.
+The third array is the structure_grid, which is where capturable structures exist. A unit can be on top of a structure.
+Whenever a player sends a list of game actions to the server, the server needs to be able to effectively recreate the gamestate from the three arrays. The server needs to be able to verify the game actions provided by the client were legal and that the final gamestate matches a hash provided by the client. 
+
+Notably I understand there are db/json structures which allow SQL commands to reference items in arrays held in a table. Presumably I want to leverage these so that I don't have to hold/recreate all 3 arrays in some sort of temporary memory. 
+
+Can you provide some guidance on how to apply this in our server structure?
+
+
+
+Ok let's step back a second here. I'm using Unity to send the grid_data via http to the server for it to be held in the maps table in the grid_data column. Notable, on the Unity side the grid_data array is an array of bytes. I'm converting that array of bytes to a base64string so I can send it via http. 
+
+What is the best way to covert this data on the Unity side so it can be sent via http to an api endpoint? Then, server side, how would I receive this information, process it into the proper data format, and save it to the db for reference with PostgreSQL's JSONB array funcionality?
+
+Client side I'm currently creating a List of gamePieceInfo, a list of all the units and structures on the grid, and then sending that over http. This is in an attempt to not send 2x very sparse arrays via http. Does it make sense more sense to handle the data this way? Then server-side the data has to be deconstructed and items placed into the arrays in the tables. Alternatively I can just send the sparse arrays over with the unit data in their respective cells in the array. Thoughts?
+
+
+OK NEW DATABASE STRUCTURE. I'm going to create a table which tracks all game pieces across all games and uses partitioning to make it managable. Create a match_piece_list table which partitions on match_id. you should also be able to quickly separate between piece_type for a given match_id. 
+Columns should be match_id, piece_type (bool, 1 for unit, 0 for structure), x_loc, y_loc, type_num (int), player_controller (int), health_val (int).
+
+In this way, instead of querying the jsonb arrays in the matches table, I can directly query a partition in the match_piece_list, and I can quickly modify individual rows to move a unit, destroy it, etc.
+
+Ok let's rebuild the map grid data with the same idea. Make a partitioned maps_tiles table with columns x_loc, y_loc, tile_type (int). This data was previously held in the grid_data column in the maps table.
+
+Let's also create a partitioned map_init_pieces table which records the initial piece data for a given map. Previously it was a list in maps called init_piece_data. The columns should be the same as the match_piece_list table but instead of having a match_id it has a map_id.
+
+
+ok great. Let's modify the saveMap function in the MapService function to drop this data in the appropriate tables. Via JSON you'll receive an array of ints to put into the 
