@@ -256,7 +256,7 @@ public class SupabaseManager : MonoBehaviour
 
                     //Debug.Log($"Raw tiles data: {tilesJson}");
                     //Debug.Log($"Raw pieces data: {piecesJson}");
-                    DebugRetrieveGamePiecesFromServer(tilesJson, piecesJson);
+                    //DebugRetrieveGamePiecesFromServer(tilesJson, piecesJson);
 
                     TilemapData mapObject = null;
                     List<GamePieceInfo> gamePieceList = new List<GamePieceInfo>();
@@ -282,16 +282,19 @@ public class SupabaseManager : MonoBehaviour
 
                     try
                     {
-                        var deserializedPieces = JsonConvert.DeserializeObject<List<GamePieceInfo>>(piecesJson);
+                        var deserializedPieces = JArray.Parse(piecesJson); // Deserialize to JArray
+
                         foreach (var piece in deserializedPieces)
                         {
-                            gamePieceList.Add(new GamePieceInfo(
-                                piece.x,
-                                piece.y,
-                                piece.typeNum,
-                                piece.playerID,
-                                piece.healthVal
-                            ));
+                            // Access the fields by their keys
+                            byte x = (byte)piece["x"];
+                            byte y = (byte)piece["y"];
+                            byte typeNum = (byte)piece["typeId"];  // Mapping from 'typeId' in JSON to 'typeNum'
+                            byte playerID = (byte)piece["ownerId"]; // Mapping from 'ownerId' in JSON to 'playerID'
+                            byte healthVal = (byte)piece["health"]; // Mapping from 'health' in JSON to 'healthVal'
+
+                            // You can now manually add them to your gamePieceList
+                            gamePieceList.Add(new GamePieceInfo(x, y, typeNum, playerID, healthVal));
                         }
 
                         Debug.Log($"Deserialized GamePieceList: {gamePieceList}");
@@ -300,6 +303,16 @@ public class SupabaseManager : MonoBehaviour
                     {
                         Debug.LogError($"Error deserializing GamePieceList: {ex.Message}");
                     }
+
+
+                    string itemString = "";
+                    foreach (var item in gamePieceList)
+                    {
+                        itemString += $"{item.x},{item.y},{item.typeNum},{item.playerID},{item.healthVal}\n";
+
+                    }
+
+                    Debug.Log($"debugging: Current game state item list, post iterating: {itemString}");
 
                     if (mapObject != null)
                         _tilemapManager.ImportTilemapFromBytes(mapObject);
