@@ -163,6 +163,20 @@ public class TilemapManager : MonoBehaviour
             //Debug.Log(debug);
         }
         return new TilemapData(width, height, tilemapByteArray);
+
+        //to print the byte array to the console
+        /*// Initialize a list to hold each byte as a string
+        List<string> byteStrings = new List<string>();
+
+        // Loop through each byte in the byte array and convert to string
+        TilemapData tmd = _tilemapManager.ExportTilemapToBytes();
+        foreach (byte b in tmd.TileBytes)
+        {
+            byteStrings.Add(b.ToString());
+        }
+
+        // Join the list into a single comma-separated string
+        Debug.Log($"debugging: Tilemap byte array: {string.Join(",", byteStrings)}");*/
     }
 
     public void ImportTilemapFromBytes(TilemapData tilemapData)

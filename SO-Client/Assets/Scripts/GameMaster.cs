@@ -363,6 +363,17 @@ public class GameMaster : MonoBehaviour
         }
 
         return gameStateList;
+
+        //to print the game state to the console
+        /*List<GamePieceInfo> currentGameState = _gameMaster.ConvertGameStateToList();
+        string itemString = "";
+        foreach (var item in currentGameState)
+        {
+            itemString += $"{item.x},{item.y},{item.typeNum},{item.playerID},{item.healthVal}\n";
+
+        }
+
+        Debug.Log($"debugging: Current game state item: {itemString}");*/
     }
 
     private void SaveGameStateListToFile(List<GamePieceInfo> gameStateList)

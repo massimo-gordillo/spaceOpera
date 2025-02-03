@@ -40,10 +40,10 @@ public class SupabaseManager : MonoBehaviour
         //_client = new SupabaseClient;
 
         loginButton.onClick.AddListener(HandleLogin);
-        executeFunctionButton.onClick.AddListener(SendCurrentMapToServer);
+        //executeFunctionButton.onClick.AddListener(SendCurrentMapToServer);
         //executeFunctionButton.onClick.AddListener(HandleRetrieveInitialStateFromServer);
         //executeFunctionButton.onClick.AddListener(() => HandleAsyncCall(() => CreateMatchAsync("aa2e6df3-4200-4469-8353-dd41d2a28781", "d0172820-32bc-4fc7-870f-be940517c008", "96fe6e44-5362-49a4-9d59-0cf04e353d0b")));
-        //executeFunctionButton.onClick.AddListener(() => HandleAsyncCall(() => RetrieveGameInitialStateFromServer("96fe6e44-5362-49a4-9d59-0cf04e353d0b")));
+        executeFunctionButton.onClick.AddListener(() => HandleAsyncCall(() => RetrieveGameInitialStateFromServer("84fe0458-c742-4bc5-b35a-b9334a0f3c90")));
         //executeFunctionButton.onClick.AddListener(() => HandleAsyncCall(() => SendCurrentMapToServer()));
 
         executeFunctionButton.interactable = true;
@@ -94,18 +94,67 @@ public class SupabaseManager : MonoBehaviour
             return;
         }
 
-        // Serialize map data to JSON
-        string serializedMapData;
-        try
-        {
-            serializedMapData = JsonUtility.ToJson(mapObject.TileBytes);
-            Debug.Log("Serialized map data: " + serializedMapData);
-        }
-        catch (Exception ex)
-        {
-            Debug.LogError($"Error serializing map data: {ex.Message}");
-            return;
-        }
+/*        // Assuming this is your map data structure
+        TilemapData mapObjectx = new TilemapData(10, 10, new byte[] { 1, 2, 3, 4, 5 });
+
+        // Get the 2D array (using the GetTileBytes2D method you already have)
+        int[] tileBytes2Dx = mapObjectx.GetTileBytesInt();
+
+        // Serialize directly without wrapping in another class
+        string serializedMapDatax = JsonUtility.ToJson(tileBytes2Dx);
+        Debug.Log("Serialized map data for testing: " + serializedMapDatax);
+        string serializedMapDataxx = "[" + string.Join(",", tileBytes2Dx) + "]";
+        Debug.Log("Serialized map data for testing: " + serializedMapDataxx);*/
+
+        string mapDataString = "{" + string.Join(",", mapObject.TileBytes) + "}";
+        Debug.Log("Map data string for testing: " + mapDataString); 
+
+
+
+        /*        // Serialize map data to JSON
+                string serializedMapData;
+                try
+                {
+                    //in case you forget where this is, it's declared at the bottom of TilemapData.cs
+                    TileBytesWrapper wrapper = new TileBytesWrapper { TileBytes = mapObject.GetTileBytesInt() };
+                    serializedMapData = JsonUtility.ToJson(wrapper);
+                    Debug.Log("Serialized map data: " + serializedMapData);
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogError($"Error serializing map data: {ex.Message}");
+                    return;
+                }*/
+
+        // Serialize map data to JSON using PostgresTileData instead of TileBytesWrapper
+        /*        string serializedMapData;
+                if (initPieceData != null)
+                {
+                    try
+                    {
+                        var postgresTileData = new PostgresTileData(mapObject.TileBytes);
+                        serializedMapData = JsonUtility.ToJson(postgresTileData);
+                        Debug.Log("Serialized map data: " + serializedMapData);
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.LogError($"Error serializing map data: {ex.Message}");
+                        return;
+                    }
+                }
+                else
+                {
+                    Debug.LogError("Map data is null.");
+                    return;
+                }*/
+
+        /*        //provided by bolt let's read through it and compare
+                var tileData = new PostgresTileData(mapObject.TileBytes);
+                string formattedTiles = tileData.ToJson();
+
+                // Now you can use this in your map submission
+                // The formattedTiles will be a plain JSON array like: [1,2,3,4]
+                Debug.Log($"Formatted tiles: {formattedTiles}");*/
 
         // Serialize initial piece data to JSON
         string serializedPieceData;
@@ -124,11 +173,11 @@ public class SupabaseManager : MonoBehaviour
         // Construct JSON payload
         var payload = new
         {
-            name = mapName,
-            tiles = serializedMapData,
-            width = mapObject.Width,
-            height = mapObject.Height,
-            pieces = serializedPieceData
+            p_name = mapName,
+            p_width = mapObject.Width,
+            p_height = mapObject.Height,
+            p_tiles = mapDataString,
+            p_pieces = serializedPieceData
         };
 
         /*        string jsonPayload;
@@ -155,9 +204,12 @@ public class SupabaseManager : MonoBehaviour
                 request.SetRequestHeader("Content-Type", "application/json");
                 request.SetRequestHeader("apikey", _supabaseAnonKey);*/
 
-        string endpoint = "/rest/v1/maps";
-        //uncomment when ready to send to server
- /*       try
+
+        //////uncomment when ready to send to server
+
+        string endpoint = "/rest/v1/rpc/save_map";
+
+        try
         {
             // Send request and await response
             var responseBody = await SupabaseClient.Instance.SendRequest<string>(endpoint, HttpMethod.Post, payload);
@@ -175,13 +227,145 @@ public class SupabaseManager : MonoBehaviour
         catch (Exception ex)
         {
             Debug.LogError($"Exception occurred while saving map: {ex.Message}");
-        }*/
+        }
 
     }
 
     public async Task RetrieveGameInitialStateFromServer(string mapId)
     {
-        string endpoint = $"/rest/v1/maps?id=eq.{mapId}";
+        string endpoint = $"/rest/v1/rpc/get_map?p_map_id={mapId}";
+
+        try
+        {
+            var response = await SupabaseClient.Instance.SendRequest<string>(endpoint, HttpMethod.Get, null);
+
+            if (!string.IsNullOrEmpty(response))
+            {
+                Debug.Log($"Raw server response: {response}");
+                serverResponseOutputViewer.text = $"Map retrieved successfully: \nResponse: {response}";
+
+                // Ensure it's a valid JSON array
+                JArray responseArray = JArray.Parse(response);
+                if (responseArray.Count > 0)
+                {
+                    JObject mapDataObject = (JObject)responseArray[0];
+
+                    // Extract "tiles" and "pieces" from the response
+                    var tilesJson = mapDataObject["tiles"]?.ToString();
+                    var piecesJson = mapDataObject["pieces"]?.ToString();
+
+                    //Debug.Log($"Raw tiles data: {tilesJson}");
+                    //Debug.Log($"Raw pieces data: {piecesJson}");
+                    DebugRetrieveGamePiecesFromServer(tilesJson, piecesJson);
+
+                    TilemapData mapObject = null;
+                    List<GamePieceInfo> gamePieceList = new List<GamePieceInfo>();
+
+                    try
+                    {
+                        List<int> tileBytesInt = JsonConvert.DeserializeObject<List<int>>(tilesJson);
+                        byte[] tileBytes = tileBytesInt.ConvertAll(b => (byte)b).ToArray();
+
+
+                        mapObject = new TilemapData
+                        {
+                            Width = mapDataObject["width"]?.Value<int>() ?? 0,
+                            Height = mapDataObject["height"]?.Value<int>() ?? 0,
+                            TileBytes = tileBytes
+                        };
+                        Debug.Log($"Deserialized TilemapData: {mapObject}");
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.LogError($"Error deserializing TilemapData: {ex.Message}");
+                    }
+
+                    try
+                    {
+                        var deserializedPieces = JsonConvert.DeserializeObject<List<GamePieceInfo>>(piecesJson);
+                        foreach (var piece in deserializedPieces)
+                        {
+                            gamePieceList.Add(new GamePieceInfo(
+                                piece.x,
+                                piece.y,
+                                piece.typeNum,
+                                piece.playerID,
+                                piece.healthVal
+                            ));
+                        }
+
+                        Debug.Log($"Deserialized GamePieceList: {gamePieceList}");
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.LogError($"Error deserializing GamePieceList: {ex.Message}");
+                    }
+
+                    if (mapObject != null)
+                        _tilemapManager.ImportTilemapFromBytes(mapObject);
+
+                    if (gamePieceList != null)
+                        _gameMaster.ConvertListToGameState(gamePieceList);
+                }
+                else
+                {
+                    Debug.LogError("No map data found.");
+                    serverResponseOutputViewer.text = "No map data found.";
+                }
+            }
+            else
+            {
+                Debug.LogError("Error retrieving map: Response was empty.");
+                serverResponseOutputViewer.text = "Error retrieving map: Response was empty.";
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"Error retrieving map: {ex.Message}");
+            serverResponseOutputViewer.text = $"Error retrieving map: {ex.Message}";
+        }
+    }
+
+    //debug method for retrieving game state from server
+    private void DebugRetrieveGamePiecesFromServer(string tilesJson, string piecesJson)
+    {
+        Debug.Log($"debugging: Tiles JSON: {tilesJson}");
+        Debug.Log($"debugging: Pieces JSON: {piecesJson}");
+
+        List<GamePieceInfo> currentGameState = _gameMaster.ConvertGameStateToList();
+        string itemString = "";
+        foreach (var item in currentGameState)
+        {
+            itemString += $"{item.x},{item.y},{item.typeNum},{item.playerID},{item.healthVal}\n";
+
+        }
+
+        Debug.Log($"debugging: Current game state item: {itemString}");
+
+        // Initialize a list to hold each byte as a string
+        List<string> byteStrings = new List<string>();
+
+        // Loop through each byte in the byte array and convert to string
+        TilemapData tmd = _tilemapManager.ExportTilemapToBytes();
+        foreach (byte b in tmd.TileBytes)
+        {
+            byteStrings.Add(b.ToString());
+        }
+
+        // Join the list into a single comma-separated string
+        Debug.Log($"debugging: Tilemap byte array: {string.Join(",", byteStrings)}");
+
+
+
+
+    }
+
+
+    /*public async Task RetrieveGameInitialStateFromServer(string mapId)
+    {
+
+        string endpoint = $"/rest/v1/rpc/get_map?p_map_id={mapId}";
+
         try
         {
             var response = await SupabaseClient.Instance.SendRequest<string>(endpoint, HttpMethod.Get, null);
@@ -247,101 +431,7 @@ public class SupabaseManager : MonoBehaviour
             Debug.LogError($"Error retrieving map: {ex.Message}");
             serverResponseOutputViewer.text = $"Error retrieving map: {ex.Message}";
         }
-    }
-
-
-
-    /*        using UnityWebRequest request = new UnityWebRequest(url, "GET");
-            request.SetRequestHeader("Content-Type", "application/json");
-            request.SetRequestHeader("apikey", _supabaseAnonKey);
-            request.downloadHandler = new DownloadHandlerBuffer();*/
-
-    // No need for uploadHandler since we're using GET
-
-
-    /*try
-    {
-        var operation = request.SendWebRequest();
-        while (!operation.isDone)
-        {
-            await Task.Yield();
-        }
-        Debug.Log($"Raw server response: {request.downloadHandler.text}");
-        if (request.result == UnityWebRequest.Result.Success)
-        {
-            Debug.Log("Map retrieved successfully.");
-            serverResponseOutputViewer.text = $"Map retrieved successfully: \nResponse: {request.downloadHandler.text}";
-
-            // Deserialize the response as an array
-            JArray responseArray = JArray.Parse(request.downloadHandler.text);
-            if (responseArray.Count > 0)
-            {
-                JObject mapDataObject = (JObject)responseArray[0];
-                string mapData = mapDataObject["grid_data"]?.ToString();
-                string pieceData = mapDataObject["init_piece_data"]?.ToString();
-
-                Debug.Log($"Raw map data: {mapData}");
-                Debug.Log($"Raw piece data: {pieceData}");
-
-                *//*                    try
-                                    {
-                                        TilemapData incomingTilemapData = new TilemapData(1, 2, null);
-                                        incomingTilemapData.tileBytesBase64 = JsonConvert.DeserializeObject<String>(mapData);
-                                        Debug.Log($"Deserialized TilemapData via drop: {incomingTilemapData.tileBytesBase64}");
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        Debug.LogError($"Error dropping into TilemapData: {ex.Message}");
-                                    }*//*
-
-                TilemapData mapObject = new TilemapData();
-                GamePieceList gamePieceList = new GamePieceList(new List<GamePieceInfo>());
-
-                try
-                {
-                    mapObject = JsonUtility.FromJson<TilemapData>(mapData); ;
-                    Debug.Log($"Deserialized TilemapData: {mapObject}");
-                }
-                catch (Exception ex)
-                {
-                    Debug.LogError($"Error deserializing TilemapData: {ex.Message}");
-                }
-
-                try
-                {
-                    gamePieceList = JsonUtility.FromJson<GamePieceList>(pieceData);
-                    Debug.Log($"Deserialized GamePieceList: {gamePieceList}");
-
-                }
-                catch (Exception ex)
-                {
-                    Debug.LogError($"Error deserializing GamePieceList: {ex.Message}");
-                }
-                //Debug.Log($"mapObject and gamePieceList deserialized:\nmap: {mapObject.TileBytes}\n%%%%\nfirst list obj: {gamePieceList.gamePieceInfos[0].ToByteArray()}");
-                // Import the map object
-                _tilemapManager.ImportTilemapFromBytes(mapObject);
-
-                // Import the game state
-                _gameMaster.ConvertListToGameState(gamePieceList.gamePieceInfos);
-            }
-            else
-            {
-                Debug.LogError("No map data found.");
-                serverResponseOutputViewer.text = "No map data found.";
-            }
-        }
-        else
-        {
-            Debug.LogError($"Error retrieving map: {request.error}\nResponse: {request.downloadHandler.text}");
-            serverResponseOutputViewer.text = $"Error retrieving map: {request.error}\nResponse: {request.downloadHandler.text}";
-        }
-    }
-    catch (Exception ex)
-    {
-        Debug.LogError($"Exception occurred while retrieving map: {ex.Message}");
-        serverResponseOutputViewer.text = $"Client: Exception occurred while retrieving map: {ex.Message}";
     }*/
-    //}
 
 
     //send gameActionsList to server for verification

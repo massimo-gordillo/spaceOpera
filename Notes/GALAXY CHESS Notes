@@ -166,3 +166,58 @@ Let's also create a partitioned map_init_pieces table which records the initial 
 
 
 ok great. Let's modify the saveMap function in the MapService function to drop this data in the appropriate tables. Via JSON you'll receive an array of ints to put into the 
+
+Let's make some fk relationships. 
+In match_piece_list, match_id requires id in matches.
+in map_init_pieces, map_id requires id in maps.
+in map_tiles map_id requires id in maps.    
+
+
+LETS TRY AND INSERT THE TABLE MANUALLY! Apparently Bolt's insert function is broken BLEH.
+
+const mapData = {
+  name: "TestMap2.1",
+  width: 16,
+  height: 19,
+  tiles: [
+1,1,3,2,2,1,1,3,2,2,2,3,1,1,2,2,3,1,1,1,1,3,2,2,1,3,3,2,1,2,3,3,1,2,2,3,1,1,3,3,3,1,1,1,1,1,1,1,1,1,1,1,1,1,3,3,3,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,3,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,3,3,1,1,1,1,3,2,1,1,1,1,1,2,3,1,1,1,1,3,3,1,1,1,3,3,2,1,2,2,2,1,2,3,3,1,1,1,3,1,1,1,1,2,2,2,1,4,4,4,1,2,2,2,1,1,1,1,2,1,1,1,1,2,4,4,4,4,4,4,4,2,1,1,1,1,2,1,1,1,1,1,2,4,4,4,4,4,4,4,2,1,1,1,1,2,2,1,1,1,1,2,4,4,4,4,4,4,4,3,1,1,1,1,1,2,1,1,1,1,3,3,4,4,4,4,4,2,3,1,1,1,1,2,1,1,1,1,1,2,3,4,4,4,4,4,3,2,1,1,1,1,1,2,2,1,1,2,2,2,2,4,4,4,2,2,2,2,1,1,2,3,3,3,3,2,2,2,2,1,4,4,4,1,2,2,2,1,1,2,3
+  ],
+  pieces: [
+  {isUnit: false, x: 0, y: 0, "typeId":200, "ownerId":0, "health":200},
+{isUnit: false, x: 0, y: 13, "typeId":200, "ownerId":0, "health":200},
+{isUnit: false, x: 1, y: 1, "typeId":200, "ownerId":0, "health":200},
+{isUnit: false, x: 1, y: 11, "typeId":201, "ownerId":1, "health":200},
+{isUnit: false, x: 2, y: 3, "typeId":200, "ownerId":0, "health":200},
+{isUnit: false, x: 2, y: 8, "typeId":201, "ownerId":1, "health":200},
+{isUnit: false, x: 3, y: 3, "typeId":200, "ownerId":0, "health":200},
+{isUnit: false, x: 3, y: 12, "typeId":205, "ownerId":1, "health":200},
+{isUnit: false, x: 3, y: 14, "typeId":200, "ownerId":1, "health":200},
+{isUnit: false, x: 4, y: 9, "typeId":200, "ownerId":1, "health":200},
+{isUnit: false, x: 4, y: 10, "typeId":200, "ownerId":1, "health":200},
+{isUnit: false, x: 6, y: 0, "typeId":200, "ownerId":0, "health":200},
+{isUnit: false, x: 6, y: 3, "typeId":201, "ownerId":0, "health":200},
+{isUnit: false, x: 7, y: 8, "typeId":200, "ownerId":0, "health":200},
+{isUnit: false, x: 7, y: 15, "typeId":200, "ownerId":0, "health":200},
+{isUnit: false, x: 8, y: 2, "typeId":200, "ownerId":0, "health":200},
+{isUnit: false, x: 10 "" :2, "typeId":200, "ownerId":0, "health":200},
+{isUnit: false, x: 11 "" :8, "typeId":200, "ownerId":0, "health":200},
+{isUnit: false, x: 11 "" :15, "typeId":200, "ownerId":0, "health":200},
+{isUnit: false, x: 12 "" :0, "typeId":200, "ownerId":0, "health":200},
+{isUnit: false, x: 12 "" :3, "typeId":201, "ownerId":0, "health":200},
+{isUnit: false, x: 14 "" :9, "typeId":200, "ownerId":2, "health":200},
+{isUnit: false, x: 14 "" :10, "typeId":200, "ownerId":2, "health":200},
+{isUnit: false, x: 15 "" :3, "typeId":200, "ownerId":0, "health":200},
+{isUnit: true, x: 15 "" :12, "typeId":0, "ownerId":2, "health":100},
+{isUnit: false, x: 15 "" :12, "typeId":205, "ownerId":2, "health":200},
+{isUnit: false, x: 15 "" :14, "typeId":200, "ownerId":2, "health":200},
+{isUnit: false, x: 16 "" :3, "typeId":200, "ownerId":0, "health":200},
+{isUnit: false, x: 16 "" :8, "typeId":201, "ownerId":2, "health":200},
+{isUnit: false, x: 17 "" :1, "typeId":200, "ownerId":0, "health":200},
+{isUnit: false, x: 17 "" :11, "typeId":201, "ownerId":2, "health":200},
+{isUnit: false, x: 18 "" :0, "typeId":200, "ownerId":0, "health":200},
+{isUnit: false, x: 18 "" :13, "typeId":200, "ownerId":0, "health":200}
+
+
+    
+  ]
+};
