@@ -267,10 +267,10 @@ public class MasterGrid : MonoBehaviour
     public void unitCombat(BaseUnit attacker, BaseUnit defender)
     {
         //0 is move
-        addGameAction(0, (byte)attacker.unitType, (byte)attacker.oldXPos, (byte)attacker.oldYPos, (byte)attacker.xPos, (byte)attacker.yPos, (byte)attacker.playerControl);
+        addGameAction(0, (byte)attacker.unitIdNum, (byte)attacker.oldXPos, (byte)attacker.oldYPos, (byte)attacker.xPos, (byte)attacker.yPos, (byte)attacker.playerControl);
 
         //1 is attack
-        addGameAction(1, (byte)attacker.unitType, (byte)attacker.xPos, (byte)attacker.yPos, (byte)defender.xPos, (byte)defender.yPos, (byte)attacker.playerControl);
+        addGameAction(1, (byte)attacker.unitIdNum, (byte)attacker.xPos, (byte)attacker.yPos, (byte)defender.xPos, (byte)defender.yPos, (byte)attacker.playerControl);
 
 
 
@@ -406,7 +406,7 @@ public class MasterGrid : MonoBehaviour
                 structure.captureHealth = structure.captureHealth - selectedUnit.healthCurrent;
             else
                 structure.switchAlliance(selectedUnit.getPlayerControl());
-            addGameAction(2, (byte)selectedUnit.unitType, (byte)selectedUnit.xPos, (byte)selectedUnit.yPos, (byte)structure.xPos, (byte)structure.yPos, (byte)selectedUnit.playerControl);
+            addGameAction(2, (byte)selectedUnit.unitIdNum, (byte)selectedUnit.xPos, (byte)selectedUnit.yPos, (byte)structure.xPos, (byte)structure.yPos, (byte)selectedUnit.playerControl);
             exhaustSelectedUnit(selectedUnit, true);
         }
         else
@@ -1071,7 +1071,7 @@ public class MasterGrid : MonoBehaviour
 
             // if you're undoing movement, don't add it to the action list
             if (!selectedUnit.undoingMovement)
-                addGameAction(0, (byte)selectedUnit.unitType, (byte)selectedUnit.xPos, (byte)selectedUnit.yPos, (byte)x, (byte)y, (byte)selectedUnit.playerControl);
+                addGameAction(0, (byte)selectedUnit.unitIdNum, (byte)selectedUnit.xPos, (byte)selectedUnit.yPos, (byte)x, (byte)y, (byte)selectedUnit.playerControl);
 
             removeUnitInGrid(selectedUnit.xPos, selectedUnit.yPos);
             setUnitInGrid(x, y, selectedUnit);
@@ -1293,7 +1293,7 @@ public class MasterGrid : MonoBehaviour
 
     public void addGameAction(
         byte actionType,
-        byte unitType,
+        byte unitIdNum,
         byte fromLocationX,
         byte fromLocationY,
         byte toLocationX,
@@ -1306,7 +1306,7 @@ public class MasterGrid : MonoBehaviour
             turnNumber = gameMaster.turnNumber,
             actionNumber = turnActionCount,
             actionType = actionType,
-            unitType = unitType,
+            unitIdNum = unitIdNum,
             fromLocationX = fromLocationX,
             fromLocationY = fromLocationY,
             toLocationX = toLocationX,

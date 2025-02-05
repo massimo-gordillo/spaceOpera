@@ -16,6 +16,7 @@ public class BaseUnit : MonoBehaviour
     //enums as defined in AttributesBaseUnit
     public Progeny progeny; 
     public UnitType unitType;
+    public byte unitIdNum;
     public HealthType healthType;
     public DamageType damageType;
     public WeaponType weaponType;

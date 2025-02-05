@@ -1,0 +1,14 @@
+unitIdNum,unitName,progeny,isResourceUnit,unitType,isInfantry,healthMax,healthType,damageType,weaponType,damageCombined,canAttackLand,canAttackAir,canAttackSea,canFireBack,baseDamage,attackRange,price,movementRange,canMoveAndAttack,minimumAttackRangeDistance,damage_type_id,armor_id
+0,Infantry,ertrian,true,land,true,100,light,light,projectile,light projectile,true,true,true,true,60,1,100,3,true,0,1,1
+1,GattlingTank,ertrian,false,land,false,400,medium,light,projectile,light projectile,true,true,true,true,300,1,800,6,true,0,1,2
+10,AAJet,ertrian,false,air,false,250,light,light,projectile,light projectile,false,true,false,true,1000,1,1800,9,true,0,1,1
+11,Bomber,ertrian,false,air,false,500,light,heavy,projectile,heavy projectile,true,false,true,false,1400,1,2000,4,true,0,3,1
+12,Battleship,ertrian,false,air,false,1300,heavy,heavy,projectile,heavy projectile,true,true,true,true,1500,2,2500,4,true,0,3,3
+2,LightTank,ertrian,false,land,false,700,medium,heavy,projectile,heavy projectile,true,false,true,true,300,1,700,7,true,0,3,2
+3,Artillery,ertrian,false,land,false,300,medium,heavy,projectile,heavy projectile,true,false,true,false,400,3,600,4,false,1,3,2
+4,Rockets,ertrian,false,land,false,200,medium,light,projectile,light projectile,true,true,true,false,400,5,1500,4,false,1,1,2
+5,APC,ertrian,false,land,false,500,heavy,none,none,none,false,false,false,false,0,0,500,7,false,0,0,3
+6,Electos,ertrian,false,land,false,350,light,light,melee,light melee,true,false,false,true,300,1,600,4,true,0,2,1
+7,HeavyTank,ertrian,false,land,false,1000,heavy,heavy,projectile,heavy projectile,true,false,true,true,800,1,1500,7,true,0,3,3
+8,EVA,ertrian,false,land,false,1400,light,heavy,melee,heavy melee,true,true,false,true,1200,1,2200,3,true,0,4,1
+9,Helicopter,ertrian,false,air,false,120,light,heavy,projectile,heavy projectile,true,true,true,true,250,1,900,6,true,0,3,1

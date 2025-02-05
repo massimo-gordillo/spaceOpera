@@ -39,6 +39,7 @@ public enum DamageType
 public class AttributesBaseUnit
 {
     public string unitName { get; set; }
+    public byte unitIdNum { get; set; }
     public byte baseUnitVariantIdentifier { get; set; }
     public Progeny progeny { get; set; } //Ertiran, Virix, Sentus
     public UnitType unitType { get; set; } //land, sea, air
