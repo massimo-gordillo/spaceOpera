@@ -1,0 +1,91 @@
+/*
+  # Improve moveUnit function
+  
+  1. Changes
+    - Add map boundary validation
+    - Add detailed error messages
+    - Check for destination occupancy
+    - Improve input validation
+*/
+
+CREATE OR REPLACE FUNCTION move_unit(
+    p_game_id UUID,
+    p_old_x INTEGER,
+    p_old_y INTEGER,
+    p_new_x INTEGER,
+    p_new_y INTEGER
+)
+RETURNS BOOLEAN
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE
+    v_piece_id UUID;
+    v_updated BOOLEAN;
+    v_map_width INTEGER;
+    v_map_height INTEGER;
+    v_map_id UUID;
+BEGIN
+    -- Get map dimensions from the match's associated map
+    SELECT m.width, m.height, m.id INTO v_map_width, v_map_height, v_map_id
+    FROM matches mt
+    JOIN maps m ON m.id = mt.map_id
+    WHERE mt.id = p_game_id;
+
+    IF v_map_width IS NULL THEN
+        RAISE EXCEPTION 'Invalid game_id: match not found';
+    END IF;
+
+    -- Validate coordinates are within map boundaries
+    IF p_old_x < 0 OR p_old_x >= v_map_width OR 
+       p_old_y < 0 OR p_old_y >= v_map_height THEN
+        RAISE EXCEPTION 'Invalid old position (%, %): coordinates out of map bounds (width: %, height: %)',
+            p_old_x, p_old_y, v_map_width, v_map_height;
+    END IF;
+
+    IF p_new_x < 0 OR p_new_x >= v_map_width OR 
+       p_new_y < 0 OR p_new_y >= v_map_height THEN
+        RAISE EXCEPTION 'Invalid new position (%, %): coordinates out of map bounds (width: %, height: %)',
+            p_new_x, p_new_y, v_map_width, v_map_height;
+    END IF;
+
+    -- Find the unit at the old position
+    SELECT id INTO v_piece_id
+    FROM match_piece_list
+    WHERE match_id = p_game_id
+        AND x_loc = p_old_x
+        AND y_loc = p_old_y
+        AND piece_type = true;
+
+    -- If no unit found, raise an exception with detailed message
+    IF v_piece_id IS NULL THEN
+        RAISE EXCEPTION 'No unit found at position (%, %)', p_old_x, p_old_y;
+    END IF;
+
+    -- Check if destination is occupied by another piece
+    IF EXISTS (
+        SELECT 1 
+        FROM match_piece_list 
+        WHERE match_id = p_game_id 
+            AND x_loc = p_new_x 
+            AND y_loc = p_new_y
+            AND piece_type = TRUE
+    ) THEN
+        RAISE EXCEPTION 'Destination position (%, %) is already occupied', p_new_x, p_new_y;
+    END IF;
+
+    -- Update the unit's position
+    UPDATE match_piece_list
+    SET x_loc = p_new_x,
+        y_loc = p_new_y
+    WHERE id = v_piece_id;
+
+    GET DIAGNOSTICS v_updated = ROW_COUNT;
+    
+    IF NOT v_updated THEN
+        RAISE EXCEPTION 'Failed to update unit position';
+    END IF;
+
+    RETURN true;
+END;
+$$;
