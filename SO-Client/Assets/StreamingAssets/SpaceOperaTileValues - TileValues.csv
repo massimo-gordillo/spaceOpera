@@ -1,7 +1,7 @@
 tileName,byteValue,defenceValue,movementCost,canInfantryTraverse,canVehicleTraverse,canLandTraverse,canSeaTraverse
 OutOfBounds,0,0,0,FALSE,FALSE,FALSE,FALSE
 Plains,1,1,0,TRUE,TRUE,TRUE,FALSE
-Forest,2,2,0,TRUE,FALSE,TRUE,FALSE
+Forest,2,2,0,TRUE,TRUE,TRUE,FALSE
 SmallMountain,3,3,0,TRUE,FALSE,TRUE,FALSE
 Water,4,0,0,FALSE,FALSE,FALSE,TRUE
 Reef,5,1,0,TRUE,FALSE,TRUE,FALSE

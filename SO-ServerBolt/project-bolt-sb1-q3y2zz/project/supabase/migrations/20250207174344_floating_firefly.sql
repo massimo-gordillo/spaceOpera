@@ -1,0 +1,194 @@
+/*
+  # Add combat defence multiplier function
+  
+  1. New Functions
+    - combat_get_defence_multiplier: Calculates defense multiplier based on tile type
+      - Takes match_id and defender coordinates
+      - Looks up tile type and its defense value
+      - Returns multiplier using formula: 1 - (defence_value / 100 * 4)
+  
+  2. Notes
+    - Used in conjunction with combat_get_damage for final damage calculation
+    - Accounts for terrain defensive bonuses
+*/
+
+CREATE OR REPLACE FUNCTION combat_get_defence_multiplier(
+    p_match_id UUID,
+    p_defender_x INTEGER,
+    p_defender_y INTEGER
+)
+RETURNS NUMERIC
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE
+    v_tile_type_id INTEGER;
+    v_defence_value INTEGER;
+    v_map_width INTEGER;
+    v_map_height INTEGER;
+BEGIN
+    -- Get map dimensions for boundary checking
+    SELECT m.width, m.height
+    INTO v_map_width, v_map_height
+    FROM matches mt
+    JOIN maps m ON m.id = mt.map_id
+    WHERE mt.id = p_match_id;
+
+    IF v_map_width IS NULL THEN
+        RAISE EXCEPTION 'Invalid match_id: match not found';
+    END IF;
+
+    -- Validate coordinates are within map boundaries
+    IF p_defender_x < 0 OR p_defender_x >= v_map_width OR 
+       p_defender_y < 0 OR p_defender_y >= v_map_height THEN
+        RAISE EXCEPTION 'Invalid defender position (%, %): coordinates out of map bounds (width: %, height: %)',
+            p_defender_x, p_defender_y, v_map_width, v_map_height;
+    END IF;
+
+    -- Get tile type at defender's position
+    SELECT tile_type_id INTO v_tile_type_id
+    FROM map_tiles
+    WHERE map_id = (SELECT map_id FROM matches WHERE id = p_match_id)
+        AND x_loc = p_defender_x
+        AND y_loc = p_defender_y;
+
+    IF v_tile_type_id IS NULL THEN
+        RAISE EXCEPTION 'No tile found at position (%, %)', p_defender_x, p_defender_y;
+    END IF;
+
+    -- Get defence value for tile type
+    SELECT defence_value INTO v_defence_value
+    FROM tile_values
+    WHERE tile_type_id = v_tile_type_id;
+
+    IF v_defence_value IS NULL THEN
+        RAISE EXCEPTION 'No defence value found for tile type %', v_tile_type_id;
+    END IF;
+
+    -- Calculate and return defence multiplier
+    RETURN 1 - (v_defence_value::NUMERIC / 100 * 4);
+END;
+$$;
+
+-- Update combat_get_damage to use the defence multiplier
+CREATE OR REPLACE FUNCTION combat_get_damage(
+    p_match_id UUID,
+    p_unit_id_num INTEGER,
+    p_attacker_x INTEGER,
+    p_attacker_y INTEGER,
+    p_defender_x INTEGER,
+    p_defender_y INTEGER
+)
+RETURNS NUMERIC
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    v_attacker_piece match_piece_list%ROWTYPE;
+    v_defender_piece match_piece_list%ROWTYPE;
+    v_damage_type TEXT;
+    v_health_type TEXT;
+    v_multiplier NUMERIC;
+    v_defence_multiplier NUMERIC;
+    v_base_damage NUMERIC;
+    v_map_width INTEGER;
+    v_map_height INTEGER;
+BEGIN
+    -- Get map dimensions for boundary checking
+    SELECT m.width, m.height
+    INTO v_map_width, v_map_height
+    FROM matches mt
+    JOIN maps m ON m.id = mt.map_id
+    WHERE mt.id = p_match_id;
+
+    IF v_map_width IS NULL THEN
+        RAISE EXCEPTION 'Invalid match_id: match not found';
+    END IF;
+
+    -- Validate coordinates are within map boundaries
+    IF p_attacker_x < 0 OR p_attacker_x >= v_map_width OR 
+       p_attacker_y < 0 OR p_attacker_y >= v_map_height THEN
+        RAISE EXCEPTION 'Invalid attacker position (%, %): coordinates out of map bounds (width: %, height: %)',
+            p_attacker_x, p_attacker_y, v_map_width, v_map_height;
+    END IF;
+
+    IF p_defender_x < 0 OR p_defender_x >= v_map_width OR 
+       p_defender_y < 0 OR p_defender_y >= v_map_height THEN
+        RAISE EXCEPTION 'Invalid defender position (%, %): coordinates out of map bounds (width: %, height: %)',
+            p_defender_x, p_defender_y, v_map_width, v_map_height;
+    END IF;
+
+    -- Get attacker unit
+    SELECT * INTO v_attacker_piece
+    FROM match_piece_list
+    WHERE match_id = p_match_id
+        AND x_loc = p_attacker_x
+        AND y_loc = p_attacker_y
+        AND is_unit = true;
+
+    IF NOT FOUND THEN
+        RAISE EXCEPTION 'No unit found at attacker position (%, %)', p_attacker_x, p_attacker_y;
+    END IF;
+
+    -- Validate unit type matches
+    IF v_attacker_piece.game_piece_id != p_unit_id_num THEN
+        RAISE EXCEPTION 'Unit type mismatch: Expected %, found %', p_unit_id_num, v_attacker_piece.game_piece_id;
+    END IF;
+
+    -- Get defender unit
+    SELECT * INTO v_defender_piece
+    FROM match_piece_list
+    WHERE match_id = p_match_id
+        AND x_loc = p_defender_x
+        AND y_loc = p_defender_y
+        AND is_unit = true;
+
+    IF NOT FOUND THEN
+        RAISE EXCEPTION 'No unit found at defender position (%, %)', p_defender_x, p_defender_y;
+    END IF;
+
+    -- Get damage type for attacker
+    SELECT damage_type INTO v_damage_type
+    FROM unit_attributes
+    WHERE game_piece_id = v_attacker_piece.game_piece_id;
+
+    IF v_damage_type IS NULL THEN
+        RAISE EXCEPTION 'No damage type found for attacking unit type %', v_attacker_piece.game_piece_id;
+    END IF;
+
+    -- Get health type for defender
+    SELECT health_type INTO v_health_type
+    FROM unit_attributes
+    WHERE game_piece_id = v_defender_piece.game_piece_id;
+
+    IF v_health_type IS NULL THEN
+        RAISE EXCEPTION 'No health type found for defender unit type %', v_defender_piece.game_piece_id;
+    END IF;
+
+    -- Get combat multiplier
+    SELECT multiplier INTO v_multiplier
+    FROM combat_multipliers
+    WHERE damage_type = v_damage_type
+      AND health_type = v_health_type;
+
+    IF v_multiplier IS NULL THEN
+        RAISE EXCEPTION 'No combat multiplier found for damage type % and health type %', 
+            v_damage_type, v_health_type;
+    END IF;
+
+    -- Get base damage
+    SELECT base_damage INTO v_base_damage
+    FROM unit_attributes
+    WHERE game_piece_id = v_attacker_piece.game_piece_id;
+
+    IF v_base_damage IS NULL THEN
+        RAISE EXCEPTION 'No base damage found for unit type %', v_attacker_piece.game_piece_id;
+    END IF;
+
+    -- Get defence multiplier based on defender's tile
+    SELECT combat_get_defence_multiplier(p_match_id, p_defender_x, p_defender_y)
+    INTO v_defence_multiplier;
+
+    -- Calculate final damage with both multipliers
+    RETURN v_base_damage * v_multiplier * v_defence_multiplier;
+END;
+$$;

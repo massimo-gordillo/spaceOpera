@@ -182,11 +182,10 @@ public class BaseUnit : MonoBehaviour
         damageRangeTextContainer.text = $"{(int)(floor*100)}% - {(int)(ceiling*100)}%";
     }
 
-    public void setHealth(int health)
+    public void setHealth(double health)
     {
-        healthCurrent = health;
         //round down to the nearest 1% of max health
-        healthCurrent = healthCurrent - healthCurrent % (healthMax / 100);
+        healthCurrent = (int)(health - health % (healthMax / 100));
         updateHealthUI();
     }
 
@@ -195,14 +194,14 @@ public class BaseUnit : MonoBehaviour
         healthTextContainer.text = ((int)((double)healthCurrent/(double)healthMax *100)).ToString();
     }
 
-    public void takeDamage(int damage)
+    public void takeDamage(double damage)
     {
         if (damage <= 0)
             setHealth(healthCurrent);
         else if (healthCurrent <= damage){
             setHealth(0);
             deleteMe();
-        }else if (healthCurrent - damage < 0.1 * healthMax)
+        }else if ((healthCurrent - damage) < 0.05 * healthMax)
         {
             setHealth(0);
             deleteMe();

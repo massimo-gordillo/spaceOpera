@@ -88,6 +88,7 @@ public class MasterGrid : MonoBehaviour
     private double defenceMultiplier;
     private double firebackMultiplier;
     private double attackLuckRange; //should probably rename, too close to attackRange
+    private bool luckOn = false;
 
     public Transform movementSquareList;
     public MovementSquare moveSquare;
@@ -277,14 +278,20 @@ public class MasterGrid : MonoBehaviour
 
 
         double damagePreLuck = getDamageBeforeLuck(attacker, defender, false);
-        double finalDamage = getDamageAfterLuck(damagePreLuck);
-
-        defender.takeDamage((int)finalDamage);
-        //Debug.Log($"Unit attacks with preluck damage {damagePreLuck} dealing {finalDamage} damage with luck factor of {finalDamage / damagePreLuck}");
+        double finalDamage = damagePreLuck;
+        if (luckOn)
+            finalDamage = getDamageAfterLuck(damagePreLuck);
+        
+        
+        defender.takeDamage(finalDamage);
+        Debug.Log($"Unit attacks with preluck damage {damagePreLuck} dealing {(int)finalDamage} damage with luck factor of {finalDamage / damagePreLuck}");
         if (canUnitAttack(defender, attacker) && defender.canFireBack && defender.attackRange >= attacker.attackRange)
         {
             double defenderFireBackDamage = getDamageBeforeLuck(defender, attacker, true);
-            attacker.takeDamage((int)defenderFireBackDamage);
+            if (luckOn)
+                defenderFireBackDamage = getDamageAfterLuck(defenderFireBackDamage);
+
+            attacker.takeDamage(defenderFireBackDamage);
             //Debug.Log($"Defending Unit fires back with {defenderFireBackDamage}");
         } else
             Debug.Log($"Can defending Unit fire back: {defender.canFireBack}, or is it out of range: {defender.attackRange} < {attacker.attackRange}");
@@ -296,20 +303,23 @@ public class MasterGrid : MonoBehaviour
         double baseDamage = getAttackerBaseDamage(attacker);
         double multiplier = getDamageMultiplier(attacker, defender);
         double defenceVal = getDefenceValueForDefender(defender);
+        
         //Debug.Log($"defenceVal for defender {defender.GetInstanceID()} is {defenceVal}");
 
         //if they are the same type of unit, they deal a maximum of 70% after type multiplier (defence and luck calculation comes after) 
-        if (attacker.unitName == defender.unitName)
+        if (attacker.gamePieceId == defender.gamePieceId)
         {
             if (!firingBack && baseDamage * multiplier > defender.healthMax * 0.70)
             {
                 baseDamage = defender.healthMax * 0.70;
                 multiplier = 1;
-            } else if (firingBack && baseDamage * multiplier * defenceVal * firebackMultiplier > defender.healthMax * 0.50) //only 50% max if firing back.
+            } /*else if (firingBack && baseDamage * multiplier * defenceVal * firebackMultiplier > defender.healthMax * 0.50) //only 50% max if firing back.
             {
                 return defender.healthMax * 0.50;
-            }
+            }*/
         }
+        //print to console info about this attack
+        Debug.Log($"Attacker: {attacker.name}, Defender: {defender.name}, baseDamage: {baseDamage}, multiplier: {multiplier}, defenceVal: {defenceVal}, firebackMultiplier: {firebackMultiplier}");
         if (!firingBack)
             return baseDamage * multiplier * defenceVal;
         else
@@ -364,6 +374,7 @@ public class MasterGrid : MonoBehaviour
 
     public double getAttackerBaseDamage(BaseUnit attacker)
     {
+        //Debug.Log($"Base damage: {attacker.baseDamage}, healthCurrent: {attacker.healthCurrent}, healthMax: {attacker.healthMax}, health ratio: {(double)attacker.healthCurrent / attacker.healthMax}");
         return attacker.baseDamage * ((double)attacker.healthCurrent / attacker.healthMax);
     }
 
@@ -887,7 +898,10 @@ public class MasterGrid : MonoBehaviour
         int tileDefenceValue = getTileDefenceValueInt(defender.xPos, defender.yPos);
         double floor = getAttackLuckFloor(damageBeforeLuck, defender.healthMax);
         double ceiling = getAttackLuckCeiling(damageBeforeLuck, defender.healthMax);
-        defender.showCombatTooltip(tileDefenceValue, floor, ceiling);
+        if(luckOn)
+            defender.showCombatTooltip(tileDefenceValue, floor, ceiling);
+        else
+            defender.showCombatTooltip(tileDefenceValue, damageBeforeLuck, damageBeforeLuck);
         Debug.Log($"For defender {defender.GetInstanceID()}, Tooltip displays floor: {floor}, ceiling: {ceiling}, base dmg before luck: {damageBeforeLuck}.");
     }
 
