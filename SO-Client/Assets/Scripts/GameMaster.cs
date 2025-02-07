@@ -186,7 +186,7 @@ public class GameMaster : MonoBehaviour
             //need a way to set to exhausted from here so the units don't have to start exhausted on the 1st turn.
             Instantiate(unit, new Vector2(selectedStructure.xPos, selectedStructure.yPos), Quaternion.identity, unitList);
             //3 is produce a unit
-            masterGrid.addGameAction(3, (byte)unit.unitType, (byte)selectedStructure.xPos, (byte)selectedStructure.yPos, (byte)unit.xPos, (byte)unit.yPos, (byte)playerTurn);
+            masterGrid.addGameAction(3, (byte)unit.unitTerrainType, (byte)selectedStructure.xPos, (byte)selectedStructure.yPos, (byte)unit.xPos, (byte)unit.yPos, (byte)playerTurn);
             playerResourceText.text = "" + playerResources[playerTurn];
             selectedStructure.turnOffCollider();
             hideChoicePanel();

@@ -10,7 +10,7 @@ public class GameValuesSO : ScriptableObject
 {
     private Dictionary<byte, AttributesBaseUnit> attributesBaseUnits;
     //private List<AttributesTile> attributesTiles;
-    private string[] unitTypes;
+    private string[] unitTerrainTypes;
     private PrefabManager prefabManager = new PrefabManager();
     private Dictionary<byte, AttributesTile> byteToAttributesTileDictionary; // Map byte values to AttributeTiles (tile rules)
     private Dictionary<string, Dictionary<string, double>> combatMultipliersDictionary;
@@ -247,7 +247,7 @@ public class GameValuesSO : ScriptableObject
     {
         Debug.Log($"unitName: {unitData.unitName}");
         Debug.Log($".progeny: {unitData.progeny}");
-        Debug.Log($"unitType: {unitData.unitType}");
+        Debug.Log($"unitTerrainType: {unitData.unitTerrainType}");
         Debug.Log($"healthMax: {unitData.healthMax}");
         Debug.Log($"healthType: {unitData.healthType}");
         Debug.Log($"weaponType: {unitData.weaponType}");

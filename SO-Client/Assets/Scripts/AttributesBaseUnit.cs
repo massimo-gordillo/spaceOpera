@@ -7,7 +7,7 @@ public enum Progeny
     Sentus
 }
 
-public enum UnitType
+public enum UnitTerrainType
 {
     Land,
     Air,
@@ -39,10 +39,10 @@ public enum DamageType
 public class AttributesBaseUnit
 {
     public string unitName { get; set; }
-    public byte unitIdNum { get; set; }
+    public byte gamePieceId { get; set; }
     public byte baseUnitVariantIdentifier { get; set; }
     public Progeny progeny { get; set; } //Ertiran, Virix, Sentus
-    public UnitType unitType { get; set; } //land, sea, air
+    public UnitTerrainType unitTerrainType { get; set; } //land, sea, air
     public bool isInfantry { get; set; }
     public bool isResourceUnit { get; set; }
     public int healthMax { get; set; }

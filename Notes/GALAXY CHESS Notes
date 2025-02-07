@@ -173,51 +173,69 @@ in map_init_pieces, map_id requires id in maps.
 in map_tiles map_id requires id in maps.    
 
 
-LETS TRY AND INSERT THE TABLE MANUALLY! Apparently Bolt's insert function is broken BLEH.
-
-const mapData = {
-  name: "TestMap2.1",
-  width: 16,
-  height: 19,
-  tiles: [
-1,1,3,2,2,1,1,3,2,2,2,3,1,1,2,2,3,1,1,1,1,3,2,2,1,3,3,2,1,2,3,3,1,2,2,3,1,1,3,3,3,1,1,1,1,1,1,1,1,1,1,1,1,1,3,3,3,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,3,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,3,3,1,1,1,1,3,2,1,1,1,1,1,2,3,1,1,1,1,3,3,1,1,1,3,3,2,1,2,2,2,1,2,3,3,1,1,1,3,1,1,1,1,2,2,2,1,4,4,4,1,2,2,2,1,1,1,1,2,1,1,1,1,2,4,4,4,4,4,4,4,2,1,1,1,1,2,1,1,1,1,1,2,4,4,4,4,4,4,4,2,1,1,1,1,2,2,1,1,1,1,2,4,4,4,4,4,4,4,3,1,1,1,1,1,2,1,1,1,1,3,3,4,4,4,4,4,2,3,1,1,1,1,2,1,1,1,1,1,2,3,4,4,4,4,4,3,2,1,1,1,1,1,2,2,1,1,2,2,2,2,4,4,4,2,2,2,2,1,1,2,3,3,3,3,2,2,2,2,1,4,4,4,1,2,2,2,1,1,2,3
-  ],
-  pieces: [
-  {isUnit: false, x: 0, y: 0, "typeId":200, "ownerId":0, "health":200},
-{isUnit: false, x: 0, y: 13, "typeId":200, "ownerId":0, "health":200},
-{isUnit: false, x: 1, y: 1, "typeId":200, "ownerId":0, "health":200},
-{isUnit: false, x: 1, y: 11, "typeId":201, "ownerId":1, "health":200},
-{isUnit: false, x: 2, y: 3, "typeId":200, "ownerId":0, "health":200},
-{isUnit: false, x: 2, y: 8, "typeId":201, "ownerId":1, "health":200},
-{isUnit: false, x: 3, y: 3, "typeId":200, "ownerId":0, "health":200},
-{isUnit: false, x: 3, y: 12, "typeId":205, "ownerId":1, "health":200},
-{isUnit: false, x: 3, y: 14, "typeId":200, "ownerId":1, "health":200},
-{isUnit: false, x: 4, y: 9, "typeId":200, "ownerId":1, "health":200},
-{isUnit: false, x: 4, y: 10, "typeId":200, "ownerId":1, "health":200},
-{isUnit: false, x: 6, y: 0, "typeId":200, "ownerId":0, "health":200},
-{isUnit: false, x: 6, y: 3, "typeId":201, "ownerId":0, "health":200},
-{isUnit: false, x: 7, y: 8, "typeId":200, "ownerId":0, "health":200},
-{isUnit: false, x: 7, y: 15, "typeId":200, "ownerId":0, "health":200},
-{isUnit: false, x: 8, y: 2, "typeId":200, "ownerId":0, "health":200},
-{isUnit: false, x: 10 "" :2, "typeId":200, "ownerId":0, "health":200},
-{isUnit: false, x: 11 "" :8, "typeId":200, "ownerId":0, "health":200},
-{isUnit: false, x: 11 "" :15, "typeId":200, "ownerId":0, "health":200},
-{isUnit: false, x: 12 "" :0, "typeId":200, "ownerId":0, "health":200},
-{isUnit: false, x: 12 "" :3, "typeId":201, "ownerId":0, "health":200},
-{isUnit: false, x: 14 "" :9, "typeId":200, "ownerId":2, "health":200},
-{isUnit: false, x: 14 "" :10, "typeId":200, "ownerId":2, "health":200},
-{isUnit: false, x: 15 "" :3, "typeId":200, "ownerId":0, "health":200},
-{isUnit: true, x: 15 "" :12, "typeId":0, "ownerId":2, "health":100},
-{isUnit: false, x: 15 "" :12, "typeId":205, "ownerId":2, "health":200},
-{isUnit: false, x: 15 "" :14, "typeId":200, "ownerId":2, "health":200},
-{isUnit: false, x: 16 "" :3, "typeId":200, "ownerId":0, "health":200},
-{isUnit: false, x: 16 "" :8, "typeId":201, "ownerId":2, "health":200},
-{isUnit: false, x: 17 "" :1, "typeId":200, "ownerId":0, "health":200},
-{isUnit: false, x: 17 "" :11, "typeId":201, "ownerId":2, "health":200},
-{isUnit: false, x: 18 "" :0, "typeId":200, "ownerId":0, "health":200},
-{isUnit: false, x: 18 "" :13, "typeId":200, "ownerId":0, "health":200}
+SUPABASE_URL=https://ezmafonauvkpalwjpaer.supabase.co
+SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV6bWFmb25hdXZrcGFsd2pwYWVyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzYxMDE5NjUsImV4cCI6MjA1MTY3Nzk2NX0.i3E8rSHoMV1ThEWctZNU25oV_DfTjBu_jsQXQZiLO0s
 
 
-    
-  ]
-};
+Write a function called moveUnit which takes in a game_id, an old_x, old_y, new_x, new_y vars.
+In the match_piece_list table, find the row where x_loc = old_x and y_loc = old_y and piece_type=true.
+replace x_loc and y_loc with the new vars.
+
+
+I've created and populated four tables, one called unit_attributes, one called unit_health_types, one called unit_damage_types, and another called combat_multipliers.
+Write a function called unitCombat which takes in a match_id, a gamePieceId, an attacker_x, attacker_y, defender_x, defender_y vars.
+In the match_piece_list table, confirm that you find the row with attacker_x, attacker_y and a row with defender_x, defender_y for this match_id.
+Confirm the gamePieceId matches the game_piece_id (previously type_num) in match_piece_list at attacker_x, attacker_y (in the given match).
+Then, search the unit_attributes table for the row with gamePieceId and make a var containing the damage_type_id.
+Then, search the match_piece_list table for the unit at defender_x, defender_y for this match_id and make another var containing the healthType.
+Then use the damage_type_id and healthType to find the cell in combat_multiplers which's primary key is the two vars, then save that in a var.
+Then, get attacker baseDamage from unit_attributes and multiply it by the multiplier you just grabbed.
+
+
+
+
+
+
+Can you add more error checking in the function please?
+It should tell me if it doesn't find a row meeting the criteria to modify. It should also check that neither of the x val or y vals are outside the width and height vars of the map with that given_id.
+
+
+game_piece_id
+map_init_pieces.piece_type > map_init_pieces.is_unit (bool)
+map_init_pieces.type_num > map_init_pieces.game_piece_id (int2)
+match_piece_list.piece_type > match_piece_list.is_unit (bool)
+match_piece_list.unit_id > match_piece_list.game_piece_id (int2)
+unit_attributes.damage_type_id > unit_attributes.damage_type
+
+SELECT match_unit_combat(
+    '390ddd58-cf3d-4a02-bff1-3d058689fad6',  -- Match ID
+        2,               -- Attacker Unit Type ID
+    3, 6,             -- Attacker X, Y
+    5, 7             -- Defender X, Y
+
+);
+
+
+
+SUPER VALUABLE SQL STATEMENTS
+
+Database introspection query that shows the current schema
+
+SELECT 
+  table_name,
+  column_name,
+  data_type,
+  column_default,
+  is_nullable
+FROM information_schema.columns
+WHERE table_schema = 'public'
+ORDER BY table_name, ordinal_position;
+
+Listing all current functions:
+
+SELECT 
+  p.proname as function_name,
+  pg_get_functiondef(p.oid) as definition
+FROM pg_proc p
+JOIN pg_namespace n ON p.pronamespace = n.oid
+WHERE n.nspname = 'public';

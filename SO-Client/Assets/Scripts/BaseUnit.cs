@@ -15,8 +15,8 @@ public class BaseUnit : MonoBehaviour
 
     //enums as defined in AttributesBaseUnit
     public Progeny progeny; 
-    public UnitType unitType;
-    public byte unitIdNum;
+    public UnitTerrainType unitTerrainType;
+    public byte gamePieceId;
     public HealthType healthType;
     public DamageType damageType;
     public WeaponType weaponType;
@@ -123,7 +123,7 @@ public class BaseUnit : MonoBehaviour
         if (data != null)
         {
             unitName = data.unitName;
-            unitType = data.unitType;
+            unitTerrainType = data.unitTerrainType;
             healthMax = data.healthMax;
             healthType = data.healthType;
             damageType = data.damageType;

@@ -40,8 +40,8 @@ public class MenuProductionPanel : MonoBehaviour
             newButton.unitPrefab = prefabManager.getPrefab(attributesBaseUnit.prefabPath);
 
             // Set the parent
-            Transform parent = attributesBaseUnit.unitType == UnitType.Land ? prodListProgeny0Land
-                               : attributesBaseUnit.unitType == UnitType.Air ? prodListProgeny0Air
+            Transform parent = attributesBaseUnit.unitTerrainType == UnitTerrainType.Land ? prodListProgeny0Land
+                               : attributesBaseUnit.unitTerrainType == UnitTerrainType.Air ? prodListProgeny0Air
                                : prodListProgeny0Sea;
             newButton.transform.SetParent(parent, false);
         }

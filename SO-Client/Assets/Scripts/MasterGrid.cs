@@ -15,7 +15,9 @@ public class GameAction
     // 0 = move, 1 = attack, 2 = capture, 3 = produce
     public byte actionType { get; set; }
 
-    public byte unitType { get; set; }
+    public byte gamePieceId { get; set; }
+
+    public byte unitTerrainType { get; set; }
 
     public byte fromLocationX { get; set; }
 
@@ -42,7 +44,7 @@ public class GameAction
     public byte actionType { get; set; }
 
     [Key(1)]
-    public byte unitType { get; set; }
+    public byte unitTerrainType { get; set; }
 
     [Key(2)]
     public byte fromLocationX { get; set; }
@@ -267,10 +269,10 @@ public class MasterGrid : MonoBehaviour
     public void unitCombat(BaseUnit attacker, BaseUnit defender)
     {
         //0 is move
-        addGameAction(0, (byte)attacker.unitIdNum, (byte)attacker.oldXPos, (byte)attacker.oldYPos, (byte)attacker.xPos, (byte)attacker.yPos, (byte)attacker.playerControl);
+        addGameAction(0, (byte)attacker.gamePieceId, (byte)attacker.oldXPos, (byte)attacker.oldYPos, (byte)attacker.xPos, (byte)attacker.yPos, (byte)attacker.playerControl);
 
         //1 is attack
-        addGameAction(1, (byte)attacker.unitIdNum, (byte)attacker.xPos, (byte)attacker.yPos, (byte)defender.xPos, (byte)defender.yPos, (byte)attacker.playerControl);
+        addGameAction(1, (byte)attacker.gamePieceId, (byte)attacker.xPos, (byte)attacker.yPos, (byte)defender.xPos, (byte)defender.yPos, (byte)attacker.playerControl);
 
 
 
@@ -369,11 +371,11 @@ public class MasterGrid : MonoBehaviour
     {
         if (attacker != null && defender != null)
         {
-            if (defender.unitType == UnitType.Land)
+            if (defender.unitTerrainType == UnitTerrainType.Land)
                 return attacker.canAttackLand;
-            else if (defender.unitType == UnitType.Sea)
+            else if (defender.unitTerrainType == UnitTerrainType.Sea)
                 return attacker.canAttackSea;
-            else if (defender.unitType == UnitType.Air)
+            else if (defender.unitTerrainType == UnitTerrainType.Air)
                 return attacker.canAttackAir;
             Debug.LogError("No unit Type returned when checking if a unit could attack");
             return true;
@@ -406,7 +408,7 @@ public class MasterGrid : MonoBehaviour
                 structure.captureHealth = structure.captureHealth - selectedUnit.healthCurrent;
             else
                 structure.switchAlliance(selectedUnit.getPlayerControl());
-            addGameAction(2, (byte)selectedUnit.unitIdNum, (byte)selectedUnit.xPos, (byte)selectedUnit.yPos, (byte)structure.xPos, (byte)structure.yPos, (byte)selectedUnit.playerControl);
+            addGameAction(2, (byte)selectedUnit.gamePieceId, (byte)selectedUnit.xPos, (byte)selectedUnit.yPos, (byte)structure.xPos, (byte)structure.yPos, (byte)selectedUnit.playerControl);
             exhaustSelectedUnit(selectedUnit, true);
         }
         else
@@ -949,7 +951,7 @@ public class MasterGrid : MonoBehaviour
 
     public double getDefenceValueForDefender(BaseUnit defender)
     {
-        if (defender.unitType == UnitType.Air)
+        if (defender.unitTerrainType == UnitTerrainType.Air)
             return 1;
         else
         {
@@ -966,15 +968,15 @@ public class MasterGrid : MonoBehaviour
         if (!tileAttributes.TryGetValue(b, out AttributesTile a))
             Debug.LogWarning($"Key '{b}' was not found in the dictionary.");
         bool moveCheck = true;
-        switch (unit.unitType)
+        switch (unit.unitTerrainType)
         {
-            case UnitType.Land:
+            case UnitTerrainType.Land:
                 moveCheck = moveCheck && a.canLandTraverse;
                 break;
-            case UnitType.Sea:
+            case UnitTerrainType.Sea:
                 moveCheck = moveCheck && a.canSeaTraverse;
                 break;
-            case UnitType.Air:
+            case UnitTerrainType.Air:
                 return moveCheck;
             default:
                 break;
@@ -1071,7 +1073,7 @@ public class MasterGrid : MonoBehaviour
 
             // if you're undoing movement, don't add it to the action list
             if (!selectedUnit.undoingMovement)
-                addGameAction(0, (byte)selectedUnit.unitIdNum, (byte)selectedUnit.xPos, (byte)selectedUnit.yPos, (byte)x, (byte)y, (byte)selectedUnit.playerControl);
+                addGameAction(0, (byte)selectedUnit.gamePieceId, (byte)selectedUnit.xPos, (byte)selectedUnit.yPos, (byte)x, (byte)y, (byte)selectedUnit.playerControl);
 
             removeUnitInGrid(selectedUnit.xPos, selectedUnit.yPos);
             setUnitInGrid(x, y, selectedUnit);
@@ -1293,7 +1295,7 @@ public class MasterGrid : MonoBehaviour
 
     public void addGameAction(
         byte actionType,
-        byte unitIdNum,
+        byte gamePieceId,
         byte fromLocationX,
         byte fromLocationY,
         byte toLocationX,
@@ -1306,7 +1308,7 @@ public class MasterGrid : MonoBehaviour
             turnNumber = gameMaster.turnNumber,
             actionNumber = turnActionCount,
             actionType = actionType,
-            unitIdNum = unitIdNum,
+            gamePieceId = gamePieceId,
             fromLocationX = fromLocationX,
             fromLocationY = fromLocationY,
             toLocationX = toLocationX,
