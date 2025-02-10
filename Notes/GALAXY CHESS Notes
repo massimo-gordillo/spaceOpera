@@ -61,6 +61,8 @@ fixed BUG #3: Can't consistently click on production structures
 Bug #4: Capturing infantry cannot unselect
 Bug #5: Undo unit movement makes it unselectable    
 
+Potential bug: a capturing unit moves away from struct but then undos the movement.
+
 TO DO, DON'T FORGET:
 Turn on Email Auth for Supabase
 Debug tilemap exportBytesToFile and importFileToBytes. I modified the serialization so I need to confirm it's not broken. For later.
@@ -200,6 +202,11 @@ Can you add more error checking in the function please?
 It should tell me if it doesn't find a row meeting the criteria to modify. It should also check that neither of the x val or y vals are outside the width and height vars of the map with that given_id.
 
 
+Ok let's add some more complexity to the combat damage calculations. Write a new function called combat_get_defence_multiplier. I want you to get a multiplier that we'll use to update the final damage value based on the tile that the defending unit is on. For the x,y location of the defender, look up the tile_id for the tile at that location. Use that tile_id to look up the defence_value in tile_values. Then calculate the defence multiplier using the following function:
+
+1 - defence_value / 100 * 4;
+
+
 game_piece_id
 map_init_pieces.piece_type > map_init_pieces.is_unit (bool)
 map_init_pieces.type_num > map_init_pieces.game_piece_id (int2)
@@ -229,6 +236,7 @@ SELECT
   is_nullable
 FROM information_schema.columns
 WHERE table_schema = 'public'
+--AND table_name = 'tile_values'
 ORDER BY table_name, ordinal_position;
 
 Listing all current functions:
@@ -239,3 +247,60 @@ SELECT
 FROM pg_proc p
 JOIN pg_namespace n ON p.pronamespace = n.oid
 WHERE n.nspname = 'public';
+
+
+Ok let's create a function called action_capture where a unit can capture a structure a structure.
+
+Structures have a default health of 200. Only units with attribute is_resource_unit = TRUE can capture a structure.
+
+Let's create a new table called structure_attributes with ID starting at 200 - 205
+
+200: Resource
+201: Factory
+202: Airport
+203: Seaport
+205: Command
+
+Let's have bools called is_resource, is_production, is_command. default_health can be 200 for all of them for now.
+
+Note that structures are also considered game pieces and will appear in the match_piece_list table.
+
+An is_resource_unit can only capture neutral structures or those controlled by other players.
+When an is_resource_unit captures a structure, its health (as a % of 100) is subtracted from the 200 base health of the structure. When a capture sets the health to 0 or less the structure is then controlled by that player.|
+
+
+
+ok let's move onto the final action, 'action_produce'.
+
+We'll need to make a small modification to the 'matches' table. Add 2 columns, 'player1_resources' and 'player2_resources'. At the beginning of a turn, a player will receive an income with the following function:
+200 + 100*(number of structures controlled by that player)
+
+Let's create a match_new_turn function to do this basic operation, we'll expand this function at a later time.
+
+Ok back to 'action_produce'. 
+
+Modify structure_attributes to have an additional column production_terrain_type, which will be either Land, Sea, Air, which match unit_attributes.terrain_type. Factory, 201, is land, Airport, 202, is Air, Seaport 203, is Sea.
+
+The inputs will be the x and y location where the unit is being produced and the game_piece_id. You'll have to do a number of checks:
+1. The structure at x,y is a production structure.
+2. Compare terrain_type between the production structure and the unit being tried to make, ensure they match.
+3. There is no game piece on this square (besides the production structure)
+4. The player who's turn it is has sufficient resources to build the unit, see unit_attributes.price.
+5. The production structure is owned by the player whose turn it is.
+
+If these checks are are all passed, a unit is created at the x,y location and added to match_piece_list. The unit_attributes.price value is deducted from the player's resources in the matches table.
+
+
+ok great! Let's add some additional logic checks to our functions. In match_piece_list add three bool columns, move_nonexhausted, attack_nonexhausted, production_nonexhausted. The default values for these is FALSE.
+
+There is an exception here. When calling the create_match function, any game_pieces in the insert_game_pieces list that belong to player 1 should be set to TRUE. (at the beginning of the game player 1 can move their units etc).
+
+Logically, is it's a structure, move and combat should be NULL, and if it's a unit then production should be NULL. If it's a nonproduction structure all should be NULL.
+
+in 'action_move', before moving, check that the unit has move_nonexhausted = TRUE. Once the unit has moved, set it to false.
+
+in 'action_combat', before attacking check that the unit has attack_nonexhausted = TRUE. Once the unit has attacked, set it to false. Also set move_nonexhausted to FALSE.
+
+When match_new_turn is triggered, for all game pieces controlled by the player's who turn it is now, set the appropriate nonexhausted values to TRUE (nulls remain null).
+
+In summary, every unit can move then attack once each per turn (can't attack the move). Each production structure can produce once per turn.
