@@ -446,6 +446,29 @@ public class SupabaseManager : MonoBehaviour
         }
     }*/
 
+    public async Task<bool> SendGameActions(List<GameAction> gameActions)
+    {
+        try
+        {
+            string endpoint = "/rest/v1/rpc/submit_game_actions";
+            var response = await _supabaseClient.SendRequest<string>(endpoint, HttpMethod.Post, gameActions);
+
+            if (!string.IsNullOrEmpty(response))
+            {
+                Debug.Log($"Game actions sent successfully: {response}");
+                return true;
+            }
+
+            Debug.LogError("Failed to send game actions.");
+            return false;
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"Error sending game actions: {ex.Message}");
+            return false;
+        }
+    }
+
 
     //send gameActionsList to server for verification
     public async Task SendGameActionsListToServer(List<GameAction> gameActionsList)

@@ -6,67 +6,11 @@ using UnityEngine;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-public class GameAction
-{
-    public short turnNumber { get; set; }
-
-    public short actionNumber { get; set; }
-
-    // 0 = move, 1 = attack, 2 = capture, 3 = produce
-    public byte actionType { get; set; }
-
-    public byte gamePieceId { get; set; }
-
-    public byte unitTerrainType { get; set; }
-
-    public byte fromLocationX { get; set; }
-
-    public byte fromLocationY { get; set; }
-
-    public byte toLocationX { get; set; }
-
-    public byte toLocationY { get; set; }
-
-    public byte playerID { get; set; }
-}
-
-/*[MessagePackObject]
-public class GameAction
-{
-    [Key(7)]
-    public short turnNumber { get; set; }
-
-    [Key(8)]
-    public short actionNumber { get; set; }
-
-    // 0 = move, 1 = attack, 2 = capture, 3 = produce
-    [Key(0)]
-    public byte actionType { get; set; }
-
-    [Key(1)]
-    public byte unitTerrainType { get; set; }
-
-    [Key(2)]
-    public byte fromLocationX { get; set; }
-
-    [Key(3)]
-    public byte fromLocationY { get; set; }
-
-    [Key(4)]
-    public byte toLocationX { get; set; }
-
-    [Key(5)]
-    public byte toLocationY { get; set; }
-
-    [Key(6)]
-    public byte playerID { get; set; }
-}*/
-
-
 
 public class MasterGrid : MonoBehaviour
 {
     bool drawing = false;
+    string match_id;
 
     public int gridX;
     public int gridY;
@@ -103,6 +47,9 @@ public class MasterGrid : MonoBehaviour
         Dictionary<byte, AttributesTile> inputTileAttributes,
         Dictionary<string, Dictionary<string, double>> inputCombatMultipliers)
     {
+
+        match_id = "1111111-11111111-111111";
+        //match_id = gameMaster.match_id;
 
         gridX = x;
         gridY = y;
