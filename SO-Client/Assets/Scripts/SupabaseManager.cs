@@ -667,9 +667,6 @@ public class SupabaseManager : MonoBehaviour
 
                 if (Guid.TryParse(matchIdString, out Guid matchId))
                 {
-                    Debug.Log($"Match ID after parse: {matchId}");
-                    //_gameMaster.match_id = matchId;
-                    //_gameMaster.match_id = matchId;
                     _gameMaster.setMatchId(matchId);
                 }
                 else

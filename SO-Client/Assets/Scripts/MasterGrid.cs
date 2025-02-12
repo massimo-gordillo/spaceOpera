@@ -139,7 +139,7 @@ public class MasterGrid : MonoBehaviour
 
     public void unitHasBeenClicked(BaseUnit unit)
     {
-        print("You've clicked on " + unit.GetInstanceID());
+        //print("You've clicked on " + unit.GetInstanceID());
         //if Choice Panel is not presented by GameMaster
         if (!gameMaster.choicePanel.activeInHierarchy) {
             //if it's the selected unit (MG 24-06-11 this should never occur anymore given the choice menu behaviour)
@@ -368,7 +368,7 @@ public class MasterGrid : MonoBehaviour
         if (selectedUnit != null)
         {
             //print("capture health: " + structure.captureHealth + "selectedUnithealth " + selectedUnit.healthCurrent);
-            if (selectedUnit.healthCurrent < structure.captureHealth) //do we want to do this math within BaseStructu
+            if (selectedUnit.healthCurrent < structure.captureHealth) //do we want to do this math within BaseStructure?
                 structure.captureHealth = structure.captureHealth - selectedUnit.healthCurrent;
             else
                 structure.switchAlliance(selectedUnit.getPlayerControl());
@@ -397,7 +397,7 @@ public class MasterGrid : MonoBehaviour
     public void drawMovement(BaseUnit mTarget)
     {
         drawing = true;
-        Debug.Log($"Setting {mTarget} as drawMovementUnit");
+        //Debug.Log($"Setting {mTarget} as drawMovementUnit");
         drawMovementUnit = mTarget;
         int movementRange = mTarget.movementRange;
         int attackRange = mTarget.attackRange;
@@ -1291,7 +1291,7 @@ public class MasterGrid : MonoBehaviour
             toLocationY = toLocationY,
             playerID = playerID
         };
-        Debug.Log($"Adding game action {turnActionCount} of type {actionType} to the game actions list with values {gamePieceId}, {fromLocationX}, {fromLocationY}, {toLocationX}, {toLocationY}.");
+        Debug.Log($"Adding game action {turnActionCount} of type {actionType} for turn number {gameMaster.turnNumber} to the game actions list with values {gamePieceId}, {fromLocationX}, {fromLocationY}, {toLocationX}, {toLocationY}.");
         gameActions.Add(gameAction);
     }
 
@@ -1308,9 +1308,5 @@ public class MasterGrid : MonoBehaviour
         return tempGameActions;
     }
 
-    public void setMatchId(Guid matchId)
-    {
-        Debug.Log("grid Setting match id to: " + matchId);
-        match_id = matchId;
-    }
+    public void setMatchId(Guid matchId){ match_id = matchId; }
 }

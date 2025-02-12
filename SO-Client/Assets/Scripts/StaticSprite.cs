@@ -35,7 +35,7 @@ public class StaticSprite : ClickableObject
 
     public override void HandleClick()
     {
-        Debug.Log("Clicked on: " + gameObject.name);
+        //Debug.Log("Clicked on: " + gameObject.name);
         if (parentComponentBaseUnit != null)
             parentComponentBaseUnit.staticSpriteHasBeenClicked();
         else if (parentComponentBaseStructure != null)
