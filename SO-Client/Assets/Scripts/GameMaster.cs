@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -13,6 +14,7 @@ public class GameMaster : MonoBehaviour
     public TilemapManager tilemapManager;
     private PrefabManager prefabManager = new PrefabManager();
     public SupabaseManager supabaseManager;
+    public Guid match_id;
 
     public Canvas canvas;
     public BaseStructure selectedStructure;
@@ -54,6 +56,7 @@ public class GameMaster : MonoBehaviour
     // Start is called before the first frame update
     void Awake()
     {
+        match_id = Guid.Parse("aaaaaaaa-8761-4e77-a086-a7365ae9e0b4");
         turnNumber = 1;
         //gameValues = AssetDatabase.LoadAssetAtPath<GameValuesSO>("Assets/Scripts/Assets/Scripts/GameValuesSO.cs.cs");
 
@@ -185,10 +188,13 @@ public class GameMaster : MonoBehaviour
             playerResources[playerTurn] -= price;
             unit.playerControl = playerTurn;
             //need a way to set to exhausted from here so the units don't have to start exhausted on the 1st turn.
-            Instantiate(unit, new Vector2(selectedStructure.xPos, selectedStructure.yPos), Quaternion.identity, unitList);
+            BaseUnit tempUnit = Instantiate(unit, new Vector2(selectedStructure.xPos, selectedStructure.yPos), Quaternion.identity, unitList);
+            //GameObject tempInstance = Object.Instantiate(unit, new Vector2(selectedStructure.xPos, selectedStructure.yPos), Quaternion.identity, unitList);
+            //BaseUnit tempUnit = tempInstance.GetComponent<BaseUnit>();
+            
             //3 is produce a unit
             //not sure why the unit x and y coordiantes aren't available here but this works.
-            masterGrid.addGameAction(3, (byte)unit.gamePieceId, (byte)selectedStructure.xPos, (byte)selectedStructure.yPos, (byte)selectedStructure.xPos, (byte)selectedStructure.yPos);
+            masterGrid.addGameAction(3, (byte)tempUnit.gamePieceId, (byte)selectedStructure.xPos, (byte)selectedStructure.yPos, (byte)selectedStructure.xPos, (byte)selectedStructure.yPos);
             playerResourceText.text = "" + playerResources[playerTurn];
             selectedStructure.turnOffCollider();
             hideChoicePanel();
@@ -458,5 +464,12 @@ public class GameMaster : MonoBehaviour
         {
             Debug.LogError("Game state file not found at " + gameStateFilePath);
         }
+    }
+
+    public void setMatchId(Guid matchId)
+    {
+        Debug.Log("Setting match id to: " + matchId);
+        match_id = matchId;
+        masterGrid.setMatchId(matchId);
     }
 }

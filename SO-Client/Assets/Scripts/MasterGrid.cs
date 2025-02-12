@@ -51,10 +51,10 @@ public class MasterGrid : MonoBehaviour
         Dictionary<string, Dictionary<string, double>> inputCombatMultipliers)
     {
 
-        match_id = Guid.Parse("4f008e15-9126-46b9-9300-ee4e1d070024");
+        //match_id = Guid.Parse("6fdb5495-8761-4e77-a086-a7365ae9e0b4");
         player1_id = Guid.Parse("aa2e6df3-4200-4469-8353-dd41d2a28781");
         player2_id = Guid.Parse("d0172820-32bc-4fc7-870f-be940517c008");
-        //match_id = gameMaster.match_id;
+        match_id = gameMaster.match_id;
 
         gridX = x;
         gridY = y;
@@ -223,7 +223,7 @@ public class MasterGrid : MonoBehaviour
     {
 
         //0 is move
-        addGameAction(0, (byte)attacker.gamePieceId, (byte)attacker.oldXPos, (byte)attacker.oldYPos, (byte)attacker.xPos, (byte)attacker.yPos);
+        //addGameAction(0, (byte)attacker.gamePieceId, (byte)attacker.oldXPos, (byte)attacker.oldYPos, (byte)attacker.xPos, (byte)attacker.yPos);
 
         //1 is attack
         addGameAction(1, (byte)attacker.gamePieceId, (byte)attacker.xPos, (byte)attacker.yPos, (byte)defender.xPos, (byte)defender.yPos);
@@ -372,6 +372,7 @@ public class MasterGrid : MonoBehaviour
                 structure.captureHealth = structure.captureHealth - selectedUnit.healthCurrent;
             else
                 structure.switchAlliance(selectedUnit.getPlayerControl());
+            //2 is capture structure
             addGameAction(2, (byte)selectedUnit.gamePieceId, (byte)selectedUnit.xPos, (byte)selectedUnit.yPos, (byte)structure.xPos, (byte)structure.yPos);
             exhaustSelectedUnit(selectedUnit, true);
         }
@@ -1271,6 +1272,8 @@ public class MasterGrid : MonoBehaviour
         byte toLocationY)
     {
 
+        //O is move, 1 is attack, 2 is capture, 3 produce unit
+
         //choose player_id based on the playerControl of the attacker, 2-player only (multiplayer improvements needed)
         Guid playerID = gameMaster.turnNumber%2 == 1 ? player1_id : player2_id;
 
@@ -1305,4 +1308,9 @@ public class MasterGrid : MonoBehaviour
         return tempGameActions;
     }
 
+    public void setMatchId(Guid matchId)
+    {
+        Debug.Log("grid Setting match id to: " + matchId);
+        match_id = matchId;
+    }
 }

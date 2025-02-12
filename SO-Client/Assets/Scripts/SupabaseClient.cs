@@ -138,44 +138,4 @@ public class SupabaseClient
 
 
 
-/*    public async Task<string> CallHelloWorld()
-    {
-        //_httpClient.DefaultRequestHeaders.Add("Content-Type", "application/json");
-        try
-        {
-
-            var payload = new
-            {
-                name = "Functions"
-            };
-
-            var content = new StringContent(
-            JsonConvert.SerializeObject(payload),
-            Encoding.UTF8,
-            "application/json"
-            );
-
-            var response = await _httpClient.PostAsync("/functions/v1/hello-world2", content);
-            var responseBody = await response.Content.ReadAsStringAsync();
-
-            if (response.IsSuccessStatusCode)
-            {
-                return responseBody;
-            }
-
-            Debug.LogError($"Hello World call failed: {responseBody}");
-            Debug.LogError($"Response headers: {response.Headers.ToString()}");
-
-            return $"Error: {responseBody}";
-        }
-        catch (Exception ex)
-        {
-            Debug.LogError($"Hello World call error: {ex.Message}");
-            return $"Error: {ex.Message}";
-        }
-    
-    }*/
-
-
-
 }

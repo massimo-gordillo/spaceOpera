@@ -33,6 +33,10 @@ public class SupabaseManager : MonoBehaviour
 
     private protected bool callServerOverLocal = false;
 
+    public Guid map_id = Guid.Parse("84fe0458-c742-4bc5-b35a-b9334a0f3c90");
+    public Guid player1_id = Guid.Parse("aa2e6df3-4200-4469-8353-dd41d2a28781");
+    public Guid player2_id = Guid.Parse("d0172820-32bc-4fc7-870f-be940517c008");
+
 
     private void Start()
     {
@@ -42,8 +46,10 @@ public class SupabaseManager : MonoBehaviour
         loginButton.onClick.AddListener(HandleLogin);
         //executeFunctionButton.onClick.AddListener(SendCurrentMapToServer);
         //executeFunctionButton.onClick.AddListener(HandleRetrieveInitialStateFromServer);
-        //executeFunctionButton.onClick.AddListener(() => HandleAsyncCall(() => CreateMatchAsync("aa2e6df3-4200-4469-8353-dd41d2a28781", "d0172820-32bc-4fc7-870f-be940517c008", "96fe6e44-5362-49a4-9d59-0cf04e353d0b")));
-        executeFunctionButton.onClick.AddListener(() => HandleAsyncCall(() => RetrieveGameInitialStateFromServer("84fe0458-c742-4bc5-b35a-b9334a0f3c90")));
+        //executeFunctionButton.onClick.AddListener(() => HandleAsyncCall(async () => _gameMaster.match_id = await CreateMatchAsync(map_id, player1_id, player2_id)));
+
+        executeFunctionButton.onClick.AddListener(() => HandleAsyncCall(() => CreateMatchAsync(map_id, player1_id, player2_id)));
+        //executeFunctionButton.onClick.AddListener(() => HandleAsyncCall(() => RetrieveGameInitialStateFromServer("84fe0458-c742-4bc5-b35a-b9334a0f3c90")));
         //executeFunctionButton.onClick.AddListener(() => HandleAsyncCall(() => SendCurrentMapToServer()));
 
         executeFunctionButton.interactable = true;
@@ -578,7 +584,7 @@ public class SupabaseManager : MonoBehaviour
 
     }*/
 
-    public async Task CreateMatchAsync(string playerAId, string playerBId, string mapId)
+    /*public async Task CreateMatchAsync(string playerAId, string playerBId, string mapId)
     {
         string _supabaseUrl = "https://ezmafonauvkpalwjpaer.supabase.co";
         string _supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV6bWFmb25hdXZrcGFsd2pwYWVyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzYxMDE5NjUsImV4cCI6MjA1MTY3Nzk2NX0.i3E8rSHoMV1ThEWctZNU25oV_DfTjBu_jsQXQZiLO0s";
@@ -636,7 +642,56 @@ public class SupabaseManager : MonoBehaviour
                 throw;
             }
         }
+    }*/
+
+    public async Task CreateMatchAsync(Guid mapId, Guid playerAId, Guid playerBId)
+    {
+        string endpoint = "/rest/v1/rpc/create_match";
+        var requestData = new
+        {
+            
+            player_a_id = playerAId,
+            player_b_id = playerBId,
+            map_id = mapId
+        };
+
+        try
+        {
+            var response = await SupabaseClient.Instance.SendRequest<JObject>(endpoint, HttpMethod.Post, requestData);
+
+            if (response != null)
+            {
+                // Directly access the "id" field in the response JObject
+                string matchIdString = response["id"]?.ToString();
+                
+
+                if (Guid.TryParse(matchIdString, out Guid matchId))
+                {
+                    Debug.Log($"Match ID after parse: {matchId}");
+                    //_gameMaster.match_id = matchId;
+                    //_gameMaster.match_id = matchId;
+                    _gameMaster.setMatchId(matchId);
+                }
+                else
+                {
+                    Debug.LogError("Failed to parse match_id from response.");
+                    throw new Exception("Invalid match_id format received.");
+                }
+            }
+            else
+            {
+                Debug.LogError("Empty response received from create_match RPC.");
+                throw new Exception("Failed to create match.");
+            }
+        }
+        
+        catch (Exception ex)
+        {
+            Debug.LogError($"CreateMatchAsync failed: {ex.Message}");
+            throw;
+        }
     }
+
 
     private static Task SendWebRequestAsync(UnityWebRequest request)
     {
