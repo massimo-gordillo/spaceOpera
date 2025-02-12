@@ -1,9 +1,10 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
 public class GameAction
 {
-    public string match_id { get; set; }
+    public Guid match_id { get; set; }
 
     public short turnNumber { get; set; }
 
@@ -24,7 +25,7 @@ public class GameAction
 
     public byte toLocationY { get; set; }
 
-    public byte playerID { get; set; }
+    public Guid playerID { get; set; }
 }
 
 /*[MessagePackObject]

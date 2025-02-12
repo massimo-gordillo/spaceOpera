@@ -12,6 +12,7 @@ public class GameMaster : MonoBehaviour
     public MasterGrid masterGrid;
     public TilemapManager tilemapManager;
     private PrefabManager prefabManager = new PrefabManager();
+    public SupabaseManager supabaseManager;
 
     public Canvas canvas;
     public BaseStructure selectedStructure;
@@ -53,7 +54,7 @@ public class GameMaster : MonoBehaviour
     // Start is called before the first frame update
     void Awake()
     {
-        turnNumber = 0;
+        turnNumber = 1;
         //gameValues = AssetDatabase.LoadAssetAtPath<GameValuesSO>("Assets/Scripts/Assets/Scripts/GameValuesSO.cs.cs");
 
         //initializes all unit values, modifies their prefab and sprites.
@@ -186,7 +187,8 @@ public class GameMaster : MonoBehaviour
             //need a way to set to exhausted from here so the units don't have to start exhausted on the 1st turn.
             Instantiate(unit, new Vector2(selectedStructure.xPos, selectedStructure.yPos), Quaternion.identity, unitList);
             //3 is produce a unit
-            masterGrid.addGameAction(3, (byte)unit.unitTerrainType, (byte)selectedStructure.xPos, (byte)selectedStructure.yPos, (byte)unit.xPos, (byte)unit.yPos, (byte)playerTurn);
+            //not sure why the unit x and y coordiantes aren't available here but this works.
+            masterGrid.addGameAction(3, (byte)unit.gamePieceId, (byte)selectedStructure.xPos, (byte)selectedStructure.yPos, (byte)selectedStructure.xPos, (byte)selectedStructure.yPos);
             playerResourceText.text = "" + playerResources[playerTurn];
             selectedStructure.turnOffCollider();
             hideChoicePanel();
@@ -209,8 +211,7 @@ public class GameMaster : MonoBehaviour
         hideChoicePanel();
         List <GameAction> gameActions = masterGrid.endTurn(playerTurn);
 
-        //serialize and send turnActions list to the server.
-
+        SendGameActions(gameActions);
 
         int i = -1;
         do
@@ -228,6 +229,11 @@ public class GameMaster : MonoBehaviour
 
         setPlayerTurnText(playerTurn);
         setPlayerResources(playerTurn);
+    }
+
+    public async void SendGameActions(List<GameAction> gameActions)
+    {
+        bool success = await supabaseManager.SendGameActions(gameActions);
     }
 
     public void setPlayerTurnText(int playerTurn) //this should probably be combined with BaseUnit.setColor

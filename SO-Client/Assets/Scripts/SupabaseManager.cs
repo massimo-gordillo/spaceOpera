@@ -446,12 +446,68 @@ public class SupabaseManager : MonoBehaviour
         }
     }*/
 
+    /*    public async Task<bool> SendGameActions(List<GameAction> gameActions)
+        {
+            try
+            {
+                string endpoint = "/rest/v1/rpc/submit_game_actions";
+                var response = await SupabaseClient.Instance.SendRequest<string>(endpoint, HttpMethod.Post, gameActions);
+
+                if (!string.IsNullOrEmpty(response))
+                {
+                    Debug.Log($"Game actions sent successfully: {response}");
+                    return true;
+                }
+
+                Debug.LogError("Failed to send game actions.");
+                return false;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Error sending game actions: {ex.Message}");
+                return false;
+            }
+        }*/
+
     public async Task<bool> SendGameActions(List<GameAction> gameActions)
     {
+        if (gameActions == null || gameActions.Count == 0)
+        {
+            Debug.LogError("Game actions list is empty.");
+            return false;
+        }
+
+        Guid matchId = gameActions[0].match_id;
+        short turnNumber = gameActions[0].turnNumber;
+
+        foreach (var action in gameActions)
+        {
+            if (action.match_id != matchId || action.turnNumber != turnNumber)
+            {
+                Debug.LogError("Inconsistent match_id or turnNumber in game actions list.");
+                return false;
+            }
+        }
+
+        // If the loop completes, all values are consistent
+        Debug.Log($"Match ID: {matchId}, Turn Number: {turnNumber} - All actions are consistent.");
+
         try
         {
             string endpoint = "/rest/v1/rpc/submit_game_actions";
-            var response = await _supabaseClient.SendRequest<string>(endpoint, HttpMethod.Post, gameActions);
+
+            var payload = new
+            {
+                p_match_id = matchId,  
+                //p_match_id = matchId.ToString(),  // Ensure UUID is sent as a string
+                p_turn_number = turnNumber,
+                p_actions = gameActions // This should already be a List<GameAction>
+            };
+
+            string jsonPayload = JsonConvert.SerializeObject(payload);
+            var content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
+
+            var response = await SupabaseClient.Instance.SendRequest<string>(endpoint, HttpMethod.Post, content);
 
             if (!string.IsNullOrEmpty(response))
             {
@@ -470,7 +526,7 @@ public class SupabaseManager : MonoBehaviour
     }
 
 
-    //send gameActionsList to server for verification
+    /*//send gameActionsList to server for verification
     public async Task SendGameActionsListToServer(List<GameAction> gameActionsList)
     {
         // Serialize the game actions list to JSON
@@ -520,7 +576,7 @@ public class SupabaseManager : MonoBehaviour
             Debug.LogError($"Error sending game actions list: {ex.Message}");
         }
 
-    }
+    }*/
 
     public async Task CreateMatchAsync(string playerAId, string playerBId, string mapId)
     {

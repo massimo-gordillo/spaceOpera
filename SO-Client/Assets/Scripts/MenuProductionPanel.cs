@@ -28,7 +28,7 @@ public class MenuProductionPanel : MonoBehaviour
 
             // Instantiate a new button
             MenuProductionButton newButton = Instantiate(productionButton, Vector2.zero, Quaternion.identity);
-            UnityEngine.Debug.Log($"newButton instance ID: {newButton.GetInstanceID()} for unit: {attributesBaseUnit.unitName}");
+            //UnityEngine.Debug.Log($"newButton instance ID: {newButton.GetInstanceID()} for unit: {attributesBaseUnit.unitName}");
 
             // Clone the spritePrefab for this button
             StaticSprite spritePrefabInstance = newButton.spritePrefabUIVariant;

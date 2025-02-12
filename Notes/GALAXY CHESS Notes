@@ -66,6 +66,8 @@ Potential bug: a capturing unit moves away from struct but then undos the moveme
 TO DO, DON'T FORGET:
 Turn on Email Auth for Supabase
 Debug tilemap exportBytesToFile and importFileToBytes. I modified the serialization so I need to confirm it's not broken. For later.
+Check if supabase function game_action_combat is necessary. I think it's a duplicate of action_combat.
+db create_match turn on random assignment.
 
 
 
@@ -85,148 +87,6 @@ Dark Colour:    115,115,115,1   #737373
 
 massimogordillo@hotmail.com
 
-
-PROMPTS:
-I'm building a 2D asynchronous Unity strategy game with Supabase as my backend service. I'm currently able to send map data to the db and want to be able to retrieve that data via http request. I have a maps table and want to receive width, height and grid_data columns. Write me a serverside .js function which will receive this request and send back this data.
-
-
-Ok I think it's best we just start fresh. Let me explain my project and what I'm hoping to accomplish.
-
-I'm building a 2D turn-based Unity game. My MVP is very simple. I want two players to be playing on one map, taking turns moving their game pieces. Imagine it's like a correspondence chess game where one player moves all their pieces, creates more, and then passes the turn to player 2 who does the same.
-
-The MVP implementation is very light. Player 1 will send the moves they performed on their turn, and a hash of the gamestate at the end of their turn to the server. The server will validate those game moves are legal and that the end state matches the hash it also generates, and upon confirming both of those checks only then will pass the information to Player 2. The game actions performed by player 1 will be replayed visually for player 2 and then player 2 can then begin their turn from the new gamestate. There are some nuances here, primarily that there needs to be random number seed management so ther server can confirm the gamestate after receving it from a player (there is a chance/luck component).
-
-We agreed to use Supabase as our backend service. Note that there is no concurrency required, the two user clients do not need to be connected, only pushes to the server and either a polling or push system to send the new gamestate information to the other player.
-
-Some details for the db setup:
-
-a single game can contain 100s of moves so it's best to make a turn_moves table which collects all the moves in a given turn.
-the game will have many maps, different grid setups upon which to intialize and play the game. On the front end I've designed each map to be converted into a serialized list of bytes (using messagepack).
-While I dont need this for the MVP imlementation, in the future I will want new users be able to create a profile, and create a game for another user to join. This requires account creation, forgot password, key management, login, logout, etc.
-Please let me know if you need any additional information before setup.
-
-Let's expand our db implementation:
-
-A players table, users. Two players are paired in a match.
-
-A matches table will contain a list of matches between two players. It will contain:
-- matchID
-- the player Ids
-- the map name and id (from the maps table)
-- who's turn it currently is
-- the current gamestate (jsonb format, a list of game pieces)
-- whether the match is completed or not
-- a 2D array called unitGrid
-- a 2D array called structureGrid
-- a 2D array called terrainGrid
-- creation time
-- match end time (populated when match is complete)
-- winner (populated when match is complete)
-
-The three 2D array items need to be readable and writable serverside for computation and validation. Only the player who's turn it is should be able to send data to the server regarding this game. 
-
-A matchMoves table which contains the following items:
-- movesListId
-- the matchID the moves are being implemented in
-- the player that sent those moves
-- A Jsonb list of game actions. This should be parsable by the serverside for move validation
-- the time those moves were received by the server
-- an isValid flag, to be set by validation service
-
-Please provide me which any suggestions you feel I might be missing.
-
-
-
-
-Ok great. I have a structural question I'd like to ask you. The game takes place on a 2D grid. Effectively, the game engine runs off of 3x 2D arrays. 
-The first array is the grid_data, this is the map terrain which effects unit movement, damage multipliers etc. 
-The second array is the unit_grid, this is where each unit is recorded, only one unit can be at any one index at any time. A given unit has a list of characteristics, unit type, health, ownership, etc.
-The third array is the structure_grid, which is where capturable structures exist. A unit can be on top of a structure.
-Whenever a player sends a list of game actions to the server, the server needs to be able to effectively recreate the gamestate from the three arrays. The server needs to be able to verify the game actions provided by the client were legal and that the final gamestate matches a hash provided by the client. 
-
-Notably I understand there are db/json structures which allow SQL commands to reference items in arrays held in a table. Presumably I want to leverage these so that I don't have to hold/recreate all 3 arrays in some sort of temporary memory. 
-
-Can you provide some guidance on how to apply this in our server structure?
-
-
-
-Ok let's step back a second here. I'm using Unity to send the grid_data via http to the server for it to be held in the maps table in the grid_data column. Notable, on the Unity side the grid_data array is an array of bytes. I'm converting that array of bytes to a base64string so I can send it via http. 
-
-What is the best way to covert this data on the Unity side so it can be sent via http to an api endpoint? Then, server side, how would I receive this information, process it into the proper data format, and save it to the db for reference with PostgreSQL's JSONB array funcionality?
-
-Client side I'm currently creating a List of gamePieceInfo, a list of all the units and structures on the grid, and then sending that over http. This is in an attempt to not send 2x very sparse arrays via http. Does it make sense more sense to handle the data this way? Then server-side the data has to be deconstructed and items placed into the arrays in the tables. Alternatively I can just send the sparse arrays over with the unit data in their respective cells in the array. Thoughts?
-
-
-OK NEW DATABASE STRUCTURE. I'm going to create a table which tracks all game pieces across all games and uses partitioning to make it managable. Create a match_piece_list table which partitions on match_id. you should also be able to quickly separate between piece_type for a given match_id. 
-Columns should be match_id, piece_type (bool, 1 for unit, 0 for structure), x_loc, y_loc, type_num (int), player_controller (int), health_val (int).
-
-In this way, instead of querying the jsonb arrays in the matches table, I can directly query a partition in the match_piece_list, and I can quickly modify individual rows to move a unit, destroy it, etc.
-
-Ok let's rebuild the map grid data with the same idea. Make a partitioned maps_tiles table with columns x_loc, y_loc, tile_type (int). This data was previously held in the grid_data column in the maps table.
-
-Let's also create a partitioned map_init_pieces table which records the initial piece data for a given map. Previously it was a list in maps called init_piece_data. The columns should be the same as the match_piece_list table but instead of having a match_id it has a map_id.
-
-
-ok great. Let's modify the saveMap function in the MapService function to drop this data in the appropriate tables. Via JSON you'll receive an array of ints to put into the 
-
-Let's make some fk relationships. 
-In match_piece_list, match_id requires id in matches.
-in map_init_pieces, map_id requires id in maps.
-in map_tiles map_id requires id in maps.    
-
-
-SUPABASE_URL=https://ezmafonauvkpalwjpaer.supabase.co
-SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV6bWFmb25hdXZrcGFsd2pwYWVyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzYxMDE5NjUsImV4cCI6MjA1MTY3Nzk2NX0.i3E8rSHoMV1ThEWctZNU25oV_DfTjBu_jsQXQZiLO0s
-
-
-Write a function called moveUnit which takes in a game_id, an old_x, old_y, new_x, new_y vars.
-In the match_piece_list table, find the row where x_loc = old_x and y_loc = old_y and piece_type=true.
-replace x_loc and y_loc with the new vars.
-
-
-I've created and populated four tables, one called unit_attributes, one called unit_health_types, one called unit_damage_types, and another called combat_multipliers.
-Write a function called unitCombat which takes in a match_id, a gamePieceId, an attacker_x, attacker_y, defender_x, defender_y vars.
-In the match_piece_list table, confirm that you find the row with attacker_x, attacker_y and a row with defender_x, defender_y for this match_id.
-Confirm the gamePieceId matches the game_piece_id (previously type_num) in match_piece_list at attacker_x, attacker_y (in the given match).
-Then, search the unit_attributes table for the row with gamePieceId and make a var containing the damage_type_id.
-Then, search the match_piece_list table for the unit at defender_x, defender_y for this match_id and make another var containing the healthType.
-Then use the damage_type_id and healthType to find the cell in combat_multiplers which's primary key is the two vars, then save that in a var.
-Then, get attacker baseDamage from unit_attributes and multiply it by the multiplier you just grabbed.
-
-
-
-
-
-
-Can you add more error checking in the function please?
-It should tell me if it doesn't find a row meeting the criteria to modify. It should also check that neither of the x val or y vals are outside the width and height vars of the map with that given_id.
-
-
-Ok let's add some more complexity to the combat damage calculations. Write a new function called combat_get_defence_multiplier. I want you to get a multiplier that we'll use to update the final damage value based on the tile that the defending unit is on. For the x,y location of the defender, look up the tile_id for the tile at that location. Use that tile_id to look up the defence_value in tile_values. Then calculate the defence multiplier using the following function:
-
-1 - defence_value / 100 * 4;
-
-
-game_piece_id
-map_init_pieces.piece_type > map_init_pieces.is_unit (bool)
-map_init_pieces.type_num > map_init_pieces.game_piece_id (int2)
-match_piece_list.piece_type > match_piece_list.is_unit (bool)
-match_piece_list.unit_id > match_piece_list.game_piece_id (int2)
-unit_attributes.damage_type_id > unit_attributes.damage_type
-
-SELECT match_unit_combat(
-    '390ddd58-cf3d-4a02-bff1-3d058689fad6',  -- Match ID
-        2,               -- Attacker Unit Type ID
-    3, 6,             -- Attacker X, Y
-    5, 7             -- Defender X, Y
-
-);
-
-
-
-SUPER VALUABLE SQL STATEMENTS
-
-Database introspection query that shows the current schema
 
 SELECT 
   table_name,
@@ -248,59 +108,11 @@ FROM pg_proc p
 JOIN pg_namespace n ON p.pronamespace = n.oid
 WHERE n.nspname = 'public';
 
+MORE DB SPECIFIC SQL STUFF
+player 1: aa2e6df3-4200-4469-8353-dd41d2a28781
+player 2: d0172820-32bc-4fc7-870f-be940517c008
+Map id:     84fe0458-c742-4bc5-b35a-b9334a0f3c90
 
-Ok let's create a function called action_capture where a unit can capture a structure a structure.
+match_id: 8953f24d-bbd2-429e-88b8-65770396df88
 
-Structures have a default health of 200. Only units with attribute is_resource_unit = TRUE can capture a structure.
-
-Let's create a new table called structure_attributes with ID starting at 200 - 205
-
-200: Resource
-201: Factory
-202: Airport
-203: Seaport
-205: Command
-
-Let's have bools called is_resource, is_production, is_command. default_health can be 200 for all of them for now.
-
-Note that structures are also considered game pieces and will appear in the match_piece_list table.
-
-An is_resource_unit can only capture neutral structures or those controlled by other players.
-When an is_resource_unit captures a structure, its health (as a % of 100) is subtracted from the 200 base health of the structure. When a capture sets the health to 0 or less the structure is then controlled by that player.|
-
-
-
-ok let's move onto the final action, 'action_produce'.
-
-We'll need to make a small modification to the 'matches' table. Add 2 columns, 'player1_resources' and 'player2_resources'. At the beginning of a turn, a player will receive an income with the following function:
-200 + 100*(number of structures controlled by that player)
-
-Let's create a match_new_turn function to do this basic operation, we'll expand this function at a later time.
-
-Ok back to 'action_produce'. 
-
-Modify structure_attributes to have an additional column production_terrain_type, which will be either Land, Sea, Air, which match unit_attributes.terrain_type. Factory, 201, is land, Airport, 202, is Air, Seaport 203, is Sea.
-
-The inputs will be the x and y location where the unit is being produced and the game_piece_id. You'll have to do a number of checks:
-1. The structure at x,y is a production structure.
-2. Compare terrain_type between the production structure and the unit being tried to make, ensure they match.
-3. There is no game piece on this square (besides the production structure)
-4. The player who's turn it is has sufficient resources to build the unit, see unit_attributes.price.
-5. The production structure is owned by the player whose turn it is.
-
-If these checks are are all passed, a unit is created at the x,y location and added to match_piece_list. The unit_attributes.price value is deducted from the player's resources in the matches table.
-
-
-ok great! Let's add some additional logic checks to our functions. In match_piece_list add three bool columns, move_nonexhausted, attack_nonexhausted, production_nonexhausted. The default values for these is FALSE.
-
-There is an exception here. When calling the create_match function, any game_pieces in the insert_game_pieces list that belong to player 1 should be set to TRUE. (at the beginning of the game player 1 can move their units etc).
-
-Logically, is it's a structure, move and combat should be NULL, and if it's a unit then production should be NULL. If it's a nonproduction structure all should be NULL.
-
-in 'action_move', before moving, check that the unit has move_nonexhausted = TRUE. Once the unit has moved, set it to false.
-
-in 'action_combat', before attacking check that the unit has attack_nonexhausted = TRUE. Once the unit has attacked, set it to false. Also set move_nonexhausted to FALSE.
-
-When match_new_turn is triggered, for all game pieces controlled by the player's who turn it is now, set the appropriate nonexhausted values to TRUE (nulls remain null).
-
-In summary, every unit can move then attack once each per turn (can't attack the move). Each production structure can produce once per turn.
+SELECT create_match('aa2e6df3-4200-4469-8353-dd41d2a28781', 'd0172820-32bc-4fc7-870f-be940517c008', '84fe0458-c742-4bc5-b35a-b9334a0f3c90');

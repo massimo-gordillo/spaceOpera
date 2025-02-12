@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -10,7 +11,9 @@ using Newtonsoft.Json.Linq;
 public class MasterGrid : MonoBehaviour
 {
     bool drawing = false;
-    string match_id;
+    Guid match_id;
+    Guid player1_id;
+    Guid player2_id;
 
     public int gridX;
     public int gridY;
@@ -48,7 +51,9 @@ public class MasterGrid : MonoBehaviour
         Dictionary<string, Dictionary<string, double>> inputCombatMultipliers)
     {
 
-        match_id = "1111111-11111111-111111";
+        match_id = Guid.Parse("4f008e15-9126-46b9-9300-ee4e1d070024");
+        player1_id = Guid.Parse("aa2e6df3-4200-4469-8353-dd41d2a28781");
+        player2_id = Guid.Parse("d0172820-32bc-4fc7-870f-be940517c008");
         //match_id = gameMaster.match_id;
 
         gridX = x;
@@ -216,11 +221,12 @@ public class MasterGrid : MonoBehaviour
 
     public void unitCombat(BaseUnit attacker, BaseUnit defender)
     {
+
         //0 is move
-        addGameAction(0, (byte)attacker.gamePieceId, (byte)attacker.oldXPos, (byte)attacker.oldYPos, (byte)attacker.xPos, (byte)attacker.yPos, (byte)attacker.playerControl);
+        addGameAction(0, (byte)attacker.gamePieceId, (byte)attacker.oldXPos, (byte)attacker.oldYPos, (byte)attacker.xPos, (byte)attacker.yPos);
 
         //1 is attack
-        addGameAction(1, (byte)attacker.gamePieceId, (byte)attacker.xPos, (byte)attacker.yPos, (byte)defender.xPos, (byte)defender.yPos, (byte)attacker.playerControl);
+        addGameAction(1, (byte)attacker.gamePieceId, (byte)attacker.xPos, (byte)attacker.yPos, (byte)defender.xPos, (byte)defender.yPos);
 
 
 
@@ -277,7 +283,7 @@ public class MasterGrid : MonoBehaviour
     {
         if (attackLuckRange % 2 == 0)
         {
-            int luckPercentageBonus = Random.Range(0, (int)attackLuckRange + 1) - (int)attackLuckRange / 2;
+            int luckPercentageBonus = UnityEngine.Random.Range(0, (int)attackLuckRange + 1) - (int)attackLuckRange / 2;
             return damageInput * (1 + (double)luckPercentageBonus / 100);
         }
         else
@@ -366,7 +372,7 @@ public class MasterGrid : MonoBehaviour
                 structure.captureHealth = structure.captureHealth - selectedUnit.healthCurrent;
             else
                 structure.switchAlliance(selectedUnit.getPlayerControl());
-            addGameAction(2, (byte)selectedUnit.gamePieceId, (byte)selectedUnit.xPos, (byte)selectedUnit.yPos, (byte)structure.xPos, (byte)structure.yPos, (byte)selectedUnit.playerControl);
+            addGameAction(2, (byte)selectedUnit.gamePieceId, (byte)selectedUnit.xPos, (byte)selectedUnit.yPos, (byte)structure.xPos, (byte)structure.yPos);
             exhaustSelectedUnit(selectedUnit, true);
         }
         else
@@ -1034,7 +1040,7 @@ public class MasterGrid : MonoBehaviour
 
             // if you're undoing movement, don't add it to the action list
             if (!selectedUnit.undoingMovement)
-                addGameAction(0, (byte)selectedUnit.gamePieceId, (byte)selectedUnit.xPos, (byte)selectedUnit.yPos, (byte)x, (byte)y, (byte)selectedUnit.playerControl);
+                addGameAction(0, (byte)selectedUnit.gamePieceId, (byte)selectedUnit.xPos, (byte)selectedUnit.yPos, (byte)x, (byte)y);
 
             removeUnitInGrid(selectedUnit.xPos, selectedUnit.yPos);
             setUnitInGrid(x, y, selectedUnit);
@@ -1067,6 +1073,8 @@ public class MasterGrid : MonoBehaviour
                 selectedUnit.oldXPos = null;
                 selectedUnit.oldYPos = null;
                 exhaustSelectedUnit(selectedUnit, false);
+
+                //if undoing movement remove the action from the gameActions list
                 if (gameActions.Count > 0 && gameActions[gameActions.Count - 1].actionNumber == turnActionCount)
                 {
                     gameActions.RemoveAt(gameActions.Count - 1);
@@ -1260,12 +1268,16 @@ public class MasterGrid : MonoBehaviour
         byte fromLocationX,
         byte fromLocationY,
         byte toLocationX,
-        byte toLocationY,
-        byte playerID)
+        byte toLocationY)
     {
+
+        //choose player_id based on the playerControl of the attacker, 2-player only (multiplayer improvements needed)
+        Guid playerID = gameMaster.turnNumber%2 == 1 ? player1_id : player2_id;
+
         turnActionCount++;
         GameAction gameAction = new GameAction
         {
+            match_id = match_id,
             turnNumber = gameMaster.turnNumber,
             actionNumber = turnActionCount,
             actionType = actionType,
@@ -1276,7 +1288,7 @@ public class MasterGrid : MonoBehaviour
             toLocationY = toLocationY,
             playerID = playerID
         };
-        Debug.Log($"Adding game action {turnActionCount} of type {actionType} to the game actions list.");
+        Debug.Log($"Adding game action {turnActionCount} of type {actionType} to the game actions list with values {gamePieceId}, {fromLocationX}, {fromLocationY}, {toLocationX}, {toLocationY}.");
         gameActions.Add(gameAction);
     }
 
@@ -1287,8 +1299,10 @@ public class MasterGrid : MonoBehaviour
         clearSelectedUnit();
         turnActionCount = 0;
         if(gameActions.Count==0)
-            Debug.LogError("FLAG: No game actions to return.");
-        return gameActions;
+            Debug.Log("FLAG: No game actions to return.");
+        List<GameAction> tempGameActions = new List<GameAction>(gameActions);
+        gameActions.Clear();
+        return tempGameActions;
     }
 
 }
