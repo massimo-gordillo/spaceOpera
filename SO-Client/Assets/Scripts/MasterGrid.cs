@@ -1297,6 +1297,7 @@ public class MasterGrid : MonoBehaviour
 
     public List<GameAction> endTurn(int playerNum)
     {
+        Debug.Log($"End of turn gameStateHash: {ComputeGameStateHash_v1()}");
         refreshUnits(playerNum);
         clearMovement();
         clearSelectedUnit();
@@ -1306,6 +1307,49 @@ public class MasterGrid : MonoBehaviour
         List<GameAction> tempGameActions = new List<GameAction>(gameActions);
         gameActions.Clear();
         return tempGameActions;
+    }
+
+    public static long ComputeGameStateHash_v1()
+    {
+        long hash = 0;
+        GameObject[] units = GameObject.FindGameObjectsWithTag("BaseUnitTag");
+        GameObject[] structures = GameObject.FindGameObjectsWithTag("BaseStructureTag");
+
+        Debug.Log($"Units: {units.Length}, Structures: {structures.Length}");
+
+        //GameObject gamePieces = units.Concat(structures).ToArray();
+
+        //find numerical hash for each unit
+        foreach (var listUnit in units)
+        {
+            //if type BaseUnit convert to baseunit
+            BaseUnit unit = listUnit.GetComponent<BaseUnit>();
+
+            long healthMultiplier = unit.healthCurrent == unit.healthMax ? 1 : unit.healthCurrent;
+            long unitHash = (long)(unit.gamePieceId+1)
+                           * (unit.playerControl + 1)
+                           * (unit.xPos + 1)
+                           * (unit.yPos + 1)
+                           * healthMultiplier;
+
+            Debug.Log($"Unit Hash: {unitHash}");
+            hash += unitHash;
+        }
+
+        foreach (var listStructure in structures)
+        {
+            //if type BaseStructure convert to baseunit
+            BaseStructure structure = listStructure.GetComponent<BaseStructure>();
+
+            long healthMultiplier = structure.captureHealth == structure.maxCaptureHealth ? 1 : structure.captureHealth;
+            long structureHash = (long)(structure.gamePieceId+1)
+                               * (structure.playerControl + 1)
+                               * (structure.xPos + 1)
+                               * (structure.yPos + 1)
+                               * healthMultiplier;
+            hash += structureHash;
+        }
+        return hash;
     }
 
     public void setMatchId(Guid matchId){ match_id = matchId; }

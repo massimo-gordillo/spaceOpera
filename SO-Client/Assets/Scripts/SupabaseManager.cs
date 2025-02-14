@@ -500,7 +500,8 @@ public class SupabaseManager : MonoBehaviour
 
         try
         {
-            string endpoint = "/rest/v1/rpc/submit_game_actions";
+            string endpoint = "/rest/v1/rpc/submit_turn";
+            //string endpoint = "/rest/v1/rpc/submit_game_actions";
 
             var payload = new
             {

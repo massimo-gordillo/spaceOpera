@@ -10,7 +10,7 @@ TagManager:
   - HealthTag
   - GameMasterTag
   - BaseUnitTag
-  - baseStructureTab
+  - BaseStructureTag
   layers:
   - Default
   - TransparentFX

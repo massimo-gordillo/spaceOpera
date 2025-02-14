@@ -10,6 +10,7 @@ public class BaseStructure : MonoBehaviour
     public int xPos;
     public int yPos;
     public int structureType; //0: resource, 1: factory, 2: airport, 5:command
+    public int gamePieceId;
     public BoxCollider2D spriteCollider;
     public GameMaster gameMaster;
     public int captureHealth;
@@ -27,6 +28,7 @@ public class BaseStructure : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        gamePieceId = 200 + structureType; //structure ids start at 200.
         xPos = (int)transform.position.x;
         yPos = (int)transform.position.y;
         //private GameObject boxColliderComponent;
