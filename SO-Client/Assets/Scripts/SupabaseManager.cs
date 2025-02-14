@@ -452,7 +452,7 @@ public class SupabaseManager : MonoBehaviour
         }
     }*/
 
-    /*    public async Task<bool> SendGameActions(List<GameAction> gameActions)
+    /*    public async Task<bool> SendSubmitTurn(List<GameAction> gameActions)
         {
             try
             {
@@ -475,7 +475,7 @@ public class SupabaseManager : MonoBehaviour
             }
         }*/
 
-    public async Task<bool> SendGameActions(List<GameAction> gameActions)
+    public async Task<bool> SendSubmitTurn(List<GameAction> gameActions, long preTurnHash, long postTurnHash)
     {
         if (gameActions == null || gameActions.Count == 0)
         {
@@ -497,6 +497,7 @@ public class SupabaseManager : MonoBehaviour
 
         // If the loop completes, all values are consistent
         Debug.Log($"Match ID: {matchId}, Turn Number: {turnNumber} - All actions are consistent.");
+        Debug.Log($"Pre-turn hash: {preTurnHash}, Post-turn hash: {postTurnHash}");
 
         try
         {
@@ -506,9 +507,10 @@ public class SupabaseManager : MonoBehaviour
             var payload = new
             {
                 p_match_id = matchId,  
-                //p_match_id = matchId.ToString(),  // Ensure UUID is sent as a string
                 p_turn_number = turnNumber,
-                p_actions = gameActions // This should already be a List<GameAction>
+                p_actions = gameActions, // This should already be a List<GameAction>
+                p_pre_turn_hash = preTurnHash,
+                p_expected_post_turn_hash = postTurnHash
             };
 
             string jsonPayload = JsonConvert.SerializeObject(payload);
@@ -534,7 +536,7 @@ public class SupabaseManager : MonoBehaviour
 
 
     /*//send gameActionsList to server for verification
-    public async Task SendGameActionsListToServer(List<GameAction> gameActionsList)
+    public async Task SendSubmitTurnListToServer(List<GameAction> gameActionsList)
     {
         // Serialize the game actions list to JSON
         string serializedGameActionsList;

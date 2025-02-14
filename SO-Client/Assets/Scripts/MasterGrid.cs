@@ -11,9 +11,11 @@ using Newtonsoft.Json.Linq;
 public class MasterGrid : MonoBehaviour
 {
     bool drawing = false;
+
     Guid match_id;
     Guid player1_id;
     Guid player2_id;
+    long preTurnHash;
 
     public int gridX;
     public int gridY;
@@ -55,6 +57,7 @@ public class MasterGrid : MonoBehaviour
         player1_id = Guid.Parse("aa2e6df3-4200-4469-8353-dd41d2a28781");
         player2_id = Guid.Parse("d0172820-32bc-4fc7-870f-be940517c008");
         match_id = gameMaster.match_id;
+        
 
         gridX = x;
         gridY = y;
@@ -67,11 +70,18 @@ public class MasterGrid : MonoBehaviour
         attackableUnits = new List<BaseUnit>();
         spriteOffStructures = new List<BaseStructure>();
 
+        
+
         attackLuckRange = 10;
         defenceMultiplier = 4.0;
         firebackMultiplier = 0.7;
         //Dictionary<(byte, byte), GamePieceInfo> gameStateDict = ConvertGameStateToList();
         //printUnitGrid();
+    }
+
+    public void Start()
+    {
+        StartCoroutine(waitGenerateInitHash());
     }
 
     /*    public void printUnitGrid()
@@ -1295,9 +1305,11 @@ public class MasterGrid : MonoBehaviour
         gameActions.Add(gameAction);
     }
 
-    public List<GameAction> endTurn(int playerNum)
+    public (List<GameAction> gameActions, long preTurnHash, long postTurnHash) endTurn(int playerNum)
     {
-        Debug.Log($"End of turn gameStateHash: {ComputeGameStateHash_v1()}");
+        long tempPreTurnHash = preTurnHash;
+        long tempPostTurnHash = ComputeGameStateHash_v1();
+        Debug.Log($"End of turn gameStateHash: {tempPostTurnHash}");
         refreshUnits(playerNum);
         clearMovement();
         clearSelectedUnit();
@@ -1306,7 +1318,8 @@ public class MasterGrid : MonoBehaviour
             Debug.Log("FLAG: No game actions to return.");
         List<GameAction> tempGameActions = new List<GameAction>(gameActions);
         gameActions.Clear();
-        return tempGameActions;
+        preTurnHash = tempPostTurnHash;
+        return (tempGameActions, tempPreTurnHash, tempPostTurnHash);
     }
 
     public static long ComputeGameStateHash_v1()
@@ -1332,7 +1345,7 @@ public class MasterGrid : MonoBehaviour
                            * (unit.yPos + 1)
                            * healthMultiplier;
 
-            Debug.Log($"Unit Hash: {unitHash}");
+            //Debug.Log($"Unit Hash: {unitHash}");
             hash += unitHash;
         }
 
@@ -1350,6 +1363,20 @@ public class MasterGrid : MonoBehaviour
             hash += structureHash;
         }
         return hash;
+    }
+
+    public void generateInitHash()
+    {
+        
+        preTurnHash = ComputeGameStateHash_v1();
+        Debug.Log($"Generating initial hash {preTurnHash}");
+    }
+
+    private IEnumerator waitGenerateInitHash()
+    {
+        // Wait until the next frame to ensure all Start() methods are called
+        yield return null;
+        generateInitHash();
     }
 
     public void setMatchId(Guid matchId){ match_id = matchId; }

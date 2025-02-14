@@ -108,14 +108,6 @@ public class GameMaster : MonoBehaviour
         SaveGameStateListToFile(ConvertGameStateToList());
         //ConvertListToGameState(gameState);
     }
-/*    private IEnumerator CallConvertGameStateToList()
-    {
-        // Wait until the next frame to ensure all Start() methods are called
-        yield return null;
-        // Now it is safe to call ConvertGameStateToList
-        SaveGameStateListToFile(ConvertGameStateToList());
-        //ConvertListToGameState(gameState);
-    }*/
 
     private void startupInstantiateUnits()
     {
@@ -215,9 +207,9 @@ public class GameMaster : MonoBehaviour
     public void endTurnButtonPressed()
     {
         hideChoicePanel();
-        List <GameAction> gameActions = masterGrid.endTurn(playerTurn);
 
-        SendGameActions(gameActions);
+        var (gameActions, preTurnHash, postTurnHash) = masterGrid.endTurn(playerTurn);
+        SubmitTurnToServer(gameActions, preTurnHash, postTurnHash);
 
         int i = -1;
         do
@@ -237,9 +229,9 @@ public class GameMaster : MonoBehaviour
         setPlayerResources(playerTurn);
     }
 
-    public async void SendGameActions(List<GameAction> gameActions)
+    public async void SubmitTurnToServer(List<GameAction> gameActions, long preTurnHash, long postTurnHash)
     {
-        bool success = await supabaseManager.SendGameActions(gameActions);
+        bool success = await supabaseManager.SendSubmitTurn(gameActions, preTurnHash, postTurnHash);
     }
 
     public void setPlayerTurnText(int playerTurn) //this should probably be combined with BaseUnit.setColor
@@ -447,6 +439,8 @@ public class GameMaster : MonoBehaviour
                     masterGrid.setStructureInGrid(x, y, structure);
                 }
             }
+
+            masterGrid.generateInitHash();
         }
         else
             Debug.LogError("gameStateList is empty!");
