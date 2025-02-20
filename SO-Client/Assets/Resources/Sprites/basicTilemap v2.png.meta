@@ -3,7 +3,7 @@ guid: 440d008068578c6408b506eaa894e9e7
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
-  serializedVersion: 11
+  serializedVersion: 12
   mipmaps:
     mipMapMode: 0
     enableMipMap: 0
@@ -63,6 +63,7 @@ TextureImporter:
   textureFormatSet: 0
   ignorePngGamma: 0
   applyGammaDecoding: 0
+  cookieLightType: 1
   platformSettings:
   - serializedVersion: 3
     buildTarget: DefaultTexturePlatform
@@ -94,6 +95,18 @@ TextureImporter:
     resizeAlgorithm: 0
     textureFormat: -1
     textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Android
+    maxTextureSize: 512
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -366,18 +379,18 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
+      basicTilemap v2_0: -1631416558
       basicTilemap v2_1: 457164516
+      basicTilemap v2_10: -2116042639
+      basicTilemap v2_11: -1214629603
+      basicTilemap v2_2: 1708618929
+      basicTilemap v2_3: 518097947
+      basicTilemap v2_4: -985799947
+      basicTilemap v2_5: -1493151631
+      basicTilemap v2_6: -2118928232
       basicTilemap v2_7: 1292036205
       basicTilemap v2_8: -2020101599
-      basicTilemap v2_6: -2118928232
-      basicTilemap v2_3: 518097947
       basicTilemap v2_9: -1694229791
-      basicTilemap v2_5: -1493151631
-      basicTilemap v2_2: 1708618929
-      basicTilemap v2_10: -2116042639
-      basicTilemap v2_0: -1631416558
-      basicTilemap v2_4: -985799947
-      basicTilemap v2_11: -1214629603
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0
