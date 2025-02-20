@@ -1,0 +1,4 @@
+Multipliers,Light Projectile,Heavy Projectile,Light Melee,Heavy Melee
+Light,1,0.25,1,0.6
+Medium,0.55,1.4,1,1.2
+Heavy,0.3,0.8,0.1,1

@@ -1,0 +1,6 @@
+damage_type,to_light,to_medium,to_heavy,damage_type_id
+None,0,0,0,0
+Light Projectile,1,0.55,0.3,1
+Light Melee,1,1,0.1,2
+Heavy Projectile,0.25,1.4,0.8,3
+Heavy Melee,0.6,1.2,1,4

@@ -1,0 +1,10 @@
+com.DefaultCompany.com.unity.template.mobile2D.launcher-pngs-0 C:\Users\massi\Documents\gitRepo\spaceOpera\SO-Client\Library\Bee\Android\Prj\IL2CPP\Gradle\launcher\build\generated\res\pngs\release
+com.DefaultCompany.com.unity.template.mobile2D.launcher-resValues-1 C:\Users\massi\Documents\gitRepo\spaceOpera\SO-Client\Library\Bee\Android\Prj\IL2CPP\Gradle\launcher\build\generated\res\resValues\release
+com.DefaultCompany.com.unity.template.mobile2D.launcher-rs-2 C:\Users\massi\Documents\gitRepo\spaceOpera\SO-Client\Library\Bee\Android\Prj\IL2CPP\Gradle\launcher\build\generated\res\rs\release
+com.DefaultCompany.com.unity.template.mobile2D.launcher-mergeReleaseResources-3 C:\Users\massi\Documents\gitRepo\spaceOpera\SO-Client\Library\Bee\Android\Prj\IL2CPP\Gradle\launcher\build\intermediates\incremental\release\mergeReleaseResources\merged.dir
+com.DefaultCompany.com.unity.template.mobile2D.launcher-mergeReleaseResources-4 C:\Users\massi\Documents\gitRepo\spaceOpera\SO-Client\Library\Bee\Android\Prj\IL2CPP\Gradle\launcher\build\intermediates\incremental\release\mergeReleaseResources\stripped.dir
+com.DefaultCompany.com.unity.template.mobile2D.launcher-merged_res-5 C:\Users\massi\Documents\gitRepo\spaceOpera\SO-Client\Library\Bee\Android\Prj\IL2CPP\Gradle\launcher\build\intermediates\merged_res\release
+com.DefaultCompany.com.unity.template.mobile2D.launcher-main-6 C:\Users\massi\Documents\gitRepo\spaceOpera\SO-Client\Library\Bee\Android\Prj\IL2CPP\Gradle\launcher\src\main\res
+com.DefaultCompany.com.unity.template.mobile2D.launcher-release-7 C:\Users\massi\Documents\gitRepo\spaceOpera\SO-Client\Library\Bee\Android\Prj\IL2CPP\Gradle\launcher\src\release\res
+com.DefaultCompany.com.unity.template.mobile2D.launcher-packaged_res-8 C:\Users\massi\Documents\gitRepo\spaceOpera\SO-Client\Library\Bee\Android\Prj\IL2CPP\Gradle\unityLibrary\build\intermediates\packaged_res\release
+com.DefaultCompany.com.unity.template.mobile2D.launcher-packaged_res-9 C:\Users\massi\Documents\gitRepo\spaceOpera\SO-Client\Library\Bee\Android\Prj\IL2CPP\Gradle\unityLibrary\mobilenotifications.androidlib\build\intermediates\packaged_res\release
