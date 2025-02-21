@@ -9,6 +9,7 @@ using MessagePack;
 
 public class GameMaster : MonoBehaviour
 {
+    //private static GameMaster _instance;
 
     public MasterGrid masterGrid;
     public TilemapManager tilemapManager;
@@ -52,16 +53,33 @@ public class GameMaster : MonoBehaviour
     public BaseStructure resourceStructurePrefab;
     private string gameStateFilePath = "Assets/InitializationData/Maps/Map3/Map3GameState.dat";
 
-
-    // Start is called before the first frame update
-    void Awake()
+/*    public static GameMaster Instance
     {
+        get
+        {
+            if (_instance == null)
+            {
+                _instance = FindObjectOfType<GameMaster>();
+                if (_instance == null)
+                {
+                    // Optionally, create the instance if it's not found (this depends on your use case)
+                    _instance = new GameObject("GameMaster").AddComponent<GameMaster>();
+                }
+            }
+            return _instance;
+        }
+    }*/
+
+    private void Awake()
+    {
+        Debug.Log("Initializing game");
         match_id = Guid.Parse("aaaaaaaa-8761-4e77-a086-a7365ae9e0b4");
         turnNumber = 1;
         //gameValues = AssetDatabase.LoadAssetAtPath<GameValuesSO>("Assets/Scripts/Assets/Scripts/GameValuesSO.cs.cs");
 
         //initializes all unit values, modifies their prefab and sprites.
         //initializes all Tilebases for tilemap
+        //only does anything if it hasn't already been initialized.
         gameValues.initialize();
 
         //initializes the TilemapManager
@@ -409,6 +427,11 @@ public class GameMaster : MonoBehaviour
                     AttributesBaseUnit data = gameValues.GetUnitDataByByte(pieceInfo.typeNum);
 
                     BaseUnit unit = prefabManager.getUnitFromPrefab(data.prefabPath);
+                    if (unit == null)
+                    {
+                        Debug.LogError($"No unit prefab found for byte value {pieceInfo.typeNum}");
+                        continue;
+                    }
                     unit.playerControl = pieceInfo.playerID;
                     unit.setHealth((int)((double)(pieceInfo.healthVal * unit.healthMax) / 100));
                     unit.xPos = x;

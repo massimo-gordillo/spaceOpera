@@ -1,14 +1,20 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
 using TMPro;
 using UnityEngine.SceneManagement;
+using UnityEngine.InputSystem;
 
 namespace SlimUI.ModernMenu{
 	public class UIMenuManager : MonoBehaviour {
 		private Animator CameraObject;
+        private InputAction continueAction;
+		public GameValuesSO gameValuesSO;
+		public bool isGameValuesLoaded = false;
+		//public GameMaster gameMaster;// = new GameMaster();
 
-		// campaign button sub menu
+        // campaign button sub menu
         [Header("MENUS")]
         [Tooltip("The Menu for when the MAIN menu buttons")]
         public GameObject mainMenu;
@@ -70,7 +76,7 @@ namespace SlimUI.ModernMenu{
 		[Tooltip("The loading bar Slider UI element in the Loading Screen")]
         public Slider loadingBar;
         public TMP_Text loadPromptText;
-		public KeyCode userPromptKey;
+		//public KeyCode userPromptKey;
 
 		[Header("SFX")]
         [Tooltip("The GameObject holding the Audio Source component for the HOVER SOUND")]
@@ -80,7 +86,31 @@ namespace SlimUI.ModernMenu{
         [Tooltip("The GameObject holding the Audio Source component for the SWOOSH SOUND when switching to the Settings Screen")]
         public AudioSource swooshSound;
 
-		void Start(){
+
+        void Awake()
+        {
+            // Create the Input Action from the "UI" Action Map
+            var actionMap = new InputActionMap("UI");
+
+            // Define the "Continue" action and bind it to a key (e.g., Spacebar)
+            continueAction = actionMap.AddAction("Continue", binding: "<Keyboard>/anyKey");
+
+            // Enable the action map
+            actionMap.Enable();
+        }
+
+        void OnEnable()
+        {
+            continueAction.Enable();
+        }
+
+        void OnDisable()
+        {
+            continueAction.Disable();
+        }
+
+
+        void Start(){
 			CameraObject = transform.GetComponent<Animator>();
 
 			playMenu.SetActive(false);
@@ -92,7 +122,21 @@ namespace SlimUI.ModernMenu{
 			SetThemeColors();
 		}
 
-		void SetThemeColors()
+/*        void Update()
+        {
+
+            bool keyPressed = Keyboard.current != null && Keyboard.current.anyKey.wasPressedThisFrame;
+            bool touchPressed = Touchscreen.current != null && Touchscreen.current.primaryTouch.press.isPressed;
+
+
+            if (keyPressed || touchPressed)
+
+            {
+                Debug.Log("Key pressed, loading next scene...");
+            }
+        }*/
+
+        void SetThemeColors()
 		{
 			switch (theme)
 			{
@@ -261,30 +305,95 @@ namespace SlimUI.ModernMenu{
 			#endif
 		}
 
-		// Load Bar synching animation
-		IEnumerator LoadAsynchronously(string sceneName){ // scene name is just the name of the current scene being loaded
-			AsyncOperation operation = SceneManager.LoadSceneAsync(sceneName);
-			operation.allowSceneActivation = false;
-			mainCanvas.SetActive(false);
-			loadingMenu.SetActive(true);
+        //write me a loadasynchronously function which waits for both the scene and the game values to load.    
 
-			while (!operation.isDone){
-				float progress = Mathf.Clamp01(operation.progress / .95f);
-				loadingBar.value = progress;
 
-				if (operation.progress >= 0.9f && waitForInput){
-					loadPromptText.text = "Press " + userPromptKey.ToString().ToUpper() + " to continue";
-					loadingBar.value = 1;
 
-					if (Input.GetKeyDown(userPromptKey)){
-						operation.allowSceneActivation = true;
-					}
-                }else if(operation.progress >= 0.9f && !waitForInput){
-					operation.allowSceneActivation = true;
-				}
+        // Main coroutine that handles loading both game values and the scene
+        IEnumerator LoadAsynchronously(string sceneName)
+        {
+            // Activate loading screen UI right away
+            mainCanvas.SetActive(false);
+            loadingMenu.SetActive(true);
+			loadPromptText.text = "Loading...";
 
-				yield return null;
-			}
-		}
-	}
+            // Start the game values loading coroutine (no need to store the coroutine in an AsyncOperation)
+            StartCoroutine(LoadGameValuesAsync());
+
+            // Start loading the scene asynchronously
+            AsyncOperation sceneLoadingOperation = SceneManager.LoadSceneAsync(sceneName);
+            sceneLoadingOperation.allowSceneActivation = false;
+
+            // While both operations are in progress, update the loading screen
+            while (!sceneLoadingOperation.isDone)
+            {
+                // Update the loading bar based on the scene loading progress
+                float progress = Mathf.Clamp01(sceneLoadingOperation.progress / .95f);
+                //loadingBar.value = progress;
+
+                // Check if scene is nearly loaded and wait for user input to continue
+                if (sceneLoadingOperation.progress >= 0.9f && isGameValuesLoaded)
+                {
+                    loadPromptText.text = "Press any key to continue";
+                    loadingBar.value = 1;
+
+                    // Wait for input before activating the scene
+                    if (continueAction.WasPressedThisFrame())
+                    {
+                        sceneLoadingOperation.allowSceneActivation = true;
+                    }
+                }
+
+                yield return null;
+            }
+        }
+
+        // Game Values async loader
+        IEnumerator LoadGameValuesAsync()
+        {
+			
+            // Start initializing game values and show a loading message
+            Debug.Log("Initializing Game Values...");
+			yield return null;
+			loadingBar.value = 0.05f;
+
+            // Update the prompt for the next loading step
+            loadPromptText.text = "Loading... Modifying Tiles";
+            yield return new WaitForSeconds(0.5f); // Simulate loading time for tile data
+            gameValuesSO.LoadTilesFromCSV("Assets/StreamingAssets/SpaceOperaTileValues - TileValues.csv");
+            loadingBar.value = 0.3f; // Update the loading bar for tiles
+
+            // Update the prompt for combat multipliers
+            loadPromptText.text = "Loading... Setting Combat Multipliers";
+            yield return new WaitForSeconds(0.5f); // Simulate loading time for combat multipliers
+            gameValuesSO.LoadCombatMultipliersFromCSV("Assets/StreamingAssets/SpaceOperaUnitValues - Combat Multipliers.csv");
+            loadingBar.value = 0.4f; // Update the loading bar for combat multipliers
+
+            loadPromptText.text = "Loading... Modifying Unit Prefabs";
+            yield return null;
+            // Load Unit data from CSV (simulate with WaitForSeconds if necessary)
+            //yield return new WaitForSeconds(0.1f); // Simulate loading time for unit data
+            gameValuesSO.LoadUnitsFromCSV("Assets/StreamingAssets/SpaceOperaUnitValues - UnitValues.csv");
+            loadingBar.value = 0.9f; // Update the loading bar as units are loaded
+
+            // Finalize loading and set loading prompt to complete
+            loadPromptText.text = "Loading... Game Scene";
+            loadingBar.value = 1.0f; // Final loading bar state
+            yield return new WaitForSeconds(0.1f); // Simulate a final pause before game values are fully initialized
+
+            // Game Values are fully loaded
+            Debug.Log("Game Values Loaded");
+            isGameValuesLoaded = true;
+
+			// Optionally, you can initialize or set up any other game values here
+			// gameValues.initialize(); // Uncomment to initialize your game values
+
+			// Return from this coroutine after all tasks are done
+			gameValuesSO.isInit = true;
+            yield return null;
+        }
+
+
+
+    }
 }

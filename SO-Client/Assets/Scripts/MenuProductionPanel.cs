@@ -22,8 +22,16 @@ public class MenuProductionPanel : MonoBehaviour
 
         attributesBaseUnits = gameValuesSO.getAttributesBaseUnits();
 
+        //throw warning if empty
+        if (attributesBaseUnits == null || attributesBaseUnits.Count ==0)
+        {
+            Debug.LogWarning("gamevaluesSO getAttributesBaseUnit is null");
+        }
+
         foreach (var kvp in attributesBaseUnits)
         {
+
+
             AttributesBaseUnit attributesBaseUnit = kvp.Value;
 
             // Instantiate a new button

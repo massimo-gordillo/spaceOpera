@@ -8,22 +8,31 @@ using System;
 [CreateAssetMenu(fileName = "UnitData", menuName = "ScriptableObjects/UnitData", order = 1)]
 public class GameValuesSO : ScriptableObject
 {
-    private Dictionary<byte, AttributesBaseUnit> attributesBaseUnits;
+    public bool isInit = false;
+    private Dictionary<byte, AttributesBaseUnit> attributesBaseUnits = new Dictionary<byte, AttributesBaseUnit>();
+    //private Dictionary<byte, AttributesBaseUnit> attributesBaseUnits;
     //private List<AttributesTile> attributesTiles;
     private string[] unitTerrainTypes;
     private PrefabManager prefabManager = new PrefabManager();
     private Dictionary<byte, AttributesTile> byteToAttributesTileDictionary; // Map byte values to AttributeTiles (tile rules)
     private Dictionary<string, Dictionary<string, double>> combatMultipliersDictionary;
 
+
     public void initialize()
     {
         //Debug.Log("GameValuesSO OnEnable called.");
-        attributesBaseUnits = new Dictionary<byte, AttributesBaseUnit>();
+        //attributesBaseUnits = new Dictionary<byte, AttributesBaseUnit>();
         //attributesTiles = new List<AttributesTile>();
-
-        LoadUnitsFromCSV("Assets/StreamingAssets/SpaceOperaUnitValues - UnitValues.csv");
-        LoadTilesFromCSV("Assets/StreamingAssets/SpaceOperaTileValues - TileValues.csv");
-        LoadCombatMultipliersFromCSV("Assets/StreamingAssets/SpaceOperaUnitValues - Combat Multipliers.csv");
+        //if (!isInit) { 
+            Debug.Log("GameValuesSO OnEnable called.");
+            LoadUnitsFromCSV("Assets/StreamingAssets/SpaceOperaUnitValues - UnitValues.csv");
+            LoadTilesFromCSV("Assets/StreamingAssets/SpaceOperaTileValues - TileValues.csv");
+            LoadCombatMultipliersFromCSV("Assets/StreamingAssets/SpaceOperaUnitValues - Combat Multipliers.csv");
+         /*   isInit = true;
+        }else
+            {
+            Debug.Log("GameValuesSO already initialized.");
+        }*/
     }
 
     public void LoadUnitsFromCSV(string filePath)
@@ -68,18 +77,6 @@ public class GameValuesSO : ScriptableObject
                 }
             }
 
-            // Handle sprite loading separately
-
-            /*String unitSpriteString = "sprites/progeny" + GetEnumIndex(unit.progeny) + "/" + unit.unitName.ToLower().Replace(" ", "") + "Sprite";
-            Debug.Log($"Unit Sprite should be here: {unitSpriteString}");
-            unit.sprite = Resources.Load<Sprite>(unitSpriteString);
-            //unit.sprite = Resources.Load<Sprite>($"sprites/{unit.unitName.ToLower().Replace(" ", "")}Sprite");*/
-
-            // Handle sprite loading separately
-            //string unitSpritePath = $"sprites/progeny{GetEnumIndex(unit.progeny)}/{unit.unitName.ToLower().Replace(" ", "")}Sprite";
-            //Debug.Log($"Attempting to load sprite from path: {unitSpritePath}");
-            //unit.sprite = Resources.Load<Sprite>(unitSpritePath);
-            //unit.spriteAtlasPath = $"Sprites/progeny{GetEnumIndex(unit.progeny)}/{unit.unitName.ToLower().Replace(" ", "")}SpriteAtlas.spriteatlas";
             unit.spriteAtlasPath = $"Sprites/progeny{GetEnumIndex(unit.progeny)}/{unit.unitName.ToLower().Replace(" ", "")}SpriteAtlas";
 
 
@@ -159,7 +156,7 @@ public class GameValuesSO : ScriptableObject
         }
     }
 
-    private void LoadCombatMultipliersFromCSV(string csvFilePath)
+    public void LoadCombatMultipliersFromCSV(string csvFilePath)
     {
         combatMultipliersDictionary = new Dictionary<string, Dictionary<string, double>>();
         using (var reader = new StreamReader(csvFilePath))
