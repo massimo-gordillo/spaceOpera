@@ -22,6 +22,8 @@ public class SupabaseManager : MonoBehaviour
     public Button loginButton;
     //public TMP_Text loginButtonText;
     public Button executeFunctionButton;
+    public Toggle sendRequestToggle;
+    public bool sendRequestToggleWarning = false;
 
     //private readonly string _supabaseUrl = "https://ezmafonauvkpalwjpaer.supabase.co";
     //private readonly string _supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV6bWFmb25hdXZrcGFsd2pwYWVyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzYxMDE5NjUsImV4cCI6MjA1MTY3Nzk2NX0.i3E8rSHoMV1ThEWctZNU25oV_DfTjBu_jsQXQZiLO0s";
@@ -477,7 +479,17 @@ public class SupabaseManager : MonoBehaviour
 
     public async Task<bool> SendSubmitTurn(List<GameAction> gameActions, long preTurnHash, long postTurnHash)
     {
-        if (gameActions == null || gameActions.Count == 0)
+        if (!sendRequestToggle.isOn)
+        {
+            if (!sendRequestToggleWarning)
+            {
+                Debug.LogWarning("Send Server Requests is off.");
+                sendRequestToggleWarning = true;
+            }
+            return false;
+        }
+
+            if (gameActions == null || gameActions.Count == 0)
         {
             Debug.LogError("Game actions list is empty.");
             return false;
