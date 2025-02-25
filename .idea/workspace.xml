@@ -1,0 +1,619 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="NONE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="ba7fbd20-6d0a-4fc1-a853-ba9c048d2d45" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/caches/deviceStreaming.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/caches/deviceStreaming.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AndroidAPK/GalaxyChessAndroid.apk" beforeDir="false" afterPath="$PROJECT_DIR$/AndroidAPK/GalaxyChessAndroid.apk" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Assets/Resources/UnitPrefabs/progeny1/AAJetPrefab.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Assets/Resources/UnitPrefabs/progeny1/AAJetPrefab.prefab" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Assets/Resources/UnitPrefabs/progeny1/APCPrefab.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Assets/Resources/UnitPrefabs/progeny1/APCPrefab.prefab" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Assets/Resources/UnitPrefabs/progeny1/ArtilleryPrefab.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Assets/Resources/UnitPrefabs/progeny1/ArtilleryPrefab.prefab" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Assets/Resources/UnitPrefabs/progeny1/BattleshipPrefab.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Assets/Resources/UnitPrefabs/progeny1/BattleshipPrefab.prefab" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Assets/Resources/UnitPrefabs/progeny1/BomberPrefab.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Assets/Resources/UnitPrefabs/progeny1/BomberPrefab.prefab" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Assets/Resources/UnitPrefabs/progeny1/EVAPrefab.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Assets/Resources/UnitPrefabs/progeny1/EVAPrefab.prefab" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Assets/Resources/UnitPrefabs/progeny1/ElectosPrefab.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Assets/Resources/UnitPrefabs/progeny1/ElectosPrefab.prefab" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Assets/Resources/UnitPrefabs/progeny1/GattlingTankPrefab.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Assets/Resources/UnitPrefabs/progeny1/GattlingTankPrefab.prefab" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Assets/Resources/UnitPrefabs/progeny1/HeavyTankPrefab.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Assets/Resources/UnitPrefabs/progeny1/HeavyTankPrefab.prefab" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Assets/Resources/UnitPrefabs/progeny1/HelicopterPrefab.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Assets/Resources/UnitPrefabs/progeny1/HelicopterPrefab.prefab" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Assets/Resources/UnitPrefabs/progeny1/InfantryPrefab.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Assets/Resources/UnitPrefabs/progeny1/InfantryPrefab.prefab" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Assets/Resources/UnitPrefabs/progeny1/LightTankPrefab.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Assets/Resources/UnitPrefabs/progeny1/LightTankPrefab.prefab" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Assets/Resources/UnitPrefabs/progeny1/RocketsPrefab.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Assets/Resources/UnitPrefabs/progeny1/RocketsPrefab.prefab" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Assets/Scenes/GameScene.unity" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Assets/Scenes/GameScene.unity" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Assets/Scenes/MenuScene.unity" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Assets/Scenes/MenuScene.unity" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Assets/Scripts/GameValuesSO.cs" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Assets/Scripts/GameValuesSO.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Assets/Scripts/PrefabManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Assets/Scripts/PrefabManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/ArtifactDB" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/ArtifactDB" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Artifacts/19/1996c96d57713f54223eee813e4f300d" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Artifacts/4d/4d03e7a16479c6d7de46bac7765b628d" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Artifacts/6e/6e26735e06bb5f1546e8f1fcf7e3ac4d" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Artifacts/90/904c638ade10a70608c5a5c1f0f69900" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Artifacts/96/9698074ca80c657bd0e4b57284719f1b" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Artifacts/b3/b387404974ac5393fb5608b869e2284a" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/1300b0aP.dag_fsmtime" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/1300b0aP.dag_fsmtime" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/.gradle/7.5.1/executionHistory/executionHistory.bin" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/.gradle/7.5.1/executionHistory/executionHistory.bin" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/.gradle/7.5.1/executionHistory/executionHistory.lock" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/.gradle/7.5.1/executionHistory/executionHistory.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/.gradle/7.5.1/fileHashes/fileHashes.bin" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/.gradle/7.5.1/fileHashes/fileHashes.bin" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/.gradle/7.5.1/fileHashes/fileHashes.lock" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/.gradle/7.5.1/fileHashes/fileHashes.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/.gradle/buildOutputCleanup/buildOutputCleanup.lock" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/.gradle/buildOutputCleanup/buildOutputCleanup.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/.gradle/file-system.probe" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/.gradle/file-system.probe" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/gradle.properties" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/gradle.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/launcher/build/intermediates/assets/release/aa/catalog.json" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/launcher/build/intermediates/assets/release/aa/catalog.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/launcher/build/intermediates/assets/release/bin/Data/Managed/Metadata/global-metadata.dat" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/launcher/build/intermediates/assets/release/bin/Data/Managed/Metadata/global-metadata.dat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/launcher/build/intermediates/assets/release/bin/Data/data.unity3d" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/launcher/build/intermediates/assets/release/bin/Data/data.unity3d" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/launcher/build/intermediates/assets/release/bin/Data/unity_app_guid" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/launcher/build/intermediates/assets/release/bin/Data/unity_app_guid" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/launcher/build/intermediates/compressed_assets/release/out/assets/aa/catalog.json.jar" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/launcher/build/intermediates/compressed_assets/release/out/assets/aa/catalog.json.jar" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/launcher/build/intermediates/compressed_assets/release/out/assets/bin/Data/Managed/Metadata/global-metadata.dat.jar" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/launcher/build/intermediates/compressed_assets/release/out/assets/bin/Data/Managed/Metadata/global-metadata.dat.jar" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/launcher/build/intermediates/compressed_assets/release/out/assets/bin/Data/data.unity3d.jar" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/launcher/build/intermediates/compressed_assets/release/out/assets/bin/Data/data.unity3d.jar" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/launcher/build/intermediates/compressed_assets/release/out/assets/bin/Data/unity_app_guid.jar" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/launcher/build/intermediates/compressed_assets/release/out/assets/bin/Data/unity_app_guid.jar" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/launcher/build/intermediates/incremental/packageRelease/tmp/release/dex-renamer-state.txt" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/launcher/build/intermediates/incremental/packageRelease/tmp/release/dex-renamer-state.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/launcher/build/intermediates/merged_native_libs/release/out/lib/armeabi-v7a/lib_burst_generated.so" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/launcher/build/intermediates/merged_native_libs/release/out/lib/armeabi-v7a/lib_burst_generated.so" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/launcher/build/intermediates/merged_native_libs/release/out/lib/armeabi-v7a/libil2cpp.so" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/launcher/build/intermediates/merged_native_libs/release/out/lib/armeabi-v7a/libil2cpp.so" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/launcher/build/intermediates/merged_native_libs/release/out/lib/armeabi-v7a/libunity.so" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/launcher/build/intermediates/merged_native_libs/release/out/lib/armeabi-v7a/libunity.so" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/launcher/build/intermediates/stripped_native_libs/release/out/lib/armeabi-v7a/lib_burst_generated.so" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/launcher/build/intermediates/stripped_native_libs/release/out/lib/armeabi-v7a/lib_burst_generated.so" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/launcher/build/intermediates/stripped_native_libs/release/out/lib/armeabi-v7a/libil2cpp.so" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/launcher/build/intermediates/stripped_native_libs/release/out/lib/armeabi-v7a/libil2cpp.so" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/launcher/build/intermediates/stripped_native_libs/release/out/lib/armeabi-v7a/libunity.so" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/launcher/build/intermediates/stripped_native_libs/release/out/lib/armeabi-v7a/libunity.so" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/launcher/build/outputs/apk/release/launcher-release.apk" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/launcher/build/outputs/apk/release/launcher-release.apk" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/.transforms/78cb1c7885102606e7266fcde0eff0f8/transformed/out/assets/aa/catalog.json" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/.transforms/78cb1c7885102606e7266fcde0eff0f8/transformed/out/assets/aa/catalog.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/.transforms/78cb1c7885102606e7266fcde0eff0f8/transformed/out/assets/bin/Data/Managed/Metadata/global-metadata.dat" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/.transforms/78cb1c7885102606e7266fcde0eff0f8/transformed/out/assets/bin/Data/Managed/Metadata/global-metadata.dat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/.transforms/78cb1c7885102606e7266fcde0eff0f8/transformed/out/assets/bin/Data/data.unity3d" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/.transforms/78cb1c7885102606e7266fcde0eff0f8/transformed/out/assets/bin/Data/data.unity3d" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/.transforms/78cb1c7885102606e7266fcde0eff0f8/transformed/out/assets/bin/Data/unity_app_guid" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/.transforms/78cb1c7885102606e7266fcde0eff0f8/transformed/out/assets/bin/Data/unity_app_guid" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/.transforms/78cb1c7885102606e7266fcde0eff0f8/transformed/out/jni/armeabi-v7a/lib_burst_generated.so" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/.transforms/78cb1c7885102606e7266fcde0eff0f8/transformed/out/jni/armeabi-v7a/lib_burst_generated.so" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/.transforms/78cb1c7885102606e7266fcde0eff0f8/transformed/out/jni/armeabi-v7a/libil2cpp.so" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/.transforms/78cb1c7885102606e7266fcde0eff0f8/transformed/out/jni/armeabi-v7a/libil2cpp.so" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/.transforms/78cb1c7885102606e7266fcde0eff0f8/transformed/out/jni/armeabi-v7a/libunity.so" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/.transforms/78cb1c7885102606e7266fcde0eff0f8/transformed/out/jni/armeabi-v7a/libunity.so" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/library_and_local_jars_jni/release/jni/armeabi-v7a/lib_burst_generated.so" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/library_and_local_jars_jni/release/jni/armeabi-v7a/lib_burst_generated.so" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/library_and_local_jars_jni/release/jni/armeabi-v7a/libil2cpp.so" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/library_and_local_jars_jni/release/jni/armeabi-v7a/libil2cpp.so" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/library_and_local_jars_jni/release/jni/armeabi-v7a/libunity.so" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/library_and_local_jars_jni/release/jni/armeabi-v7a/libunity.so" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/library_assets/release/out/aa/catalog.json" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/library_assets/release/out/aa/catalog.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/library_assets/release/out/bin/Data/Managed/Metadata/global-metadata.dat" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/library_assets/release/out/bin/Data/Managed/Metadata/global-metadata.dat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/library_assets/release/out/bin/Data/data.unity3d" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/library_assets/release/out/bin/Data/data.unity3d" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/library_assets/release/out/bin/Data/unity_app_guid" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/library_assets/release/out/bin/Data/unity_app_guid" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/library_jni/release/jni/armeabi-v7a/lib_burst_generated.so" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/library_jni/release/jni/armeabi-v7a/lib_burst_generated.so" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/library_jni/release/jni/armeabi-v7a/libil2cpp.so" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/library_jni/release/jni/armeabi-v7a/libil2cpp.so" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/library_jni/release/jni/armeabi-v7a/libunity.so" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/library_jni/release/jni/armeabi-v7a/libunity.so" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/local_aar_for_lint/release/out.aar" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/local_aar_for_lint/release/out.aar" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/merged_jni_libs/release/out/armeabi-v7a/lib_burst_generated.so" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/merged_jni_libs/release/out/armeabi-v7a/lib_burst_generated.so" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/merged_jni_libs/release/out/armeabi-v7a/libil2cpp.so" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/merged_jni_libs/release/out/armeabi-v7a/libil2cpp.so" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/merged_jni_libs/release/out/armeabi-v7a/libunity.so" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/merged_jni_libs/release/out/armeabi-v7a/libunity.so" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/merged_native_libs/release/out/lib/armeabi-v7a/lib_burst_generated.so" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/merged_native_libs/release/out/lib/armeabi-v7a/lib_burst_generated.so" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/merged_native_libs/release/out/lib/armeabi-v7a/libil2cpp.so" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/merged_native_libs/release/out/lib/armeabi-v7a/libil2cpp.so" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/merged_native_libs/release/out/lib/armeabi-v7a/libunity.so" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/merged_native_libs/release/out/lib/armeabi-v7a/libunity.so" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/stripped_native_libs/release/out/lib/armeabi-v7a/lib_burst_generated.so" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/stripped_native_libs/release/out/lib/armeabi-v7a/lib_burst_generated.so" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/stripped_native_libs/release/out/lib/armeabi-v7a/libil2cpp.so" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/stripped_native_libs/release/out/lib/armeabi-v7a/libil2cpp.so" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/stripped_native_libs/release/out/lib/armeabi-v7a/libunity.so" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/stripped_native_libs/release/out/lib/armeabi-v7a/libunity.so" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/src/main/assets/aa/catalog.json" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/src/main/assets/aa/catalog.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/src/main/assets/bin/Data/Managed/Metadata/global-metadata.dat" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/src/main/assets/bin/Data/Managed/Metadata/global-metadata.dat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/src/main/assets/bin/Data/data.unity3d" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/src/main/assets/bin/Data/data.unity3d" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/src/main/assets/bin/Data/unity_app_guid" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/src/main/assets/bin/Data/unity_app_guid" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/src/main/jniLibs/armeabi-v7a/lib_burst_generated.so" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/src/main/jniLibs/armeabi-v7a/lib_burst_generated.so" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/src/main/jniLibs/armeabi-v7a/libil2cpp.so" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/src/main/jniLibs/armeabi-v7a/libil2cpp.so" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/src/main/jniLibs/armeabi-v7a/libunity.so" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/src/main/jniLibs/armeabi-v7a/libunity.so" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Il2CppBackup/Managed/Assembly-CSharp.dll" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Il2CppBackup/Managed/Assembly-CSharp.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Il2CppBackup/Managed/Assembly-CSharp.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Il2CppBackup/Managed/Assembly-CSharp.pdb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Il2CppBackup/Managed/Newtonsoft.Json.dll" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Il2CppBackup/Managed/Newtonsoft.Json.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Il2CppBackup/Managed/Newtonsoft.Json.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Il2CppBackup/Managed/Newtonsoft.Json.pdb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Il2CppBackup/Managed/UnityEngine.CoreModule.dll" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Il2CppBackup/Managed/UnityEngine.CoreModule.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Il2CppBackup/Managed/UnityEngine.CoreModule.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Il2CppBackup/Managed/UnityEngine.CoreModule.pdb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Il2CppBackup/Managed/UnityEngine.InputLegacyModule.dll" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Il2CppBackup/Managed/UnityEngine.InputLegacyModule.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Il2CppBackup/Managed/UnityEngine.InputLegacyModule.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Il2CppBackup/Managed/UnityEngine.InputLegacyModule.pdb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Il2CppBackup/Managed/icallsummary.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Il2CppBackup/il2cppOutput/Assembly-CSharp.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Il2CppBackup/il2cppOutput/Assembly-CSharp.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Il2CppBackup/il2cppOutput/Assembly-CSharp_CodeGen.c" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Il2CppBackup/il2cppOutput/Assembly-CSharp_CodeGen.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Il2CppBackup/il2cppOutput/Assembly-CSharp__1.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Il2CppBackup/il2cppOutput/Assembly-CSharp__1.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Il2CppBackup/il2cppOutput/GenericMethods.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Il2CppBackup/il2cppOutput/GenericMethods.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Il2CppBackup/il2cppOutput/GenericMethods__1.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Il2CppBackup/il2cppOutput/GenericMethods__1.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Il2CppBackup/il2cppOutput/GenericMethods__13.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Il2CppBackup/il2cppOutput/GenericMethods__13.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Il2CppBackup/il2cppOutput/GenericMethods__14.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Il2CppBackup/il2cppOutput/GenericMethods__14.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Il2CppBackup/il2cppOutput/GenericMethods__15.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Il2CppBackup/il2cppOutput/GenericMethods__15.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Il2CppBackup/il2cppOutput/Il2CppCCFieldValuesTable.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Il2CppBackup/il2cppOutput/Il2CppCCFieldValuesTable.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Il2CppBackup/il2cppOutput/Il2CppCCTypeValuesTable.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Il2CppBackup/il2cppOutput/Il2CppCCTypeValuesTable.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Il2CppBackup/il2cppOutput/Il2CppCCalculateFieldValues2.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Il2CppBackup/il2cppOutput/Il2CppCCalculateFieldValues2.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Il2CppBackup/il2cppOutput/Il2CppCCalculateFieldValues3.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Il2CppBackup/il2cppOutput/Il2CppCCalculateFieldValues3.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Il2CppBackup/il2cppOutput/Il2CppCCalculateTypeValues1.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Il2CppBackup/il2cppOutput/Il2CppCCalculateTypeValues1.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Il2CppBackup/il2cppOutput/Il2CppGenericAdjustorThunkTable.c" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Il2CppBackup/il2cppOutput/Il2CppGenericAdjustorThunkTable.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Il2CppBackup/il2cppOutput/Il2CppGenericInstDefinitions.c" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Il2CppBackup/il2cppOutput/Il2CppGenericInstDefinitions.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Il2CppBackup/il2cppOutput/Il2CppGenericMethodDefinitions.c" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Il2CppBackup/il2cppOutput/Il2CppGenericMethodDefinitions.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Il2CppBackup/il2cppOutput/Il2CppGenericMethodPointerTable.c" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Il2CppBackup/il2cppOutput/Il2CppGenericMethodPointerTable.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Il2CppBackup/il2cppOutput/Il2CppMetadataRegistration.c" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Il2CppBackup/il2cppOutput/Il2CppMetadataRegistration.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Il2CppBackup/il2cppOutput/Il2CppMetadataUsage.c" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Il2CppBackup/il2cppOutput/Il2CppMetadataUsage.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Il2CppBackup/il2cppOutput/Il2CppRgctxTable.c" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Il2CppBackup/il2cppOutput/Il2CppRgctxTable.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Il2CppBackup/il2cppOutput/Il2CppTypeDefinitions.c" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Il2CppBackup/il2cppOutput/Il2CppTypeDefinitions.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Il2CppBackup/il2cppOutput/UnityEngine.CoreModule_CodeGen.c" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Il2CppBackup/il2cppOutput/UnityEngine.CoreModule_CodeGen.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Il2CppBackup/il2cppOutput/UnityEngine.CoreModule__1.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Il2CppBackup/il2cppOutput/UnityEngine.CoreModule__1.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Il2CppBackup/il2cppOutput/UnityEngine.InputLegacyModule.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Il2CppBackup/il2cppOutput/UnityEngine.InputLegacyModule.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Il2CppBackup/il2cppOutput/UnityEngine.InputLegacyModule_CodeGen.c" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Android/Prj/IL2CPP/Il2CppBackup/il2cppOutput/UnityEngine.InputLegacyModule_CodeGen.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Playerea8fd7cc-inputdata.json" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Playerea8fd7cc-inputdata.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Playerea8fd7cc.dag" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Playerea8fd7cc.dag" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Playerea8fd7cc.dag.json" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Playerea8fd7cc.dag.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Playerea8fd7cc.dag.outputdata" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Playerea8fd7cc.dag.outputdata" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Playerea8fd7cc.dag_derived" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Playerea8fd7cc.dag_derived" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/Playerea8fd7cc.dag_fsmtime" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/Playerea8fd7cc.dag_fsmtime" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/TundraBuildState.state" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/TundraBuildState.state" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/TundraBuildState.state.map" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/TundraBuildState.state.map" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/1300b0aE.dag/Assembly-CSharp.dll" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/1300b0aE.dag/Assembly-CSharp.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/1300b0aE.dag/Assembly-CSharp.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/1300b0aE.dag/Assembly-CSharp.pdb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/1300b0aE.dag/post-processed/Assembly-CSharp.dll" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/1300b0aE.dag/post-processed/Assembly-CSharp.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/1300b0aE.dag/post-processed/Assembly-CSharp.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/1300b0aE.dag/post-processed/Assembly-CSharp.pdb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/1300b0aP.dag/Assembly-CSharp.dll" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/1300b0aP.dag/Assembly-CSharp.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/1300b0aP.dag/Assembly-CSharp.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/1300b0aP.dag/Assembly-CSharp.pdb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/1300b0aP.dag/Assembly-CSharp.ref.dll" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/1300b0aP.dag/Assembly-CSharp.ref.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/1300b0aP.dag/post-processed/Assembly-CSharp.dll" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/1300b0aP.dag/post-processed/Assembly-CSharp.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/1300b0aP.dag/post-processed/Assembly-CSharp.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/1300b0aP.dag/post-processed/Assembly-CSharp.pdb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/ManagedStripped/Assembly-CSharp.dll" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/ManagedStripped/Assembly-CSharp.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/ManagedStripped/Assembly-CSharp.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/ManagedStripped/Assembly-CSharp.pdb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/ManagedStripped/Newtonsoft.Json.dll" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/ManagedStripped/Newtonsoft.Json.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/ManagedStripped/Newtonsoft.Json.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/ManagedStripped/Newtonsoft.Json.pdb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/ManagedStripped/UnityEngine.CoreModule.dll" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/ManagedStripped/UnityEngine.CoreModule.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/ManagedStripped/UnityEngine.CoreModule.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/ManagedStripped/UnityEngine.CoreModule.pdb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/ManagedStripped/UnityEngine.InputLegacyModule.dll" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/ManagedStripped/UnityEngine.InputLegacyModule.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/ManagedStripped/UnityEngine.InputLegacyModule.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/ManagedStripped/UnityEngine.InputLegacyModule.pdb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/ManagedStripped/icallsummary.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/UnityICallRegistration.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/UnityICallRegistration.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/build/armeabi-v7a/Data/Metadata/global-metadata.dat" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/build/armeabi-v7a/Data/Metadata/global-metadata.dat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/build/armeabi-v7a/libil2cpp.dbg.so" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/build/armeabi-v7a/libil2cpp.dbg.so" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/build/armeabi-v7a/libil2cpp.so" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/build/armeabi-v7a/libil2cpp.so" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/build/armeabi-v7a/libil2cpp.sym.so" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/build/armeabi-v7a/libil2cpp.sym.so" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Assembly-CSharp.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Assembly-CSharp_CodeGen.c" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Assembly-CSharp__1.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/GenericMethods.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/GenericMethods__1.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/GenericMethods__10.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/GenericMethods__11.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/GenericMethods__12.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/GenericMethods__13.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/GenericMethods__14.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/GenericMethods__15.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/GenericMethods__16.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/GenericMethods__17.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/GenericMethods__18.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/GenericMethods__19.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/GenericMethods__2.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/GenericMethods__3.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/GenericMethods__4.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/GenericMethods__5.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/GenericMethods__6.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/GenericMethods__7.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/GenericMethods__8.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/GenericMethods__9.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Generics.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Generics__1.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Generics__10.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Generics__11.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Generics__12.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Generics__13.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Generics__14.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Generics__15.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Generics__16.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Generics__17.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Generics__18.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Generics__19.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Generics__2.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Generics__20.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Generics__21.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Generics__22.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Generics__23.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Generics__24.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Generics__25.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Generics__26.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Generics__27.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Generics__28.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Generics__29.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Generics__3.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Generics__30.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Generics__31.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Generics__32.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Generics__33.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Generics__34.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Generics__35.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Generics__36.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Generics__37.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Generics__38.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Generics__39.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Generics__4.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Generics__40.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Generics__41.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Generics__42.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Generics__43.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Generics__44.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Generics__45.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Generics__46.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Generics__47.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Generics__48.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Generics__49.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Generics__5.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Generics__50.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Generics__51.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Generics__52.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Generics__53.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Generics__54.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Generics__55.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Generics__56.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Generics__57.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Generics__58.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Generics__59.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Generics__6.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Generics__60.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Generics__61.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Generics__62.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Generics__63.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Generics__64.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Generics__65.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Generics__66.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Generics__67.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Generics__68.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Generics__69.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Generics__7.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Generics__70.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Generics__71.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Generics__72.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Generics__73.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Generics__74.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Generics__75.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Generics__76.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Generics__77.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Generics__78.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Generics__79.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Generics__8.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Generics__9.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Il2CppCCFieldValuesTable.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Il2CppCCTypeValuesTable.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Il2CppCCalculateFieldValues.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Il2CppCCalculateFieldValues1.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Il2CppCCalculateFieldValues2.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Il2CppCCalculateFieldValues3.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Il2CppCCalculateTypeValues.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Il2CppCCalculateTypeValues1.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Il2CppCodeRegistration.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Il2CppGenericAdjustorThunkTable.c" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Il2CppGenericClassTable.c" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Il2CppGenericInstDefinitions.c" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Il2CppGenericMethodDefinitions.c" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Il2CppGenericMethodPointerTable.c" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Il2CppGenericMethodTable.c" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Il2CppInteropDataTable.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Il2CppInvokerTable.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Il2CppMetadataRegistration.c" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Il2CppMetadataUsage.c" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Il2CppReversePInvokeWrapperTable.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Il2CppRgctxTable.c" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Il2CppTypeDefinitions.c" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/InputSystem.Samples.Visualizers.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/InputSystem.Samples.Visualizers_CodeGen.c" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/MessagePack.Annotations.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/MessagePack.Annotations_CodeGen.c" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/MessagePack.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/MessagePack_CodeGen.c" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/MessagePack__1.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/MessagePack__2.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Microsoft.IdentityModel.Abstractions.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Microsoft.IdentityModel.Abstractions_CodeGen.c" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Microsoft.IdentityModel.JsonWebTokens.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Microsoft.IdentityModel.JsonWebTokens_CodeGen.c" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Microsoft.IdentityModel.Logging.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Microsoft.IdentityModel.Logging_CodeGen.c" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Microsoft.IdentityModel.Tokens.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Microsoft.IdentityModel.Tokens_CodeGen.c" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Microsoft.NET.StringTools.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Microsoft.NET.StringTools_CodeGen.c" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/MimeMapping.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/MimeMapping_CodeGen.c" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/MimeMapping__1.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/MimeMapping__2.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Mono.Security.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Mono.Security_CodeGen.c" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Mono.Security__1.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Newtonsoft.Json.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Newtonsoft.Json_CodeGen.c" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Newtonsoft.Json__1.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Newtonsoft.Json__2.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Newtonsoft.Json__3.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Newtonsoft.Json__4.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Newtonsoft.Json__5.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Newtonsoft.Json__6.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Newtonsoft.Json__7.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Newtonsoft.Json__8.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Supabase.Core.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Supabase.Core_CodeGen.c" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Supabase.Functions.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Supabase.Functions_CodeGen.c" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Supabase.Gotrue.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Supabase.Gotrue_CodeGen.c" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Supabase.Gotrue__1.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Supabase.Postgrest.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Supabase.Postgrest_CodeGen.c" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Supabase.Realtime.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Supabase.Realtime_CodeGen.c" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Supabase.Storage.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Supabase.Storage_CodeGen.c" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Supabase.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Supabase_CodeGen.c" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/System.Configuration.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/System.Configuration_CodeGen.c" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/System.Core.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/System.Core_CodeGen.c" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/System.Core__1.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/System.Core__2.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/System.Core__3.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/System.Core__4.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/System.Data.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/System.Data_CodeGen.c" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/System.Data__1.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/System.Data__2.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/System.Data__3.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/System.Data__4.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/System.Data__5.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/System.Data__6.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/System.Data__7.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/System.Data__8.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/System.Data__9.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/System.Drawing.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/System.Drawing_CodeGen.c" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/System.IdentityModel.Tokens.Jwt.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/System.IdentityModel.Tokens.Jwt_CodeGen.c" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/System.Net.Http.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/System.Net.Http_CodeGen.c" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/System.Net.Http__1.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/System.Numerics.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/System.Numerics_CodeGen.c" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/System.Reactive.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/System.Reactive_CodeGen.c" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/System.Runtime.CompilerServices.Unsafe.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/System.Runtime.CompilerServices.Unsafe_CodeGen.c" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/System.Runtime.Serialization.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/System.Runtime.Serialization_CodeGen.c" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/System.Text.Encodings.Web.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/System.Text.Encodings.Web_CodeGen.c" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/System.Text.Json.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/System.Text.Json_CodeGen.c" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/System.Text.Json__1.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/System.Threading.Channels.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/System.Threading.Channels_CodeGen.c" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/System.Xml.Linq.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/System.Xml.Linq_CodeGen.c" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/System.Xml.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/System.Xml_CodeGen.c" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/System.Xml__1.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/System.Xml__10.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/System.Xml__11.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/System.Xml__12.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/System.Xml__13.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/System.Xml__14.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/System.Xml__15.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/System.Xml__16.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/System.Xml__2.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/System.Xml__3.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/System.Xml__4.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/System.Xml__5.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/System.Xml__6.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/System.Xml__7.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/System.Xml__8.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/System.Xml__9.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/System.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/System_CodeGen.c" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/System__1.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/System__10.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/System__11.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/System__12.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/System__2.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/System__3.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/System__4.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/System__5.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/System__6.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/System__7.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/System__8.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/System__9.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Unity.Addressables.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Unity.Addressables_CodeGen.c" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Unity.Addressables__1.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Unity.InputSystem.ForUI.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Unity.InputSystem.ForUI_CodeGen.c" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Unity.InputSystem.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Unity.InputSystem_CodeGen.c" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Unity.InputSystem__1.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Unity.InputSystem__10.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Unity.InputSystem__11.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Unity.InputSystem__2.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Unity.InputSystem__3.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Unity.InputSystem__4.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Unity.InputSystem__5.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Unity.InputSystem__6.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Unity.InputSystem__7.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Unity.InputSystem__8.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/Unity.InputSystem__9.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/UnityEngine.CoreModule_CodeGen.c" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/UnityEngine.CoreModule_CodeGen.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/UnityEngine.CoreModule__1.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/UnityEngine.CoreModule__1.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/UnityEngine.InputLegacyModule.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/UnityEngine.InputLegacyModule.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/UnityEngine.InputLegacyModule_CodeGen.c" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/UnityEngine.InputLegacyModule_CodeGen.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/analytics.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/mscorlib.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/mscorlib_CodeGen.c" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/mscorlib__1.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/mscorlib__10.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/mscorlib__11.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/mscorlib__12.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/mscorlib__13.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/mscorlib__14.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/mscorlib__15.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/mscorlib__16.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/mscorlib__17.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/mscorlib__18.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/mscorlib__19.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/mscorlib__2.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/mscorlib__20.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/mscorlib__21.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/mscorlib__22.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/mscorlib__23.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/mscorlib__24.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/mscorlib__3.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/mscorlib__4.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/mscorlib__5.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/mscorlib__6.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/mscorlib__7.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/mscorlib__8.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/cpp/mscorlib__9.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/data/Metadata/global-metadata.dat" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/data/Resources/Newtonsoft.Json.dll-resources.dat" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/data/Resources/System.Data.dll-resources.dat" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/data/Resources/System.Drawing.dll-resources.dat" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/data/Resources/System.Reactive.dll-resources.dat" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/data/Resources/System.Text.Json.dll-resources.dat" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/data/Resources/System.Threading.Channels.dll-resources.dat" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/il2cppOutput/data/Resources/mscorlib.dll-resources.dat" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/iz17e/0nwt37yi99mo.o" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/iz17e/0nwt37yi99mo.o" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/iz17e/23ntxqa49vfm.o" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/iz17e/23ntxqa49vfm.o" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/iz17e/3agyupvxp3oi.o" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/iz17e/3agyupvxp3oi.o" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/iz17e/3b89h6q2dyw1.o" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/iz17e/3b89h6q2dyw1.o" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/iz17e/4sdu2v2qnucy.o" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/iz17e/4sdu2v2qnucy.o" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/iz17e/84te2r5ypb3c.o" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/iz17e/84te2r5ypb3c.o" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/iz17e/a0acnksju992.o" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/iz17e/a0acnksju992.o" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/iz17e/avqh9d7fa95f.o" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/iz17e/avqh9d7fa95f.o" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/iz17e/e9ise2teueqd.o" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/iz17e/e9ise2teueqd.o" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/iz17e/f7dx9sp592lv.o" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/iz17e/f7dx9sp592lv.o" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/iz17e/g6rjogst9dgj.o" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/iz17e/g6rjogst9dgj.o" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/iz17e/hok5hhw66732.o" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/iz17e/hok5hhw66732.o" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/iz17e/j37ryetexffw.o" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/iz17e/j37ryetexffw.o" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/iz17e/jvopcsf3210q.o" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/iz17e/jvopcsf3210q.o" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/iz17e/ks051k5byxrd.o" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/iz17e/ks051k5byxrd.o" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/iz17e/libil2cpp.so" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/iz17e/libil2cpp.so" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/iz17e/mxir08ewtdut.o" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/iz17e/mxir08ewtdut.o" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/iz17e/o8jjluj24ylm.o" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/iz17e/o8jjluj24ylm.o" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/iz17e/peckwyanxokr.o" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/iz17e/peckwyanxokr.o" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/iz17e/qmw0gerl1q16.o" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/iz17e/qmw0gerl1q16.o" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/iz17e/r7pigdq7buxj.o" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/iz17e/r7pigdq7buxj.o" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/iz17e/sp76qbo7qh28.o" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/iz17e/sp76qbo7qh28.o" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/iz17e/wjm5oqsqc3gr.o" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/iz17e/wjm5oqsqc3gr.o" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/iz17e/wm4t751aalqn.o" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/iz17e/wm4t751aalqn.o" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/iz17e/wwgmeeoz5z4j.o" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/iz17e/wwgmeeoz5z4j.o" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/iz17e/xmlwg1kf1sl4.o" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/iz17e/xmlwg1kf1sl4.o" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/libunity/armeabi-v7a/UnityICallRegistration.o" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/libunity/armeabi-v7a/UnityICallRegistration.o" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/libunity/armeabi-v7a/libunity.dbg.so" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/libunity/armeabi-v7a/libunity.dbg.so" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/libunity/armeabi-v7a/libunity.sym.so" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/libunity/armeabi-v7a/libunity.sym.so" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/libunity/armeabi-v7a/stripped/libunity.so" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/libunity/armeabi-v7a/stripped/libunity.so" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/libunity/armeabi-v7a/unstripped/libunity.so" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/Android/libunity/armeabi-v7a/unstripped/libunity.so" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/csharpactions/build.gradle_cjsu.info" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/csharpactions/build.gradle_cjsu.info" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/il2cpp_conv_gdkf.traceevents" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/objcopy_b9ry/libil2cpp.dbg.so" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/objcopy_b9ry/libil2cpp.dbg.so" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/objcopy_b9ry/libil2cpp.so" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/objcopy_b9ry/libil2cpp.so" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/objcopy_b9ry/libil2cpp.sym.so" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/objcopy_b9ry/libil2cpp.sym.so" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/objcopy_b9ry/stripped/libil2cpp.so" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/objcopy_b9ry/stripped/libil2cpp.so" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/unitylinker_xy1a.traceevents" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/artifacts/unitylinker_xy1a.traceevents" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/backend_profiler1.traceevents" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/backend_profiler1.traceevents" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/backend_profiler2.traceevents" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/backend_profiler2.traceevents" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/buildprogram0.traceevents" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/buildprogram0.traceevents" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/buildprogram1.traceevents" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/buildprogram1.traceevents" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/buildreport.json" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/buildreport.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/buildreport.json_0.traceevents" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/buildreport.json_0.traceevents" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/buildreport.json_1.traceevents" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/buildreport.json_1.traceevents" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/fullprofile.json" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/fullprofile.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/tundra.digestcache" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/tundra.digestcache" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/tundra.log.json" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/tundra.log.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Bee/tundra.scancache" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Bee/tundra.scancache" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/BuildPlayerData/Editor/TypeDb-All.json" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/BuildPlayerData/Editor/TypeDb-All.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/BuildPlayerData/Player/TypeDb-All.json" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/BuildPlayerData/Player/TypeDb-All.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/BurstCache/Android-Arm/83a22f254bd488f05c33a43fbb0f3a37.so" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/BurstCache/Android-Arm/83a22f254bd488f05c33a43fbb0f3a37.so" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/BurstCache/Android-Arm/BurstCacheManifest.cm" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/BurstCache/Android-Arm/BurstCacheManifest.cm" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/BurstCache/Android-Arm/Hashes/04849841cbd64ae4f14b14088ec89ba9.bhc" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/BurstCache/Android-Arm/Hashes/04849841cbd64ae4f14b14088ec89ba9.bhc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/BurstCache/Android-Arm/Hashes/07e4275e93bdfafb968c284023fc9820.bhc" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/BurstCache/Android-Arm/Hashes/07e4275e93bdfafb968c284023fc9820.bhc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/BurstCache/Android-Arm/Hashes/10fcbea22543c5442693fd8a7d25c17e.bhc" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/BurstCache/Android-Arm/Hashes/10fcbea22543c5442693fd8a7d25c17e.bhc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/BurstCache/Android-Arm/Hashes/1b32dd62c44741036c1a7c4dfd861a5f.bhc" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/BurstCache/Android-Arm/Hashes/1b32dd62c44741036c1a7c4dfd861a5f.bhc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/BurstCache/Android-Arm/Hashes/2690bd0d90dd7c49e19c4e3d782e4d47.bhc" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/BurstCache/Android-Arm/Hashes/2690bd0d90dd7c49e19c4e3d782e4d47.bhc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/BurstCache/Android-Arm/Hashes/276f060065e14adaac79fb5f2d94dbfa.bhc" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/BurstCache/Android-Arm/Hashes/276f060065e14adaac79fb5f2d94dbfa.bhc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/BurstCache/Android-Arm/Hashes/3aa7767756913884e27019266e846ff5.bhc" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/BurstCache/Android-Arm/Hashes/3aa7767756913884e27019266e846ff5.bhc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/BurstCache/Android-Arm/Hashes/4aec67408cb35a8986c97516e2d987cc.bhc" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/BurstCache/Android-Arm/Hashes/4aec67408cb35a8986c97516e2d987cc.bhc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/BurstCache/Android-Arm/Hashes/5b501be94503972228b519b90621e33c.bhc" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/BurstCache/Android-Arm/Hashes/5b501be94503972228b519b90621e33c.bhc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/BurstCache/Android-Arm/Hashes/5c9ce1eda6eed24019624a03f1ed1924.bhc" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/BurstCache/Android-Arm/Hashes/5c9ce1eda6eed24019624a03f1ed1924.bhc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/BurstCache/Android-Arm/Hashes/6bacc24f8fbd0569ff1b62fefb1417dc.bhc" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/BurstCache/Android-Arm/Hashes/6bacc24f8fbd0569ff1b62fefb1417dc.bhc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/BurstCache/Android-Arm/Hashes/79ca44773a80b27e5e0d8a57df695a56.bhc" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/BurstCache/Android-Arm/Hashes/79ca44773a80b27e5e0d8a57df695a56.bhc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/BurstCache/Android-Arm/Hashes/7e3bacb6f5b0bcc18c1e8aeb137d53a0.bhc" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/BurstCache/Android-Arm/Hashes/7e3bacb6f5b0bcc18c1e8aeb137d53a0.bhc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/BurstCache/Android-Arm/Hashes/870b822777e4fe63520e4a3a53179608.bhc" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/BurstCache/Android-Arm/Hashes/870b822777e4fe63520e4a3a53179608.bhc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/BurstCache/Android-Arm/Hashes/884aca2c643c62d26e43bae87904707e.bhc" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/BurstCache/Android-Arm/Hashes/884aca2c643c62d26e43bae87904707e.bhc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/BurstCache/Android-Arm/Hashes/91f51160291864b0206e12cb610e855b.bhc" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/BurstCache/Android-Arm/Hashes/91f51160291864b0206e12cb610e855b.bhc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/BurstCache/Android-Arm/Hashes/9c53d1adad94ad02b3f2930c4ac7f801.bhc" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/BurstCache/Android-Arm/Hashes/9c53d1adad94ad02b3f2930c4ac7f801.bhc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/BurstCache/Android-Arm/Hashes/9cf559ea0404040a4d1983c50673093f.bhc" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/BurstCache/Android-Arm/Hashes/9cf559ea0404040a4d1983c50673093f.bhc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/BurstCache/Android-Arm/Hashes/a110ffe6b760e4b56cb86ae44bc7857d.bhc" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/BurstCache/Android-Arm/Hashes/a110ffe6b760e4b56cb86ae44bc7857d.bhc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/BurstCache/Android-Arm/Hashes/a4d5411344300a095066e124a5463880.bhc" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/BurstCache/Android-Arm/Hashes/a4d5411344300a095066e124a5463880.bhc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/BurstCache/Android-Arm/Hashes/adc2d0afbb84ddac780bfb45cb79a069.bhc" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/BurstCache/Android-Arm/Hashes/adc2d0afbb84ddac780bfb45cb79a069.bhc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/BurstCache/Android-Arm/Hashes/beb497e134b24e0d443f6a91ee099283.bhc" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/BurstCache/Android-Arm/Hashes/beb497e134b24e0d443f6a91ee099283.bhc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/BurstCache/Android-Arm/Hashes/c18595ec66b5d2d8a90beeeeae8aef29.bhc" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/BurstCache/Android-Arm/Hashes/c18595ec66b5d2d8a90beeeeae8aef29.bhc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/BurstCache/Android-Arm/Hashes/c2a23f44a5662aa84e9ce05a03a5c697.bhc" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/BurstCache/Android-Arm/Hashes/c2a23f44a5662aa84e9ce05a03a5c697.bhc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/BurstCache/Android-Arm/Hashes/e2300fde9f8908a48805745fcae933ee.bhc" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/BurstCache/Android-Arm/Hashes/e2300fde9f8908a48805745fcae933ee.bhc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/BurstCache/Android-Arm/Hashes/e280f7a2a7bd4e990528db890a95b139.bhc" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/BurstCache/Android-Arm/Hashes/e280f7a2a7bd4e990528db890a95b139.bhc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/BurstCache/Android-Arm/Hashes/e331c7b1fa5090f90a7bd7c89ae8bb33.bhc" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/BurstCache/Android-Arm/Hashes/e331c7b1fa5090f90a7bd7c89ae8bb33.bhc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/BurstCache/Android-Arm/Hashes/e46a347a64c793855e1e633a10266065.bhc" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/BurstCache/Android-Arm/Hashes/e46a347a64c793855e1e633a10266065.bhc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/BurstCache/Android-Arm/Hashes/e9f0e9e5fc07f37c5afd347e0e21a954.bhc" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/BurstCache/Android-Arm/Hashes/e9f0e9e5fc07f37c5afd347e0e21a954.bhc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/BurstCache/JIT/BurstCacheManifest.cm" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/BurstCache/JIT/BurstCacheManifest.cm" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/BurstCache/JIT/Hashes/a110ffe6b760e4b56cb86ae44bc7857d.bhc" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/BurstCache/JIT/Hashes/a110ffe6b760e4b56cb86ae44bc7857d.bhc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/EditorUserBuildSettings.asset" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/EditorUserBuildSettings.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/GridBrush/UnityEditor.Tilemaps.GridBrush.asset" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/GridBrush/UnityEditor.Tilemaps.GridBrush.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/LastBuild.buildreport" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/LastBuild.buildreport" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/LastSceneManagerSetup.txt" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/LastSceneManagerSetup.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/PlayerDataCache/Android/Data/data.unity3d" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/PlayerDataCache/Android/Data/data.unity3d" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/PlayerDataCache/Android/DataBuildDirtyInfo.json" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/PlayerDataCache/Android/DataBuildDirtyInfo.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/PlayerDataCache/Android/ScriptsOnlyCache.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/PlayerDataCache/Android/ScriptsOnlyCache.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/SceneVisibilityState.asset" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/SceneVisibilityState.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/ScriptAssemblies/Assembly-CSharp.dll" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/ScriptAssemblies/Assembly-CSharp.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/ScriptAssemblies/Assembly-CSharp.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/ScriptAssemblies/Assembly-CSharp.pdb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/Search/transactions.db" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/Search/transactions.db" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/ShaderCache.db" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/ShaderCache.db" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/SourceAssetDB" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/SourceAssetDB" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/StateCache/MainStageHierarchy/4d/4d2a36d9faf65734f0bbefb3ee623532.json" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/StateCache/MainStageHierarchy/4d/4d2a36d9faf65734f0bbefb3ee623532.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/StateCache/PrefabStageHierarchy/31/3193a2b1be0274f077929ae0059d9f47.json" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/StateCache/PrefabStageHierarchy/31/3193a2b1be0274f077929ae0059d9f47.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/StateCache/PrefabStageHierarchy/f8/f8edd28f6621887c6e50a909161d9605.json" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/StateCache/PrefabStageHierarchy/f8/f8edd28f6621887c6e50a909161d9605.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/StateCache/SceneView/8c/8cd7c613bf844de3b80696e27a479d5e.json" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/StateCache/SceneView/8c/8cd7c613bf844de3b80696e27a479d5e.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/com.unity.addressables/AddressablesBuildTEP.json" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/com.unity.addressables/AddressablesBuildTEP.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/com.unity.addressables/aa/Android/catalog.json" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/com.unity.addressables/aa/Android/catalog.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Library/expandedItems" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Library/expandedItems" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Logs/AssetImportWorker0.log" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Logs/AssetImportWorker0.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Logs/AssetImportWorker1.log" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Logs/AssetImportWorker1.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Logs/shadercompiler-AssetImportWorker0.log" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Logs/shadercompiler-AssetImportWorker0.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Logs/shadercompiler-UnityShaderCompiler.exe0.log" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Logs/shadercompiler-UnityShaderCompiler.exe0.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/ProjectSettings/ProjectSettings.asset" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/ProjectSettings/ProjectSettings.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/UserSettings/AndroidLogcatSettings.asset" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/UserSettings/AndroidLogcatSettings.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/UserSettings/EditorUserSettings.asset" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/UserSettings/EditorUserSettings.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/UserSettings/Layouts/default-2021.dwlt" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/UserSettings/Layouts/default-2021.dwlt" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ClangdSettings">
+    <option name="formatViaClangd" value="false" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 5
+}</component>
+  <component name="ProjectId" id="2tK8E3eo0SvruQ4JYIKa2TYTUNI" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.readMode.enableVisualFormatting&quot;: &quot;true&quot;,
+    &quot;cf.first.check.clang-format&quot;: &quot;false&quot;,
+    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="ba7fbd20-6d0a-4fc1-a853-ba9c048d2d45" name="Changes" comment="" />
+      <created>1740089291419</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1740089291419</updated>
+    </task>
+    <servers />
+  </component>
+</project>
