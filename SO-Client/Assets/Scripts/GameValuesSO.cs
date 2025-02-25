@@ -8,7 +8,7 @@ using System;
 [CreateAssetMenu(fileName = "UnitData", menuName = "ScriptableObjects/UnitData", order = 1)]
 public class GameValuesSO : ScriptableObject
 {
-    public bool isInit = false;
+    public bool isInit;
     private Dictionary<byte, AttributesBaseUnit> attributesBaseUnits = new Dictionary<byte, AttributesBaseUnit>();
     //private Dictionary<byte, AttributesBaseUnit> attributesBaseUnits;
     //private List<AttributesTile> attributesTiles;
@@ -18,21 +18,26 @@ public class GameValuesSO : ScriptableObject
     private Dictionary<string, Dictionary<string, double>> combatMultipliersDictionary;
 
 
+    void OnEnable()
+    {
+        isInit = false;
+    }
+
     public void initialize()
     {
         //Debug.Log("GameValuesSO OnEnable called.");
         //attributesBaseUnits = new Dictionary<byte, AttributesBaseUnit>();
         //attributesTiles = new List<AttributesTile>();
-        //if (!isInit) { 
+        if (!isInit) { 
             Debug.Log("GameValuesSO OnEnable called.");
             LoadUnitsFromCSV("Assets/StreamingAssets/SpaceOperaUnitValues - UnitValues.csv");
             LoadTilesFromCSV("Assets/StreamingAssets/SpaceOperaTileValues - TileValues.csv");
             LoadCombatMultipliersFromCSV("Assets/StreamingAssets/SpaceOperaUnitValues - Combat Multipliers.csv");
-         /*   isInit = true;
+            isInit = true;
         }else
             {
             Debug.Log("GameValuesSO already initialized.");
-        }*/
+        }
     }
 
     public void LoadUnitsFromCSV(string filePath)

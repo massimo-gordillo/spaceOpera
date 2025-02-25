@@ -381,7 +381,7 @@ namespace SlimUI.ModernMenu{
             loadingBar.value = 1.0f; // Final loading bar state
             yield return new WaitForSeconds(0.1f); // Simulate a final pause before game values are fully initialized
 
-            // Game Values are fully loaded
+            // Flag to check if user can continue to the next scene
             Debug.Log("Game Values Loaded");
             isGameValuesLoaded = true;
 

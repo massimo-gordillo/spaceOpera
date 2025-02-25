@@ -50,4 +50,4 @@ sysinfo.txt
 .keystore
 
 #Ignore future changes to prefabs
-#Assets/Resources/UnitPrefabs/progeny1/*
+SO-Client/Assets/Resources/UnitPrefabs/progeny1/*

@@ -69,6 +69,9 @@ Debug tilemap exportBytesToFile and importFileToBytes. I modified the serializat
 Check if supabase function game_action_combat is necessary. I think it's a duplicate of action_combat.
 db create_match turn on random assignment.
 
+General notes to remember:
+SO-Client\Assets\Resources\UnitPrefabs\progeny1\* have been set to assume-unchanged
+
 
 
 ART NOTES:
@@ -116,3 +119,11 @@ Map id:     84fe0458-c742-4bc5-b35a-b9334a0f3c90
 match_id: 8953f24d-bbd2-429e-88b8-65770396df88
 
 SELECT create_match('aa2e6df3-4200-4469-8353-dd41d2a28781', 'd0172820-32bc-4fc7-870f-be940517c008', '84fe0458-c742-4bc5-b35a-b9334a0f3c90');
+
+SELECT (create_match(
+    'aa2e6df3-4200-4469-8353-dd41d2a28781', 
+    'd0172820-32bc-4fc7-870f-be940517c008', 
+    '84fe0458-c742-4bc5-b35a-b9334a0f3c90'
+)).* LIMIT 1;
+
+(12819c7e-7c4a-4b31-b2ab-f765c1a81208,aa2e6df3-4200-4469-8353-dd41d2a28781,d0172820-32bc-4fc7-870f-be940517c008,84fe0458-c742-4bc5-b35a-b9334a0f3c90,TestMap21,aa2e6df3-4200-4469-8353-dd41d2a28781,f,"2025-02-12 01:25:35.246011+00",,,1,1000,1000)
