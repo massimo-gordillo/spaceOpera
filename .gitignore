@@ -48,3 +48,6 @@ sysinfo.txt
 # Ignore environment files
 .env
 .keystore
+
+#Ignore future changes to prefabs
+Assets/Resources/UnitPrefabs/progeny1/*
