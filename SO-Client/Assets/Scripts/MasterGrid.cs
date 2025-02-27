@@ -175,9 +175,11 @@ public class MasterGrid : MonoBehaviour
             //if there is no selected unit and the clicked unit isn't exhausted & player controls that unit.
             else if (getSelectedUnit() == null && unit.getNonExhausted() && unit.getPlayerControl() == gameMaster.getPlayerTurn()) //what if you don't control this unit?
             {
+                clearMovement();
                 setSelectedUnit(unit);
                 presentChoicesAtLocation(unit.xPos, unit.yPos, unit);
 
+                //MG 25-02-26: I don't think this is necessary anymore, I'm ok locking a player into doing all their game actions with a given unit in one shot.
                 if (unit.movementNonExhausted == true) //if the unit hasn't moved already this turn.
                 {
                     if (!drawing)
@@ -405,7 +407,7 @@ public class MasterGrid : MonoBehaviour
 
             BaseStructure oldStructure = whatStructureIsInThisLocation((int)oldX, (int)oldY);
             //debug the values in the if statement below
-            Debug.Log($"oldX: {oldX}, oldY: {oldY}, isResourceUnit {selectedUnit.isResourceUnit}, prevCaptureVal {selectedUnit.prevStructureCaptureVal}, oldStructure: {oldStructure}, oldStructure.playerControl: {oldStructure.playerControl}, selectedUnit.playerControl: {selectedUnit.playerControl}");
+            //Debug.Log($"oldX: {oldX}, oldY: {oldY}, isResourceUnit {selectedUnit.isResourceUnit}, prevCaptureVal {selectedUnit.prevStructureCaptureVal}, oldStructure: {oldStructure}, oldStructure.playerControl: {oldStructure.playerControl}, selectedUnit.playerControl: {selectedUnit.playerControl}");
 
             //if the unit was capturing a structure before undo, reset the capture health to the previous value.
             if (selectedUnit.isResourceUnit && selectedUnit.prevStructureCaptureVal != null && oldStructure != null && oldStructure.playerControl != selectedUnit.playerControl)
@@ -1183,7 +1185,9 @@ public class MasterGrid : MonoBehaviour
     public void clearSelectedUnit()
     {
         selectedUnit = null;
+        clearAttackableUnits();
         clearMovement();
+        
     }
 
     public void refreshUnits(int playerTurn)
