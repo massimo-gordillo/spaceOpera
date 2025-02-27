@@ -2123,7 +2123,7 @@ GameObject:
   - component: {fileID: 294224761}
   - component: {fileID: 294224760}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: ExitButtonText (TMP)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6440,6 +6440,7 @@ MonoBehaviour:
   captureButton: {fileID: 1570366192}
   undoMovementButton: {fileID: 1480146372}
   endTurnButton: {fileID: 2003348280}
+  bottomButtonText: {fileID: 294224760}
   playerWinCard: {fileID: 1387104827}
   playerWinText: {fileID: 1856127898}
   gridX: 30

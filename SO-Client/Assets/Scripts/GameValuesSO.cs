@@ -1,9 +1,10 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using System.IO;
 using System.Reflection;
-using System;
+using UnityEngine;
+using UnityEngine.Networking;
 
 [CreateAssetMenu(fileName = "UnitData", menuName = "ScriptableObjects/UnitData", order = 1)]
 public class GameValuesSO : ScriptableObject
@@ -30,9 +31,10 @@ public class GameValuesSO : ScriptableObject
         //attributesTiles = new List<AttributesTile>();
         if (!isInit) { 
             Debug.Log("GameValuesSO OnEnable called.");
-            LoadUnitsFromCSV("Assets/StreamingAssets/SpaceOperaUnitValues - UnitValues.csv");
-            LoadTilesFromCSV("Assets/StreamingAssets/SpaceOperaTileValues - TileValues.csv");
-            LoadCombatMultipliersFromCSV("Assets/StreamingAssets/SpaceOperaUnitValues - Combat Multipliers.csv");
+            LoadUnitsFromCSV("UnitValues.json");
+            //LoadUnitsFromCSV("SpaceOperaUnitValues - UnitValues.csv");
+            LoadTilesFromCSV("TileValues.json");
+            LoadCombatMultipliersFromCSV("UnitValuesCombatMultipliers.json");
             isInit = true;
         }else
             {
@@ -40,11 +42,126 @@ public class GameValuesSO : ScriptableObject
         }
     }
 
-    public void LoadUnitsFromCSV(string filePath)
-    {
-        string[] lines = File.ReadAllLines(filePath);
+    /*    public void LoadCSVFromJSON(string fileName, Action<List<string>> callback)
+        {
+            StartCoroutine(LoadCSVCoroutine(fileName, callback));
+        }*/
 
-        if (lines.Length <= 1)
+    public List<string> LoadCSVFromJSON(string fileName)
+    {
+        string filePath = Path.Combine(Application.streamingAssetsPath, fileName);
+        string csvText = null;
+
+        if (filePath.StartsWith("jar:") || filePath.StartsWith("file://"))
+        {
+            UnityWebRequest request = UnityWebRequest.Get(filePath);
+            request.SendWebRequest();
+
+            while (!request.isDone) { }  // Block execution
+
+            if (request.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogError("Failed to load CSV: " + request.error);
+                return null;
+            }
+            csvText = request.downloadHandler.text;
+            /*            using (UnityWebRequest request = UnityWebRequest.Get(filePath))
+                        {
+                            var operation = request.SendWebRequest();
+                            while (!operation.isDone) { }  // Block execution
+
+                            if (request.result != UnityWebRequest.Result.Success)
+                            {
+                                Debug.LogError("Failed to load CSV: " + request.error);
+                                return null;
+                            }
+
+                            csvText = request.downloadHandler.text;
+                        }*/
+        }
+        else
+        {
+            if (File.Exists(filePath))
+            {
+                csvText = File.ReadAllText(filePath);
+            }
+            else
+            {
+                Debug.LogError("CSV file not found: " + filePath);
+                return null;
+            }
+        }
+
+        return !string.IsNullOrEmpty(csvText)
+            ? new List<string>(csvText.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.None))
+            : null;
+    }
+
+
+    /*public string[] loadCSVFromJSON(string fileName)
+    {
+        string filePath = Path.Combine(Application.streamingAssetsPath, fileName);
+        string csvText = null;
+
+        // For Android, we need to use UnityWebRequest
+        if (filePath.StartsWith("jar:"))
+        {
+            using (UnityWebRequest request = UnityWebRequest.Get(filePath))
+            {
+                yield return request.SendWebRequest();
+
+                if (request.result != UnityWebRequest.Result.Success)
+                {
+                    Debug.LogError("Failed to load CSV: " + request.error);
+                }
+                else
+                {
+                    csvText = request.downloadHandler.text;
+                    Debug.Log("CSV Loaded: " + csvText.Substring(0, Mathf.Min(20, csvText.Length))); // Log first 100 chars
+                }
+            }
+        }
+        else
+        {
+            // For PC, Mac, etc., use File.ReadAllText
+            if (File.Exists(filePath))
+            {
+                csvText = File.ReadAllText(filePath);
+                Debug.Log("CSV Loaded: " + csvText.Substring(0, Mathf.Min(100, csvText.Length)));
+            }
+            else
+            {
+                Debug.LogError("CSV file not found: " + filePath);
+            }
+        }
+
+        if (csvText != null)
+        {
+            //loop to iterate through the JSON output and convert it to a string array
+            return csvText.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.None);
+        }
+        else
+        {
+            Debug.LogError("csv read is empty");
+            return null;
+        }
+
+    }*/
+
+    public void LoadUnitsFromCSV(string fileName)
+    {
+
+        //string filePath = Path.Combine(Application.streamingAssetsPath, fileName);
+
+        //string[] lines = File.ReadAllLines(filePath);
+        //string csv = loadCSVFromJSON(fileName);
+        List<string> lines = LoadCSVFromJSON(fileName);
+
+        //loop to iterate through the JSON output and convert it to a string array
+        //string[] lines = csv.Split(new string[] {"\r\n", "\n" }, StringSplitOptions.None);
+
+
+        if (lines == null || lines.Count <= 1)
         {
             Debug.LogError("CSV file (units) is empty or only contains headers.");
             return;
@@ -53,7 +170,7 @@ public class GameValuesSO : ScriptableObject
         // Read headers
         string[] headers = lines[0].Split(',');
 
-        for (int i = 1; i < lines.Length; i++) // Skip header line
+        for (int i = 1; i < lines.Count; i++) // Skip header line
         {
             string[] values = lines[i].Split(',');
             AttributesBaseUnit unit = new AttributesBaseUnit();
@@ -105,12 +222,13 @@ public class GameValuesSO : ScriptableObject
     }
 
 
-    public void LoadTilesFromCSV(string filePath)
+    public void LoadTilesFromCSV(string fileName)
     {
         byteToAttributesTileDictionary = new Dictionary<byte, AttributesTile>();
-        string[] lines = File.ReadAllLines(filePath);
+        List<string> lines = LoadCSVFromJSON(fileName);
+        //string[] lines = File.ReadAllLines(filePath);
 
-        if (lines.Length <= 1)
+        if (lines == null || lines.Count <= 1)
         {
             Debug.LogError("CSV file (tiles) is empty or only contains headers.");
             return;
@@ -119,7 +237,7 @@ public class GameValuesSO : ScriptableObject
         // Read headers
         string[] headers = lines[0].Split(',');
 
-        for (int i = 1; i < lines.Length; i++) // For each row in the array (skip header line)
+        for (int i = 1; i < lines.Count; i++) // For each row in the array (skip header line)
         {
             string[] values = lines[i].Split(',');
             AttributesTile attributesTile = new AttributesTile();
@@ -161,8 +279,9 @@ public class GameValuesSO : ScriptableObject
         }
     }
 
-    public void LoadCombatMultipliersFromCSV(string csvFilePath)
+    /*public void LoadCombatMultipliersFromCSV(string fileName)
     {
+        List <string> lines = LoadCSVFromJSON(fileName);
         combatMultipliersDictionary = new Dictionary<string, Dictionary<string, double>>();
         using (var reader = new StreamReader(csvFilePath))
         {
@@ -184,7 +303,50 @@ public class GameValuesSO : ScriptableObject
 
             }
         }
+    }*/
+
+    public void LoadCombatMultipliersFromCSV(string fileName)
+    {
+        List<string> lines = LoadCSVFromJSON(fileName);
+
+        if (lines == null || lines.Count < 2) // Ensure there are at least headers + 1 row
+        {
+            Debug.LogError("CSV file is empty or only contains headers.");
+            return;
+        }
+
+        combatMultipliersDictionary = new Dictionary<string, Dictionary<string, double>>();
+
+        string[] headers = lines[0].Split(',');
+
+        for (int i = 1; i < lines.Count; i++) // Skip the header row
+        {
+            string[] values = lines[i].Split(',');
+            if (values.Length != headers.Length)
+            {
+                Debug.LogWarning($"Skipping malformed line {i}: {lines[i]}");
+                continue; // Skip if row doesn't match header length
+            }
+
+            string healthType = values[0];
+            var innerDict = new Dictionary<string, double>();
+
+            for (int j = 1; j < headers.Length; j++) // Start from 1 to skip healthType column
+            {
+                if (double.TryParse(values[j], out double multiplier))
+                {
+                    innerDict[headers[j]] = multiplier;
+                }
+                else
+                {
+                    Debug.LogWarning($"Invalid number at row {i}, column {headers[j]}: {values[j]}");
+                }
+            }
+
+            combatMultipliersDictionary[healthType] = innerDict;
+        }
     }
+
 
 
 

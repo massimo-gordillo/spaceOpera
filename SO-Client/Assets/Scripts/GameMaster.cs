@@ -40,6 +40,7 @@ public class GameMaster : MonoBehaviour
     public Button captureButton;
     public Button undoMovementButton;
     public Button endTurnButton;
+    public TMP_Text bottomButtonText;
 
     public GameObject playerWinCard;
     public TMP_Text playerWinText;
@@ -220,6 +221,8 @@ public class GameMaster : MonoBehaviour
             masterGrid.exhaustSelectedUnit(masterGrid.selectedUnit, true);
         }
         hideChoicePanel();
+        if (masterGrid.selectedUnit != null)
+            masterGrid.clearSelectedUnit();
     }
 
     public void endTurnButtonPressed()
@@ -276,6 +279,10 @@ public class GameMaster : MonoBehaviour
             attackButton.interactable = attackableUnitsBool;
             captureButton.interactable = capturableStructureBool;
             undoMovementButton.interactable = hasMoved;
+            if(hasMoved)
+                bottomButtonText.text = "Do Nothing";
+            else
+                bottomButtonText.text = "Exit";
         }
     }
 

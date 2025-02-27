@@ -42,6 +42,8 @@ public class BaseUnit : MonoBehaviour
     public bool undoingMovement = false;
     public int? oldXPos = null;
     public int? oldYPos = null;
+    //if infantry unit was capturing a structure, this will hold the value of the structure capture progress in case of an undo.
+    public int? prevStructureCaptureVal = null;
     //public Sprite sprite; //MG 24-08-04: You cannot kill this var. It is used by AttributesBaseUnit, GameValuesSO and PrefabManager to work with the sprite values.
     public SpriteRenderer crosshairSpriteRenderer;
     public StaticSprite spriteContainer;

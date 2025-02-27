@@ -398,8 +398,22 @@ public class MasterGrid : MonoBehaviour
     public void undoMovementButtonPressed()
     {
         selectedUnit.undoingMovement = true;
-        if (selectedUnit.oldXPos != null && selectedUnit.oldYPos != null)
-            moveTarget((int)selectedUnit.oldXPos, (int)selectedUnit.oldYPos);
+        int? oldX = selectedUnit.oldXPos;
+        int? oldY = selectedUnit.oldYPos;
+        if (oldX != null && oldY != null)
+        {
+
+            BaseStructure oldStructure = whatStructureIsInThisLocation((int)oldX, (int)oldY);
+            //debug the values in the if statement below
+            Debug.Log($"oldX: {oldX}, oldY: {oldY}, isResourceUnit {selectedUnit.isResourceUnit}, prevCaptureVal {selectedUnit.prevStructureCaptureVal}, oldStructure: {oldStructure}, oldStructure.playerControl: {oldStructure.playerControl}, selectedUnit.playerControl: {selectedUnit.playerControl}");
+
+            //if the unit was capturing a structure before undo, reset the capture health to the previous value.
+            if (selectedUnit.isResourceUnit && selectedUnit.prevStructureCaptureVal != null && oldStructure != null && oldStructure.playerControl != selectedUnit.playerControl)
+                oldStructure.captureHealth = (int)selectedUnit.prevStructureCaptureVal;
+
+            moveTarget((int)oldX, (int)oldY);
+        }
+        clearSelectedUnit();
     }
 
 
@@ -1044,6 +1058,10 @@ public class MasterGrid : MonoBehaviour
             BaseStructure oldStructure = whatStructureIsInThisLocation(selectedUnit.xPos, selectedUnit.yPos);
             if (oldStructure != null)
             {
+                //in case of undo, hold the previous capture % in case it needs to be restored.
+                if (selectedUnit.isResourceUnit && oldStructure.captureHealth != oldStructure.maxCaptureHealth)
+                    selectedUnit.prevStructureCaptureVal = oldStructure.captureHealth;
+                //then reset the capture health
                 oldStructure.turnOnCollider();
                 oldStructure.resetCaptureHealth();
             }
@@ -1083,6 +1101,7 @@ public class MasterGrid : MonoBehaviour
                 selectedUnit.undoingMovement = false;
                 selectedUnit.oldXPos = null;
                 selectedUnit.oldYPos = null;
+                whatStructureIsInThisLocation(selectedUnit.xPos, selectedUnit.yPos)?.turnOffCollider();
                 exhaustSelectedUnit(selectedUnit, false);
 
                 //if undoing movement remove the action from the gameActions list
@@ -1091,6 +1110,7 @@ public class MasterGrid : MonoBehaviour
                     gameActions.RemoveAt(gameActions.Count - 1);
                     turnActionCount--;
                 }
+
 
             }
 

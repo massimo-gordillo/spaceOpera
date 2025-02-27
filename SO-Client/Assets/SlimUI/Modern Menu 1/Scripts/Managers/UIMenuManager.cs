@@ -6,6 +6,8 @@ using TMPro;
 using UnityEngine.SceneManagement;
 using UnityEngine.InputSystem;
 
+using System.IO;
+
 namespace SlimUI.ModernMenu{
 	public class UIMenuManager : MonoBehaviour {
 		private Animator CameraObject;
@@ -97,6 +99,24 @@ namespace SlimUI.ModernMenu{
 
             // Enable the action map
             actionMap.Enable();
+
+			CheckStreamingAssets();
+
+        }
+
+        void CheckStreamingAssets()
+        {
+            string filePath = Path.Combine(Application.streamingAssetsPath, "UnitValues.json");
+            Debug.Log("Checking file at: " + filePath);
+
+            if (File.Exists(filePath))
+            {
+                Debug.Log("ASSETS: File exists in StreamingAssets!");
+            }
+            else
+            {
+                Debug.LogError("ASSETS: File NOT found in StreamingAssets!");
+            }
         }
 
         void OnEnable()

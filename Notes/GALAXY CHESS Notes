@@ -127,3 +127,6 @@ SELECT (create_match(
 )).* LIMIT 1;
 
 (12819c7e-7c4a-4b31-b2ab-f765c1a81208,aa2e6df3-4200-4469-8353-dd41d2a28781,d0172820-32bc-4fc7-870f-be940517c008,84fe0458-c742-4bc5-b35a-b9334a0f3c90,TestMap21,aa2e6df3-4200-4469-8353-dd41d2a28781,f,"2025-02-12 01:25:35.246011+00",,,1,1000,1000)
+
+Script notes:
+In the year 801 GE, human conquest continues its expansion into space. After a decade of work, a scientific survey of a new space sector comes to an end. Given its high density of BISMUTH-209, The East Galactic Mining Company has bid and won executive control over the frontier sector. No great conquest is without risk; in the unknown, dangers are wholly alien…
