@@ -66,19 +66,54 @@ public class TilemapManager : MonoBehaviour
         return (gridWidth, gridHeight);
     }
 
-    /*    private void InitializeTileDictionaries()
-        {
-            byteToTileDictionary = new Dictionary<byte, TileBase>();
-            tileNameToByteDictionary = new Dictionary<TileBase, byte>();
-
-            for (byte i = 0; i < tileAssets.Count; i++)
-            {
-                byteToTileDictionary.Add(i, tileAssets[i]);
-                tileNameToByteDictionary.Add(tileAssets[i], i);
-            }
-        }  */
-
     private void InitializeTileDictionaries()
+    {
+        string tilemapName = "Tilemapv3";
+        string basePath = "Tilemap/Tiles/"+tilemapName;
+        //string tilesName = "BasicTilemap v3_";
+
+        byteToTilesListDictionary = new Dictionary<byte, List<TileBase>>();
+        tileNameToByteDictionary = new Dictionary<string, byte>();
+
+        // Load all tiles from the base path (including subdirectories in Resources)
+        TileBase[] tiles = Resources.LoadAll<TileBase>(basePath);
+
+        if (tiles == null || tiles.Length == 0)
+        {
+            Debug.LogError($"No tiles found in Resources/{basePath}");
+            return;
+        }
+
+        foreach (TileBase tile in tiles)
+        {
+            if (tile == null)
+            {
+                Debug.LogError("One of the loaded tiles is null.");
+                continue;
+            }
+
+            // Extract the folder name as a byte value from the tile's name
+            string[] nameParts = tile.name.Split('_'); // Assuming tiles are named like "TileName_1"
+            if (nameParts.Length > 1 && byte.TryParse(nameParts[1], out byte byteNumber))
+            {
+                Debug.Log($"Tile {tile.name} has byte prefix {byteNumber}.");
+                tileAssets.Add(tile);
+                tileNameToByteDictionary[tile.name] = byteNumber;
+
+                if (!byteToTilesListDictionary.ContainsKey(byteNumber))
+                    byteToTilesListDictionary[byteNumber] = new List<TileBase>();
+
+                byteToTilesListDictionary[byteNumber].Add(tile);
+            }
+            else
+            {
+                Debug.LogWarning($"Tile {tile.name} does not have a valid byte prefix and will be skipped.");
+            }
+        }
+    }
+
+
+    /*private void InitializeTileDictionaries()
     {
         string basePath = "Tilemap/Tiles/DynamicTilemapTest";
         //get all the directories at the basePath. You will find a series of folders with a single byte at the name of the folder.
@@ -108,10 +143,10 @@ public class TilemapManager : MonoBehaviour
                 }
 
 
-                /*                if (tileNameToByteDictionary == null || tileNameToByteDictionary.Count == 0)
+                *//*                if (tileNameToByteDictionary == null || tileNameToByteDictionary.Count == 0)
                                 {
                                     Debug.Log("tileNameToByteDictionary is empty or null.");
-                                }*/
+                                }*//*
 
 
             }
@@ -131,7 +166,7 @@ public class TilemapManager : MonoBehaviour
                 return;
             }
         }
-    }
+    }*/
 
     public TilemapData ExportTilemapToBytes()
     {
@@ -148,15 +183,33 @@ public class TilemapManager : MonoBehaviour
             {
                 Vector3Int pos = new Vector3Int(x, y, 0);
                 TileBase tile = tilemap.GetTile(pos); //this is a built in tilemap function
-                if (tile != null && tileNameToByteDictionary.TryGetValue(tile.name, out byte tileByte))
+
+                //temporary fix for switching to upgraded tilemap. Ugly fix but it will work for now.
+                //Tilemap implementation needs to be improved but this might not matter once loading from server/bytemap becomes main way of retrieving.
+                string modifiedTileName = null;
+                if (tile.name.Contains("v2"))
+                {
+                    modifiedTileName = tile.name.Replace("v2", "v3");
+                }
+                bool checkFlag = false;
+
+                if (tile != null && tileNameToByteDictionary.TryGetValue(modifiedTileName, out byte tileByte))
                 {
                     tilemapByteArray[y * width + x] = tileByte;
-                    //debug = debug + "" + tileByte + ", ";
+                    if (!checkFlag)
+                    {
+                        Debug.Log($"Tile {tile.name} at position {pos} has byte value {tileByte}.");
+                        checkFlag = true;
+                    }
                 }
                 else
                 {
                     tilemapByteArray[y * width + x] = 255; // Use 255 for empty or unrecognized tiles
-                    //debug = debug + "X, ";
+                    if (!checkFlag)
+                    {
+                        Debug.Log($"Tile {tile.name} at position {pos} has byte value 255.");
+                        checkFlag = true;
+                    }
                 }
 
             }
