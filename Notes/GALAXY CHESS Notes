@@ -63,6 +63,12 @@ Bug #5: Undo unit movement makes it unselectable
 
 Potential bug: a capturing unit moves away from struct but then undos the movement.
 
+SECOND RUN USER TEST:
+Highlight the selected unit 
+Give notice if moveable units remain
+Disable unit creation button if not enough money
+Warning message if you put a unit on a unused production structure
+
 TO DO, DON'T FORGET:
 Turn on Email Auth for Supabase
 Debug tilemap exportBytesToFile and importFileToBytes. I modified the serialization so I need to confirm it's not broken. For later.
@@ -130,3 +136,13 @@ SELECT (create_match(
 
 Script notes:
 In the year 801 GE, human conquest continues its expansion into space. After a decade of work, a scientific survey of a new space sector comes to an end. Given its high density of BISMUTH-209, The East Galactic Mining Company has bid and won executive control over the frontier sector. No great conquest is without risk; in the unknown, dangers are wholly alien…
+
+TUTORIAL NOTES:
+You can capture any enemy or neutral structure
+Move adjacent and attack
+Production structures once per turn
+Capturing a structure means more resources every turn
+Win by capturing your opps home base (or later maybe some concession condition)
+No diagonal attacking
+What the units do/are good at
+Moving/destrying capturing unit resets the health

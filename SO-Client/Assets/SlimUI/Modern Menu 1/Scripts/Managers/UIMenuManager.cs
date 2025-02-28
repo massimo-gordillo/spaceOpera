@@ -8,6 +8,8 @@ using UnityEngine.InputSystem;
 
 using System.IO;
 
+//using UnityEngine.Networking;
+
 namespace SlimUI.ModernMenu{
 	public class UIMenuManager : MonoBehaviour {
 		private Animator CameraObject;
@@ -88,6 +90,10 @@ namespace SlimUI.ModernMenu{
         [Tooltip("The GameObject holding the Audio Source component for the SWOOSH SOUND when switching to the Settings Screen")]
         public AudioSource swooshSound;
 
+        public AsyncOperation sceneLoadingOperation = null;
+        public Button startGameButton;
+        public TMP_Text startGameButtonText;
+
 
         void Awake()
         {
@@ -100,24 +106,39 @@ namespace SlimUI.ModernMenu{
             // Enable the action map
             actionMap.Enable();
 
-			CheckStreamingAssets();
+            //StartCoroutine(CheckStreamingAssets());
+            startGameButton.interactable=false;
+            startGameButtonText.text = "Loading...";
 
         }
 
-        void CheckStreamingAssets()
+        /*IEnumerator CheckStreamingAssets()
         {
             string filePath = Path.Combine(Application.streamingAssetsPath, "UnitValues.json");
             Debug.Log("Checking file at: " + filePath);
 
-            if (File.Exists(filePath))
+            using (UnityWebRequest www = UnityWebRequest.Get(filePath))
             {
-                Debug.Log("ASSETS: File exists in StreamingAssets!");
-            }
-            else
-            {
-                Debug.LogError("ASSETS: File NOT found in StreamingAssets!");
+                yield return www.SendWebRequest();
+                if (www.result == UnityWebRequest.Result.Success)
+                {
+                    Debug.Log("File successfully loaded: " + www.downloadHandler.text);
+                }
+                else
+                {
+                    Debug.LogError("ASSETS: File NOT found in StreamingAssets!");
+                }
             }
         }
+            *//*            if (File.Exists(filePath))
+                        {
+                            Debug.Log("ASSETS: File exists in StreamingAssets!");
+                        }
+                        else
+                        {
+                            Debug.LogError("ASSETS: File NOT found in StreamingAssets!");
+                        }*//*
+        //}*/
 
         void OnEnable()
         {
@@ -341,7 +362,7 @@ namespace SlimUI.ModernMenu{
             StartCoroutine(LoadGameValuesAsync());
 
             // Start loading the scene asynchronously
-            AsyncOperation sceneLoadingOperation = SceneManager.LoadSceneAsync(sceneName);
+            sceneLoadingOperation = SceneManager.LoadSceneAsync(sceneName);
             sceneLoadingOperation.allowSceneActivation = false;
 
             // While both operations are in progress, update the loading screen
@@ -354,18 +375,31 @@ namespace SlimUI.ModernMenu{
                 // Check if scene is nearly loaded and wait for user input to continue
                 if (sceneLoadingOperation.progress >= 0.9f && isGameValuesLoaded)
                 {
-                    loadPromptText.text = "Press any key to continue";
+                    loadPromptText.text = "Ready...";
                     loadingBar.value = 1;
 
+                    startGameButton.interactable = true;
+                    startGameButtonText.text = "Play";
                     // Wait for input before activating the scene
                     if (continueAction.WasPressedThisFrame())
                     {
-                        sceneLoadingOperation.allowSceneActivation = true;
+                        setSceneLoadOperationTrue();
                     }
                 }
 
                 yield return null;
             }
+        }
+
+        public void setSceneLoadOperationTrue()
+        {
+            if (sceneLoadingOperation != null)
+            {
+                startGameButtonText.text = "Play";
+                sceneLoadingOperation.allowSceneActivation = true;
+            }
+            else
+                Debug.LogError("Scene Loading Operation is null");
         }
 
         // Game Values async loader
@@ -380,20 +414,20 @@ namespace SlimUI.ModernMenu{
             // Update the prompt for the next loading step
             loadPromptText.text = "Loading... Modifying Tiles";
             yield return new WaitForSeconds(0.5f); // Simulate loading time for tile data
-            gameValuesSO.LoadTilesFromCSV("Assets/StreamingAssets/SpaceOperaTileValues - TileValues.csv");
+            gameValuesSO.LoadTilesFromCSV("TileValues.json");
             loadingBar.value = 0.3f; // Update the loading bar for tiles
 
             // Update the prompt for combat multipliers
             loadPromptText.text = "Loading... Setting Combat Multipliers";
             yield return new WaitForSeconds(0.5f); // Simulate loading time for combat multipliers
-            gameValuesSO.LoadCombatMultipliersFromCSV("Assets/StreamingAssets/SpaceOperaUnitValues - Combat Multipliers.csv");
+            gameValuesSO.LoadCombatMultipliersFromCSV("UnitValuesCombatMultipliers.json");
             loadingBar.value = 0.4f; // Update the loading bar for combat multipliers
 
             loadPromptText.text = "Loading... Modifying Unit Prefabs";
             yield return null;
             // Load Unit data from CSV (simulate with WaitForSeconds if necessary)
             //yield return new WaitForSeconds(0.1f); // Simulate loading time for unit data
-            gameValuesSO.LoadUnitsFromCSV("Assets/StreamingAssets/SpaceOperaUnitValues - UnitValues.csv");
+            gameValuesSO.LoadUnitsFromCSV("UnitValues.json");
             loadingBar.value = 0.9f; // Update the loading bar as units are loaded
 
             // Finalize loading and set loading prompt to complete
