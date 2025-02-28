@@ -88,7 +88,6 @@ public class PrefabManager
                         setSprites(unitData, unitScript.spriteContainer);
                     }
                 }
-                UnityEngine.Debug.Log("I got this far!");
                 // Optional: UnityEngine.Debug log to verify properties
                 //UnityEngine.Debug.Log($"For unit {unitData.unitName}, modified prefab at path: {prefabPath} with unitData properties.");
 

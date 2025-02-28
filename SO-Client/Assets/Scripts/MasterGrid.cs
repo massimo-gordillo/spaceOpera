@@ -1352,7 +1352,7 @@ public class MasterGrid : MonoBehaviour
         GameObject[] units = GameObject.FindGameObjectsWithTag("BaseUnitTag");
         GameObject[] structures = GameObject.FindGameObjectsWithTag("BaseStructureTag");
 
-        Debug.Log($"Units: {units.Length}, Structures: {structures.Length}");
+        //Debug.Log($"Units: {units.Length}, Structures: {structures.Length}");
 
         //GameObject gamePieces = units.Concat(structures).ToArray();
 

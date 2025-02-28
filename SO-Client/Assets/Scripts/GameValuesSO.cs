@@ -30,7 +30,7 @@ public class GameValuesSO : ScriptableObject
         //attributesBaseUnits = new Dictionary<byte, AttributesBaseUnit>();
         //attributesTiles = new List<AttributesTile>();
         if (!isInit) { 
-            Debug.Log("GameValuesSO OnEnable called.");
+            //Debug.Log("GameValuesSO OnEnable called.");
             LoadUnitsFromCSV("UnitValues.json");
             //LoadUnitsFromCSV("SpaceOperaUnitValues - UnitValues.csv");
             LoadTilesFromCSV("TileValues.json");

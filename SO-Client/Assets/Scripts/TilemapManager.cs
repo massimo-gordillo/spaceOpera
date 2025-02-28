@@ -36,7 +36,7 @@ public class TilemapManager : MonoBehaviour
         //tilemapFilePath = "Assets/InitializationData/Maps/Map2";
         //byteToAttributesTileDictionary = inputAttributesTilesDictionary;
         // Log the tilemap reference
-        Debug.Log($"Initializing TilemapManager with tilemap: {tilemap.name}");
+        //Debug.Log($"Initializing TilemapManager with tilemap: {tilemap.name}");
 
         (Vector2Int bounds, Vector2Int deltaFromZero) = GetTilemapBounds();
         gridWidth = bounds.x;// + deltaFromZero.x;
@@ -96,7 +96,7 @@ public class TilemapManager : MonoBehaviour
             string[] nameParts = tile.name.Split('_'); // Assuming tiles are named like "TileName_1"
             if (nameParts.Length > 1 && byte.TryParse(nameParts[1], out byte byteNumber))
             {
-                Debug.Log($"Tile {tile.name} has byte prefix {byteNumber}.");
+                //Debug.Log($"Tile {tile.name} has byte prefix {byteNumber}.");
                 tileAssets.Add(tile);
                 tileNameToByteDictionary[tile.name] = byteNumber;
 
@@ -191,25 +191,15 @@ public class TilemapManager : MonoBehaviour
                 {
                     modifiedTileName = tile.name.Replace("v2", "v3");
                 }
-                bool checkFlag = false;
 
                 if (tile != null && tileNameToByteDictionary.TryGetValue(modifiedTileName, out byte tileByte))
                 {
                     tilemapByteArray[y * width + x] = tileByte;
-                    if (!checkFlag)
-                    {
-                        Debug.Log($"Tile {tile.name} at position {pos} has byte value {tileByte}.");
-                        checkFlag = true;
-                    }
+
                 }
                 else
                 {
                     tilemapByteArray[y * width + x] = 255; // Use 255 for empty or unrecognized tiles
-                    if (!checkFlag)
-                    {
-                        Debug.Log($"Tile {tile.name} at position {pos} has byte value 255.");
-                        checkFlag = true;
-                    }
                 }
 
             }
@@ -287,13 +277,13 @@ public class TilemapManager : MonoBehaviour
                         }
                         else
                         {
-                            Debug.Log("Tilemap failed to find in byteToTileDict.");
+                            Debug.LogWarning("Tilemap failed to find in byteToTileDict.");
                         }
                     }
                 }
             }
 
-            Debug.Log("Tilemap imported from byte array.");
+            //Debug.Log("Tilemap imported from byte array.");
         }
         catch (Exception ex)
         {
@@ -347,7 +337,7 @@ public class TilemapManager : MonoBehaviour
             }
             else
             {
-                Debug.Log($"TilemapData has size {data.TileBytes.Length}.");
+                //Debug.Log($"TilemapData has size {data.TileBytes.Length}.");
                 return data.TileBytes;
             }
                 
@@ -428,7 +418,7 @@ public class TilemapManager : MonoBehaviour
             int width = bounds.size.x;  // Number of tiles in the X direction
             int height = bounds.size.y; // Number of tiles in the Y direction
 
-            Debug.Log($"Tilemap Dimensions: Width = {width}, Height = {height}, xMax = {bounds.xMax}, yMax = {bounds.yMax}, xMin = {bounds.xMin}, yMin = {bounds.yMin}");
+            //Debug.Log($"Tilemap Dimensions: Width = {width}, Height = {height}, xMax = {bounds.xMax}, yMax = {bounds.yMax}, xMin = {bounds.xMin}, yMin = {bounds.yMin}");
 
 /*            for (int x = bounds.xMin-1; x < bounds.xMax+1; x++)
             {
@@ -452,7 +442,7 @@ public class TilemapManager : MonoBehaviour
             int deltaX = (Mathf.Abs(minX) <= Mathf.Abs(maxX)) ? minX : maxX;
             int deltaY = (Mathf.Abs(minY) <= Mathf.Abs(maxY)) ? minY : maxY;
 
-            Debug.Log($"deltaX: {deltaX}, deltaY: {deltaY}");
+            //Debug.Log($"deltaX: {deltaX}, deltaY: {deltaY}");
 
             return (new Vector2Int(width, height), new Vector2Int(deltaX, deltaY));
         }

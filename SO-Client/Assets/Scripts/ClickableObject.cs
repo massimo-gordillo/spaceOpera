@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class ClickableObject : MonoBehaviour
 {
@@ -38,6 +39,15 @@ public class ClickableObject : MonoBehaviour
             
             HandleClick();
         }
+    }*/
+
+/*    public void OnPointerClick(PointerEventData eventData)
+    {
+        // Ensure cameraDrag is not null before calling the method
+        //if (!isDragging && cameraDrag.isMouseDownOnClickableObject)
+        //{
+            HandleClick();
+        //}
     }*/
 
     public virtual void HandleClick()
