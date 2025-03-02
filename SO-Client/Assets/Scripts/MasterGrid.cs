@@ -527,9 +527,10 @@ public class MasterGrid : MonoBehaviour
             return squareQueuesList;
 
         // Explore all 4 directions
-        for (int direction = 0; direction < 4; direction++)
+        //for (int direction = 0; direction < 4; direction++)
+        foreach (Vector2Int direction in DirectionList())
         {
-            Vector2Int adjacentCell = checkingCell + sinDir(direction);
+            Vector2Int adjacentCell = checkingCell + direction;
             int xCheck = adjacentCell.x;
             int yCheck = adjacentCell.y;
 
@@ -590,6 +591,143 @@ public class MasterGrid : MonoBehaviour
 
         // Recursion
         return AStarSearchRecursive(mTarget, movementRange, attackRange, cellsToCheck, checkedCells, squareQueuesList);
+    }
+
+    public void AnimateMovement(BaseUnit unit, Vector2Int start, Vector2Int end)
+    {
+
+        Debug.Log($"Animating movement from {start} to {end}");
+        List<Vector2Int> path = BidirectionalSearch(start, end, unit);
+
+        //movement animation speed
+        float speed = 15.0f;
+
+        if(path.Count == 0)
+        {
+            Debug.LogError("No valid path found for movement animation.");
+            return;
+        }
+
+        StartCoroutine(AnimateMovementVisual(unit, path, speed));
+        Debug.Log("Movement animation complete.");
+    }
+    public IEnumerator AnimateMovementVisual(BaseUnit unit, List<Vector2Int> path, float speed)
+    {
+        foreach (var position in path)
+        {
+            Vector3 targetPosition = new Vector3(position.x, position.y, unit.transform.position.z);
+
+            while (Vector3.Distance(unit.transform.position, targetPosition) > 0.01f)
+            {
+                unit.transform.position = Vector3.MoveTowards(unit.transform.position, targetPosition, speed * Time.deltaTime);
+                yield return null; // Waits until next frame before continuing loop
+            }
+        }
+
+        Debug.Log("Movement animation complete.");
+    }
+
+
+    public List<Vector2Int> BidirectionalSearch(
+        Vector2Int start,
+        Vector2Int end,
+        BaseUnit unit)
+    {
+        if (start == end) return new List<Vector2Int> { start };
+
+        // Queues for bidirectional search
+        Queue<Vector2Int> queueStart = new Queue<Vector2Int>();
+        Queue<Vector2Int> queueEnd = new Queue<Vector2Int>();
+
+        // Parent tracking for reconstruction
+        Dictionary<Vector2Int, Vector2Int> parentStart = new Dictionary<Vector2Int, Vector2Int>();
+        Dictionary<Vector2Int, Vector2Int> parentEnd = new Dictionary<Vector2Int, Vector2Int>();
+
+        queueStart.Enqueue(start);
+        parentStart[start] = start;
+
+        queueEnd.Enqueue(end);
+        parentEnd[end] = end;
+
+        //Vector2Int? meetingPointNullable = null;
+        Vector2Int meetingPoint = Vector2Int.zero;
+        bool pathFound = false;
+
+        while (queueStart.Count > 0 && queueEnd.Count > 0)
+        {
+            if (ExpandFrontier(queueStart, parentStart, parentEnd, ref meetingPoint, unit))
+            {
+                pathFound = true;
+                break;
+            }
+            if (ExpandFrontier(queueEnd, parentEnd, parentStart, ref meetingPoint, unit))
+            {
+                pathFound = true;
+                break;
+            }
+        }
+
+        if (!pathFound) return new List<Vector2Int>(); // No valid path found
+
+        return ReconstructPath(meetingPoint, parentStart, parentEnd);
+    }
+
+    private bool ExpandFrontier(
+        Queue<Vector2Int> queue,
+        Dictionary<Vector2Int, Vector2Int> parents,
+        Dictionary<Vector2Int, Vector2Int> otherParents,
+        ref Vector2Int meetingPoint,
+        BaseUnit unit)
+    {
+        if (queue.Count == 0) return false;
+
+        Vector2Int current = queue.Dequeue();
+
+        foreach (Vector2Int dir in DirectionList())
+        {
+            Vector2Int neighbor = current + dir;
+            if (parents.ContainsKey(neighbor) || legalMove(neighbor.x, neighbor.y, unit)<=0)
+                continue;
+
+            parents[neighbor] = current;
+            queue.Enqueue(neighbor);
+
+            if (otherParents.ContainsKey(neighbor))
+            {
+                meetingPoint = neighbor;
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static List<Vector2Int> ReconstructPath(
+    Vector2Int meetingPoint,
+    Dictionary<Vector2Int, Vector2Int> parentStart,
+    Dictionary<Vector2Int, Vector2Int> parentEnd)
+    {
+        List<Vector2Int> path = new List<Vector2Int>();
+
+        // Move from meeting point back to start
+        Vector2Int current = meetingPoint;
+        path.Add(current); // Explicitly add meeting point
+        while (current != parentStart[current])
+        {
+            current = parentStart[current];
+            path.Add(current);
+        }
+        path.Reverse(); // Start-to-meeting order
+
+        // Move from meeting point to end
+        current = meetingPoint; // Reset to meeting point
+        while (current != parentEnd[current])
+        {
+            current = parentEnd[current];
+            path.Add(current);
+        }
+
+        return path;
     }
 
     // Helper function to check if a cell is in bounds
@@ -1019,9 +1157,26 @@ public class MasterGrid : MonoBehaviour
         
     }
 
-    public Vector2Int sinDir(int d)//0 up, 1 right, 2 down, 3 left
+/*    public Vector2Int sinDir(int d)//0 up, 1 right, 2 down, 3 left
     {
         return new Vector2Int((int)(Mathf.Sin(d * Mathf.PI / 2)), (int)(Mathf.Sin((d + 1) * Mathf.PI / 2)));
+    }*/
+
+    //above function but returns a list of vectors
+    public List<Vector2Int> DirectionList()
+    {
+        return new List<Vector2Int>
+        {
+            new Vector2Int(0, 1),  // Up
+            new Vector2Int(1, 0),  // Right
+            new Vector2Int(0, -1), // Down
+            new Vector2Int(-1, 0)  // Left
+        };
+        //god this is so clever but it just wastes computation time
+        /*        List<Vector2Int> dirList = new List<Vector2Int>();
+                for (int d = 0; d < 4; d++)//0 up, 1 right, 2 down, 3 left
+                    dirList.Add(new Vector2Int((int)(Mathf.Sin(d * Mathf.PI / 2)), (int)(Mathf.Sin((d + 1) * Mathf.PI / 2)));
+                return dirList;*/
     }
 
     public void clearMovement()
@@ -1067,7 +1222,8 @@ public class MasterGrid : MonoBehaviour
                 oldStructure.turnOnCollider();
                 oldStructure.resetCaptureHealth();
             }
-            selectedUnit.transform.position = new Vector2(x, y); //you can't define this as a Vector2Int bc the game engine requires conversion to Vector3
+            AnimateMovement(selectedUnit, new Vector2Int(selectedUnit.xPos, selectedUnit.yPos), new Vector2Int(x, y));
+            //selectedUnit.transform.position = new Vector2(x, y); //you can't define this as a Vector2Int bc the game engine requires conversion to Vector3
 
             // if you're undoing movement, don't add it to the action list
             if (!selectedUnit.undoingMovement)
@@ -1076,22 +1232,6 @@ public class MasterGrid : MonoBehaviour
             removeUnitInGrid(selectedUnit.xPos, selectedUnit.yPos);
             setUnitInGrid(x, y, selectedUnit);
 
-            /*if (selectedUnit is BaseUnit) //why is this check here? MG: 24-05-08
-            {
-                presentChoicesAtLocation(x, y, selectedUnit);
-                //checkEnemiesInRange(selectedUnit.xPos, selectedUnit.yPos, selectedUnit.attackRange);
-                //structure = manageStructureAtLocation(selectedUnit.xPos, selectedUnit.yPos);
-            }
-
-            if (structure == null) //after moving, if the unit is not on a structure AND
-            {
-                gameMaster.hideChoicePanel();
-                if (attackableUnits.Count == 0) //and there is no nearby units, unselect it.
-                {
-                    //selectedUnit.setNonExhausted(false);
-                    exhaustSelectedUnit(selectedUnit,true);
-                }
-            }*/
             if (!selectedUnit.undoingMovement)
             {
                 selectedUnit.movementNonExhausted = false;
