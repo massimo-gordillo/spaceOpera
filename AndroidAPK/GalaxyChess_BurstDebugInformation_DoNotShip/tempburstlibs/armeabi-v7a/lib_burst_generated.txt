@@ -9,6 +9,7 @@ Library: C:\Users\massi\Documents\gitRepo\spaceOpera\SO-Client\Temp\StagingArea\
 --target-framework=NetFramework
 --generate-link-xml=Temp\burst.link.xml
 --temp-folder=C:\Users\massi\Documents\gitRepo\spaceOpera\SO-Client\Temp\Burst
+--debug=Full
 --key-folder=C:/Program Files/Unity/Hub/Editor/2021.3.45f1/Editor/Data/PlaybackEngines/AndroidPlayer
 --decode-folder=C:\Users\massi\Documents\gitRepo\spaceOpera\SO-Client\Library\Burst
 --output=C:\Users\massi\Documents\gitRepo\spaceOpera\SO-Client\Temp\StagingArea\tempburstlibs\armeabi-v7a\lib_burst_generated

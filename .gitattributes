@@ -1,3 +1,4 @@
 # Specify filepatterns you want to assign special attributes.
 *.dat -diff
 *.unity -diff
+SO-Client/Assets/Resources/UnitPrefabs/progeny1/* -diff
