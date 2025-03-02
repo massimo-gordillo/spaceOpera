@@ -600,7 +600,7 @@ public class MasterGrid : MonoBehaviour
         List<Vector2Int> path = BidirectionalSearch(start, end, unit);
 
         //movement animation speed
-        float speed = 15.0f;
+        float speed = 12.0f;
 
         if(path.Count == 0)
         {
@@ -1097,6 +1097,9 @@ public class MasterGrid : MonoBehaviour
 
     public bool canUnitMoveToByteValue(BaseUnit unit, byte b)
     {
+        //absolutely awful temp fix for the fact that the byte values are off by 5 because of the old tilemap I used to draw the inital map. In future, grid will be created from scatch and this can be removed.
+        
+        b = (byte)(b - 5);
         if (!tileAttributes.TryGetValue(b, out AttributesTile a))
             Debug.LogWarning($"Key '{b}' was not found in the dictionary.");
         bool moveCheck = true;
@@ -1118,6 +1121,7 @@ public class MasterGrid : MonoBehaviour
             moveCheck = moveCheck && a.canInfantryTraverse;
         else
             moveCheck = moveCheck && a.canVehicleTraverse;
+        //Debug.Log($"Unit {unit.unitName} can move to tile {b} with a value of {moveCheck}");
         return moveCheck;
     }
 

@@ -96,7 +96,7 @@ public class TilemapManager : MonoBehaviour
             string[] nameParts = tile.name.Split('_'); // Assuming tiles are named like "TileName_1"
             if (nameParts.Length > 1 && byte.TryParse(nameParts[1], out byte byteNumber))
             {
-                //Debug.Log($"Tile {tile.name} has byte prefix {byteNumber}.");
+                Debug.Log($"Tile {tile.name} has byte prefix {byteNumber}.");
                 tileAssets.Add(tile);
                 tileNameToByteDictionary[tile.name] = byteNumber;
 
