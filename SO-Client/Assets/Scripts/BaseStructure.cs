@@ -22,6 +22,11 @@ public class BaseStructure : MonoBehaviour
     public SpriteRenderer progeny1SpriteRenderer;
     public SpriteRenderer progeny2SpriteRenderer;
 
+    public StaticSprite spriteContainer;
+    public SpriteRenderer progeny0spriteFillSR;
+    public SpriteRenderer progeny0spriteTrimSR;
+    public SpriteRenderer progeny0spriteLightsSR;
+
 
 
 
@@ -38,18 +43,6 @@ public class BaseStructure : MonoBehaviour
         masterGrid = GameObject.FindGameObjectWithTag("MasterGridTag").GetComponent<MasterGrid>();
         masterGrid.setStructureInGrid(xPos, yPos, this);
         
-        
-/*        //set sprite. 
-        Sprite spr = null;
-        if (structureType == 0)
-            spr = Resources.Load<Sprite>("sprites/BismuthV1/BismuthTilev1.1");
-        else if (structureType == 1)
-            spr = Resources.Load<Sprite>("sprites/factorySprite");
-        else if (structureType == 2)
-            spr = Resources.Load<Sprite>("sprites/airportSprite");
-        else if (structureType == 5)
-            spr = Resources.Load<Sprite>("sprites/commandStructureSprite");
-        neutralSpriteRenderer.sprite = spr;*/
         baseColor = neutralSpriteRenderer.color;
         if (playerControl == 0)
             turnOffCaptureSprites();
@@ -83,7 +76,12 @@ public class BaseStructure : MonoBehaviour
         float saturation = 1.0f;
         float value = 1.0f;
         Color color = Color.HSVToRGB(hue / 360f, saturation, value);
-        neutralSpriteRenderer.color = color;
+        progeny0spriteFillSR.color = color;
+        if(structureType != 0)
+        {
+            neutralSpriteRenderer.color = color;
+        }
+
     }
 
     public bool isCapturableBy(BaseUnit unit)
@@ -100,13 +98,23 @@ public class BaseStructure : MonoBehaviour
         playerControl = (byte)capturePlayerInt;
         resetCaptureHealth();
         setColor(capturePlayerInt);
+        setCaptureSprite((byte)capturePlayerInt);
     }
 
     public void setCaptureSprite(byte progeny)
     {
         turnOffCaptureSprites();
         if (gameMaster.playerProgeny[playerControl] == 0)
-            progeny0SpriteRenderer.gameObject.SetActive(true);
+        {
+            if (structureType == 0)
+            {
+                progeny0spriteFillSR.gameObject.SetActive(true);
+                progeny0spriteTrimSR.gameObject.SetActive(true);
+                progeny0spriteLightsSR.gameObject.SetActive(true);
+            }
+            else
+                progeny0SpriteRenderer.gameObject.SetActive(true);
+        }
         else if (gameMaster.playerProgeny[playerControl] == 1)
             progeny1SpriteRenderer.gameObject.SetActive(true);
         else if (gameMaster.playerProgeny[playerControl] == 2)
@@ -120,6 +128,9 @@ public class BaseStructure : MonoBehaviour
         progeny0SpriteRenderer.gameObject.SetActive(false);
         progeny1SpriteRenderer.gameObject.SetActive(false);
         progeny2SpriteRenderer.gameObject.SetActive(false);
+        progeny0spriteFillSR.gameObject.SetActive(false);
+        progeny0spriteTrimSR.gameObject.SetActive(false);
+        progeny0spriteLightsSR.gameObject.SetActive(false);
     }
 
     public void staticSpriteHasBeenClicked()

@@ -78,6 +78,10 @@ public class BaseUnit : MonoBehaviour
         baseColor = spriteFillSR.color;
         originalLightsColor = spriteLightsSR.color;
 
+        //a good hack will probably want to fix later.
+        if ((playerControl+1) % 2 == 1)
+            flipSprites();
+
         if (playerControl == masterGrid.getPlayerTurn())
             setNonExhausted(false);
         else
@@ -285,6 +289,13 @@ public class BaseUnit : MonoBehaviour
         float adjustedLightsValue = nonExhausted ? lightsValue : lightsValue * 0.7f; // Darken when exhausted
         Color lightsColor = Color.HSVToRGB(lightsHue, lightsSaturation, adjustedLightsValue);
         spriteLightsSR.color = lightsColor;
+    }
+
+    public void flipSprites()
+    {
+        spriteFillSR.flipX = true;
+        spriteTrimSR.flipX = true;
+        spriteLightsSR.flipX = true;
     }
 
 
