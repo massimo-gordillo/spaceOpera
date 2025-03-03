@@ -48,12 +48,12 @@ public class CameraDrag : MonoBehaviour
             isPressed = Touchscreen.current.primaryTouch.press.wasPressedThisFrame;
             //isReleased = Touchscreen.current.primaryTouch.press.wasReleasedThisFrame;
             wasTouchingLastFrame = true;
-            Debug.Log($"touchscreen touched!");
+            //Debug.Log($"touchscreen touched!");
         }else if (wasTouchingLastFrame)
         {
             inputPosition = Touchscreen.current.primaryTouch.position.ReadValue();
             isReleased = true;
-            Debug.Log($"touchscreen touched! Was it released this frame? {isReleased}");
+            //Debug.Log($"touchscreen touched! Was it released this frame? {isReleased}");
             wasTouchingLastFrame = false;
         }
         else if (Mouse.current != null)
@@ -74,7 +74,7 @@ public class CameraDrag : MonoBehaviour
             if (EventSystem.current.IsPointerOverGameObject() || IsPointerOverUI(inputPosition))
             {
                 isMouseDownOnClickableObject = true;
-                Debug.Log("clickable element clicked!");
+                //Debug.Log("clickable element clicked!");
                 return;
             }
 
@@ -105,7 +105,7 @@ public class CameraDrag : MonoBehaviour
 
         if (isReleased)
         {
-            Debug.Log($"mouse released!, dragging = {isDragging}, isMouseDown? {isMouseDownOnClickableObject}");
+            //Debug.Log($"mouse released!, dragging = {isDragging}, isMouseDown? {isMouseDownOnClickableObject}");
             if (!isDragging && !isMouseDownOnClickableObject)
             {
                 ClickableObject clickableObject = GetClickableObjectUnderPointer(inputPosition);
@@ -115,7 +115,7 @@ public class CameraDrag : MonoBehaviour
                 }
                 else
                 {
-                    Debug.Log("clickable object under pointer is null");
+                    Debug.LogWarning("clickable object under pointer is null");
                 }
             }
 
@@ -165,15 +165,8 @@ public class CameraDrag : MonoBehaviour
     {
        
         RaycastHit2D hit = Physics2D.Raycast(cam.ScreenToWorldPoint(position), Vector2.zero);
-        if (hit.collider != null)
-        {
-            Debug.Log($"hit collider is not null and clickableObjectIsNull? {hit.collider.GetComponent<ClickableObject>() == null}");
-
-        }
-        else
-        {
-            Debug.Log("hit collider is null");
-        }
+        if (hit.collider == null)
+            Debug.LogWarning("hit collider is null");
         return hit.collider != null && hit.collider.GetComponent<ClickableObject>() != null;
     }
 
