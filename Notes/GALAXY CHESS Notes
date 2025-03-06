@@ -146,3 +146,11 @@ Win by capturing your opps home base (or later maybe some concession condition)
 No diagonal attacking
 What the units do/are good at
 Moving/destrying capturing unit resets the health
+
+
+.NET Standard 2.0 folders which have 2.1 instances:
+Microsoft.Bcl.AsyncInterfaces.1.1.0
+Microsoft.Bcl.AsyncInterfaces.1.1.0
+System.Text.Encodings.Web.4.7.2
+System.Threading.Channels.5.0.0
+Websocket.Client.4.6.1

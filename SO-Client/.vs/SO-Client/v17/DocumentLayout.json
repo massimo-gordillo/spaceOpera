@@ -3,8 +3,28 @@
   "WorkspaceRootPath": "C:\\Users\\massi\\Documents\\gitRepo\\spaceOpera\\SO-Client\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{5BFDBD8C-00C6-A840-8746-4E747F9626F3}|Assembly-CSharp.csproj|C:\\Users\\massi\\Documents\\gitRepo\\spaceOpera\\SO-Client\\assets\\scripts\\gameaction.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5BFDBD8C-00C6-A840-8746-4E747F9626F3}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\gameaction.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{5BFDBD8C-00C6-A840-8746-4E747F9626F3}|Assembly-CSharp.csproj|c:\\users\\massi\\documents\\gitrepo\\spaceopera\\so-client\\assets\\scripts\\gamemaster.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{5BFDBD8C-00C6-A840-8746-4E747F9626F3}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\gamemaster.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5BFDBD8C-00C6-A840-8746-4E747F9626F3}|Assembly-CSharp.csproj|C:\\Users\\massi\\Documents\\gitRepo\\spaceOpera\\SO-Client\\assets\\scripts\\tilemapmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5BFDBD8C-00C6-A840-8746-4E747F9626F3}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\tilemapmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5BFDBD8C-00C6-A840-8746-4E747F9626F3}|Assembly-CSharp.csproj|C:\\Users\\massi\\Documents\\gitRepo\\spaceOpera\\SO-Client\\assets\\scripts\\supabasemanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5BFDBD8C-00C6-A840-8746-4E747F9626F3}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\supabasemanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5BFDBD8C-00C6-A840-8746-4E747F9626F3}|Assembly-CSharp.csproj|C:\\Users\\massi\\Documents\\gitRepo\\spaceOpera\\SO-Client\\assets\\scripts\\mastergrid.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5BFDBD8C-00C6-A840-8746-4E747F9626F3}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\mastergrid.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{5BFDBD8C-00C6-A840-8746-4E747F9626F3}|Assembly-CSharp.csproj|C:\\Users\\massi\\Documents\\gitRepo\\spaceOpera\\SO-Client\\assets\\scripts\\gamepieceinfo.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5BFDBD8C-00C6-A840-8746-4E747F9626F3}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\gamepieceinfo.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -14,7 +34,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 1,
+          "SelectedChildIndex": 3,
           "Children": [
             {
               "$type": "Bookmark",
@@ -22,13 +42,74 @@
             },
             {
               "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "TilemapManager.cs",
+              "DocumentMoniker": "C:\\Users\\massi\\Documents\\gitRepo\\spaceOpera\\SO-Client\\Assets\\Scripts\\TilemapManager.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\TilemapManager.cs",
+              "ToolTip": "C:\\Users\\massi\\Documents\\gitRepo\\spaceOpera\\SO-Client\\Assets\\Scripts\\TilemapManager.cs",
+              "RelativeToolTip": "Assets\\Scripts\\TilemapManager.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-03-06T03:01:53.208Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "SupabaseManager.cs",
+              "DocumentMoniker": "C:\\Users\\massi\\Documents\\gitRepo\\spaceOpera\\SO-Client\\Assets\\Scripts\\SupabaseManager.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\SupabaseManager.cs",
+              "ToolTip": "C:\\Users\\massi\\Documents\\gitRepo\\spaceOpera\\SO-Client\\Assets\\Scripts\\SupabaseManager.cs",
+              "RelativeToolTip": "Assets\\Scripts\\SupabaseManager.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAACAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-03-06T03:01:45.892Z"
+            },
+            {
+              "$type": "Document",
               "DocumentIndex": 0,
+              "Title": "GameAction.cs",
+              "DocumentMoniker": "C:\\Users\\massi\\Documents\\gitRepo\\spaceOpera\\SO-Client\\Assets\\Scripts\\GameAction.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\GameAction.cs",
+              "ToolTip": "C:\\Users\\massi\\Documents\\gitRepo\\spaceOpera\\SO-Client\\Assets\\Scripts\\GameAction.cs",
+              "RelativeToolTip": "Assets\\Scripts\\GameAction.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAQAAAANAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-03-06T02:20:08.954Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "MasterGrid.cs",
+              "DocumentMoniker": "C:\\Users\\massi\\Documents\\gitRepo\\spaceOpera\\SO-Client\\Assets\\Scripts\\MasterGrid.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\MasterGrid.cs",
+              "ToolTip": "C:\\Users\\massi\\Documents\\gitRepo\\spaceOpera\\SO-Client\\Assets\\Scripts\\MasterGrid.cs",
+              "RelativeToolTip": "Assets\\Scripts\\MasterGrid.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-03-06T01:14:39.683Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "GamePieceInfo.cs",
+              "DocumentMoniker": "C:\\Users\\massi\\Documents\\gitRepo\\spaceOpera\\SO-Client\\Assets\\Scripts\\GamePieceInfo.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\GamePieceInfo.cs",
+              "ToolTip": "C:\\Users\\massi\\Documents\\gitRepo\\spaceOpera\\SO-Client\\Assets\\Scripts\\GamePieceInfo.cs",
+              "RelativeToolTip": "Assets\\Scripts\\GamePieceInfo.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-03-06T01:12:25.586Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
               "Title": "GameMaster.cs",
               "DocumentMoniker": "C:\\Users\\massi\\Documents\\gitRepo\\spaceOpera\\SO-Client\\Assets\\Scripts\\GameMaster.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\GameMaster.cs",
               "ToolTip": "C:\\Users\\massi\\Documents\\gitRepo\\spaceOpera\\SO-Client\\Assets\\Scripts\\GameMaster.cs",
               "RelativeToolTip": "Assets\\Scripts\\GameMaster.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAHcAAAAAAAAAAAD4v4IAAAAqAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-03-06T00:43:48.72Z",
               "EditorCaption": ""

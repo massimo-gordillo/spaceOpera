@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System.IO;
-using MessagePack;
+//using MessagePack;
 
 public class GameMaster : MonoBehaviour
 {
@@ -124,7 +124,7 @@ public class GameMaster : MonoBehaviour
         // Wait until the next frame to ensure all Start() methods are called
         yield return null;
         // Now it is safe to call ConvertGameStateToList
-        SaveGameStateListToFile(ConvertGameStateToList());
+        //SaveGameStateListToFile(ConvertGameStateToList());
         //ConvertListToGameState(gameState);
     }
 
@@ -405,12 +405,12 @@ public class GameMaster : MonoBehaviour
         Debug.Log($"debugging: Current game state item: {itemString}");*/
     }
 
-    private void SaveGameStateListToFile(List<GamePieceInfo> gameStateList)
+/*    private void SaveGameStateListToFile(List<GamePieceInfo> gameStateList)
     {
         byte[] bytes = MessagePackSerializer.Serialize(gameStateList);
         File.WriteAllBytes(gameStateFilePath, bytes);
         Debug.Log("Game state saved to " + gameStateFilePath);
-    }
+    }*/
 
     //need error checking here.
     //Cannot have two units on the same hex.
@@ -476,7 +476,7 @@ public class GameMaster : MonoBehaviour
             Debug.LogError("gameStateList is empty!");
     }
 
-    public void ConvertFileToGameState()
+/*    public void ConvertFileToGameState()
     {
         if (File.Exists(gameStateFilePath))
         {
@@ -488,7 +488,7 @@ public class GameMaster : MonoBehaviour
         {
             Debug.LogError("Game state file not found at " + gameStateFilePath);
         }
-    }
+    }*/
 
     public void setMatchId(Guid matchId)
     {
