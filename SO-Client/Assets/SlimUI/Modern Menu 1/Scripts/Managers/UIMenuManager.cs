@@ -414,20 +414,20 @@ namespace SlimUI.ModernMenu{
             // Update the prompt for the next loading step
             loadPromptText.text = "Loading... Modifying Tiles";
             yield return new WaitForSeconds(0.5f); // Simulate loading time for tile data
-            gameValuesSO.LoadTilesFromCSV("TileValues.json");
+            gameValuesSO.LoadTilesFromCSV();
             loadingBar.value = 0.3f; // Update the loading bar for tiles
 
             // Update the prompt for combat multipliers
             loadPromptText.text = "Loading... Setting Combat Multipliers";
             yield return new WaitForSeconds(0.5f); // Simulate loading time for combat multipliers
-            gameValuesSO.LoadCombatMultipliersFromCSV("UnitValuesCombatMultipliers.json");
+            gameValuesSO.LoadCombatMultipliersFromCSV();
             loadingBar.value = 0.4f; // Update the loading bar for combat multipliers
 
             loadPromptText.text = "Loading... Modifying Unit Prefabs";
             yield return null;
             // Load Unit data from CSV (simulate with WaitForSeconds if necessary)
             //yield return new WaitForSeconds(0.1f); // Simulate loading time for unit data
-            gameValuesSO.LoadUnitsFromCSV("UnitValues.json");
+            gameValuesSO.LoadUnitsFromCSV();
             loadingBar.value = 0.9f; // Update the loading bar as units are loaded
 
             // Finalize loading and set loading prompt to complete

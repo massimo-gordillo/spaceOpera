@@ -1103,6 +1103,7 @@ public class MasterGrid : MonoBehaviour
         if (!tileAttributes.TryGetValue(b, out AttributesTile a))
             Debug.LogWarning($"Key '{b}' was not found in the dictionary.");
         bool moveCheck = true;
+        Debug.Log($"Checking if unit {unit.unitName} can move to tile {b} with a value of {unit.unitTerrainType}");
         switch (unit.unitTerrainType)
         {
             case UnitTerrainType.Land:

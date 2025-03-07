@@ -31,10 +31,10 @@ public class GameValuesSO : ScriptableObject
         //attributesTiles = new List<AttributesTile>();
         if (!isInit) { 
             //Debug.Log("GameValuesSO OnEnable called.");
-            LoadUnitsFromCSV("UnitValues.json");
+            LoadUnitsFromCSV();
             //LoadUnitsFromCSV("SpaceOperaUnitValues - UnitValues.csv");
-            LoadTilesFromCSV("TileValues.json");
-            LoadCombatMultipliersFromCSV("UnitValuesCombatMultipliers.json");
+            LoadTilesFromCSV();
+            LoadCombatMultipliersFromCSV();
             isInit = true;
         }else
             {
@@ -148,14 +148,14 @@ public class GameValuesSO : ScriptableObject
 
     }*/
 
-    public void LoadUnitsFromCSV(string fileName)
+    public void LoadUnitsFromCSV()
     {
 
         //string filePath = Path.Combine(Application.streamingAssetsPath, fileName);
 
         //string[] lines = File.ReadAllLines(filePath);
         //string csv = loadCSVFromJSON(fileName);
-        List<string> lines = LoadCSVFromJSON(fileName);
+        List<string> lines = LoadCSVFromJSON("UnitValues.json");
 
         //loop to iterate through the JSON output and convert it to a string array
         //string[] lines = csv.Split(new string[] {"\r\n", "\n" }, StringSplitOptions.None);
@@ -222,10 +222,11 @@ public class GameValuesSO : ScriptableObject
     }
 
 
-    public void LoadTilesFromCSV(string fileName)
+    public void LoadTilesFromCSV()
     {
+
         byteToAttributesTileDictionary = new Dictionary<byte, AttributesTile>();
-        List<string> lines = LoadCSVFromJSON(fileName);
+        List<string> lines = LoadCSVFromJSON("TileValues.json");
         //string[] lines = File.ReadAllLines(filePath);
 
         if (lines == null || lines.Count <= 1)
@@ -305,9 +306,9 @@ public class GameValuesSO : ScriptableObject
         }
     }*/
 
-    public void LoadCombatMultipliersFromCSV(string fileName)
+    public void LoadCombatMultipliersFromCSV()
     {
-        List<string> lines = LoadCSVFromJSON(fileName);
+        List<string> lines = LoadCSVFromJSON("UnitValuesCombatMultipliers.json");
 
         if (lines == null || lines.Count < 2) // Ensure there are at least headers + 1 row
         {
