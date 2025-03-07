@@ -75,6 +75,13 @@ public class BaseUnit : MonoBehaviour
         masterGrid = GameObject.FindGameObjectWithTag("MasterGridTag").GetComponent<MasterGrid>();
         masterGrid.setUnitInGrid(xPos, yPos, this);
 
+        //if the unit is created after the structure on start, turn off the collider. BaseStructure has a similar check on start.
+        BaseStructure onLocation = masterGrid.whatStructureIsInThisLocation(xPos, yPos);
+        if (onLocation != null)
+        {
+            onLocation.turnOffCollider();
+        }
+
         baseColor = spriteFillSR.color;
         originalLightsColor = spriteLightsSR.color;
 

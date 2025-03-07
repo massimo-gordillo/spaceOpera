@@ -1,4 +1,4 @@
-gamePieceId,unitName,progeny,isResourceUnit,unitType,isInfantry,healthMax,baseDamage,healthType,damageType,weaponType,damageCombined,canAttackLand,canAttackAir,canAttackSea,canFireBack,attackRange,price,movementRange,canMoveAndAttack,minimumAttackRangeDistance
+gamePieceId,unitName,progeny,isResourceUnit,unitTerrainType,isInfantry,healthMax,baseDamage,healthType,damageType,weaponType,damageCombined,canAttackLand,canAttackAir,canAttackSea,canFireBack,attackRange,price,movementRange,canMoveAndAttack,minimumAttackRangeDistance
 0,Infantry,ertrian,TRUE,land,TRUE,100,60,light,light,projectile,light projectile,TRUE,TRUE,TRUE,TRUE,1,100,3,TRUE,0
 1,GattlingTank,ertrian,FALSE,land,FALSE,400,300,medium,light,projectile,light projectile,TRUE,TRUE,TRUE,TRUE,1,800,6,TRUE,0
 2,LightTank,ertrian,FALSE,land,FALSE,700,300,medium,heavy,projectile,heavy projectile,TRUE,FALSE,TRUE,TRUE,1,700,7,TRUE,0

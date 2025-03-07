@@ -54,3 +54,4 @@ sysinfo.txt
 
 #Ignore future changes to prefabs
 SO-Client/Assets/Resources/UnitPrefabs/progeny1/*
+SO-Client/.vs/*
