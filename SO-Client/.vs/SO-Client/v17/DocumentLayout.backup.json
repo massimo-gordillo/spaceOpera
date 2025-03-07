@@ -3,6 +3,10 @@
   "WorkspaceRootPath": "C:\\Users\\massi\\Documents\\gitRepo\\spaceOpera\\SO-Client\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{5BFDBD8C-00C6-A840-8746-4E747F9626F3}|Assembly-CSharp.csproj|c:\\users\\massi\\documents\\gitrepo\\spaceopera\\so-client\\assets\\scripts\\supabasemanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5BFDBD8C-00C6-A840-8746-4E747F9626F3}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\supabasemanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{5BFDBD8C-00C6-A840-8746-4E747F9626F3}|Assembly-CSharp.csproj|c:\\users\\massi\\documents\\gitrepo\\spaceopera\\so-client\\assets\\scripts\\supabaseclient.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{5BFDBD8C-00C6-A840-8746-4E747F9626F3}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\supabaseclient.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
@@ -31,6 +35,19 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
+              "Title": "SupabaseManager.cs",
+              "DocumentMoniker": "C:\\Users\\massi\\Documents\\gitRepo\\spaceOpera\\SO-Client\\Assets\\Scripts\\SupabaseManager.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\SupabaseManager.cs",
+              "ToolTip": "C:\\Users\\massi\\Documents\\gitRepo\\spaceOpera\\SO-Client\\Assets\\Scripts\\SupabaseManager.cs",
+              "RelativeToolTip": "Assets\\Scripts\\SupabaseManager.cs",
+              "ViewState": "AgIAAAMCAAAAAAAAAAAAAA8CAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-03-06T20:07:21.181Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
               "Title": "SupabaseClient.cs",
               "DocumentMoniker": "C:\\Users\\massi\\Documents\\gitRepo\\spaceOpera\\SO-Client\\Assets\\Scripts\\SupabaseClient.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\SupabaseClient.cs",
@@ -43,7 +60,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 2,
               "Title": "MasterGrid.cs",
               "DocumentMoniker": "C:\\Users\\massi\\Documents\\gitRepo\\spaceOpera\\SO-Client\\Assets\\Scripts\\MasterGrid.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\MasterGrid.cs",
@@ -51,12 +68,11 @@
               "RelativeToolTip": "Assets\\Scripts\\MasterGrid.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-03-06T01:14:39.683Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-03-06T01:14:39.683Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 3,
               "Title": "GameMaster.cs",
               "DocumentMoniker": "C:\\Users\\massi\\Documents\\gitRepo\\spaceOpera\\SO-Client\\Assets\\Scripts\\GameMaster.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\GameMaster.cs",
@@ -64,8 +80,7 @@
               "RelativeToolTip": "Assets\\Scripts\\GameMaster.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAIEAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-03-06T00:43:48.72Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-03-06T00:43:48.72Z"
             }
           ]
         }
