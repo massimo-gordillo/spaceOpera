@@ -306,7 +306,7 @@ MonoBehaviour:
   yPos: 0
   structureType: 0
   gamePieceId: 0
-  spriteCollider: {fileID: 487244310135845115}
+  spriteCollider: {fileID: 2565654716756766496}
   gameMaster: {fileID: 0}
   captureHealth: 0
   maxCaptureHealth: 0
@@ -684,7 +684,7 @@ BoxCollider2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7193809193557888953}
-  m_Enabled: 1
+  m_Enabled: 0
   m_Density: 1
   m_Material: {fileID: 0}
   m_IsTrigger: 0
@@ -836,7 +836,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 9156639417219105286, guid: 88268c20a16956b4c9b0579543f1d861, type: 3}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 9189135686034927351, guid: 88268c20a16956b4c9b0579543f1d861, type: 3}
       propertyPath: m_Size.y
@@ -864,6 +864,11 @@ Transform:
 --- !u!212 &2526445097848062929 stripped
 SpriteRenderer:
   m_CorrespondingSourceObject: {fileID: 9189135686034927351, guid: 88268c20a16956b4c9b0579543f1d861, type: 3}
+  m_PrefabInstance: {fileID: 6668109583086054694}
+  m_PrefabAsset: {fileID: 0}
+--- !u!61 &2565654716756766496 stripped
+BoxCollider2D:
+  m_CorrespondingSourceObject: {fileID: 9156639417219105286, guid: 88268c20a16956b4c9b0579543f1d861, type: 3}
   m_PrefabInstance: {fileID: 6668109583086054694}
   m_PrefabAsset: {fileID: 0}
 --- !u!114 &3928288898641380239 stripped
