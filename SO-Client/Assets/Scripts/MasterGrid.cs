@@ -1099,7 +1099,7 @@ public class MasterGrid : MonoBehaviour
     {
         //absolutely awful temp fix for the fact that the byte values are off by 5 because of the old tilemap I used to draw the inital map. In future, grid will be created from scatch and this can be removed.
         
-        b = (byte)(b - 5);
+        //b = (byte)(b - 5);
         if (!tileAttributes.TryGetValue(b, out AttributesTile a))
             Debug.LogWarning($"Key '{b}' was not found in the dictionary.");
         bool moveCheck = true;

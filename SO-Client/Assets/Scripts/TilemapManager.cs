@@ -68,7 +68,7 @@ public class TilemapManager : MonoBehaviour
 
     private void InitializeTileDictionaries()
     {
-        string tilemapName = "Tilemapv3";
+        string tilemapName = "tilemapv4";
         string basePath = "Tilemap/Tiles/"+tilemapName;
         //string tilesName = "BasicTilemap v3_";
 
@@ -110,6 +110,10 @@ public class TilemapManager : MonoBehaviour
                 Debug.LogWarning($"Tile {tile.name} does not have a valid byte prefix and will be skipped.");
             }
         }
+/*        foreach(KeyValuePair<byte, List<TileBase>> kvp in byteToTilesListDictionary)
+        {
+            Debug.Log($"Byte {kvp.Key} has {kvp.Value.Count} tiles.");
+        }*/
     }
 
 
@@ -173,6 +177,7 @@ public class TilemapManager : MonoBehaviour
         (Vector2Int bounds, Vector2Int deltaFromZero) = GetTilemapBounds();
         int width = bounds.x;// + delta.x;
         int height = bounds.y;// + delta.y;
+        Debug.Log($"Exporting tilemap to bytes: Width = {width}, Height = {height}");
         byte[] tilemapByteArray = new byte[width * height];
         //BoundsInt bounds = tilemap.cellBounds;
 
@@ -182,6 +187,10 @@ public class TilemapManager : MonoBehaviour
             for (int x = 0; x < width; x++)
             {
                 Vector3Int pos = new Vector3Int(x, y, 0);
+                if(tilemap.GetTile(pos)==null)
+                {
+                    Debug.Log($"Tile at {pos} is null.");
+                }
                 TileBase tile = tilemap.GetTile(pos); //this is a built in tilemap function
 
                 //temporary fix for switching to upgraded tilemap. Ugly fix but it will work for now.
@@ -189,11 +198,16 @@ public class TilemapManager : MonoBehaviour
                 string modifiedTileName = null;
                 if (tile.name.Contains("v2"))
                 {
-                    modifiedTileName = tile.name.Replace("v2", "v3");
-                }
-
+                    modifiedTileName = tile.name.Replace("v2", "-v4");
+                }else
+                    modifiedTileName = tile.name;
+                //Debug.Log($"Tile name: {tile.name}, Modified name: {modifiedTileName}");
                 if (tile != null && tileNameToByteDictionary.TryGetValue(modifiedTileName, out byte tileByte))
                 {
+/*                    if (tileByte == 252)
+                    {
+                        Debug.LogWarning($"Tile {tile.name} at {pos} is given byte value 252.");
+                    }*/
                     tilemapByteArray[y * width + x] = tileByte;
 
                 }

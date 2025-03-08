@@ -128,9 +128,9 @@ public class BaseStructure : MonoBehaviour
         progeny0SpriteRenderer.gameObject.SetActive(false);
         progeny1SpriteRenderer.gameObject.SetActive(false);
         progeny2SpriteRenderer.gameObject.SetActive(false);
-        progeny0spriteFillSR.gameObject.SetActive(false);
+/*        progeny0spriteFillSR.gameObject.SetActive(false);
         progeny0spriteTrimSR.gameObject.SetActive(false);
-        progeny0spriteLightsSR.gameObject.SetActive(false);
+        progeny0spriteLightsSR.gameObject.SetActive(false);*/
     }
 
     public void staticSpriteHasBeenClicked()
