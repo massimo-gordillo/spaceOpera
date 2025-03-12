@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 469a7e6a2228481488fe75cc22963bee
+guid: ae3d1fe9f38248a44af79b09436aaed6
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -105,7 +105,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: hornetSprites_0
+      name: archerSprites_0
       rect:
         serializedVersion: 2
         x: 0
@@ -119,14 +119,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 106d0b064f6d2de4bbf41582e11703b0
-      internalID: 52809880
+      spriteID: ac2986ff54eaab24a9b9a54365257234
+      internalID: 1041546907
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: hornetSprites_1
+      name: archerSprites_1
       rect:
         serializedVersion: 2
         x: 32
@@ -140,14 +140,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 1b2c17064a503ee4ab73ed1c0ff80ddf
-      internalID: -373341117
+      spriteID: edf0fb725380e204892b92b856501f4f
+      internalID: 420881766
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: hornetSprites_2
+      name: archerSprites_2
       rect:
         serializedVersion: 2
         x: 0
@@ -161,14 +161,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: a9679b5e49b993045b5d765dc40a4dd4
-      internalID: -1764772557
+      spriteID: 85c5c799e485ade45aa2d5f49f9bcfd3
+      internalID: 398783270
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: hornetSprites_3
+      name: archerSprites_3
       rect:
         serializedVersion: 2
         x: 32
@@ -182,8 +182,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 2ba4b5bd1e286ad4795550544e3b6c5d
-      internalID: -1596452228
+      spriteID: cd0d2e06d7074d14790f8034ce8eaa3c
+      internalID: 441294190
       vertices: []
       indices: 
       edges: []
@@ -199,10 +199,10 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      hornetSprites_0: 52809880
-      hornetSprites_1: -373341117
-      hornetSprites_2: -1764772557
-      hornetSprites_3: -1596452228
+      archerSprites_0: 1041546907
+      archerSprites_1: 420881766
+      archerSprites_2: 398783270
+      archerSprites_3: 441294190
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0

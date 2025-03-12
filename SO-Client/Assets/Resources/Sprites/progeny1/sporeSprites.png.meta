@@ -119,8 +119,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: b33b7c63157eaf141b196cf302b592c9
-      internalID: -2089828325
+      spriteID: 15e840fafa3269b40b5317f874f6a592
+      internalID: 157978293
       vertices: []
       indices: 
       edges: []
@@ -140,8 +140,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: d31164a6861656d4baa6251db6cdab32
-      internalID: 1421834101
+      spriteID: fa7e6db7d63c9a646bf03ea40040af32
+      internalID: -1575009024
       vertices: []
       indices: 
       edges: []
@@ -161,8 +161,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 6b7e695b86e26104fa51ea1c0f32ae32
-      internalID: 467480909
+      spriteID: da1ba5433fc56e44c990c171555cc6d2
+      internalID: -142783421
       vertices: []
       indices: 
       edges: []
@@ -182,8 +182,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: ce6336f2807cb564a8a1b90ad77976f5
-      internalID: -853378453
+      spriteID: 93d68156de955214abe1fcf08e56027a
+      internalID: 652986050
       vertices: []
       indices: 
       edges: []
@@ -199,10 +199,10 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      sporeSprites_0: -2089828325
-      sporeSprites_1: 1421834101
-      sporeSprites_2: 467480909
-      sporeSprites_3: -853378453
+      sporeSprites_0: 157978293
+      sporeSprites_1: -1575009024
+      sporeSprites_2: -142783421
+      sporeSprites_3: 652986050
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0

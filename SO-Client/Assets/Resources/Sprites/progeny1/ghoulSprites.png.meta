@@ -109,6 +109,48 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 0
+        y: 32
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e3db7e12314e1f94587a2d58c82b802c
+      internalID: -724950616
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ghoulSprites_1
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 32
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: cd402e96ae95e40409a18cfba754bb70
+      internalID: -868466820
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ghoulSprites_2
+      rect:
+        serializedVersion: 2
+        x: 0
         y: 0
         width: 32
         height: 32
@@ -119,14 +161,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: e0416fdce932b2f418092e4e0c609a25
-      internalID: 1602482869
+      spriteID: a231aaa881c7abd48a7b6a817224b734
+      internalID: -552304715
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ghoulSprites_1
+      name: ghoulSprites_3
       rect:
         serializedVersion: 2
         x: 32
@@ -140,50 +182,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 20199ce311ce12b4e8ee3022b76345a3
-      internalID: 1858967926
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: ghoulSprites_2
-      rect:
-        serializedVersion: 2
-        x: 64
-        y: 0
-        width: 32
-        height: 32
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: dd4d98b5d0b1c084ea928d33a7ce3acb
-      internalID: 1930138488
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: ghoulSprites_3
-      rect:
-        serializedVersion: 2
-        x: 96
-        y: 0
-        width: 32
-        height: 32
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: e092dc1c2967a6347a2a40c39b5ebc25
-      internalID: -208594194
+      spriteID: 765856551640b884090121edecc1b641
+      internalID: -1921426604
       vertices: []
       indices: 
       edges: []
@@ -199,10 +199,10 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      ghoulSprites_0: 1602482869
-      ghoulSprites_1: 1858967926
-      ghoulSprites_2: 1930138488
-      ghoulSprites_3: -208594194
+      ghoulSprites_0: -724950616
+      ghoulSprites_1: -868466820
+      ghoulSprites_2: -552304715
+      ghoulSprites_3: -1921426604
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0
