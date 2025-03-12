@@ -195,6 +195,11 @@ public class GameValuesSO : ScriptableObject
                         convertedValue = Convert.ChangeType(value, property.PropertyType);
                     }
 
+/*                    //debug statement if value is health and unit is spore then tell me the health value
+                    if (header == "healthMax" && unit.unitName == "Spore")
+                    {
+                        Debug.Log($"Spore health value: {convertedValue}");
+                    }*/
                     property.SetValue(unit, convertedValue, null);
                 }
             }

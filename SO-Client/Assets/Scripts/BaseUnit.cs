@@ -198,7 +198,8 @@ public class BaseUnit : MonoBehaviour
     public void setHealth(double health)
     {
         //round down to the nearest 1% of max health
-        healthCurrent = (int)(health - health % (healthMax / 100));
+        int healthStep = Math.Max(1, healthMax / 100); // Ensure healthStep is at least 1
+        healthCurrent = (int)(health - (health % healthStep));
         updateHealthUI();
     }
 

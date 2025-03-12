@@ -35,6 +35,8 @@ public class PrefabManager
     }
 
 
+
+
     public void modifyPrefab(string prefabPath, AttributesBaseUnit unitData)
     {
         //UnityEngine.Debug.Log($"Attempting to modify prefab at path: {prefabPath}");
@@ -188,7 +190,7 @@ public class PrefabManager
     //need to separate StaticSprite from AttributesBaseUnit because MenuProductionPanel passes a different sprite.
     public void setSprites(AttributesBaseUnit attributes, StaticSprite spritePrefab)
     {
-        
+
 
         // Check for null parameters
         if (attributes == null)
@@ -216,48 +218,82 @@ public class PrefabManager
             UnityEngine.Debug.LogError($"Error converting progeny enum to index: {ex.Message}");
             return;
         }
+        string basePath;
+        string fillSpritePath;
+        string lightsSpritePath;
+        string trimSpritePath;
+        string unitNameLower = attributes.unitName.ToLower().Replace(" ", "");
 
-        // Construct paths
-        string basePath = $"Sprites/progeny{progenyIndex}/{attributes.unitName.ToLower().Replace(" ", "")}Sprites/{attributes.unitName.ToLower().Replace(" ", "")}";
-        string fillSpritePath = $"{basePath}Sprite_Fill";
-        string lightsSpritePath = $"{basePath}Sprite_Lights";
-        string trimSpritePath = $"{basePath}Sprite_Trim";
+        // Construct paths. Old implementation for progeny0. 
+        if (progenyIndex == 0) { 
+            basePath = $"Sprites/progeny{progenyIndex}/{unitNameLower}Sprites/{attributes.unitName.ToLower().Replace(" ", "")}";
+            fillSpritePath = $"{basePath}Sprite_Fill";
+            trimSpritePath = $"{basePath}Sprite_Trim";
+            lightsSpritePath = $"{basePath}Sprite_Lights";
+            //UnityEngine.Debug.Log($"Setting sprites for: {attributes.unitName}");
+            //UnityEngine.Debug.Log($"spritePrefab instance ID: {spritePrefab.GetInstanceID()} for unit: {attributes.unitName}");
+            //UnityEngine.Debug.Log($"spritePrefab path: {basePath} for unit: {attributes.unitName}");
 
-        //UnityEngine.Debug.Log($"Setting sprites for: {attributes.unitName}");
-        //UnityEngine.Debug.Log($"spritePrefab instance ID: {spritePrefab.GetInstanceID()} for unit: {attributes.unitName}");
-        //UnityEngine.Debug.Log($"spritePrefab path: {basePath} for unit: {attributes.unitName}");
+            // Load sprites and check for errors
+            Sprite fillSprite = Resources.Load<Sprite>(fillSpritePath);
+            if (fillSprite == null)
+            {
+                //UnityEngine.Debug.Log($"Failed to load fill sprite from path: {fillSpritePath}");
+            }
+            else
+            {
+                spritePrefab.fillSR.sprite = fillSprite;
+            }
 
-        // Load sprites and check for errors
-        Sprite fillSprite = Resources.Load<Sprite>(fillSpritePath);
-        if (fillSprite == null)
-        {
-            //UnityEngine.Debug.Log($"Failed to load fill sprite from path: {fillSpritePath}");
+            Sprite trimSprite = Resources.Load<Sprite>(trimSpritePath);
+            if (trimSprite == null)
+            {
+                //UnityEngine.Debug.Log($"Failed to load trim sprite from path: {trimSpritePath}");
+            }
+            else
+            {
+                spritePrefab.trimSR.sprite = trimSprite;
+            }
+
+            Sprite lightsSprite = Resources.Load<Sprite>(lightsSpritePath);
+            if (lightsSprite == null)
+            {
+                //UnityEngine.Debug.Log($"Failed to load lights sprite from path: {lightsSpritePath}");
+                spritePrefab.lightsSR.sprite = null;
+            }
+            else
+            {
+                spritePrefab.lightsSR.sprite = lightsSprite;
+            }
+
+
         }
-        else
+        else //newer implementation
         {
-            spritePrefab.fillSR.sprite = fillSprite;
+            basePath = $"Sprites/progeny{progenyIndex}/{unitNameLower}Sprites";
+/*            basePath = $"Sprites/progeny{progenyIndex}/{unitNameLower}Sprites/{unitNameLower}_";
+            fillSpritePath = $"{basePath}1";
+            trimSpritePath = $"{basePath}2";
+            lightsSpritePath = $"{basePath}3";*/
+            Sprite[] sprites = Resources.LoadAll<Sprite>(basePath);
+            if (sprites == null || sprites.Length == 0)
+            {
+                UnityEngine.Debug.LogError($"Failed to load sprites from path: {basePath}");
+                return;
+            }
+            /*            //sprite image has to be a multi sprites and in the order of 0: full sprite, 1: fill, 2: trim, 3:lights.
+                        spritePrefab.fillSR.sprite = sprites[1];
+                        spritePrefab.trimSR.sprite = sprites[2];
+                        spritePrefab.trimSR.sprite = sprites[3];*/
+            UnityEngine.Debug.Log($"Loaded {sprites.Length} sprites for {attributes.unitName} at path: {basePath}");
+
+            // Ensure we have enough sprites to assign
+            if (sprites.Length > 1) spritePrefab.fillSR.sprite = sprites[1];
+            if (sprites.Length > 2) spritePrefab.trimSR.sprite = sprites[2];
+            if (sprites.Length > 3) spritePrefab.lightsSR.sprite = sprites[3];
         }
 
-        Sprite lightsSprite = Resources.Load<Sprite>(lightsSpritePath);
-        if (lightsSprite == null)
-        {
-            //UnityEngine.Debug.Log($"Failed to load lights sprite from path: {lightsSpritePath}");
-            spritePrefab.lightsSR.sprite = null;
-        }
-        else
-        {
-            spritePrefab.lightsSR.sprite = lightsSprite;
-        }
 
-        Sprite trimSprite = Resources.Load<Sprite>(trimSpritePath);
-        if (trimSprite == null)
-        {
-            //UnityEngine.Debug.Log($"Failed to load trim sprite from path: {trimSpritePath}");
-        }
-        else
-        {
-            spritePrefab.trimSR.sprite = trimSprite;
-        }
     }
 
 }
