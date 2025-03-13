@@ -18,14 +18,18 @@ public class BaseStructure : MonoBehaviour
     public TextMeshProUGUI healthTextContainer;
     private Color baseColor;
     public SpriteRenderer neutralSpriteRenderer;
-    public SpriteRenderer progeny0SpriteRenderer;
+/*    public SpriteRenderer progeny0SpriteRenderer;
     public SpriteRenderer progeny1SpriteRenderer;
-    public SpriteRenderer progeny2SpriteRenderer;
+    public SpriteRenderer progeny2SpriteRenderer;*/
 
-    public StaticSprite spriteContainer;
+    public StaticSprite progeny0CaptureSpriteContainer;
     public SpriteRenderer progeny0spriteFillSR;
     public SpriteRenderer progeny0spriteTrimSR;
     public SpriteRenderer progeny0spriteLightsSR;
+    public StaticSprite progeny1spriteContainer;
+    public SpriteRenderer progeny1spriteFillSR;
+    public SpriteRenderer progeny1spriteTrimSR;
+    public SpriteRenderer progeny1spriteLightsSR;
 
 
 
@@ -113,21 +117,25 @@ public class BaseStructure : MonoBehaviour
                 progeny0spriteLightsSR.gameObject.SetActive(true);
             }
             else
-                progeny0SpriteRenderer.gameObject.SetActive(true);
+                progeny0CaptureSpriteContainer.gameObject.SetActive(true);
+                //progeny0SpriteRenderer.gameObject.SetActive(true);
         }
         else if (gameMaster.playerProgeny[playerControl] == 1)
-            progeny1SpriteRenderer.gameObject.SetActive(true);
+        {
+            progeny1spriteContainer.gameObject.SetActive(true);
+        }
         else if (gameMaster.playerProgeny[playerControl] == 2)
-            progeny2SpriteRenderer.gameObject.SetActive(true);
+            Debug.LogError("Structure: Progeny 2 not yet implemented");
         else
             Debug.LogError($"No progeny for byte value {progeny} found, unable to set capture sprite");
     }
 
     public void turnOffCaptureSprites()
     {
-        progeny0SpriteRenderer.gameObject.SetActive(false);
-        progeny1SpriteRenderer.gameObject.SetActive(false);
-        progeny2SpriteRenderer.gameObject.SetActive(false);
+        //progeny0SpriteRenderer.gameObject.SetActive(false);
+        //progeny1SpriteRenderer.gameObject.SetActive(false);
+        progeny1spriteContainer.gameObject.SetActive(false);
+        //progeny2SpriteRenderer.gameObject.SetActive(false);
 /*        progeny0spriteFillSR.gameObject.SetActive(false);
         progeny0spriteTrimSR.gameObject.SetActive(false);
         progeny0spriteLightsSR.gameObject.SetActive(false);*/

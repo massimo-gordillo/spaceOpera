@@ -6525,6 +6525,7 @@ MonoBehaviour:
   healthType: 0
   damageType: 0
   weaponType: 0
+  attributesHash: 0
   isResourceUnit: 1
   isInfantry: 0
   healthMax: 0
@@ -14909,6 +14910,7 @@ MonoBehaviour:
   healthType: 0
   damageType: 0
   weaponType: 0
+  attributesHash: 0
   isResourceUnit: 1
   isInfantry: 0
   healthMax: 0
@@ -15627,6 +15629,7 @@ MonoBehaviour:
   healthType: 0
   damageType: 0
   weaponType: 0
+  attributesHash: 0
   isResourceUnit: 1
   isInfantry: 0
   healthMax: 0
