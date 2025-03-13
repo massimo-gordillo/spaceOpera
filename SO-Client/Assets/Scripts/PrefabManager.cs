@@ -19,24 +19,21 @@ public class PrefabManager
     {
         string prefabPath = unitAttributes.prefabPath;
         BaseUnit prefab = getUnitFromPrefab(prefabPath);
-        if (prefab == null || prefab.attributesHash != unitAttributes.attributesHash)
+        bool updateSpritesFlag = false;
+        if (prefab == null || prefab.attributesHash != unitAttributes.attributesHash || updateSpritesFlag)
         {
             if (prefab.attributesHash != unitAttributes.attributesHash && prefab != null)
             {
-                UnityEngine.Debug.Log($"prefab exists at: {unitAttributes.prefabPath} but has different attribute hash {unitAttributes.attributesHash}");
+                UnityEngine.Debug.Log($"prefab {unitAttributes.unitName} has different attribute hash, rebuilding.");
             }
             //Assets/Resources/UnitPrefabs/progeny1/BasePrefab.prefab
             string basePrefabPath = "UnitPrefabs/BaseUnitBasePrefab";
             ClonePrefab(basePrefabPath, prefabPath);
             modifyPrefab(prefabPath, unitAttributes);
         }
-        else
+/*        else
         {
             UnityEngine.Debug.Log($"for unit {unitAttributes.unitName}, prefab check ok");
-        }
-/*        else if (prefab.attributesHash != unitAttributes.attributesHash)
-        {
-            UnityEngine.Debug.Log($"prefab exists at: {unitAttributes.prefabPath} but has different attribute hash {unitAttributes.attributesHash}");
         }*/
     }
 
