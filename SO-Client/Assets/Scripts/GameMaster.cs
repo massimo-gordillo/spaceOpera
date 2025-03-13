@@ -368,7 +368,7 @@ public class GameMaster : MonoBehaviour
                     (
                         (byte)x,
                         (byte)y,
-                        unit.baseUnitVariantIdentifier,
+                        unit.gamePieceId,
                         (byte)unit.playerControl,
                         (byte)((double)unit.healthCurrent / (double)unit.healthMax * 100)
                     );

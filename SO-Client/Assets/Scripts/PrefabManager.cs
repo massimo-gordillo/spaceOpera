@@ -3,15 +3,41 @@ using System.Reflection;
 using UnityEngine.U2D;
 using System.Diagnostics;
 using System;
+using System.Collections.Generic;
 //using System.Diagnostics;
 
 public class PrefabManager
 {
     private GameValuesSO gameValuesSO;
 
-    public void setGameValues(GameValuesSO setGameValuesSO)
+    /*    public void setGameValues(GameValuesSO setGameValuesSO)
+        {
+            gameValuesSO = setGameValuesSO;
+        }*/
+
+    public void managePrefabOnStartUp(AttributesBaseUnit unitAttributes)
     {
-        gameValuesSO = setGameValuesSO;
+        string prefabPath = unitAttributes.prefabPath;
+        BaseUnit prefab = getUnitFromPrefab(prefabPath);
+        if (prefab == null || prefab.attributesHash != unitAttributes.attributesHash)
+        {
+            if (prefab.attributesHash != unitAttributes.attributesHash && prefab != null)
+            {
+                UnityEngine.Debug.Log($"prefab exists at: {unitAttributes.prefabPath} but has different attribute hash {unitAttributes.attributesHash}");
+            }
+            //Assets/Resources/UnitPrefabs/progeny1/BasePrefab.prefab
+            string basePrefabPath = "UnitPrefabs/BaseUnitBasePrefab";
+            ClonePrefab(basePrefabPath, prefabPath);
+            modifyPrefab(prefabPath, unitAttributes);
+        }
+        else
+        {
+            UnityEngine.Debug.Log($"for unit {unitAttributes.unitName}, prefab check ok");
+        }
+/*        else if (prefab.attributesHash != unitAttributes.attributesHash)
+        {
+            UnityEngine.Debug.Log($"prefab exists at: {unitAttributes.prefabPath} but has different attribute hash {unitAttributes.attributesHash}");
+        }*/
     }
 
     public GameObject getPrefab(string prefabPath)
@@ -19,7 +45,7 @@ public class PrefabManager
         GameObject prefab = Resources.Load<GameObject>(prefabPath.Replace("Assets/Resources/", "").Replace(".prefab", ""));
         if (prefab == null)
         {
-            UnityEngine.Debug.LogError("Prefab not found at path: " + prefabPath);
+            UnityEngine.Debug.LogWarning("Prefab not found at path: " + prefabPath);
         }
         return prefab;
     }

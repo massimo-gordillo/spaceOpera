@@ -21,6 +21,7 @@ public class BaseUnit : MonoBehaviour
     public DamageType damageType;
     public WeaponType weaponType;
 
+    public long attributesHash;
     public bool isResourceUnit;
     public bool isInfantry;
     public int healthMax;

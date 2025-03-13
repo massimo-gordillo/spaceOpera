@@ -173,7 +173,7 @@ public class GameValuesSO : ScriptableObject
         for (int i = 1; i < lines.Count; i++) // Skip header line
         {
             string[] values = lines[i].Split(',');
-            AttributesBaseUnit unit = new AttributesBaseUnit();
+            AttributesBaseUnit unitAttributes = new AttributesBaseUnit();
 
             for (int j = 0; j < headers.Length; j++)
             {
@@ -195,16 +195,16 @@ public class GameValuesSO : ScriptableObject
                         convertedValue = Convert.ChangeType(value, property.PropertyType);
                     }
 
-/*                    //debug statement if value is health and unit is spore then tell me the health value
-                    if (header == "healthMax" && unit.unitName == "Spore")
-                    {
-                        Debug.Log($"Spore health value: {convertedValue}");
-                    }*/
-                    property.SetValue(unit, convertedValue, null);
+                    /*                    //debug statement if value is health and unit is spore then tell me the health value
+                                        if (header == "healthMax" && unit.unitName == "Spore")
+                                        {
+                                            Debug.Log($"Spore health value: {convertedValue}");
+                                        }*/
+                    property.SetValue(unitAttributes, convertedValue, null);
                 }
             }
 
-            unit.spriteAtlasPath = $"Sprites/progeny{GetEnumIndex(unit.progeny)}/{unit.unitName.ToLower().Replace(" ", "")}SpriteAtlas";
+            unitAttributes.spriteAtlasPath = $"Sprites/progeny{GetEnumIndex(unitAttributes.progeny)}/{unitAttributes.unitName.ToLower().Replace(" ", "")}SpriteAtlas";
 
 
             /*if (unit.sprite == null)
@@ -214,15 +214,24 @@ public class GameValuesSO : ScriptableObject
 
 
 
-            unit.prefabPath = generatePrefabLocationString(unit.unitName, unit.progeny);
-            unit.baseUnitVariantIdentifier = (byte)(i - 1);
+            unitAttributes.prefabPath = generatePrefabLocationString(unitAttributes.unitName, unitAttributes.progeny);
+            unitAttributes.gamePieceId = (byte)(i - 1);
+            unitAttributes.attributesHash = ComputeUnitHash(unitAttributes);
             //add unit attributes to list of attributesBaseUnit.
-            attributesBaseUnits.Add(unit.baseUnitVariantIdentifier, unit);
+            attributesBaseUnits.Add(unitAttributes.gamePieceId, unitAttributes);
 
-            //Assets/Resources/UnitPrefabs/progeny1/BasePrefab.prefab
-            string basePrefabPath = "UnitPrefabs/BaseUnitBasePrefab";
-            prefabManager.ClonePrefab(basePrefabPath, unit.prefabPath);
-            prefabManager.modifyPrefab(unit.prefabPath, unit);
+            prefabManager.managePrefabOnStartUp(unitAttributes);
+/*            if (Resources.Load(unitAttributes.prefabPath) == null)// || Resources.Load(unitAttributes.prefabPath) != )
+            {
+                //Assets/Resources/UnitPrefabs/progeny1/BasePrefab.prefab
+                string basePrefabPath = "UnitPrefabs/BaseUnitBasePrefab";
+                prefabManager.ClonePrefab(basePrefabPath, unitAttributes.prefabPath);
+                prefabManager.modifyPrefab(unitAttributes.prefabPath, unitAttributes);
+            }
+            else
+            {
+                Debug.Log($"for unit {unitAttributes.unitName}, prefab exists at: {unitAttributes.prefabPath}");
+            }*/
         }
     }
 
@@ -352,6 +361,72 @@ public class GameValuesSO : ScriptableObject
             combatMultipliersDictionary[healthType] = innerDict;
         }
     }
+
+    private long ComputeUnitHash(AttributesBaseUnit unitAttributes)
+    {
+        long hash=3;
+        long hashInstance;
+        int i = 0;
+
+        foreach (PropertyInfo property in typeof(AttributesBaseUnit).GetProperties(BindingFlags.Public | BindingFlags.Instance))
+        {
+            hashInstance = 7;
+            i++;
+            object value = property.GetValue(unitAttributes);
+
+            if (value is int intValue)
+            {
+                hashInstance += intValue;
+            }
+            else if (value is float floatValue)
+            {
+                hashInstance += (int)floatValue; 
+            }
+            else if (value is double doubleValue)
+            {
+                hashInstance += (int)doubleValue;
+            }
+            else if (value is byte byteValue)
+            {
+                hashInstance += byteValue + 1;
+            }
+            else if (value is Enum enumValue)
+            {
+                hashInstance += Convert.ToInt64(enumValue);
+            }
+            else if (value is string stringValue)
+            {
+                int stringHash = 1;
+                unchecked
+                {
+                    foreach (char c in stringValue)
+                    {
+                        stringHash += c;
+                    }
+                }
+                hashInstance += stringHash;
+                //hash += HashString(stringValue);
+            }
+            hashInstance *= i;
+            hash *= hashInstance;
+        }
+
+        return hash;
+    }
+
+/*    private int HashString(string str)
+    {
+        unchecked
+        {
+            int hash = 0;
+            foreach (char c in str)
+            {
+                hash = (hash * 31) + c; // Prime number multiplication
+            }
+            return hash;
+        }
+    }*/
+
 
 
 

@@ -92,7 +92,9 @@ Dark Grey:      46,46,46,1      #2e2e2e
 Light Colour:   255,255,255,1   #ffffff
 Med Colour:     157,157,157,1   #9d9d9d
 Dark Colour:    115,115,115,1   #737373
+Extra Dark C: #555555
 
+Virix Yellow: #ffff00
 
 massimogordillo@hotmail.com
 
@@ -146,7 +148,6 @@ Win by capturing your opps home base (or later maybe some concession condition)
 No diagonal attacking
 What the units do/are good at
 Moving/destrying capturing unit resets the health
-
 
 .NET Standard 2.0 folders which have 2.1 instances:
 Microsoft.Bcl.AsyncInterfaces.1.1.0
