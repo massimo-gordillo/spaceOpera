@@ -108,23 +108,24 @@ public class BaseStructure : MonoBehaviour
     public void setCaptureSprite(byte progeny)
     {
         turnOffCaptureSprites();
-        if (gameMaster.playerProgeny[playerControl] == 0)
+        if (progeny == 0)
         {
             if (structureType == 0)
             {
-                progeny0spriteFillSR.gameObject.SetActive(true);
-                progeny0spriteTrimSR.gameObject.SetActive(true);
-                progeny0spriteLightsSR.gameObject.SetActive(true);
+                /*                progeny0spriteFillSR.gameObject.SetActive(true);
+                                progeny0spriteTrimSR.gameObject.SetActive(true);
+                                progeny0spriteLightsSR.gameObject.SetActive(true);*/
+                progeny0CaptureSpriteContainer.gameObject.SetActive(true);
             }
             else
-                progeny0CaptureSpriteContainer.gameObject.SetActive(true);
+            { }
                 //progeny0SpriteRenderer.gameObject.SetActive(true);
         }
-        else if (gameMaster.playerProgeny[playerControl] == 1)
+        else if (progeny == 1)
         {
             progeny1spriteContainer.gameObject.SetActive(true);
         }
-        else if (gameMaster.playerProgeny[playerControl] == 2)
+        else if (progeny == 2)
             Debug.LogError("Structure: Progeny 2 not yet implemented");
         else
             Debug.LogError($"No progeny for byte value {progeny} found, unable to set capture sprite");

@@ -9,7 +9,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1354807818261213982, guid: b02aa9d5d64b2414abeba39fe8b377e8, type: 3}
       propertyPath: m_Name
-      value: baseStructure Variant
+      value: commandStructure
       objectReference: {fileID: 0}
     - target: {fileID: 3397026737060665485, guid: b02aa9d5d64b2414abeba39fe8b377e8, type: 3}
       propertyPath: structureType
@@ -63,5 +63,9 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7500212903833245582, guid: b02aa9d5d64b2414abeba39fe8b377e8, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: fe0e49f52c86fe44683706d3919dd92f, type: 3}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b02aa9d5d64b2414abeba39fe8b377e8, type: 3}
