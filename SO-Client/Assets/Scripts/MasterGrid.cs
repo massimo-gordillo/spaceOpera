@@ -377,11 +377,12 @@ public class MasterGrid : MonoBehaviour
 
     public void captureStructure(BaseStructure structure)
     {
+        //int healthRatio = selectedUnit.healthCurrent/selectedUnit.healthMax;
         if (selectedUnit != null)
         {
             //print("capture health: " + structure.captureHealth + "selectedUnithealth " + selectedUnit.healthCurrent);
-            if (selectedUnit.healthCurrent < structure.captureHealth) //do we want to do this math within BaseStructure?
-                structure.captureHealth = structure.captureHealth - selectedUnit.healthCurrent;
+            if (selectedUnit.getHealthPercentage() < structure.captureHealth) //do we want to do this math within BaseStructure?
+                structure.captureHealth =- selectedUnit.getHealthPercentage();
             else
                 structure.switchAlliance(selectedUnit.getPlayerControl());
             //2 is capture structure

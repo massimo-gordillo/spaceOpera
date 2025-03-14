@@ -204,9 +204,14 @@ public class BaseUnit : MonoBehaviour
         updateHealthUI();
     }
 
+    public int getHealthPercentage()
+    {
+        return (int)((double)healthCurrent / (double)healthMax * 100);
+    }
+
     public void updateHealthUI()
     {
-        healthTextContainer.text = ((int)((double)healthCurrent/(double)healthMax *100)).ToString();
+        healthTextContainer.text = getHealthPercentage().ToString();
     }
 
     public void takeDamage(double damage)

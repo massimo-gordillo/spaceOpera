@@ -26,7 +26,8 @@ public class GameMaster : MonoBehaviour
     public int numPlayers;
     public short turnNumber;
     private bool[] playersNotLost;
-    public byte[] playerProgeny;
+    /*public byte[] playerProgeny;*/
+    Dictionary<byte, byte> playerProgeny = new Dictionary<byte, byte>();
     public TMP_Text playerTurnText;
     public TMP_Text playerResourceText;
     private int[] playerResources;
@@ -73,10 +74,13 @@ public class GameMaster : MonoBehaviour
 
     private void Awake()
     {
-        Debug.Log("Initializing game");
+        //Debug.Log("Initializing game");
         match_id = Guid.Parse("aaaaaaaa-8761-4e77-a086-a7365ae9e0b4");
         turnNumber = 1;
-        //gameValues = AssetDatabase.LoadAssetAtPath<GameValuesSO>("Assets/Scripts/Assets/Scripts/GameValuesSO.cs.cs");
+        //player 1 is ertrian, player 2 is virix
+        playerProgeny.Add(1, 0);
+        playerProgeny.Add(2, 1);
+        Debug.Log($"player 1 is progeny {getPlayerProgeny(0)}, player 2 is progeny {getPlayerProgeny(1)}");
 
         //initializes all unit values, modifies their prefab and sprites.
         //initializes all Tilebases for tilemap
@@ -94,11 +98,14 @@ public class GameMaster : MonoBehaviour
         playerTurn = 1; //player 0 is neutral
         numPlayers = 2; //will set dynamically later
         playersNotLost = new bool[numPlayers+1];
-        playerProgeny = new byte[numPlayers + 1];
+        //playerProgeny = new byte[numPlayers + 1];
+        
+
+
         for (int i = 0; i <= numPlayers; i++)
         {
             playersNotLost[i] = true;
-            playerProgeny[i] = 0;
+            //playerProgeny[i] = 0;
         }
         playersNotLost[0] = false;
         setPlayerTurnText(playerTurn);
@@ -495,5 +502,10 @@ public class GameMaster : MonoBehaviour
         Debug.Log("Setting match id to: " + matchId);
         match_id = matchId;
         masterGrid.setMatchId(matchId);
+    }
+    public byte getPlayerProgeny(byte b)
+    {
+        playerProgeny.TryGetValue(b, out byte p);
+        return p;
     }
 }

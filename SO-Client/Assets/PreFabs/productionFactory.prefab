@@ -9,7 +9,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 53039266285752851, guid: b02aa9d5d64b2414abeba39fe8b377e8, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 177109629106287834, guid: b02aa9d5d64b2414abeba39fe8b377e8, type: 3}
       propertyPath: m_IsActive
@@ -50,7 +50,7 @@ PrefabInstance:
     - target: {fileID: 2526445097848062929, guid: b02aa9d5d64b2414abeba39fe8b377e8, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: 21300000, guid: 7c12b0b1098fddc498cefa7579266e32, type: 3}
+      objectReference: {fileID: 557729958, guid: c3e202a6a5f3efb409cab2bcc147bd5b, type: 3}
     - target: {fileID: 2526445097848062929, guid: b02aa9d5d64b2414abeba39fe8b377e8, type: 3}
       propertyPath: m_SortingLayer
       value: 2
@@ -65,7 +65,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2565654716756766496, guid: b02aa9d5d64b2414abeba39fe8b377e8, type: 3}
       propertyPath: m_Enabled
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2637392255310505224, guid: b02aa9d5d64b2414abeba39fe8b377e8, type: 3}
       propertyPath: m_Size.y
@@ -186,7 +186,7 @@ PrefabInstance:
     - target: {fileID: 7929936143671255885, guid: b02aa9d5d64b2414abeba39fe8b377e8, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: 21300000, guid: 360cb5219fcea2645a37daedace9720e, type: 3}
+      objectReference: {fileID: -2075513048, guid: c3e202a6a5f3efb409cab2bcc147bd5b, type: 3}
     - target: {fileID: 7929936143671255885, guid: b02aa9d5d64b2414abeba39fe8b377e8, type: 3}
       propertyPath: m_SortingLayer
       value: 2
@@ -202,7 +202,7 @@ PrefabInstance:
     - target: {fileID: 7952551712083098261, guid: b02aa9d5d64b2414abeba39fe8b377e8, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: 21300000, guid: ac4b8620ec7d80a49a4ab5924902ead2, type: 3}
+      objectReference: {fileID: 1782608436, guid: c3e202a6a5f3efb409cab2bcc147bd5b, type: 3}
     - target: {fileID: 7952551712083098261, guid: b02aa9d5d64b2414abeba39fe8b377e8, type: 3}
       propertyPath: m_Color.b
       value: 1

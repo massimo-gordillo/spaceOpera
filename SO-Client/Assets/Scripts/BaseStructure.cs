@@ -48,13 +48,13 @@ public class BaseStructure : MonoBehaviour
         masterGrid.setStructureInGrid(xPos, yPos, this);
         
         baseColor = neutralSpriteRenderer.color;
-        if (playerControl == 0)
-            turnOffCaptureSprites();
-        if (playerControl != 0)
-        {
-            setColor(playerControl);
-            setCaptureSprite(gameMaster.playerProgeny[playerControl]);
-        }
+        //turnOffCaptureSprites();
+/*        if (structureType != 200)
+                setColor(neutralSpriteRenderer);
+        if (playerControl != 0)*/
+        setCaptureSpritesAndColor();
+
+
         if (masterGrid.whatUnitIsInThisLocation(xPos, yPos) != null)
             turnOffCollider();
 
@@ -73,17 +73,22 @@ public class BaseStructure : MonoBehaviour
         healthTextContainer.text = captureHealth.ToString();
     }
 
-    public void setColor(int player) //Should this be combined with baseUnit.setColor? Maybe Mastergrid does this modification.
+    public void setColor(SpriteRenderer sprite) //Should this be combined with baseUnit.setColor? Maybe Mastergrid does this modification.
     {
-        //float hue = ((float)player / (float)gameMaster.numPlayers) * 360f;
-        float hue = ((float)player / 3.0f) * 360f;
-        float saturation = 1.0f;
-        float value = 1.0f;
-        Color color = Color.HSVToRGB(hue / 360f, saturation, value);
-        progeny0spriteFillSR.color = color;
-        if(structureType != 0)
-        {
-            neutralSpriteRenderer.color = color;
+        int player = playerControl;
+        if (player != 0) {
+            //float hue = ((float)player / (float)gameMaster.numPlayers) * 360f;
+            float hue = ((float)player / 3.0f) * 360f;
+            float saturation = 1.0f;
+            float value = 1.0f;
+            Color color = Color.HSVToRGB(hue / 360f, saturation, value);
+            sprite.color = color;
+            /*if(structureType != 0)
+            {
+                neutralSpriteRenderer.color = color;
+            }*/
+        }else{
+            sprite.color = baseColor;
         }
 
     }
@@ -101,34 +106,51 @@ public class BaseStructure : MonoBehaviour
             gameMaster.playerLoses(playerControl);
         playerControl = (byte)capturePlayerInt;
         resetCaptureHealth();
-        setColor(capturePlayerInt);
-        setCaptureSprite((byte)capturePlayerInt);
+        setCaptureSpritesAndColor();
     }
 
-    public void setCaptureSprite(byte progeny)
+    public void setCaptureSpritesAndColor()
     {
+        byte progeny = gameMaster.getPlayerProgeny(playerControl);
+        if (structureType == 0 && playerControl != 0)
+        {
+            Debug.Log($"Setting capture sprite for player {playerControl}, progeny: {progeny}, master grid says: {gameMaster.getPlayerProgeny(playerControl)}");
+        }
         turnOffCaptureSprites();
-        if (progeny == 0)
+/*        if (structureType == 0)
+            setColor(neutralSpriteRenderer);*/
+        if (playerControl != 0)
         {
-            if (structureType == 0)
+            if (progeny == 0)
             {
-                /*                progeny0spriteFillSR.gameObject.SetActive(true);
-                                progeny0spriteTrimSR.gameObject.SetActive(true);
-                                progeny0spriteLightsSR.gameObject.SetActive(true);*/
-                progeny0CaptureSpriteContainer.gameObject.SetActive(true);
-            }
-            else
-            { }
+                if (structureType == 0)
+                {
+                    /*                progeny0spriteFillSR.gameObject.SetActive(true);
+                                    progeny0spriteTrimSR.gameObject.SetActive(true);
+                                    progeny0spriteLightsSR.gameObject.SetActive(true);*/
+                    progeny0CaptureSpriteContainer.gameObject.SetActive(true);
+                    setColor(progeny0spriteFillSR);
+                }
+                else
+                { 
+                    setColor(neutralSpriteRenderer); 
+                }
                 //progeny0SpriteRenderer.gameObject.SetActive(true);
+            }
+            else if (progeny == 1)
+            {
+                progeny1spriteContainer.gameObject.SetActive(true);
+                setColor(progeny1spriteFillSR);
+                neutralSpriteRenderer.color = baseColor;
+            }
+            else if (gameMaster.getPlayerProgeny(playerControl) == 2)
+                Debug.LogError("Structure: Progeny 2 not yet implemented");
+            else
+                Debug.LogError($"No progeny for byte value {progeny} found, unable to set capture sprite");
         }
-        else if (progeny == 1)
-        {
-            progeny1spriteContainer.gameObject.SetActive(true);
-        }
-        else if (progeny == 2)
-            Debug.LogError("Structure: Progeny 2 not yet implemented");
         else
-            Debug.LogError($"No progeny for byte value {progeny} found, unable to set capture sprite");
+            setColor(neutralSpriteRenderer);
+
     }
 
     public void turnOffCaptureSprites()
@@ -137,9 +159,10 @@ public class BaseStructure : MonoBehaviour
         //progeny1SpriteRenderer.gameObject.SetActive(false);
         progeny1spriteContainer.gameObject.SetActive(false);
         //progeny2SpriteRenderer.gameObject.SetActive(false);
-/*        progeny0spriteFillSR.gameObject.SetActive(false);
-        progeny0spriteTrimSR.gameObject.SetActive(false);
-        progeny0spriteLightsSR.gameObject.SetActive(false);*/
+        /*        progeny0spriteFillSR.gameObject.SetActive(false);
+                progeny0spriteTrimSR.gameObject.SetActive(false);
+                progeny0spriteLightsSR.gameObject.SetActive(false);*/
+        progeny0CaptureSpriteContainer.gameObject.SetActive(false);
     }
 
     public void staticSpriteHasBeenClicked()
