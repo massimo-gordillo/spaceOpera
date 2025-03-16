@@ -166,11 +166,11 @@ public class GameMaster : MonoBehaviour
     public void structureHasBeenClicked(BaseStructure structure)
     {
         //should probably try/catch if structure is null
-        if (structure.playerControl == playerTurn && structure.structureType != 0 && structure.structureType != 5)
+        if (structure.playerControl == playerTurn && (structure.structureType != 0 && structure.structureType != 5) || getPlayerProgeny((byte)playerTurn)==1 )
         {
             choicePanel.SetActive(true);
             productionPanel.gameObject.SetActive(true);
-            productionPanel.presentProdList(structure.structureType);
+            productionPanel.presentProdList(structure.structureType, getPlayerProgeny((byte)playerTurn));
             selectedStructure = structure;
         }
     }

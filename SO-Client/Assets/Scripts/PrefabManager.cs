@@ -248,20 +248,21 @@ public class PrefabManager
         string unitNameLower = attributes.unitName.ToLower().Replace(" ", "");
 
         // Construct paths. Old implementation for progeny0. 
-        if (progenyIndex == 0) { 
+        if (progenyIndex == 0 && unitNameLower!="infantry") { 
             basePath = $"Sprites/progeny{progenyIndex}/{unitNameLower}Sprites/{attributes.unitName.ToLower().Replace(" ", "")}";
             fillSpritePath = $"{basePath}Sprite_Fill";
             trimSpritePath = $"{basePath}Sprite_Trim";
             lightsSpritePath = $"{basePath}Sprite_Lights";
             //UnityEngine.Debug.Log($"Setting sprites for: {attributes.unitName}");
             //UnityEngine.Debug.Log($"spritePrefab instance ID: {spritePrefab.GetInstanceID()} for unit: {attributes.unitName}");
-            //UnityEngine.Debug.Log($"spritePrefab path: {basePath} for unit: {attributes.unitName}");
+            UnityEngine.Debug.Log($"spritePrefab path: {basePath} for unit: {attributes.unitName}");
+
 
             // Load sprites and check for errors
             Sprite fillSprite = Resources.Load<Sprite>(fillSpritePath);
             if (fillSprite == null)
             {
-                //UnityEngine.Debug.Log($"Failed to load fill sprite from path: {fillSpritePath}");
+                UnityEngine.Debug.Log($"Failed to load fill sprite from path: {fillSpritePath}");
             }
             else
             {

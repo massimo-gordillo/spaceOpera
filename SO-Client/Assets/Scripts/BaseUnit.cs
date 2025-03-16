@@ -17,6 +17,7 @@ public class BaseUnit : MonoBehaviour
     public Progeny progeny; 
     public UnitTerrainType unitTerrainType;
     public byte gamePieceId;
+    public bool isNotPrototype;
     public HealthType healthType;
     public DamageType damageType;
     public WeaponType weaponType;

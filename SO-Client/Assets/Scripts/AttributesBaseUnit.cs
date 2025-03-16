@@ -41,6 +41,7 @@ public class AttributesBaseUnit
     public string unitName { get; set; }
     public byte gamePieceId { get; set; }
     //public byte baseUnitVariantIdentifier { get; set; }
+    public bool isNotPrototype { get; set; }
     public Progeny progeny { get; set; } //Ertiran, Virix, Sentus
     public UnitTerrainType unitTerrainType { get; set; } //land, sea, air
     public bool isInfantry { get; set; }
