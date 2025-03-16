@@ -77,8 +77,8 @@ public class GameMaster : MonoBehaviour
         //Debug.Log("Initializing game");
         match_id = Guid.Parse("aaaaaaaa-8761-4e77-a086-a7365ae9e0b4");
         turnNumber = 1;
-        //player 1 is ertrian, player 2 is virix
-        playerProgeny.Add(1, 0);
+        
+        playerProgeny.Add(1, 2);
         playerProgeny.Add(2, 1);
         Debug.Log($"player 1 is progeny {getPlayerProgeny(0)}, player 2 is progeny {getPlayerProgeny(1)}");
 
@@ -135,17 +135,38 @@ public class GameMaster : MonoBehaviour
         //ConvertListToGameState(gameState);
     }
 
-    private void startupInstantiateUnits()
+    public void startupInstantiateUnits(int x, int y, int player)
     {
-        BaseUnit infantryUnitPrefab = Resources.Load<BaseUnit>("UnitPrefabs/progeny1/InfantryPrefab");
+        byte progeny = getPlayerProgeny((byte)player);
+        if (player != 1)
+        {
+            if (progeny == 0)
+            {
+                BaseUnit infantryUnitPrefab = Resources.Load<BaseUnit>("UnitPrefabs/progeny1/InfantryPrefab");
+                BaseUnit unit = Instantiate(infantryUnitPrefab, new Vector2(x, y), Quaternion.identity, unitList);
+                unit.playerControl = player;
+            }
+            else if (progeny == 1)
+            {
+                BaseUnit sporeUnitPrefab = Resources.Load<BaseUnit>("UnitPrefabs/progeny2/SporePrefab");
+                BaseUnit unit = Instantiate(sporeUnitPrefab, new Vector2(x, y), Quaternion.identity, unitList);
+                unit.playerControl = player;
+            }
+            else if (progeny == 2)
+            {
+                BaseUnit blacksmithUnitPrefab = Resources.Load<BaseUnit>("UnitPrefabs/progeny3/BlacksmithPrefab");
+                BaseUnit unit = Instantiate(blacksmithUnitPrefab, new Vector2(x, y), Quaternion.identity, unitList);
+                unit.playerControl = player;
+            }
+        }
+        
 
-        if (infantryUnitPrefab == null)
+/*        if (infantryUnitPrefab == null)
         {
             Debug.LogError("Infantry prefab not found at the specified path.");
             return;
-        }
-
-        BaseUnit unit = Instantiate(infantryUnitPrefab, new Vector2(20, 17), Quaternion.identity, unitList);
+}
+      BaseUnit unit = Instantiate(infantryUnitPrefab, new Vector2(20, 17), Quaternion.identity, unitList);
         unit.playerControl = 1;
 
         BaseUnit unit2 = Instantiate(infantryUnitPrefab, new Vector2(14, 14), Quaternion.identity, unitList);
@@ -155,7 +176,7 @@ public class GameMaster : MonoBehaviour
         BaseUnit unit4 = Instantiate(infantryUnitPrefab, new Vector2(24, 18), Quaternion.identity, unitList);
         unit4.playerControl = 2;
         BaseUnit unit5 = Instantiate(infantryUnitPrefab, new Vector2(24, 15), Quaternion.identity, unitList);
-        unit5.playerControl = 1;
+        unit5.playerControl = 1;*/
     }
 
     public int getIncomeForPlayer(int player)
@@ -166,7 +187,7 @@ public class GameMaster : MonoBehaviour
     public void structureHasBeenClicked(BaseStructure structure)
     {
         //should probably try/catch if structure is null
-        if (structure.playerControl == playerTurn && (structure.structureType != 0 && structure.structureType != 5) || getPlayerProgeny((byte)playerTurn)==1 )
+        if (structure!=null && structure.playerControl == playerTurn && (structure.structureType != 0 && structure.structureType != 5))// || getPlayerProgeny((byte)playerTurn)==1 )
         {
             choicePanel.SetActive(true);
             productionPanel.gameObject.SetActive(true);

@@ -36,7 +36,7 @@ public class MasterGrid : MonoBehaviour
     private Dictionary<string, Dictionary<string, double>> combatMultipliers;
     private double defenceMultiplier;
     private double firebackMultiplier;
-    private double attackLuckRange; //should probably rename, too close to attackRange
+    private double attackLuckDomain;
     private bool luckOn = false;
 
     public Transform movementSquareList;
@@ -72,7 +72,7 @@ public class MasterGrid : MonoBehaviour
 
         
 
-        attackLuckRange = 10;
+        attackLuckDomain = 10;
         defenceMultiplier = 4.0;
         firebackMultiplier = 0.7;
         //Dictionary<(byte, byte), GamePieceInfo> gameStateDict = ConvertGameStateToList();
@@ -293,22 +293,22 @@ public class MasterGrid : MonoBehaviour
 
     public double getDamageAfterLuck(double damageInput)
     {
-        if (attackLuckRange % 2 == 0)
+        if (attackLuckDomain % 2 == 0)
         {
-            int luckPercentageBonus = UnityEngine.Random.Range(0, (int)attackLuckRange + 1) - (int)attackLuckRange / 2;
+            int luckPercentageBonus = UnityEngine.Random.Range(0, (int)attackLuckDomain + 1) - (int)attackLuckDomain / 2;
             return damageInput * (1 + (double)luckPercentageBonus / 100);
         }
         else
         {
-            Debug.LogError($"attackLuckRange is not an even number! cannot compute random range calculation.");
+            Debug.LogError($"attackLuckDomain is not an even number! cannot compute random range calculation.");
             return damageInput;
         }
     }
 
-    //return % damage taken by defending unit (ceiling, + attackLuckRange/2 percentage)
+    //return % damage taken by defending unit (ceiling, + attackLuckDomain/2 percentage)
     public double getAttackLuckCeiling(double damageInput, double maxHealth)
     {
-        double attackLuckCeiling = attackLuckRange / 200;
+        double attackLuckCeiling = attackLuckDomain / 200;
         double ceiling = damageInput * (1 + attackLuckCeiling);
         if (ceiling > maxHealth)
             return 100;
@@ -320,11 +320,11 @@ public class MasterGrid : MonoBehaviour
             return ceiling / maxHealth;
     }
 
-    //return % damage taken by defending unit (floor, - attackLuckRange/2 percentage)
+    //return % damage taken by defending unit (floor, - attackLuckDomain/2 percentage)
     public double getAttackLuckFloor(double damageInput, double maxHealth)
     {
-        //the negative side of attackLuckRange
-        double attackLuckFloor = (-0.5 * attackLuckRange) / 100;
+        //the negative side of attackLuckDomain
+        double attackLuckFloor = (-0.5 * attackLuckDomain) / 100;
         double floor = damageInput * (1 + attackLuckFloor);
         if (floor > maxHealth)
             return 100;

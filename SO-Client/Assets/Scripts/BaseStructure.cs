@@ -46,7 +46,11 @@ public class BaseStructure : MonoBehaviour
         captureHealth = maxCaptureHealth;
         masterGrid = GameObject.FindGameObjectWithTag("MasterGridTag").GetComponent<MasterGrid>();
         masterGrid.setStructureInGrid(xPos, yPos, this);
-        
+        if(structureType == 5)
+        {
+            gameMaster.startupInstantiateUnits(xPos,yPos,playerControl );
+        }
+
         baseColor = neutralSpriteRenderer.color;
         //turnOffCaptureSprites();
 /*        if (structureType != 200)
@@ -121,7 +125,7 @@ public class BaseStructure : MonoBehaviour
             setColor(neutralSpriteRenderer);*/
         if (playerControl != 0)
         {
-            if (progeny == 0)
+            if (progeny == 0 || progeny == 2)
             {
                 if (structureType == 0)
                 {
@@ -143,9 +147,9 @@ public class BaseStructure : MonoBehaviour
                 setColor(progeny1spriteFillSR);
                 neutralSpriteRenderer.color = baseColor;
             }
-            else if (gameMaster.getPlayerProgeny(playerControl) == 2)
+            /*else if (gameMaster.getPlayerProgeny(playerControl) == 2)
                 Debug.LogError("Structure: Progeny 2 not yet implemented");
-            else
+            */else
                 Debug.LogError($"No progeny for byte value {progeny} found, unable to set capture sprite");
         }
         else
