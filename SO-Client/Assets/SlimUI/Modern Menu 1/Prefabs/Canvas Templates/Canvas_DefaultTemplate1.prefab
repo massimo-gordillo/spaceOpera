@@ -16317,6 +16317,7 @@ MonoBehaviour:
   swooshSound: {fileID: 415849237809912358}
   startGameButton: {fileID: 0}
   startGameButtonText: {fileID: 0}
+  progenySelectMenu: {fileID: 0}
 --- !u!114 &393905815672338038
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -26846,8 +26847,8 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 353311197699356888}
-  m_LocalRotation: {x: 0.015344907, y: -0.58969563, z: 0.006879348, w: -0.80745053}
-  m_LocalPosition: {x: 0, y: 0, z: -17.54812}
+  m_LocalRotation: {x: -0.0067294748, y: -0.5898596, z: -0.0049159476, w: 0.8074629}
+  m_LocalPosition: {x: 0, y: 0, z: -16.08}
   m_LocalScale: {x: 0.020000009, y: 0.019999998, z: 0.020000005}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -26859,10 +26860,10 @@ RectTransform:
   - {fileID: 575470883786081080}
   m_Father: {fileID: 355529388823523236}
   m_RootOrder: 3
-  m_LocalEulerAnglesHint: {x: 0, y: 90.00001, z: 0}
+  m_LocalEulerAnglesHint: {x: -0.955, y: -72.297, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 26.446497, y: -2.1135802}
+  m_AnchoredPosition: {x: -24.14, y: -2.11}
   m_SizeDelta: {x: 1980, y: 1024}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!223 &574351138966444376

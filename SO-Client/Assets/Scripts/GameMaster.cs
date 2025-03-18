@@ -55,31 +55,41 @@ public class GameMaster : MonoBehaviour
     public BaseStructure resourceStructurePrefab;
     private string gameStateFilePath = "Assets/InitializationData/Maps/Map3/Map3GameState.dat";
 
-/*    public static GameMaster Instance
-    {
-        get
+    static int player1ProgenySelected;
+    static int player2ProgenySelected;
+    /*    public static GameMaster Instance
         {
-            if (_instance == null)
+            get
             {
-                _instance = FindObjectOfType<GameMaster>();
                 if (_instance == null)
                 {
-                    // Optionally, create the instance if it's not found (this depends on your use case)
-                    _instance = new GameObject("GameMaster").AddComponent<GameMaster>();
+                    _instance = FindObjectOfType<GameMaster>();
+                    if (_instance == null)
+                    {
+                        // Optionally, create the instance if it's not found (this depends on your use case)
+                        _instance = new GameObject("GameMaster").AddComponent<GameMaster>();
+                    }
                 }
+                return _instance;
             }
-            return _instance;
-        }
-    }*/
+        }*/
 
     private void Awake()
     {
         //Debug.Log("Initializing game");
         match_id = Guid.Parse("aaaaaaaa-8761-4e77-a086-a7365ae9e0b4");
         turnNumber = 1;
-        
-        playerProgeny.Add(1, 2);
-        playerProgeny.Add(2, 1);
+        if(MatchSettings.playerProgenys[0]>=0&& MatchSettings.playerProgenys[1] >= 0)
+        {
+            
+            playerProgeny.Add(1, (byte)MatchSettings.playerProgenys[0]);
+            playerProgeny.Add(2, (byte)MatchSettings.playerProgenys[1]);
+        }
+        else {
+            Debug.LogWarning("Progeny set to -1 selected, defaulting to 1 and 2");
+            playerProgeny.Add(1, 2);
+            playerProgeny.Add(2, 1);
+        }
         Debug.Log($"player 1 is progeny {getPlayerProgeny(0)}, player 2 is progeny {getPlayerProgeny(1)}");
 
         //initializes all unit values, modifies their prefab and sprites.

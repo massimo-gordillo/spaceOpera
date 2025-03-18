@@ -54,6 +54,7 @@ namespace SlimUI.ModernMenu{
         public GameObject PanelCombat;
         [Tooltip("The UI Sub-Panel under KEY BINDINGS for GENERAL")]
         public GameObject PanelGeneral;
+        public GameObject PanelSelect;
         
 
         // highlights in settings screen
@@ -238,7 +239,6 @@ namespace SlimUI.ModernMenu{
 			DisablePlayCampaign();
             
             CameraObject.SetFloat("Animate",1);
-            Debug.Log("animate val2: " + CameraObject.GetFloat("Animate"));
         }
         
 
@@ -246,15 +246,12 @@ namespace SlimUI.ModernMenu{
 		public void Position1(){
             
             CameraObject.SetFloat("Animate",0);
-            Debug.Log("animate val1: " + CameraObject.GetFloat("Animate"));
         }
 
         public void Position3()
         {
             DisablePlayCampaign();
-            
             CameraObject.SetFloat("Animate", 2);
-            Debug.Log("animate val3: " + CameraObject.GetFloat("Animate"));
         }
 
         void DisablePanels(){
@@ -371,6 +368,7 @@ namespace SlimUI.ModernMenu{
         {
             // Activate loading screen UI right away
             mainCanvas.SetActive(false);
+            PanelSelect.SetActive(false);
             loadingMenu.SetActive(true);
 			loadPromptText.text = "Loading...";
 
@@ -380,7 +378,6 @@ namespace SlimUI.ModernMenu{
             // Start loading the scene asynchronously
             sceneLoadingOperation = SceneManager.LoadSceneAsync(sceneName);
             sceneLoadingOperation.allowSceneActivation = false;
-
             // While both operations are in progress, update the loading screen
             while (!sceneLoadingOperation.isDone)
             {
@@ -426,6 +423,9 @@ namespace SlimUI.ModernMenu{
             Debug.Log("Initializing Game Values...");
 			yield return null;
 			loadingBar.value = 0.05f;
+
+            
+
 
             // Update the prompt for the next loading step
             loadPromptText.text = "Loading... Modifying Tiles";
