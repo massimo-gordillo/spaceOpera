@@ -8,11 +8,17 @@ public static class MatchSettings {
 
     static public int numPlayers;
     static public int[] playerProgenys;
+    static public bool isInit=false;
 
     static public void SetNumPlayers(int numPlayers)
     {
         MatchSettings.numPlayers = numPlayers;
         playerProgenys = new int[numPlayers];
+        for (int i = 0; i < numPlayers; i++)
+        {
+            playerProgenys[i] = -1;
+        }
+        isInit = true;
     }
 
     public static void SetPlayerProgeny(int playerIndex, int progeny)

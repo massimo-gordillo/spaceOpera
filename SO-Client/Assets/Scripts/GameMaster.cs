@@ -79,18 +79,23 @@ public class GameMaster : MonoBehaviour
         //Debug.Log("Initializing game");
         match_id = Guid.Parse("aaaaaaaa-8761-4e77-a086-a7365ae9e0b4");
         turnNumber = 1;
-        if(MatchSettings.playerProgenys[0]>=0&& MatchSettings.playerProgenys[1] >= 0)
+        if(MatchSettings.isInit==false)
         {
-            
+            //Debug.LogWarning("MatchSettings.numPlayers is null, defaulting to 2");
+            MatchSettings.SetNumPlayers(2);
+        }
+
+        if (MatchSettings.playerProgenys[0]>=0 && MatchSettings.playerProgenys[1] >= 0)
+        {   
             playerProgeny.Add(1, (byte)MatchSettings.playerProgenys[0]);
             playerProgeny.Add(2, (byte)MatchSettings.playerProgenys[1]);
         }
         else {
-            Debug.LogWarning("Progeny set to -1 selected, defaulting to 1 and 2");
-            playerProgeny.Add(1, 2);
+            Debug.LogWarning("Progeny set to -1 selected, defaulting to hard values");
+            playerProgeny.Add(1, 0);
             playerProgeny.Add(2, 1);
         }
-        Debug.Log($"player 1 is progeny {getPlayerProgeny(0)}, player 2 is progeny {getPlayerProgeny(1)}");
+        //Debug.Log($"player 1 is progeny {getPlayerProgeny(0)}, player 2 is progeny {getPlayerProgeny(1)}");
 
         //initializes all unit values, modifies their prefab and sprites.
         //initializes all Tilebases for tilemap
