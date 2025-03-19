@@ -15,7 +15,8 @@ public class BaseStructure : MonoBehaviour
     public GameMaster gameMaster;
     public int captureHealth;
     public int maxCaptureHealth;
-    public TextMeshProUGUI healthTextContainer;
+    public TextMeshPro healthTextContainer;
+    public GameObject healthCanvas;
     private Color baseColor;
     public SpriteRenderer neutralSpriteRenderer;
 /*    public SpriteRenderer progeny0SpriteRenderer;
@@ -71,12 +72,6 @@ public class BaseStructure : MonoBehaviour
 
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        healthTextContainer.text = captureHealth.ToString();
-    }
-
     public void setColor(SpriteRenderer sprite) //Should this be combined with baseUnit.setColor? Maybe Mastergrid does this modification.
     {
         int player = playerControl;
@@ -101,7 +96,7 @@ public class BaseStructure : MonoBehaviour
     {
         //"resource" probably shouldn't be hardcoded here. Should it instead reference the 1st item in the GameValuesSO unitTypes array?
         //What if I want to change the unitTypes array? Should I just have a "is resource unit" flag?
-        return (unit.getPlayerControl() != playerControl && unit.isResourceUnit);  
+        return (unit.playerControl != playerControl && unit.isResourceUnit);  
     }
 
     public void switchAlliance(int capturePlayerInt)
@@ -155,6 +150,36 @@ public class BaseStructure : MonoBehaviour
         else
             setColor(neutralSpriteRenderer);
 
+    }
+
+    public void captureByPercentage(int percentCapturing, int playerCapturing)
+    {
+        
+        if (playerCapturing != playerControl)
+        {
+            if (percentCapturing < captureHealth)
+                captureHealth -= percentCapturing;
+            else
+                switchAlliance(playerCapturing);
+            Debug.Log("capture health: " + captureHealth + "selectedUnithealth " + percentCapturing);
+            setCaptureHealth(captureHealth);
+        }else
+            Debug.LogError("Player " + playerCapturing + " tried to capture their own structure");
+    }
+
+    public void setCaptureHealth(int health)
+    {
+        if (captureHealth >= maxCaptureHealth)
+        {
+            captureHealth = maxCaptureHealth;
+            healthCanvas.SetActive(false);
+        }
+        else
+        {
+            captureHealth = health;
+            healthCanvas.SetActive(true);
+        }
+        healthTextContainer.text = captureHealth.ToString()+"/"+maxCaptureHealth.ToString();
     }
 
     public void turnOffCaptureSprites()

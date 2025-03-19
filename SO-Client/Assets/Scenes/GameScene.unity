@@ -6680,6 +6680,7 @@ MonoBehaviour:
   nonExhausted: 0
   undoingMovement: 0
   crosshairSpriteRenderer: {fileID: 1834689752}
+  healthCanvas: {fileID: 0}
   spriteContainer: {fileID: 0}
   spriteFillSR: {fileID: 0}
   spriteTrimSR: {fileID: 0}
@@ -15067,6 +15068,7 @@ MonoBehaviour:
   nonExhausted: 0
   undoingMovement: 0
   crosshairSpriteRenderer: {fileID: 492674986}
+  healthCanvas: {fileID: 0}
   spriteContainer: {fileID: 0}
   spriteFillSR: {fileID: 0}
   spriteTrimSR: {fileID: 0}
@@ -15787,6 +15789,7 @@ MonoBehaviour:
   nonExhausted: 0
   undoingMovement: 0
   crosshairSpriteRenderer: {fileID: 462398237}
+  healthCanvas: {fileID: 0}
   spriteContainer: {fileID: 0}
   spriteFillSR: {fileID: 0}
   spriteTrimSR: {fileID: 0}

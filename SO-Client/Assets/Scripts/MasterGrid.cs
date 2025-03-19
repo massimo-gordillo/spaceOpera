@@ -173,7 +173,7 @@ public class MasterGrid : MonoBehaviour
             }
 
             //if there is no selected unit and the clicked unit isn't exhausted & player controls that unit.
-            else if (getSelectedUnit() == null && unit.getNonExhausted() && unit.getPlayerControl() == gameMaster.getPlayerTurn()) //what if you don't control this unit?
+            else if (getSelectedUnit() == null && unit.getNonExhausted() && unit.playerControl == gameMaster.getPlayerTurn()) //what if you don't control this unit?
             {
                 clearMovement();
                 setSelectedUnit(unit);
@@ -211,7 +211,7 @@ public class MasterGrid : MonoBehaviour
                     exhaustSelectedUnit(selectedUnit, true);
                 }
                 // if there is no selected unit and its NOT controlled by active player AND its not in the list of attackable units, display its movement range
-            } else if (getSelectedUnit() == null && unit.getPlayerControl() != gameMaster.getPlayerTurn() && !attackableUnits.Contains(unit))
+            } else if (getSelectedUnit() == null && unit.playerControl != gameMaster.getPlayerTurn() && !attackableUnits.Contains(unit))
             {
                 if (!drawing)
                 {
@@ -380,11 +380,15 @@ public class MasterGrid : MonoBehaviour
         //int healthRatio = selectedUnit.healthCurrent/selectedUnit.healthMax;
         if (selectedUnit != null)
         {
-            //print("capture health: " + structure.captureHealth + "selectedUnithealth " + selectedUnit.healthCurrent);
+            if (structure != null)
+            {
+                structure.captureByPercentage(selectedUnit.getHealthPercentage(), selectedUnit.playerControl);
+            }
+/*            //print("capture health: " + structure.captureHealth + "selectedUnithealth " + selectedUnit.healthCurrent);
             if (selectedUnit.getHealthPercentage() < structure.captureHealth) //do we want to do this math within BaseStructure?
                 structure.captureHealth =- selectedUnit.getHealthPercentage();
             else
-                structure.switchAlliance(selectedUnit.getPlayerControl());
+                structure.switchAlliance(selectedUnit.getPlayerControl());*/
             //2 is capture structure
             addGameAction(2, (byte)selectedUnit.gamePieceId, (byte)selectedUnit.xPos, (byte)selectedUnit.yPos, (byte)structure.xPos, (byte)structure.yPos);
             exhaustSelectedUnit(selectedUnit, true);
@@ -1344,7 +1348,7 @@ public class MasterGrid : MonoBehaviour
         foreach (GameObject go in allUnits)
         {
             BaseUnit unit = go.GetComponent<BaseUnit>();
-            if (unit.getPlayerControl() == playerTurn)
+            if (unit.playerControl == playerTurn)
             {
                 unit.setNonExhausted(true);
                 unit.oldXPos = null;
@@ -1361,7 +1365,7 @@ public class MasterGrid : MonoBehaviour
         foreach (GameObject go in allUnits)
         {
             BaseUnit unit = go.GetComponent<BaseUnit>();
-            if (unit.getPlayerControl() == player)
+            if (unit.playerControl == player)
             {
                 unit.setNonExhausted(false);
                 unit.oldXPos = null;

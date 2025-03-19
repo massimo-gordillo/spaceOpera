@@ -48,6 +48,7 @@ public class BaseUnit : MonoBehaviour
     public int? prevStructureCaptureVal = null;
     //public Sprite sprite; //MG 24-08-04: You cannot kill this var. It is used by AttributesBaseUnit, GameValuesSO and PrefabManager to work with the sprite values.
     public SpriteRenderer crosshairSpriteRenderer;
+    public GameObject healthCanvas;
     public StaticSprite spriteContainer;
     public SpriteRenderer spriteFillSR;
     public SpriteRenderer spriteTrimSR;
@@ -212,7 +213,14 @@ public class BaseUnit : MonoBehaviour
 
     public void updateHealthUI()
     {
-        healthTextContainer.text = getHealthPercentage().ToString();
+        int healthPercentage = getHealthPercentage();
+        if (healthPercentage == 100){
+            healthCanvas.SetActive(false);
+        }else
+        {
+            healthCanvas.SetActive(true);
+        }
+        healthTextContainer.text = healthPercentage.ToString();
     }
 
     public void takeDamage(double damage)
@@ -314,10 +322,10 @@ public class BaseUnit : MonoBehaviour
     }
 
 
-    public int getPlayerControl()
+/*    public int getPlayerControl()
     {
         return playerControl;
-    }
+    }*/
 
     public void deleteMe()
     {
