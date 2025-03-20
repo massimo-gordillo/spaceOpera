@@ -20,7 +20,7 @@ public class PrefabManager
         string prefabPath = unitAttributes.prefabPath;
         BaseUnit prefab = getBaseUnitFromPath(prefabPath);
         //manual check if I want to mass update all prefabs if I've done work on the BaseUnitBasePrefab.
-        bool updateSpritesFlag = false;
+        bool updateSpritesFlag = true;
         if (prefab == null || prefab.attributesHash != unitAttributes.attributesHash || updateSpritesFlag)
         {
             if (prefab.attributesHash != unitAttributes.attributesHash && prefab != null)
