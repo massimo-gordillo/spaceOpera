@@ -53,7 +53,7 @@ public class MenuProductionPanel : MonoBehaviour
             // Set the button properties
             newButton.buttonText.text = $"{attributesBaseUnit.unitName}\n{attributesBaseUnit.price}";
             prefabManager.setSprites(attributesBaseUnit, spritePrefabInstance);
-            newButton.unitPrefab = prefabManager.getPrefab(attributesBaseUnit.prefabPath);
+            newButton.unitPrefab = prefabManager.getPrefabFromPath(attributesBaseUnit.prefabPath);
 
             // Set the parent
             //Debug.Log($"for unit {attributesBaseUnit.unitName}, type {attributesBaseUnit.unitTerrainType} ");
@@ -141,6 +141,10 @@ public class MenuProductionPanel : MonoBehaviour
             if (uiButton != null)
             {
                 uiButton.interactable = playerResources >= button.GetPrice();
+            }
+            if(button.GetUnitName() == "Spore")
+            {
+                uiButton.interactable = false;
             }
         }
 

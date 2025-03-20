@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System.IO;
+//using System.Diagnostics;
 //using MessagePack;
 
 public class GameMaster : MonoBehaviour
@@ -238,26 +239,35 @@ public class GameMaster : MonoBehaviour
 
     public void unitProductionButtonPressed(BaseUnit unit)
     {
-        int price = unit.price;
-        print(price);
-        if (playerResources[playerTurn] >= price)
+/*        int price = unit.price;
+        print(price);*/
+        if (playerResources[playerTurn] >= unit.price)
         {
-            playerResources[playerTurn] -= price;
-            unit.playerControl = playerTurn;
-            //need a way to set to exhausted from here so the units don't have to start exhausted on the 1st turn.
-            BaseUnit tempUnit = Instantiate(unit, new Vector2(selectedStructure.xPos, selectedStructure.yPos), Quaternion.identity, unitList);
-            //GameObject tempInstance = Object.Instantiate(unit, new Vector2(selectedStructure.xPos, selectedStructure.yPos), Quaternion.identity, unitList);
-            //BaseUnit tempUnit = tempInstance.GetComponent<BaseUnit>();
-            
-            //3 is produce a unit
-            //not sure why the unit x and y coordiantes aren't available here but this works.
-            masterGrid.addGameAction(3, (byte)tempUnit.gamePieceId, (byte)selectedStructure.xPos, (byte)selectedStructure.yPos, (byte)selectedStructure.xPos, (byte)selectedStructure.yPos);
-            playerResourceText.text = "" + playerResources[playerTurn];
-            selectedStructure.turnOffCollider();
+            ProduceUnit(unit, playerTurn, false);
             hideChoicePanel();
         }
         else
             print("You must mine more minerals!");
+    }
+
+    public void ProduceUnit(BaseUnit unit, int playerControl, bool isNonExhausted)
+    {
+        playerResources[playerTurn] -= unit.price;
+        unit.playerControl = playerTurn;
+        
+
+        //need a way to set to exhausted from here so the units don't have to start exhausted on the 1st turn.
+        BaseUnit tempUnit = Instantiate(unit, new Vector2(selectedStructure.xPos, selectedStructure.yPos), Quaternion.identity, unitList);
+        //tempUnit.setNonExhausted(isNonExhausted);
+
+        //GameObject tempInstance = Object.Instantiate(unit, new Vector2(selectedStructure.xPos, selectedStructure.yPos), Quaternion.identity, unitList);
+        //BaseUnit tempUnit = tempInstance.GetComponent<BaseUnit>();
+
+        //3 is produce a unit
+        //not sure why the unit x and y coordiantes aren't available here but this works.
+        masterGrid.addGameAction(3, (byte)tempUnit.gamePieceId, (byte)selectedStructure.xPos, (byte)selectedStructure.yPos, (byte)selectedStructure.xPos, (byte)selectedStructure.yPos);
+        playerResourceText.text = "" + playerResources[playerTurn];
+        selectedStructure.turnOffCollider();
     }
 
     public void exitButtonPressed()
@@ -294,6 +304,18 @@ public class GameMaster : MonoBehaviour
 
         setPlayerTurnText(playerTurn);
         setPlayerResources(playerTurn);
+
+        //Debug.Log("Player " + playerTurn + " turn, progeny:" + getPlayerProgeny((byte)playerTurn));
+        if (getPlayerProgeny((byte)playerTurn) == 1)
+        {
+            foreach(BaseStructure productionStructure in masterGrid.GetProductionStructures(playerTurn)){
+                //Debug.Log("Production structure at loc " + productionStructure.xPos + ", " + productionStructure.yPos + " producing a spore");
+                selectedStructure = productionStructure;
+                if(!selectedStructure.IsCoveredByUnit())
+                    ProduceUnit(prefabManager.getBaseUnitFromName("spore",1),playerTurn, true);
+            }
+        }
+        masterGrid.refreshUnits(playerTurn);
     }
 
     public async void SubmitTurnToServer(List<GameAction> gameActions, long preTurnHash, long postTurnHash)
@@ -479,7 +501,7 @@ public class GameMaster : MonoBehaviour
                     int y = pieceInfo.y;
                     AttributesBaseUnit data = gameValues.GetUnitDataByByte(pieceInfo.typeNum);
 
-                    BaseUnit unit = prefabManager.getUnitFromPrefab(data.prefabPath);
+                    BaseUnit unit = prefabManager.getBaseUnitFromPath(data.prefabPath);
                     if (unit == null)
                     {
                         Debug.LogError($"No unit prefab found for byte value {pieceInfo.typeNum}");
@@ -547,4 +569,6 @@ public class GameMaster : MonoBehaviour
         playerProgeny.TryGetValue(b, out byte p);
         return p;
     }
+
+
 }

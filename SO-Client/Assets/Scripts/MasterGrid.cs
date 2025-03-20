@@ -1484,7 +1484,7 @@ public class MasterGrid : MonoBehaviour
         long tempPreTurnHash = preTurnHash;
         long tempPostTurnHash = ComputeGameStateHash_v1();
         Debug.Log($"End of turn gameStateHash: {tempPostTurnHash}");
-        refreshUnits(playerNum);
+
         clearMovement();
         clearSelectedUnit();
         turnActionCount = 0;
@@ -1494,6 +1494,45 @@ public class MasterGrid : MonoBehaviour
         gameActions.Clear();
         preTurnHash = tempPostTurnHash;
         return (tempGameActions, tempPreTurnHash, tempPostTurnHash);
+    }
+
+    public List <BaseStructure> GetStructures(int? player)
+    {
+        GameObject[] structuresGameObjects = GameObject.FindGameObjectsWithTag("BaseStructureTag");
+        if(structuresGameObjects.Length == 0)
+        {
+            Debug.LogError("No structures with tag found.");
+            return new List<BaseStructure>();
+        }
+        List <BaseStructure> structures = new List<BaseStructure>();
+        foreach (GameObject structuresGameObject in structuresGameObjects) {
+            if (player == null)
+                structures.Add(structuresGameObject.GetComponent<BaseStructure>());
+            else
+                if (structuresGameObject.GetComponent<BaseStructure>().playerControl == player)
+                    structures.Add(structuresGameObject.GetComponent<BaseStructure>());
+        }
+        return structures;
+    }
+
+    public List<BaseStructure> GetProductionStructures(int? player)
+    {
+        List<BaseStructure> structures = GetStructures(player);
+        List<BaseStructure> productionStructures = new List<BaseStructure>();
+        foreach (BaseStructure structure in structures)
+        {
+            if (structure.IsProduction())
+            {
+                Debug.Log($"Checking production structure, has playerControl {structure.playerControl}");
+                if (player == null)
+                    productionStructures.Add(structure);
+                else
+                    if (structure.playerControl == player)
+                    productionStructures.Add(structure);
+            }
+        }
+        Debug.Log($"Number Production Structures: {productionStructures.Count}");
+        return productionStructures;
     }
 
     public static long ComputeGameStateHash_v1()

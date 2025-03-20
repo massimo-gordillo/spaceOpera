@@ -11,6 +11,7 @@ TagManager:
   - GameMasterTag
   - BaseUnitTag
   - BaseStructureTag
+  - ProductionStructureTag
   layers:
   - Default
   - TransparentFX

@@ -60,7 +60,7 @@ public class BaseStructure : MonoBehaviour
         setCaptureSpritesAndColor();
 
 
-        if (masterGrid.whatUnitIsInThisLocation(xPos, yPos) != null)
+        if (IsCoveredByUnit())
             turnOffCollider();
 
         //healthTextContainer = GetComponentInChildren<TextMeshProUGUI>();
@@ -213,5 +213,15 @@ public class BaseStructure : MonoBehaviour
     public void resetCaptureHealth()
     {
         setCaptureHealth(maxCaptureHealth);
+    }
+
+    public bool IsProduction()
+    {
+        return (!(structureType == 0 || structureType == 5));
+    }
+
+    public bool IsCoveredByUnit()
+    {
+        return (masterGrid.whatUnitIsInThisLocation(xPos, yPos) != null);
     }
 }

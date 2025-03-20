@@ -92,10 +92,12 @@ public class BaseUnit : MonoBehaviour
         if ((playerControl+1) % 2 == 1)
             flipSprites();
 
-        if (playerControl == masterGrid.getPlayerTurn())
+
+
+/*        if (playerControl == masterGrid.getPlayerTurn())
             setNonExhausted(false);
         else
-            setNonExhausted(true);
+            setNonExhausted(true);*/
 
         //playerControl = 1; //will have to set dynamically later
 
@@ -115,7 +117,7 @@ public class BaseUnit : MonoBehaviour
 
         hideCrosshairs();
         hideCombatTooltip();
-        //setColor(playerControl, nonExhausted);
+        setColor(playerControl, nonExhausted);
 
     }
     // Update is called once per frame

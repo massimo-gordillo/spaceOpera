@@ -29,4 +29,9 @@ public class MenuProductionButton : MonoBehaviour
     {
         return unitPrefab.GetComponent<BaseUnit>().price;
     }
+
+    public string GetUnitName()
+    {
+        return unitPrefab.GetComponent<BaseUnit>().unitName;
+    }
 }

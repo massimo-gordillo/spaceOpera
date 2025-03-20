@@ -18,7 +18,7 @@ public class PrefabManager
     public void managePrefabOnStartUp(AttributesBaseUnit unitAttributes)
     {
         string prefabPath = unitAttributes.prefabPath;
-        BaseUnit prefab = getUnitFromPrefab(prefabPath);
+        BaseUnit prefab = getBaseUnitFromPath(prefabPath);
         //manual check if I want to mass update all prefabs if I've done work on the BaseUnitBasePrefab.
         bool updateSpritesFlag = false;
         if (prefab == null || prefab.attributesHash != unitAttributes.attributesHash || updateSpritesFlag)
@@ -38,7 +38,7 @@ public class PrefabManager
         }*/
     }
 
-    public GameObject getPrefab(string prefabPath)
+    public GameObject getPrefabFromPath(string prefabPath)
     {
         GameObject prefab = Resources.Load<GameObject>(prefabPath.Replace("Assets/Resources/", "").Replace(".prefab", ""));
         if (prefab == null)
@@ -48,9 +48,20 @@ public class PrefabManager
         return prefab;
     }
 
-    public BaseUnit getUnitFromPrefab(string prefabPath)
+    public BaseUnit getBaseUnitFromPath(string prefabPath)
     {
         BaseUnit prefab = Resources.Load<BaseUnit>(prefabPath.Replace("Assets/Resources/", "").Replace(".prefab", ""));
+        if (prefab == null)
+        {
+            UnityEngine.Debug.LogError("Prefab not found at path: " + prefabPath);
+        }
+        return prefab;
+    }
+
+    public BaseUnit getBaseUnitFromName(string name, int progeny)
+    {
+        string prefabPath = $"UnitPrefabs/progeny{progeny+1}/{name}Prefab";
+        BaseUnit prefab = Resources.Load<BaseUnit>(prefabPath);
         if (prefab == null)
         {
             UnityEngine.Debug.LogError("Prefab not found at path: " + prefabPath);
@@ -65,7 +76,7 @@ public class PrefabManager
     {
         //UnityEngine.Debug.Log($"Attempting to modify prefab at path: {prefabPath}");
 
-        GameObject prefab = getPrefab(prefabPath);
+        GameObject prefab = getPrefabFromPath(prefabPath);
 
         if (prefab == null)
         {
@@ -142,7 +153,7 @@ public class PrefabManager
 
     public void ClonePrefab(string basePrefabPath, string newPrefabPath)
     {
-        GameObject basePrefab = getPrefab(basePrefabPath);
+        GameObject basePrefab = getPrefabFromPath(basePrefabPath);
 
         if (basePrefab == null)
         {
