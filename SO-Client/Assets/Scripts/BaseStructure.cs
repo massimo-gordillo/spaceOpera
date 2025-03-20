@@ -212,6 +212,6 @@ public class BaseStructure : MonoBehaviour
 
     public void resetCaptureHealth()
     {
-        captureHealth = maxCaptureHealth;
+        setCaptureHealth(maxCaptureHealth);
     }
 }

@@ -24,4 +24,9 @@ public class MenuProductionButton : MonoBehaviour
         gameMaster.unitProductionButtonPressed(tempInstance.GetComponent<BaseUnit>());
         Object.DestroyImmediate(tempInstance);
     }
+
+    public int GetPrice()
+    {
+        return unitPrefab.GetComponent<BaseUnit>().price;
+    }
 }

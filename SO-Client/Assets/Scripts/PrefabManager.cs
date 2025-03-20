@@ -256,7 +256,7 @@ public class PrefabManager
             lightsSpritePath = $"{basePath}Sprite_Lights";
             //UnityEngine.Debug.Log($"Setting sprites for: {attributes.unitName}");
             //UnityEngine.Debug.Log($"spritePrefab instance ID: {spritePrefab.GetInstanceID()} for unit: {attributes.unitName}");
-            UnityEngine.Debug.Log($"spritePrefab path: {basePath} for unit: {attributes.unitName}");
+            //UnityEngine.Debug.Log($"spritePrefab path: {basePath} for unit: {attributes.unitName}");
 
 
             // Load sprites and check for errors
@@ -310,7 +310,7 @@ public class PrefabManager
                         spritePrefab.fillSR.sprite = sprites[1];
                         spritePrefab.trimSR.sprite = sprites[2];
                         spritePrefab.trimSR.sprite = sprites[3];*/
-            UnityEngine.Debug.Log($"Loaded {sprites.Length} sprites for {attributes.unitName} at path: {basePath}");
+            //UnityEngine.Debug.Log($"Loaded {sprites.Length} sprites for {attributes.unitName} at path: {basePath}");
 
             // Ensure we have enough sprites to assign
             if (sprites.Length > 1) spritePrefab.fillSR.sprite = sprites[1];

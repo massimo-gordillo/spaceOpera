@@ -131,14 +131,14 @@ public class GameMaster : MonoBehaviour
         for (int i = 1; i <= numPlayers; i++)
             setPlayerResources(i);
         //startupInstantiateUnits();
-
+        //productionPanel.Start();
     }
 
     void Start()
     {
-        //Comment to perform appropriate action. Start the coroutine to call ConvertGameStateToList
-        //StartCoroutine(CallConvertGameStateToList());
-        //ConvertFileToGameState();
+        //have to wait until start to init the production panel because it needs to wait for GameValuesSO.
+        productionPanel.init();
+
     }
 
     private IEnumerator CallConvertGameStateToList()
@@ -201,12 +201,15 @@ public class GameMaster : MonoBehaviour
 
     public void structureHasBeenClicked(BaseStructure structure)
     {
+        Debug.Log("Structure at loc " + structure.xPos + ", " + structure.yPos + " has been clicked.");
         //should probably try/catch if structure is null
-        if (structure!=null && structure.playerControl == playerTurn && (structure.structureType != 0 && structure.structureType != 5))// || getPlayerProgeny((byte)playerTurn)==1 )
+        if (structure!=null && structure.playerControl == playerTurn && (structure.structureType != 0 && structure.structureType != 5) || getPlayerProgeny((byte)playerTurn)==1 )
         {
             choicePanel.SetActive(true);
             productionPanel.gameObject.SetActive(true);
-            productionPanel.presentProdList(structure.structureType, getPlayerProgeny((byte)playerTurn));
+            productionPanel.presentProdList(structure.structureType, getPlayerProgeny((byte)playerTurn), playerResources[playerTurn]);
+
+            bottomButtonText.text = "Exit";
             selectedStructure = structure;
         }
     }
