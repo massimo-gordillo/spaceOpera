@@ -212,6 +212,7 @@ public class BaseStructure : MonoBehaviour
 
     public void resetCaptureHealth()
     {
+        healthCanvas.SetActive(false);
         setCaptureHealth(maxCaptureHealth);
     }
 

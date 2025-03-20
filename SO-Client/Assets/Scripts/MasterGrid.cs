@@ -391,7 +391,12 @@ public class MasterGrid : MonoBehaviour
                 structure.switchAlliance(selectedUnit.getPlayerControl());*/
             //2 is capture structure
             addGameAction(2, (byte)selectedUnit.gamePieceId, (byte)selectedUnit.xPos, (byte)selectedUnit.yPos, (byte)structure.xPos, (byte)structure.yPos);
-            exhaustSelectedUnit(selectedUnit, true);
+            
+            //Trying virix implementation where spore kills itself upon capturing
+            if (structure.playerControl == selectedUnit.playerControl && selectedUnit.unitName == "Spore")
+                deleteUnit(selectedUnit);
+            else
+                exhaustSelectedUnit(selectedUnit, true);
         }
         else
             print("attempting to capture structure but no selectedUnit to capture it.");
@@ -1290,6 +1295,8 @@ public class MasterGrid : MonoBehaviour
 
     public void deleteUnit(BaseUnit deadUnit)
     {
+        if(selectedUnit != null && deadUnit == selectedUnit)
+            clearSelectedUnit();
         removeUnitInGrid(deadUnit.xPos, deadUnit.yPos);
         //if not null call the function
         whatStructureIsInThisLocation(deadUnit.xPos, deadUnit.yPos)?.resetCaptureHealth();
