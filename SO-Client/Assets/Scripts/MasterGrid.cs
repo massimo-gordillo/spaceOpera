@@ -6,6 +6,8 @@ using UnityEngine;
 //using System.Text.Json.Serialization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.IO;
+using System.Text;
 
 
 public class MasterGrid : MonoBehaviour
@@ -82,6 +84,8 @@ public class MasterGrid : MonoBehaviour
     public void Start()
     {
         StartCoroutine(waitGenerateInitHash());
+        //save arrays to csv for debugging/visualization
+        StartCoroutine(waitGenerateSaveArrayToCSV());
     }
 
     /*    public void printUnitGrid()
@@ -146,6 +150,8 @@ public class MasterGrid : MonoBehaviour
         // Optionally, you can log success message or additional information here
         Debug.Log("Terrain set successfully.");
     }
+
+    
 
     public void unitHasBeenClicked(BaseUnit unit)
     {
@@ -828,61 +834,6 @@ public class MasterGrid : MonoBehaviour
         }
 
     }
-
-    /*public void DrawAttackOutline(List<Queue<Vector2Int>> attackOutlineSquareQueuesList, BaseUnit mTarget)
-    {
-        // Ensure the list has exactly 3 queues
-        if (attackOutlineSquareQueuesList == null || attackOutlineSquareQueuesList.Count != 3)
-        {
-            Debug.LogError("The attackOutlineSquareQueuesList does not contain exactly 3 queues.");
-            return;
-        }
-
-        Queue<Vector2Int> attackQueue = attackOutlineSquareQueuesList[1];
-
-        if (attackQueue.Count == 0)
-        {
-            Debug.Log("No attack locations to draw outline for.");
-            return;
-        }
-
-
-        while (attackQueue.Count > 0)
-        {
-            Vector2Int cell = attackQueue.Dequeue();
-            //if there's a unit at this location, mark it with an attack square
-            BaseUnit unitAtLocation = whatUnitIsInThisLocation(cell.x - 1, cell.y - 1);
-            if (unitAtLocation != null && unitAtLocation.playerControl != getPlayerTurn())
-            {
-                drawDamageSquare(cell.x - 1, cell.y - 1, drawMovementUnit.playerControl == getPlayerTurn());
-                //if there's a structure at this location, turn off its collider
-                BaseStructure s = whatStructureIsInThisLocation(cell.x - 1, cell.y - 1);
-                if (s != null)
-                {
-                    turnOffStructureCollider(s);
-                }
-            }
-
-            Vector2Int unitLocation = new Vector2Int(mTarget.xPos, mTarget.yPos);
-            Vector2Int attackLocation = new Vector2Int(cell.x - 1, cell.y - 1);
-            int xDiff = attackLocation.x - unitLocation.x;
-            int yDiff = attackLocation.y - unitLocation.y;
-
-            Debug.Log($"Unit Location: {unitLocation}");
-            Debug.Log($"Attack Location: {attackLocation}");
-            Debug.Log($"xDiff: {xDiff}, yDiff: {yDiff}");
-
-            //GameObject attackOutline = new RangeOutlineSprite();
-
-            if (Mathf.Abs(xDiff) + Mathf.Abs(yDiff) == mTarget.attackRange)
-            {
-                if (xDiff == 0)
-                    Instantiate(rangeOutlineSprite, new Vector2(attackLocation.x, (float)(attackLocation.y - 0.5)), Quaternion.identity, movementSquareList);
-            }
-
-        }
-
-    }*/
 
     public void DrawAttackOutline(List<Queue<Vector2Int>> attackOutlineSquareQueuesList, BaseUnit mTarget)
     {
@@ -1600,4 +1551,90 @@ public class MasterGrid : MonoBehaviour
     }
 
     public void setMatchId(Guid matchId){ match_id = matchId; }
+
+    public void SaveArrayToCSV(string fileName, int[,] array)
+    {
+        StringBuilder sb = new StringBuilder();
+        int rows = array.GetLength(0);
+        int cols = array.GetLength(1);
+
+        for (int j = cols-1; j >=0; j--)
+        {
+            for (int i = rows-1; i >=0; i--)
+            {
+
+                sb.Append(array[i, j]);
+
+                if (i>0)
+                    sb.Append(",");
+            }
+            sb.AppendLine();
+        }
+
+        string filePath = Path.Combine(Application.persistentDataPath, fileName);
+        File.WriteAllText(filePath, sb.ToString());
+
+        Debug.Log($"CSV saved to: {filePath}");
+    }
+    public int[,] populateSentusDefenseGrid(int distance, int searchType)
+    {
+        int xMax = structureGrid.GetLength(0);
+        int yMax = structureGrid.GetLength(1);
+        //Debug.Log($"Structure size is {xMax}, {yMax}");
+
+        if (searchType == 1)
+            Debug.Log("performing pyramid search for distance: " + distance);
+        if (searchType == 0)
+            Debug.Log("performing square search for distance: " + distance);
+
+        int[,] defenceGridInt = new int[xMax, yMax];
+
+        //Debug.Log($"defenceGridInt size: {defenceGridInt.GetLength(0)},{defenceGridInt.GetLength(1)}");
+        foreach (BaseStructure s in structureGrid)
+        {
+            if (s != null && s.gamePieceId == 200)
+            {
+                int x = s.xPos;
+                int y = s.yPos;
+                //Debug.Log($"Checking Structure at {x},{y}");
+                //defenceGridInt[x, y] += 1;
+                for (int i = -distance; i <= distance; i++)
+                {
+                    for (int j = -distance; j <= distance; j++)
+                        if (x + i >= 0 && x + i < xMax && y + j >= 0 && y + j < yMax)
+                        {
+                            //Debug.Log($"Searching {x},{y}, indexes: {i},{j}");
+                            //square search
+                            if (searchType == 0)
+                            {
+                                defenceGridInt[x + i, y + j] += 1;
+
+                            }
+                            //pyramid search
+                            else if (searchType == 1 && Math.Abs(i) + Math.Abs(j) <= distance)
+                                defenceGridInt[x + i, y + j] += 1;
+                        }
+                }
+            }
+        }
+        return defenceGridInt;
+    }
+
+    private IEnumerator waitGenerateSaveArrayToCSV()
+    {
+        // Wait until the next frame to ensure all Start() methods are called
+        yield return null;
+        int[,] structureGridInt = new int[structureGrid.GetLength(0), structureGrid.GetLength(1)];
+        foreach(BaseStructure s in structureGrid)
+        {
+            if(s != null)
+                structureGridInt[s.xPos, s.yPos] = s.gamePieceId;
+        }
+        SaveArrayToCSV("StructureGrid.csv", structureGridInt);
+        //SaveArrayToCSV("SentusDefenceGridPyramid3.csv", populateSentusDefenseGrid(3, 1));
+        //SaveArrayToCSV("SentusDefenceGridSquare3.csv", populateSentusDefenseGrid(3, 0));
+        SaveArrayToCSV("SentusDefenceGridSquare2.csv", populateSentusDefenseGrid(2, 0));
+        //SaveArrayToCSV("SentusDefenceGridPyramid4.csv", populateSentusDefenseGrid(4, 1));
+        //SaveArrayToCSV("SentusDefenceGridSquare4.csv", populateSentusDefenseGrid(4, 0));
+    }
 }
