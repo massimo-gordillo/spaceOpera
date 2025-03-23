@@ -923,6 +923,11 @@ public class MasterGrid : MonoBehaviour
         blueSquare.setColor(color);
         blueSquare.boxCollider2D.enabled = isControllersTurn;
         blueSquare.stripeSprite.gameObject.SetActive(!isControllersTurn);
+        if(drawMovementUnit.progeny == Progeny.Sentus)
+        {
+            Debug.Log($"Showing shields at {x},{y}, is {defenceGridInt[x, y]}");
+            blueSquare.showShields(defenceGridInt[x, y]);
+        }
         Instantiate(blueSquare, new Vector2(x, y), Quaternion.identity, movementSquareList);
     }
 
@@ -933,6 +938,7 @@ public class MasterGrid : MonoBehaviour
         redSquare.setColor(c);
         redSquare.boxCollider2D.enabled = false;
         redSquare.stripeSprite.gameObject.SetActive(!isControllersTurn);
+        redSquare.showShields(0);
         Instantiate(redSquare, new Vector2(x, y), Quaternion.identity, movementSquareList);
     }
 
