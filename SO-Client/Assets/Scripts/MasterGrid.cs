@@ -1044,15 +1044,23 @@ public class MasterGrid : MonoBehaviour
 
     public double getDefenceValueForDefender(BaseUnit defender)
     {
-        if (defender.unitTerrainType == UnitTerrainType.Air)
-            return 1;
-        else
+        double defenceGridDouble = 0;
+        double tileMultiplier = 1;
+        //Debug.Log($"defence, unit terrain type: {defender.unitTerrainType}");
+        //Sentus implementation #1.
+        if (defender.progeny == Progeny.Sentus)
         {
-            double tileMuiltiplier = getTileDefenceValueMultiplier(defender.xPos, defender.yPos);
-
-            Debug.Log($"TileDefenceMultiplier: {tileMuiltiplier}");
-            return tileMuiltiplier;
+            //decimal close to 0
+            defenceGridDouble = GetSentusDefenceMultiplier(defender.xPos, defender.yPos);
         }
+        if (defender.unitTerrainType != UnitTerrainType.Air)
+        {
+            //decimal close to 1
+
+            tileMultiplier = getTileDefenceValueMultiplier(defender.xPos, defender.yPos);
+        }
+        //Debug.Log($"Defence: Tile: {tileMultiplier} defence: {defenceGridDouble}");
+        return tileMultiplier - defenceGridDouble;
     }
 
 
