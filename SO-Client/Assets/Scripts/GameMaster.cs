@@ -94,7 +94,7 @@ public class GameMaster : MonoBehaviour
         else {
             Debug.LogWarning("Progeny set to -1 selected, defaulting to hard values");
             playerProgeny.Add(1, 0);
-            playerProgeny.Add(2, 1);
+            playerProgeny.Add(2, 2);
         }
         //Debug.Log($"player 1 is progeny {getPlayerProgeny(0)}, player 2 is progeny {getPlayerProgeny(1)}");
 

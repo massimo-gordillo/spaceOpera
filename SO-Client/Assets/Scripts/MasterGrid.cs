@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.IO;
 using System.Text;
+using Unity.Mathematics;
 
 
 public class MasterGrid : MonoBehaviour
@@ -27,6 +28,7 @@ public class MasterGrid : MonoBehaviour
     public BaseUnit[,] unitGrid; //2D array
     public BaseStructure[,] structureGrid; //2D array
     public byte[,] terrainGrid;
+    public int[,] defenceGridInt;
     //public TerrainCell terrainCell;
     public List<BaseUnit> attackableUnits;
     public List<BaseStructure> spriteOffStructures;
@@ -39,7 +41,7 @@ public class MasterGrid : MonoBehaviour
     private double defenceMultiplier;
     private double firebackMultiplier;
     private double attackLuckDomain;
-    private bool luckOn = false;
+    private bool luckOn =false;
 
     public Transform movementSquareList;
     public MovementSquare moveSquare;
@@ -85,7 +87,8 @@ public class MasterGrid : MonoBehaviour
     {
         StartCoroutine(waitGenerateInitHash());
         //save arrays to csv for debugging/visualization
-        StartCoroutine(waitGenerateSaveArrayToCSV());
+        //StartCoroutine(waitGenerateSaveArrayToCSV());
+        populateSentusDefenceGrid(2, 0);
     }
 
     /*    public void printUnitGrid()
@@ -148,7 +151,7 @@ public class MasterGrid : MonoBehaviour
         }
 
         // Optionally, you can log success message or additional information here
-        Debug.Log("Terrain set successfully.");
+        //Debug.Log("Terrain set successfully.");
     }
 
     
@@ -290,7 +293,7 @@ public class MasterGrid : MonoBehaviour
             }*/
         }
         //print to console info about this attack
-        Debug.Log($"Attacker: {attacker.name}, Defender: {defender.name}, baseDamage: {baseDamage}, multiplier: {multiplier}, defenceVal: {defenceVal}, firebackMultiplier: {firebackMultiplier}");
+        //Debug.Log($"Attacker: {attacker.name}, Defender: {defender.name}, baseDamage: {baseDamage}, multiplier: {multiplier}, defenceVal: {defenceVal}, firebackMultiplier: {firebackMultiplier}");
         if (!firingBack)
             return baseDamage * multiplier * defenceVal;
         else
@@ -612,7 +615,7 @@ public class MasterGrid : MonoBehaviour
     public void AnimateMovement(BaseUnit unit, Vector2Int start, Vector2Int end)
     {
 
-        Debug.Log($"Animating movement from {start} to {end}");
+        //Debug.Log($"Animating movement from {start} to {end}");
         List<Vector2Int> path = BidirectionalSearch(start, end, unit);
 
         //movement animation speed
@@ -625,7 +628,7 @@ public class MasterGrid : MonoBehaviour
         }
 
         StartCoroutine(AnimateMovementVisual(unit, path, speed));
-        Debug.Log("Movement animation complete.");
+        //Debug.Log("Movement animation complete.");
     }
     public IEnumerator AnimateMovementVisual(BaseUnit unit, List<Vector2Int> path, float speed)
     {
@@ -640,7 +643,7 @@ public class MasterGrid : MonoBehaviour
             }
         }
 
-        Debug.Log("Movement animation complete.");
+        //Debug.Log("Movement animation complete.");
     }
 
 
@@ -777,7 +780,7 @@ public class MasterGrid : MonoBehaviour
         // Throw an error if the list has more than 3 items
         if (squareQueuesList == null)
         {
-            Debug.Log($"The squareQueuesList is null. Filling with empty lists");
+            Debug.LogWarning($"The squareQueuesList is null. Filling with empty lists");
             squareQueuesList = new List<Queue<Vector2Int>>();
             //populating the first 3 items in the list with empty queues to avoid null reference exceptions.
             while (squareQueuesList.Count < 3)
@@ -847,7 +850,7 @@ public class MasterGrid : MonoBehaviour
 
         if (attackQueue.Count == 0)
         {
-            Debug.Log("No attack locations to draw outline for.");
+            Debug.LogWarning("No attack locations to draw outline for.");
             return;
         }
 
@@ -876,8 +879,8 @@ public class MasterGrid : MonoBehaviour
             int xDiff = attackLocation.x - unitLocation.x;
             int yDiff = attackLocation.y - unitLocation.y;
 
-            Debug.Log($"Unit Location: {unitLocation}, Attack Location: {attackLocation}, xDiff: {xDiff}, yDiff: {yDiff}");
-            Debug.Log($"Calculated range: {Mathf.Abs(xDiff) + Mathf.Abs(yDiff)}, Target attack range: {mTarget.attackRange}");
+            //Debug.Log($"Unit Location: {unitLocation}, Attack Location: {attackLocation}, xDiff: {xDiff}, yDiff: {yDiff}");
+            //Debug.Log($"Calculated range: {Mathf.Abs(xDiff) + Mathf.Abs(yDiff)}, Target attack range: {mTarget.attackRange}");
 
             // Check if the difference matches the attack range, and allow both horizontal and vertical placements
             if (Mathf.Abs(xDiff) + Mathf.Abs(yDiff) == mTarget.attackRange)
@@ -1024,7 +1027,7 @@ public class MasterGrid : MonoBehaviour
 
     public double getTileDefenceValueMultiplier(int x, int y)
     {
-        return 1 - (double)getTileDefenceValueInt(x, y) / 100 * defenceMultiplier;
+        return (double)getTileDefenceValueInt(x, y) / 100.0 * defenceMultiplier;
     }
 
     public int getTileDefenceValueInt(int x, int y)
@@ -1032,7 +1035,6 @@ public class MasterGrid : MonoBehaviour
         AttributesTile tile;
         if (tileAttributes.TryGetValue(whatTileIsInThisLocation(x, y), out tile))
         {
-            //Debug.Log($"Tile at location {x},{y} for byteValue {whatTileIsInThisLocation(x, y)} has defenceValue {tile.defenceValue}");
             return tile.defenceValue;
         }
         else
@@ -1045,22 +1047,20 @@ public class MasterGrid : MonoBehaviour
     public double getDefenceValueForDefender(BaseUnit defender)
     {
         double defenceGridDouble = 0;
-        double tileMultiplier = 1;
+        double tileMultiplier = 0;
         //Debug.Log($"defence, unit terrain type: {defender.unitTerrainType}");
         //Sentus implementation #1.
         if (defender.progeny == Progeny.Sentus)
         {
-            //decimal close to 0
             defenceGridDouble = GetSentusDefenceMultiplier(defender.xPos, defender.yPos);
         }
         if (defender.unitTerrainType != UnitTerrainType.Air)
         {
-            //decimal close to 1
 
             tileMultiplier = getTileDefenceValueMultiplier(defender.xPos, defender.yPos);
         }
-        //Debug.Log($"Defence: Tile: {tileMultiplier} defence: {defenceGridDouble}");
-        return tileMultiplier - defenceGridDouble;
+        Debug.Log($"Defence: Tile: {tileMultiplier} defence: {defenceGridDouble}");
+        return 1 - tileMultiplier - defenceGridDouble;
     }
 
 
@@ -1283,9 +1283,10 @@ public class MasterGrid : MonoBehaviour
 
     public void exhaustSelectedUnit(BaseUnit unit, bool exhaust)
     {
-        if (selectedUnit == unit)
+        if (selectedUnit == unit) //weird check here, not sure why it enters if the unit doesn't exist.
         {
-            unit.setNonExhausted(!exhaust);
+            if(unit!=null)
+                unit.setNonExhausted(!exhaust);
             clearAttackableUnits();
             clearSelectedUnit();
             gameMaster.hideChoicePanel();
@@ -1441,7 +1442,7 @@ public class MasterGrid : MonoBehaviour
             toLocationY = toLocationY,
             playerID = playerID
         };
-        Debug.Log($"Adding game action {turnActionCount} of type {actionType} for turn number {gameMaster.turnNumber} to the game actions list with values {gamePieceId}, {fromLocationX}, {fromLocationY}, {toLocationX}, {toLocationY}.");
+        //Debug.Log($"Adding game action {turnActionCount} of type {actionType} for turn number {gameMaster.turnNumber} to the game actions list with values {gamePieceId}, {fromLocationX}, {fromLocationY}, {toLocationX}, {toLocationY}.");
         gameActions.Add(gameAction);
     }
 
@@ -1449,13 +1450,13 @@ public class MasterGrid : MonoBehaviour
     {
         long tempPreTurnHash = preTurnHash;
         long tempPostTurnHash = ComputeGameStateHash_v1();
-        Debug.Log($"End of turn gameStateHash: {tempPostTurnHash}");
+        //Debug.Log($"End of turn gameStateHash: {tempPostTurnHash}");
 
         clearMovement();
         clearSelectedUnit();
         turnActionCount = 0;
         if(gameActions.Count==0)
-            Debug.Log("FLAG: No game actions to return.");
+            Debug.LogWarning("FLAG: No game actions to return.");
         List<GameAction> tempGameActions = new List<GameAction>(gameActions);
         gameActions.Clear();
         preTurnHash = tempPostTurnHash;
@@ -1489,7 +1490,7 @@ public class MasterGrid : MonoBehaviour
         {
             if (structure.IsProduction())
             {
-                Debug.Log($"Checking production structure, has playerControl {structure.playerControl}");
+                //Debug.Log($"Checking production structure, has playerControl {structure.playerControl}");
                 if (player == null)
                     productionStructures.Add(structure);
                 else
@@ -1497,7 +1498,7 @@ public class MasterGrid : MonoBehaviour
                     productionStructures.Add(structure);
             }
         }
-        Debug.Log($"Number Production Structures: {productionStructures.Count}");
+        //Debug.Log($"Number Production Structures: {productionStructures.Count}");
         return productionStructures;
     }
 
@@ -1548,7 +1549,7 @@ public class MasterGrid : MonoBehaviour
     {
         
         preTurnHash = ComputeGameStateHash_v1();
-        Debug.Log($"Generating initial hash {preTurnHash}");
+        //Debug.Log($"Generating initial hash {preTurnHash}");
     }
 
     private IEnumerator waitGenerateInitHash()
@@ -1558,7 +1559,12 @@ public class MasterGrid : MonoBehaviour
         generateInitHash();
     }
 
-    public void setMatchId(Guid matchId){ match_id = matchId; }
+    public void setMatchId(Guid matchId)
+    { 
+        match_id = matchId;
+        //assuming that setting of match_id means we're doing a server match so we're turning off luck until we have a rand seed management implementation.
+        luckOn = false;
+    }
 
     public void SaveArrayToCSV(string fileName, int[,] array)
     {
@@ -1582,20 +1588,20 @@ public class MasterGrid : MonoBehaviour
         string filePath = Path.Combine(Application.persistentDataPath, fileName);
         File.WriteAllText(filePath, sb.ToString());
 
-        Debug.Log($"CSV saved to: {filePath}");
+        //Debug.Log($"CSV saved to: {filePath}");
     }
-    public int[,] populateSentusDefenseGrid(int distance, int searchType)
+    public int[,] populateSentusDefenceGrid(int distance, int searchType)
     {
         int xMax = structureGrid.GetLength(0);
         int yMax = structureGrid.GetLength(1);
         //Debug.Log($"Structure size is {xMax}, {yMax}");
 
-        if (searchType == 1)
+/*        if (searchType == 1)
             Debug.Log("performing pyramid search for distance: " + distance);
         if (searchType == 0)
-            Debug.Log("performing square search for distance: " + distance);
+            Debug.Log("performing square search for distance: " + distance);*/
 
-        int[,] defenceGridInt = new int[xMax, yMax];
+        defenceGridInt = new int[xMax, yMax];
 
         //Debug.Log($"defenceGridInt size: {defenceGridInt.GetLength(0)},{defenceGridInt.GetLength(1)}");
         foreach (BaseStructure s in structureGrid)
@@ -1628,6 +1634,22 @@ public class MasterGrid : MonoBehaviour
         return defenceGridInt;
     }
 
+    public double GetSentusDefenceMultiplier (int x, int y)
+    {
+        if (defenceGridInt==null || defenceGridInt[x, y] < 0)
+        {
+            Debug.LogWarning("Sentus Defence Grid not properly initialized");
+            return 0;
+        }
+        else if (defenceGridInt[x,y] >= 3){
+            return 3 * defenceMultiplier/100;
+        }else if (defenceGridInt[x,y]>= 0)
+        {
+            return defenceGridInt[x, y] * defenceMultiplier/100;
+        }
+        return 0;
+    }
+
     private IEnumerator waitGenerateSaveArrayToCSV()
     {
         // Wait until the next frame to ensure all Start() methods are called
@@ -1639,10 +1661,10 @@ public class MasterGrid : MonoBehaviour
                 structureGridInt[s.xPos, s.yPos] = s.gamePieceId;
         }
         SaveArrayToCSV("StructureGrid.csv", structureGridInt);
-        //SaveArrayToCSV("SentusDefenceGridPyramid3.csv", populateSentusDefenseGrid(3, 1));
-        //SaveArrayToCSV("SentusDefenceGridSquare3.csv", populateSentusDefenseGrid(3, 0));
-        SaveArrayToCSV("SentusDefenceGridSquare2.csv", populateSentusDefenseGrid(2, 0));
-        //SaveArrayToCSV("SentusDefenceGridPyramid4.csv", populateSentusDefenseGrid(4, 1));
-        //SaveArrayToCSV("SentusDefenceGridSquare4.csv", populateSentusDefenseGrid(4, 0));
+        //SaveArrayToCSV("SentusDefenceGridPyramid3.csv", populateSentusDefenceGrid(3, 1));
+        //SaveArrayToCSV("SentusDefenceGridSquare3.csv", populateSentusDefenceGrid(3, 0));
+        SaveArrayToCSV("SentusDefenceGridSquare2.csv", populateSentusDefenceGrid(2, 0));
+        //SaveArrayToCSV("SentusDefenceGridPyramid4.csv", populateSentusDefenceGrid(4, 1));
+        //SaveArrayToCSV("SentusDefenceGridSquare4.csv", populateSentusDefenceGrid(4, 0));
     }
 }

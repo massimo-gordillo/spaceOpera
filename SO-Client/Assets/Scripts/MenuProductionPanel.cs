@@ -85,7 +85,7 @@ public class MenuProductionPanel : MonoBehaviour
 
     public void presentProdList(int structNum, byte playerProgeny, int playerResources)
     {
-        Debug.Log("presentProdList: " + structNum + "/" + playerProgeny + "/" + playerResources);
+        //Debug.Log("presentProdList: " + structNum + "/" + playerProgeny + "/" + playerResources);
         Transform presentedList = null;
         prodListProgeny0Land.gameObject.SetActive(false);
         prodListProgeny0Air.gameObject.SetActive(false);
@@ -117,7 +117,7 @@ public class MenuProductionPanel : MonoBehaviour
         }
 
         presentedList.gameObject.SetActive(true);
-        Debug.Log("presentProdList: " + presentedList.gameObject.name + "player resources: " + playerResources);
+        //Debug.Log("presentProdList: " + presentedList.gameObject.name + "player resources: " + playerResources);
         //Player can't select to produce units they cannot afford
         /*        foreach (MenuProductionButton button in presentedList.GetComponentsInChildren<MenuProductionButton>())
                 {

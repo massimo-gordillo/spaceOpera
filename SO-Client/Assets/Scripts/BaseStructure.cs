@@ -111,10 +111,10 @@ public class BaseStructure : MonoBehaviour
     public void setCaptureSpritesAndColor()
     {
         byte progeny = gameMaster.getPlayerProgeny(playerControl);
-        if (structureType == 0 && playerControl != 0)
+/*        if (structureType == 0 && playerControl != 0)
         {
             Debug.Log($"Setting capture sprite for player {playerControl}, progeny: {progeny}, master grid says: {gameMaster.getPlayerProgeny(playerControl)}");
-        }
+        }*/
         turnOffCaptureSprites();
 /*        if (structureType == 0)
             setColor(neutralSpriteRenderer);*/
