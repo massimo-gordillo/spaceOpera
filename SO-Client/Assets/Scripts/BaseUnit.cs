@@ -53,6 +53,12 @@ public class BaseUnit : MonoBehaviour
     public SpriteRenderer spriteFillSR;
     public SpriteRenderer spriteTrimSR;
     public SpriteRenderer spriteLightsSR;
+    public GameObject cornerSpriteTL;
+    public GameObject cornerSpriteTR;
+    public GameObject cornerSpriteBL;
+    public GameObject cornerSpriteBR;
+
+
     public MasterGrid masterGrid;
     public string prefabPath;
     public string spriteAtlasPath;
@@ -118,7 +124,7 @@ public class BaseUnit : MonoBehaviour
         hideCrosshairs();
         hideCombatTooltip();
         setColor(playerControl, nonExhausted);
-
+        showSelectedCorners(false);
     }
     // Update is called once per frame
     void Update()
@@ -183,6 +189,14 @@ public class BaseUnit : MonoBehaviour
         {
             combatTooltip.SetActive(false);
         }
+    }
+
+    public void showSelectedCorners(bool b)
+    {
+        cornerSpriteTL.SetActive(b);
+        cornerSpriteTR.SetActive(b);
+        cornerSpriteBL.SetActive(b);
+        cornerSpriteBR.SetActive(b);
     }
 
     public void showCombatTooltip(int defence, double floor, double ceiling)
@@ -314,6 +328,11 @@ public class BaseUnit : MonoBehaviour
         float adjustedLightsValue = nonExhausted ? lightsValue : lightsValue * 0.7f; // Darken when exhausted
         Color lightsColor = Color.HSVToRGB(lightsHue, lightsSaturation, adjustedLightsValue);
         spriteLightsSR.color = lightsColor;
+
+        cornerSpriteTL.GetComponent<SpriteRenderer>().color = color;
+        cornerSpriteTR.GetComponent<SpriteRenderer>().color = color;
+        cornerSpriteBL.GetComponent<SpriteRenderer>().color = color;
+        cornerSpriteBR.GetComponent<SpriteRenderer>().color = color;
     }
 
     public void flipSprites()

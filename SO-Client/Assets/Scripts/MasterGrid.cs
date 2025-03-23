@@ -194,7 +194,7 @@ public class MasterGrid : MonoBehaviour
                     if (!drawing)
                     {
                         //drawing = true;
-                        selectedUnit = unit;
+                        setSelectedUnit(unit);
                         drawMovement(unit);
                     }
                 }
@@ -444,6 +444,7 @@ public class MasterGrid : MonoBehaviour
         drawing = true;
         //Debug.Log($"Setting {mTarget} as drawMovementUnit");
         drawMovementUnit = mTarget;
+        mTarget.showSelectedCorners(true);
         int movementRange = mTarget.movementRange;
         int attackRange = mTarget.attackRange;
         int totalRange = movementRange + attackRange;
@@ -1167,8 +1168,10 @@ public class MasterGrid : MonoBehaviour
         for (var i = 0; i < movementSquares.Length; i++)
             Destroy(movementSquares[i]);
         drawing = false;
-/*        if(drawMovementUnit != null)
-            Debug.Log($"Removing unit {drawMovementUnit.GetInstanceID()} from drawMovementUnit");*/
+        /*        if(drawMovementUnit != null)
+                    Debug.Log($"Removing unit {drawMovementUnit.GetInstanceID()} from drawMovementUnit");*/
+        if(drawMovementUnit!=null)
+            drawMovementUnit.showSelectedCorners(false);
         drawMovementUnit = null;
         turnOnAllUncoveredStructureColliders();
     }
@@ -1285,6 +1288,7 @@ public class MasterGrid : MonoBehaviour
     public void setSelectedUnit(BaseUnit unit)
     {
         selectedUnit = unit;
+        unit.showSelectedCorners(true);
     }
 
     public void exhaustSelectedUnit(BaseUnit unit, bool exhaust)
@@ -1307,10 +1311,12 @@ public class MasterGrid : MonoBehaviour
 
     public void clearSelectedUnit()
     {
+        if(selectedUnit != null)
+            selectedUnit.showSelectedCorners(false);
         selectedUnit = null;
         clearAttackableUnits();
         clearMovement();
-        
+
     }
 
     public void refreshUnits(int playerTurn)
