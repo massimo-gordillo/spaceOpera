@@ -44,8 +44,17 @@ public class GameMaster : MonoBehaviour
     public Button endTurnButton;
     public TMP_Text bottomButtonText;
 
-    public GameObject playerWinCard;
-    public TMP_Text playerWinText;
+    public bool isAnimating;
+    public GameObject announcementCard;
+    public TMP_Text announcementCardText;
+    //public float animationDuration = 0.5f;
+    public float holdDuration;
+    public float swoopDuration;
+
+    private RectTransform announcementCardRT;
+    private Vector2 offScreenLeft;
+    private Vector2 offScreenRight;
+    private Vector2 centerPosition;
 
     public int gridX;
     public int gridY;
@@ -110,7 +119,7 @@ public class GameMaster : MonoBehaviour
         masterGrid.startup(gridX, gridY, tilemapManager.getTilemapByteArray(), gameValues.getAttributesTilesDictionary(), gameValues.getCombatMultiplierDictionary());
 
         hideChoicePanel();
-        playerWinCard.SetActive(false);
+        announcementCard.SetActive(false);
         playerTurn = 1; //player 0 is neutral
         numPlayers = 2; //will set dynamically later
         playersNotLost = new bool[numPlayers+1];
@@ -139,6 +148,27 @@ public class GameMaster : MonoBehaviour
     {
         //have to wait until start to init the production panel because it needs to wait for GameValuesSO.
         productionPanel.init();
+
+        //animation
+        isAnimating = false;
+        announcementCard.SetActive(true);
+        announcementCardRT = announcementCard.GetComponent<RectTransform>();
+
+        // Define positions based on screen width
+        float screenWidth = Screen.width;
+        centerPosition = announcementCardRT.anchoredPosition;
+        offScreenLeft = new Vector2(-screenWidth, centerPosition.y);
+        offScreenRight = new Vector2(screenWidth, centerPosition.y);
+
+        // Start hidden off-screen
+        
+        announcementCardRT.anchoredPosition = offScreenRight;
+        announcementCardRT.position = offScreenRight;
+        holdDuration = 0.001f;
+        swoopDuration = 0.5f;
+        //WaitForSeconds(0.5);
+        if(isAnimating)
+            AnimateStartTurnCard(1);
 
     }
 
@@ -287,7 +317,7 @@ public class GameMaster : MonoBehaviour
 
         var (gameActions, preTurnHash, postTurnHash) = masterGrid.endTurn(playerTurn);
         SubmitTurnToServer(gameActions, preTurnHash, postTurnHash);
-
+        masterGrid.refreshUnits(playerTurn);
         int i = -1;
         do
         { //always increment player number once, then check if that player is still in the game. Go next, never repeat more than num players.
@@ -301,6 +331,9 @@ public class GameMaster : MonoBehaviour
         if (i >= numPlayers)
             playerWins(-1); //error case
         turnNumber++;
+
+        if(isAnimating)
+            AnimateStartTurnCard(playerTurn);
 
         setPlayerTurnText(playerTurn);
         setPlayerResources(playerTurn);
@@ -318,7 +351,8 @@ public class GameMaster : MonoBehaviour
         masterGrid.refreshUnits(playerTurn);
     }
 
-    public async void SubmitTurnToServer(List<GameAction> gameActions, long preTurnHash, long postTurnHash)
+    
+public async void SubmitTurnToServer(List<GameAction> gameActions, long preTurnHash, long postTurnHash)
     {
         bool success = await supabaseManager.SendSubmitTurn(gameActions, preTurnHash, postTurnHash);
     }
@@ -414,8 +448,8 @@ public class GameMaster : MonoBehaviour
 
     private void displayWinnerCard(int player)
     {
-        playerWinCard.SetActive(true);
-        playerWinText.text = $"Player {player} wins!";
+        announcementCard.SetActive(true);
+        announcementCardText.text = $"Player {player} wins!";
         endTurnButton.interactable = false;
         masterGrid.playerWins(player);
     }
@@ -569,6 +603,43 @@ public class GameMaster : MonoBehaviour
         playerProgeny.TryGetValue(b, out byte p);
         return p;
     }
+
+    public void AnimateStartTurnCard(int player)
+    {
+        endTurnButton.GetComponent<Button>().interactable = false;
+        Vector2 endPos = (player % 2 == 0) ? offScreenRight : offScreenLeft;
+        Vector2 startPos = (player % 2 == 0) ? offScreenLeft : offScreenRight;
+
+        announcementCardText.text = $"Player {player}'s turn!";
+        announcementCardRT.anchoredPosition = startPos;
+
+        StartCoroutine(SwoopInAndOutTurnCard(startPos, centerPosition, endPos));
+    }
+
+    private IEnumerator SwoopInAndOutTurnCard(Vector2 startPos, Vector2 centerPos, Vector2 endPos)
+    {
+        yield return SwoopTurnCard(startPos, centerPos, swoopDuration*1.5f, easeOutCubic);
+        yield return new WaitForSeconds(holdDuration);
+        yield return SwoopTurnCard(centerPos, endPos, swoopDuration, easeInCubic);
+        endTurnButton.GetComponent<Button>().interactable = true;
+    }
+
+    private IEnumerator SwoopTurnCard(Vector2 startPos, Vector2 endPos, float duration, System.Func<float, float> easingFunction)
+    {
+        float time = 0;
+        while (time < duration)
+        {
+            float t = easingFunction(time / duration); // Apply easing
+            announcementCardRT.anchoredPosition = Vector2.Lerp(startPos, endPos, t);
+            time += Time.deltaTime;
+            yield return null;
+        }
+        announcementCardRT.anchoredPosition = endPos;
+    }
+
+    // Easing functions for smoother animation
+    private float easeOutCubic(float t) => 1 - Mathf.Pow(1 - t, 3);
+    private float easeInCubic(float t) => Mathf.Pow(t, 3);
 
 
 }
