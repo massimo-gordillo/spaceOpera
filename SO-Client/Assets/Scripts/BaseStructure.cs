@@ -102,7 +102,7 @@ public class BaseStructure : MonoBehaviour
     public void switchAlliance(int capturePlayerInt)
     {
         if (structureType == 5 && playerControl != capturePlayerInt)
-            gameMaster.playerLoses(playerControl);
+            gameMaster.ConcedePlayer(playerControl);
         playerControl = (byte)capturePlayerInt;
         resetCaptureHealth();
         setCaptureSpritesAndColor();

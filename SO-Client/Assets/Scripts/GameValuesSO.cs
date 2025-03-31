@@ -150,6 +150,10 @@ public class GameValuesSO : ScriptableObject
 
     public void LoadUnitsFromCSV()
     {
+        //Don't load twice. 
+        if(isInit)
+            return;
+        //MG: 25-03-31: an improvement could exist here, where you only load the units relevant to the level/progeny. Future performance improvement.
 
         //string filePath = Path.Combine(Application.streamingAssetsPath, fileName);
 
@@ -238,6 +242,8 @@ public class GameValuesSO : ScriptableObject
 
     public void LoadTilesFromCSV()
     {
+        if (isInit)
+            return;
 
         byteToAttributesTileDictionary = new Dictionary<byte, AttributesTile>();
         List<string> lines = LoadCSVFromJSON("TileValues.json");
@@ -322,6 +328,10 @@ public class GameValuesSO : ScriptableObject
 
     public void LoadCombatMultipliersFromCSV()
     {
+        //if already initialized, skip this operation. Important for loading a new game from menu after completing one
+        if (isInit)
+            return;
+
         List<string> lines = LoadCSVFromJSON("UnitValuesCombatMultipliers.json");
 
         if (lines == null || lines.Count < 2) // Ensure there are at least headers + 1 row

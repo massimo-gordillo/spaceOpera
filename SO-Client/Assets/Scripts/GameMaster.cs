@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System.IO;
+using UnityEngine.SceneManagement;
 //using System.Diagnostics;
 //using MessagePack;
 
@@ -47,6 +48,13 @@ public class GameMaster : MonoBehaviour
     public bool isAnimating;
     public GameObject announcementCard;
     public TMP_Text announcementCardText;
+    public GameObject promptCard;
+    public TMP_Text promptCardMainText;
+    public TMP_Text promptCardQuestionText;
+    public TMP_Text promptCardButtonLeftText;
+    public TMP_Text promptCardButtonRightText;
+    public Button concedeMenuButton;
+    public Button backToMenuButton;
     //public float animationDuration = 0.5f;
     public float holdDuration;
     public float swoopDuration;
@@ -237,9 +245,9 @@ public class GameMaster : MonoBehaviour
         if (structure!=null && structure.playerControl == playerTurn && (structure.structureType != 0 && structure.structureType != 5) || (getPlayerProgeny((byte)playerTurn)==1 && playerTurn == structure.playerControl) )
         {
             choicePanel.SetActive(true);
-            productionPanel.gameObject.SetActive(true);
-            productionPanel.presentProdList(structure.structureType, getPlayerProgeny((byte)playerTurn), playerResources[playerTurn]);
 
+            productionPanel.presentProdList(structure.structureType, getPlayerProgeny((byte)playerTurn), playerResources[playerTurn]);
+            productionPanel.gameObject.SetActive(true);
             bottomButtonText.text = "Exit";
             selectedStructure = structure;
         }
@@ -422,7 +430,7 @@ public async void SubmitTurnToServer(List<GameAction> gameActions, long preTurnH
         playerResourceText.text = ""+playerResources[playerTurn];
     }
 
-    public void playerLoses (int player)
+/*    public void playerLoses (int player)
     {
         playersNotLost[player] = false;
         int count=0;
@@ -436,20 +444,31 @@ public async void SubmitTurnToServer(List<GameAction> gameActions, long preTurnH
         }
         if (numPlayers - count <= 1)
             playerWins(playerWinner);
-    }
+    }*/
 
     private void playerWins (int player)
     {
         if (player == -1)
             Debug.LogError($"Player {player} has won the game, this is a failcase");
         else
+        {
+            concedeMenuButton.interactable = false;
+            backToMenuButton.interactable = true;
+            endTurnButton.interactable = false;
             displayWinnerCard(player);
+        }
+    }
+
+    public void ReturnToMainMenu()
+    {
+        SceneManager.LoadSceneAsync("MenuScene");
     }
 
     private void displayWinnerCard(int player)
     {
-        announcementCard.SetActive(true);
-        announcementCardText.text = $"Player {player} wins!";
+        promptCard.SetActive(true);
+        promptCardMainText.text = $"Player {player} wins!";
+        promptCardQuestionText.text = "Return to main menu?";
         endTurnButton.interactable = false;
         masterGrid.playerWins(player);
     }
@@ -641,5 +660,46 @@ public async void SubmitTurnToServer(List<GameAction> gameActions, long preTurnH
     private float easeOutCubic(float t) => 1 - Mathf.Pow(1 - t, 3);
     private float easeInCubic(float t) => Mathf.Pow(t, 3);
 
+    public void ConcedeCurrentPlayer()
+    {
+        ConcedePlayer(playerTurn);
+    }
 
+    public void ConcedePlayer(int i)
+    {
+        playersNotLost[playerTurn] = false;
+        if(i == playerTurn)
+        {
+            endTurnButtonPressed();
+        }
+        CheckIfWinner();
+    }
+
+    private void CheckIfWinner()
+    {
+        int? winner = null;
+        int playerNotLostCount = 0;
+
+        for (int i = 1; i < playersNotLost.Length; i++)
+        {
+            if (playersNotLost[i] == true)
+            {
+                playerNotLostCount++;
+                winner = i;
+            }
+        }
+
+        if (winner!=null && playerNotLostCount == 1)
+        {
+            playerWins((int)winner);
+        }else if(playerNotLostCount > 1)
+        {
+            Debug.Log("More than 1 player remains");
+        }
+        else if (playerNotLostCount <= 0)
+        {
+            Debug.LogError("No players have not lost");
+        }
+
+    }
 }
