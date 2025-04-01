@@ -100,6 +100,8 @@ namespace SlimUI.ModernMenu{
 
         void Awake()
         {
+
+
             // Create the Input Action from the "UI" Action Map
             var actionMap = new InputActionMap("UI");
 
@@ -156,8 +158,10 @@ namespace SlimUI.ModernMenu{
 
         void Start(){
 			CameraObject = transform.GetComponent<Animator>();
+            //keep initial camera still
+            CameraObject.SetFloat("Animate", 1);
 
-			playMenu.SetActive(false);
+            playMenu.SetActive(false);
 			exitMenu.SetActive(false);
 			if(extrasMenu) extrasMenu.SetActive(false);
 			firstMenu.SetActive(true);
@@ -253,6 +257,12 @@ namespace SlimUI.ModernMenu{
             DisablePlayCampaign();
             CameraObject.SetFloat("Animate", 2);
         }
+
+/*        public void Position0()
+        {
+            DisablePlayCampaign();
+            CameraObject.SetFloat("Animate", 10);
+        }*/
 
         void DisablePanels(){
 			PanelControls.SetActive(false);
@@ -423,9 +433,6 @@ namespace SlimUI.ModernMenu{
             Debug.Log("Initializing Game Values...");
 			yield return null;
 			loadingBar.value = 0.05f;
-
-            
-
 
             // Update the prompt for the next loading step
             loadPromptText.text = "Loading... Modifying Tiles";
