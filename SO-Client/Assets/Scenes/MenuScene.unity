@@ -1773,17 +1773,17 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 707458898}
-  m_LocalRotation: {x: -0, y: -0, z: 1.1641532e-10, w: 1}
+  m_LocalRotation: {x: 0.00000006241763, y: 0.00000058132235, z: -0.000000021776263, w: -1}
   m_LocalPosition: {x: 0, y: 0, z: 13}
-  m_LocalScale: {x: 1.5, y: 1.5, z: 1.5}
+  m_LocalScale: {x: 1.7, y: 1.7, z: 1.7}
   m_ConstrainProportionsScale: 1
   m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 0
+  m_Father: {fileID: 2088960266}
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 3}
+  m_AnchoredPosition: {x: 0, y: 9}
   m_SizeDelta: {x: 7427.1606, y: 1175}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!4 &709413638 stripped
@@ -3360,12 +3360,13 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1319906902}
+  - {fileID: 707458901}
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 20}
+  m_AnchoredPosition: {x: 0, y: 11}
   m_SizeDelta: {x: 40, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2088960267
@@ -3380,11 +3381,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 74547876b5d03c340b163dd9ed44b494, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  textContainer: {fileID: 1319906901}
   textDisplay: {fileID: 1319906903}
-  typingSpeed: 0.05
-  pauseSpeed: 0.5
-  caretBlinkSpeed: 0.5
+  typingSpeed: 0.03
+  pauseSpeed: 0.6
+  caretBlinkSpeed: 0.3
+  waitTimeDelayRate: 0.4
+  panDurationMulitplier: 1.7
   manager: {fileID: 351642386607453119}
+  logoSprite: {fileID: 707458899}
+  logoStartPosition: {x: 0, y: 20, z: 13}
+  logoFinalPosition: {x: 0, y: 3, z: 13}
 --- !u!82 &2088960268
 AudioSource:
   m_ObjectHideFlags: 0
@@ -3783,7 +3790,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 355529388823523236, guid: 0a68be1bd13d8694e8d8fe85574ac075, type: 3}
       propertyPath: m_RootOrder
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 355529388823523236, guid: 0a68be1bd13d8694e8d8fe85574ac075, type: 3}
       propertyPath: m_LocalPosition.x
