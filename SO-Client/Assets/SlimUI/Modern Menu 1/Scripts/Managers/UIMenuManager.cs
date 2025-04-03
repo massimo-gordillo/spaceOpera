@@ -13,6 +13,7 @@ using System.IO;
 namespace SlimUI.ModernMenu{
 	public class UIMenuManager : MonoBehaviour {
 		private Animator CameraObject;
+        public AudioSource introAudio;
         private InputAction continueAction;
 		public GameValuesSO gameValuesSO;
 		public bool isGameValuesLoaded = false;
@@ -159,7 +160,7 @@ namespace SlimUI.ModernMenu{
         void Start(){
 			CameraObject = transform.GetComponent<Animator>();
             //keep initial camera still
-            CameraObject.SetFloat("Animate", 1);
+            CameraObject.SetFloat("Animate", 0);
 
             playMenu.SetActive(false);
 			exitMenu.SetActive(false);
@@ -381,6 +382,7 @@ namespace SlimUI.ModernMenu{
             PanelSelect.SetActive(false);
             loadingMenu.SetActive(true);
 			loadPromptText.text = "Loading...";
+            StartCoroutine(muteMusic());
 
             // Start the game values loading coroutine (no need to store the coroutine in an AsyncOperation)
             StartCoroutine(LoadGameValuesAsync());
@@ -412,6 +414,20 @@ namespace SlimUI.ModernMenu{
 
                 yield return null;
             }
+        }
+
+        IEnumerator muteMusic()
+        {
+            float duration = 0.25f;
+            float elapsedTime = 0;
+            while(elapsedTime < duration)
+            {
+                elapsedTime += Time.deltaTime;
+                introAudio.volume = Mathf.Lerp(1f, 0f, elapsedTime / duration);
+                yield return null;
+            }
+            introAudio.volume = 0;
+            yield return null;
         }
 
         public void setSceneLoadOperationTrue()

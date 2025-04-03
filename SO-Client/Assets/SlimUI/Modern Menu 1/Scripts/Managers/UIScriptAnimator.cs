@@ -7,30 +7,45 @@ using UnityEngine.UIElements;
 public class UIScriptAnimator : MonoBehaviour
 {
     public GameObject textContainer;
-    public TextMeshPro textDisplay; 
-    public float typingSpeed = 0.04f;
-    public float pauseSpeed = 0.6f;
-    public float caretBlinkSpeed = 0.3f; 
-    public float waitTimeDelayRate = 0.4f;
-    public float panDurationMulitplier = 1.2f;
+    Vector3 textContainerStartPosition;
+
+    public TextMeshPro textDisplay;
     private string fullText;
     private string currentText = "";
+
+    public Button skipButton;
+    public TextMeshPro skipButtonText;
+    //public Color buttonTextColor;
+
+    public float typingSpeed;
+    public float pauseSpeed;
+    public float caretBlinkSpeed; 
+    public float waitTimeDelayRate;
+    public float panDurationMulitplier;
+
+
     private bool isTypingComplete = false;
     public UIMenuManager manager;
+
+    public Canvas menuCanvas;
+    Vector3 menuCanvasStartPosition;
+    Vector3 menuCanvasEndPosition;
+
     public SpriteRenderer logoSprite;
-    Vector3 textContainerPosition;
-    //Vector3 textContainerStartingPosition;
-    
     public Vector3 logoStartPosition;
     public Vector3 logoFinalPosition;
     Color logoColor;
 
     void Start()
     {
+        menuCanvasEndPosition = new Vector3(1.2f, 1.5f, 22.1f);
+        menuCanvasStartPosition = new Vector3(1.2f, -10.0f, 22.1f);
+        menuCanvas.transform.position = menuCanvasStartPosition;
         logoColor = logoSprite.color;
         logoSprite.color = new Color(logoColor.r, logoColor.g, logoColor.b, 0);
         logoSprite.transform.position = logoStartPosition;
-        textContainerPosition = textContainer.transform.position;
+        textContainerStartPosition = textContainer.transform.position;
+        skipButtonText.color = new Color(skipButtonText.color.r, skipButtonText.color.g, skipButtonText.color.b, 0.25f);
         //logoFinalPosition = logoSprite.transform.position;
         SetStartText();
         StartCoroutine(TypeText());
@@ -109,24 +124,29 @@ public class UIScriptAnimator : MonoBehaviour
 
     IEnumerator IntroAnimations()
     {
-        //logoSprite.transform.position = textContainerPosition;
-        float waitTime = typingSpeed * fullText.Length * waitTimeDelayRate;
-        //yield return new WaitForSeconds(1.0f);
-        yield return new WaitForSeconds(waitTime);
-        float duration = typingSpeed * fullText.Length * panDurationMulitplier; // Time taken to move off-screen
-        float scrollElapsedTime = 0f;
-        Vector3 targetPosition = textContainerPosition + new Vector3(0, 30, 0);
 
-        while (scrollElapsedTime < duration)
+        //logoSprite.transform.position = textContainerStartPosition;
+        StartCoroutine(FadeInSkipButton());
+        float waitTime = typingSpeed * fullText.Length * waitTimeDelayRate;
+        yield return new WaitForSeconds(waitTime);
+        float scrollDuration = typingSpeed * fullText.Length * panDurationMulitplier; // Time taken to move off-screen
+        float scrollElapsedTime = 0f;
+        Vector3 scrollTargetPosition = new Vector3(0, 20, 20);
+        float t;
+        float modT;
+
+        while (scrollElapsedTime < scrollDuration)
         {
-            textContainer.transform.position = Vector3.Lerp(textContainerPosition, targetPosition, scrollElapsedTime / duration);
+            t = scrollElapsedTime / scrollDuration;
+            modT = Mathf.Pow(t, 1.25f);
+            textContainer.transform.position = Vector3.Lerp(textContainerStartPosition, scrollTargetPosition, modT);
             scrollElapsedTime += Time.deltaTime;
             yield return null;  // Wait for next frame
         }
 
         
         float fadeInElapsedTime = 0f;
-        float fadeInDuration = 8.0f;
+        float fadeInDuration = 4.0f;
 
 
         while (fadeInElapsedTime < fadeInDuration)
@@ -140,14 +160,18 @@ public class UIScriptAnimator : MonoBehaviour
         //set camera position to menu
         manager.Position1();
 
-        yield return new WaitForSeconds(2.0f);
+        yield return new WaitForSeconds(1.5f);
 
         float settleElapsedTime = 0;
-        float settleDuration = 6.0f;
+        float settleDuration = 2.5f;
 
         while (settleElapsedTime < settleDuration)
         {
-            logoSprite.transform.position = Vector3.Lerp(logoStartPosition, logoFinalPosition, settleElapsedTime / settleDuration);
+            t = 1 - Mathf.Pow(1 - (settleElapsedTime / settleDuration), 2f);
+            logoSprite.transform.position = Vector3.Lerp(logoStartPosition, logoFinalPosition, t);
+            menuCanvas.transform.position = Vector3.Lerp(menuCanvasStartPosition, menuCanvasEndPosition, t);
+            //logoSprite.transform.position = Vector3.Lerp(logoStartPosition, logoFinalPosition, settleElapsedTime / settleDuration);
+            //menuCanvas.transform.position = Vector3.Lerp(menuCanvasStartPosition, menuCanvasEndPosition, settleElapsedTime / settleDuration);
             settleElapsedTime += Time.deltaTime;
             yield return null;  // Wait for next frame
         }
@@ -174,6 +198,20 @@ public class UIScriptAnimator : MonoBehaviour
                 //yield return new WaitForSeconds(caretBlinkSpeed);
             }
         }*/
+
+    IEnumerator FadeInSkipButton()
+    {
+        yield return new WaitForSeconds(1.5f);
+        float fadeInDuration = 4;
+        float duration = 0;
+        float startFade = 0.25f;
+        while(duration < fadeInDuration)
+        {
+            skipButtonText.color = new Color(skipButtonText.color.r, skipButtonText.color.g, skipButtonText.color.b, startFade + (duration / fadeInDuration));// * (1 - startFade));
+            duration += Time.deltaTime;
+            yield return null;
+        }
+    }
 
     IEnumerator BlinkCaret()
     {
