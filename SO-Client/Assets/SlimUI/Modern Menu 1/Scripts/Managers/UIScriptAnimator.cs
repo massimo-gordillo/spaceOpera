@@ -13,8 +13,9 @@ public class UIScriptAnimator : MonoBehaviour
     private string fullText;
     private string currentText = "";
 
-    public Button skipButton;
+    public GameObject skipButton;
     public TextMeshPro skipButtonText;
+    float maxSkipButtonOpacity = 0.8f;
     //public Color buttonTextColor;
 
     public float typingSpeed;
@@ -24,7 +25,7 @@ public class UIScriptAnimator : MonoBehaviour
     public float panDurationMulitplier;
 
 
-    private bool isTypingComplete = false;
+    private bool isAnimationComplete = false;
     public UIMenuManager manager;
 
     public Canvas menuCanvas;
@@ -52,6 +53,18 @@ public class UIScriptAnimator : MonoBehaviour
         StartCoroutine(IntroAnimations());
     }
 
+    public void JumpToStart()
+    {
+        Debug.Log("jumpingToStart");
+        isAnimationComplete = true;
+        
+        StartCoroutine(SettleMainMenu(0.5f));
+        StartCoroutine(FadeOutSkipButton(0.1f));
+        textContainer.transform.position = new Vector3(0, 20, 20);
+        logoSprite.color = logoColor;
+        
+    }
+
     public void SetStartText()
     {
         fullText = "In the year 801 GE, human conquest continues its expansion into space.\n\n" +
@@ -66,9 +79,12 @@ public class UIScriptAnimator : MonoBehaviour
         //Debug.Log("Typing Speed: " + typingSpeed);
         textDisplay.text = "|";
         StartCoroutine(BlinkCaret());
-        yield return new WaitForSeconds(pauseSpeed*2);
+        yield return new WaitForSeconds(pauseSpeed * 2);
         for (int i = 0; i < fullText.Length; i++)
         {
+            if (isAnimationComplete)
+                break;
+
             currentText += fullText[i];
             textDisplay.text = currentText + "|"; // Show caret
             if (fullText[i] == '.')
@@ -90,11 +106,12 @@ public class UIScriptAnimator : MonoBehaviour
                 //yield return new WaitForSeconds(Mathf.Max(typingSpeed, 0.01f));
             }
         }
+        
 
         //set camera position to menu
         //manager.Position1();
         
-        isTypingComplete = true;
+        //isTypingComplete = true;
 
 /*        Vector2 canvasCenter = new Vector2(Screen.width / 2, Screen.height / 2);
         Debug.Log($"Canvas Center: {canvasCenter}");*/
@@ -125,45 +142,54 @@ public class UIScriptAnimator : MonoBehaviour
     IEnumerator IntroAnimations()
     {
 
-        //logoSprite.transform.position = textContainerStartPosition;
-        StartCoroutine(FadeInSkipButton());
-        float waitTime = typingSpeed * fullText.Length * waitTimeDelayRate;
-        yield return new WaitForSeconds(waitTime);
-        float scrollDuration = typingSpeed * fullText.Length * panDurationMulitplier; // Time taken to move off-screen
-        float scrollElapsedTime = 0f;
-        Vector3 scrollTargetPosition = new Vector3(0, 20, 20);
-        float t;
-        float modT;
+            //logoSprite.transform.position = textContainerStartPosition;
+            StartCoroutine(FadeInSkipButton());
+            float waitTime = typingSpeed * fullText.Length * waitTimeDelayRate;
+            yield return new WaitForSeconds(waitTime);
+            float scrollDuration = typingSpeed * fullText.Length * panDurationMulitplier; // Time taken to move off-screen
+            float scrollElapsedTime = 0f;
+            Vector3 scrollTargetPosition = new Vector3(0, 20, 20);
+            float t;
+            float modT;
 
-        while (scrollElapsedTime < scrollDuration)
-        {
-            t = scrollElapsedTime / scrollDuration;
-            modT = Mathf.Pow(t, 1.25f);
-            textContainer.transform.position = Vector3.Lerp(textContainerStartPosition, scrollTargetPosition, modT);
-            scrollElapsedTime += Time.deltaTime;
-            yield return null;  // Wait for next frame
-        }
-
-        
-        float fadeInElapsedTime = 0f;
-        float fadeInDuration = 4.0f;
+            while (scrollElapsedTime < scrollDuration)
+            {
+                if (isAnimationComplete)
+                    yield break;
+                t = scrollElapsedTime / scrollDuration;
+                modT = Mathf.Pow(t, 1.25f);
+                textContainer.transform.position = Vector3.Lerp(textContainerStartPosition, scrollTargetPosition, modT);
+                scrollElapsedTime += Time.deltaTime;
+                yield return null;  // Wait for next frame
+            }
 
 
-        while (fadeInElapsedTime < fadeInDuration)
-        {
-            fadeInElapsedTime += Time.deltaTime;
-            float alpha = Mathf.Clamp01(fadeInElapsedTime / fadeInDuration);
-            logoSprite.color = new Color(logoColor.r, logoColor.g, logoColor.b, alpha);
-            yield return null;
-        }
+            float fadeInElapsedTime = 0f;
+            float fadeInDuration = 4.0f;
 
-        //set camera position to menu
-        manager.Position1();
 
-        yield return new WaitForSeconds(1.5f);
+            while (fadeInElapsedTime < fadeInDuration)
+            {
+                if (isAnimationComplete)
+                    yield break;
+                fadeInElapsedTime += Time.deltaTime;
+                float alpha = Mathf.Clamp01(fadeInElapsedTime / fadeInDuration);
+                logoSprite.color = new Color(logoColor.r, logoColor.g, logoColor.b, alpha);
+                yield return null;
+            }
 
+            //set camera position to menu
+            manager.Position1();
+
+            yield return new WaitForSeconds(1.5f);
+            StartCoroutine(FadeOutSkipButton(1));
+            StartCoroutine(SettleMainMenu(2.5f));
+    }
+
+    public IEnumerator SettleMainMenu(float settleDuration)
+    {
         float settleElapsedTime = 0;
-        float settleDuration = 2.5f;
+        float t;
 
         while (settleElapsedTime < settleDuration)
         {
@@ -175,7 +201,6 @@ public class UIScriptAnimator : MonoBehaviour
             settleElapsedTime += Time.deltaTime;
             yield return null;  // Wait for next frame
         }
-
     }
 
     /*    IEnumerator BlinkCaret()
@@ -201,16 +226,38 @@ public class UIScriptAnimator : MonoBehaviour
 
     IEnumerator FadeInSkipButton()
     {
-        yield return new WaitForSeconds(1.5f);
-        float fadeInDuration = 4;
-        float duration = 0;
-        float startFade = 0.25f;
-        while(duration < fadeInDuration)
+        if (skipButtonText.color.b != maxSkipButtonOpacity)
         {
-            skipButtonText.color = new Color(skipButtonText.color.r, skipButtonText.color.g, skipButtonText.color.b, startFade + (duration / fadeInDuration));// * (1 - startFade));
-            duration += Time.deltaTime;
-            yield return null;
+            yield return new WaitForSeconds(1.5f);
+            float fadeInDuration = 4;
+            float duration = 0;
+            float startFade = 0.25f;
+            while (duration < fadeInDuration)
+            {
+                if (isAnimationComplete)
+                    yield break;
+                skipButtonText.color = new Color(skipButtonText.color.r, skipButtonText.color.g, skipButtonText.color.b, startFade + (maxSkipButtonOpacity - startFade) * (duration / fadeInDuration));// * (1 - startFade));
+                duration += Time.deltaTime;
+                yield return null;
+            }
+            skipButtonText.color = new Color(skipButtonText.color.r, skipButtonText.color.g, skipButtonText.color.b, maxSkipButtonOpacity);
         }
+    }
+
+    IEnumerator FadeOutSkipButton(float fadeOutDuration)
+    {
+        if(skipButtonText.color.a != 0) { 
+            float duration = 0;
+            float startFade = maxSkipButtonOpacity;
+            while (duration < fadeOutDuration)
+            {
+                skipButtonText.color = new Color(skipButtonText.color.r, skipButtonText.color.g, skipButtonText.color.b, startFade - (duration / fadeOutDuration));// * (1 - startFade));
+                duration += Time.deltaTime;
+                yield return null;
+            }
+            skipButtonText.color = new Color(skipButtonText.color.r, skipButtonText.color.g, skipButtonText.color.b, 0);
+        }
+        skipButton.SetActive(false);
     }
 
     IEnumerator BlinkCaret()
