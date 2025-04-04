@@ -6,6 +6,8 @@ using UnityEngine.UIElements;
 
 public class UIScriptAnimator : MonoBehaviour
 {
+    private static bool hasAnimated = false;
+
     public GameObject textContainer;
     Vector3 textContainerStartPosition;
 
@@ -49,15 +51,21 @@ public class UIScriptAnimator : MonoBehaviour
         skipButtonText.color = new Color(skipButtonText.color.r, skipButtonText.color.g, skipButtonText.color.b, 0.25f);
         //logoFinalPosition = logoSprite.transform.position;
         SetStartText();
-        StartCoroutine(TypeText());
-        StartCoroutine(IntroAnimations());
+        if (!hasAnimated)
+        {
+            StartCoroutine(TypeText());
+            StartCoroutine(IntroAnimations());
+            hasAnimated = true;
+        }
+        else
+            JumpToStart();
     }
 
     public void JumpToStart()
     {
         //Debug.Log("jumpingToStart");
         isAnimationComplete = true;
-        
+        hasAnimated = true;
         StartCoroutine(SettleMainMenu(0.5f));
         StartCoroutine(FadeOutSkipButton(0.1f));
         textContainer.transform.position = new Vector3(0, 40, 20);
