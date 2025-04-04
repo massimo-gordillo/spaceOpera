@@ -362,7 +362,8 @@ public class GameMaster : MonoBehaviour
                     Debug.Log($"structure at {structure.xPos}, {structure.yPos} is being covered by {coveringUnit.unitName}!");
                 else
                     Debug.Log($"structure at {structure.xPos}, {structure.yPos} not covered ");
-                if (structure.structureType != 0 && structure.structureType != 5)
+                //create a virix spore on all production structures except on the first turn.
+                if (structure.structureType != 0 && structure.structureType != 5 && turnNumber > numPlayers)
                 {
                     selectedStructure = structure;
                     if (coveringUnit == null)
