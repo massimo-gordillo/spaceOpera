@@ -113,10 +113,10 @@ public class CameraDrag : MonoBehaviour
                 {
                     HandleObjectClick(clickableObject);
                 }
-                else
+/*                else
                 {
                     Debug.LogWarning("clickable object under pointer is null");
-                }
+                }*/
             }
 
             isDragging = false;

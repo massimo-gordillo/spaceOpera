@@ -240,7 +240,7 @@ public class GameMaster : MonoBehaviour
 
     public void structureHasBeenClicked(BaseStructure structure)
     {
-        Debug.Log("Structure at loc " + structure.xPos + ", " + structure.yPos + " has been clicked.");
+        //Debug.Log("Structure at loc " + structure.xPos + ", " + structure.yPos + " has been clicked.");
         //should probably try/catch if structure is null
         if (structure!=null && structure.playerControl == playerTurn && (structure.structureType != 0 && structure.structureType != 5) || (getPlayerProgeny((byte)playerTurn)==1 && playerTurn == structure.playerControl) )
         {

@@ -278,7 +278,7 @@ public class MasterGrid : MonoBehaviour
         double multiplier = getDamageMultiplier(attacker, defender);
         double defenceVal = getDefenceValueForDefender(defender);
         
-        //Debug.Log($"defenceVal for defender {defender.GetInstanceID()} is {defenceVal}");
+        Debug.Log($"attacker base damage: {baseDamage}, multiplier = {multiplier}, defenceVal for defender is {defenceVal}");
 
         //if they are the same type of unit, they deal a maximum of 70% after type multiplier (defence and luck calculation comes after) 
         if (attacker.gamePieceId == defender.gamePieceId)
@@ -926,7 +926,7 @@ public class MasterGrid : MonoBehaviour
         blueSquare.stripeSprite.gameObject.SetActive(!isControllersTurn);
         if(drawMovementUnit.progeny == Progeny.Sentus)
         {
-            Debug.Log($"Showing shields at {x},{y}, is {defenceGridInt[x, y]}");
+            //Debug.Log($"Showing shields at {x},{y}, is {defenceGridInt[x, y]}");
             blueSquare.showShields(defenceGridInt[x, y]);
         }
         Instantiate(blueSquare, new Vector2(x, y), Quaternion.identity, movementSquareList);
@@ -987,11 +987,17 @@ public class MasterGrid : MonoBehaviour
         int tileDefenceValue = getTileDefenceValueInt(defender.xPos, defender.yPos);
         double floor = getAttackLuckFloor(damageBeforeLuck, defender.healthMax);
         double ceiling = getAttackLuckCeiling(damageBeforeLuck, defender.healthMax);
-        if(luckOn)
+        if (luckOn)
+        {
             defender.showCombatTooltip(tileDefenceValue, floor, ceiling);
+            //Debug.Log($"For defender {defender.GetInstanceID()}, Tooltip displays floor: {floor}, ceiling: {ceiling}, base dmg before luck: {damageBeforeLuck}.");
+        }
         else
-            defender.showCombatTooltip(tileDefenceValue, damageBeforeLuck, damageBeforeLuck);
-        Debug.Log($"For defender {defender.GetInstanceID()}, Tooltip displays floor: {floor}, ceiling: {ceiling}, base dmg before luck: {damageBeforeLuck}.");
+        {
+            defender.showCombatTooltip(tileDefenceValue, damageBeforeLuck/defender.healthMax, damageBeforeLuck/defender.healthMax);
+            //Debug.Log($"For defender {defender.GetInstanceID()}, Tooltip displays floor: {damageBeforeLuck}, ceiling: {damageBeforeLuck}, base dmg before luck: {damageBeforeLuck}.");
+
+        }
     }
 
     public BaseUnit whatUnitIsInThisLocation(int x, int y)
