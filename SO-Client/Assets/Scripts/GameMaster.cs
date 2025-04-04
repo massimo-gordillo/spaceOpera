@@ -197,23 +197,26 @@ public class GameMaster : MonoBehaviour
             if (progeny == 0)
             {
                 BaseUnit infantryUnitPrefab = Resources.Load<BaseUnit>("UnitPrefabs/progeny1/InfantryPrefab");
-                BaseUnit unit = GetInstantiateUnit(infantryUnitPrefab, x, y);
+                infantryUnitPrefab.playerControl = player;
+                BaseUnit unit = GetInstantiateUnit(infantryUnitPrefab, x, y, player);
                 //BaseUnit unit = Instantiate(infantryUnitPrefab, new Vector2(x, y), Quaternion.identity, unitList);
-                unit.playerControl = player;
+                
             }
             else if (progeny == 1)
             {
                 BaseUnit sporeUnitPrefab = Resources.Load<BaseUnit>("UnitPrefabs/progeny2/SporePrefab");
-                BaseUnit unit = GetInstantiateUnit(sporeUnitPrefab, x, y);
+                sporeUnitPrefab.playerControl = player;
+                BaseUnit unit = GetInstantiateUnit(sporeUnitPrefab, x, y, player);
                 //BaseUnit unit = Instantiate(sporeUnitPrefab, new Vector2(x, y), Quaternion.identity, unitList);
-                unit.playerControl = player;
+                
             }
             else if (progeny == 2)
             {
                 BaseUnit blacksmithUnitPrefab = Resources.Load<BaseUnit>("UnitPrefabs/progeny3/BlacksmithPrefab");
-                BaseUnit unit = GetInstantiateUnit(blacksmithUnitPrefab, x, y);
+                blacksmithUnitPrefab.playerControl = player;
+                BaseUnit unit = GetInstantiateUnit(blacksmithUnitPrefab, x, y, player);
                 //BaseUnit unit = Instantiate(blacksmithUnitPrefab, new Vector2(x, y), Quaternion.identity, unitList);
-                unit.playerControl = player;
+                
             }
         }
         
@@ -294,11 +297,11 @@ public class GameMaster : MonoBehaviour
     public void ProduceUnit(BaseUnit unit, int playerControl, bool isNonExhausted)
     {
         playerResources[playerTurn] -= unit.price;
-        unit.playerControl = playerTurn;
+        //unit.playerControl = playerTurn;
         
 
         //need a way to set to exhausted from here so the units don't have to start exhausted on the 1st turn.
-        BaseUnit tempUnit = GetInstantiateUnit(unit, selectedStructure.xPos, selectedStructure.yPos);
+        BaseUnit tempUnit = GetInstantiateUnit(unit, selectedStructure.xPos, selectedStructure.yPos, null);
         //BaseUnit tempUnit = Instantiate(unit, new Vector2(selectedStructure.xPos, selectedStructure.yPos), Quaternion.identity, unitList);
         //tempUnit.setNonExhausted(isNonExhausted);
 
@@ -330,6 +333,19 @@ public class GameMaster : MonoBehaviour
         var (gameActions, preTurnHash, postTurnHash) = masterGrid.endTurn(playerTurn);
         SubmitTurnToServer(gameActions, preTurnHash, postTurnHash);
         masterGrid.refreshUnits(playerTurn);
+
+        if (getPlayerProgeny((byte)playerTurn) == 1)
+        {
+            foreach (BaseStructure structure in masterGrid.GetStructures(playerTurn))
+            {
+                BaseUnit coveringUnit = masterGrid.whatUnitIsInThisLocation(structure.xPos, structure.yPos);
+                if (coveringUnit != null && coveringUnit.unitName == "seed")
+                {
+                    masterGrid.deleteUnit(coveringUnit);
+                }
+            }
+        }
+
         int i = -1;
         do
         { //always increment player number once, then check if that player is still in the game. Go next, never repeat more than num players.
@@ -355,25 +371,15 @@ public class GameMaster : MonoBehaviour
         //special virix handling
         if (getPlayerProgeny((byte)playerTurn) == 1)
         {
-            foreach(BaseStructure structure in masterGrid.GetStructures(playerTurn)){
-                //Debug.Log("Production structure at loc " + productionStructure.xPos + ", " + productionStructure.yPos + " producing a spore");
-                BaseUnit coveringUnit = masterGrid.whatUnitIsInThisLocation(structure.xPos, structure.yPos);
-                if (coveringUnit != null)
-                    Debug.Log($"structure at {structure.xPos}, {structure.yPos} is being covered by {coveringUnit.unitName}!");
-                else
-                    Debug.Log($"structure at {structure.xPos}, {structure.yPos} not covered ");
+            foreach(BaseStructure structure in masterGrid.GetProductionStructures(playerTurn)){
                 //create a virix spore on all production structures except on the first turn.
-                if (structure.structureType != 0 && structure.structureType != 5 && turnNumber > numPlayers)
+                if (turnNumber > numPlayers)
                 {
                     selectedStructure = structure;
-                    if (coveringUnit == null)
+                    if (masterGrid.whatUnitIsInThisLocation(structure.xPos, structure.yPos) == null)
                         ProduceUnit(PrefabManager.getBaseUnitFromName("spore", 1), playerTurn, true);
                 }
-                if (coveringUnit!= null && coveringUnit.unitName == "seed")
-                {
-                    
-                    masterGrid.deleteUnit(coveringUnit);
-                }
+
 
             }
         }
@@ -624,9 +630,12 @@ public async void SubmitTurnToServer(List<GameAction> gameActions, long preTurnH
         Instantiate(unit, new Vector2(x, y), Quaternion.identity, unitList);
     }
     
-    public BaseUnit GetInstantiateUnit(BaseUnit unit, int x, int y)
+    public BaseUnit GetInstantiateUnit(BaseUnit unit, int x, int y, int? player)
     {
-        unit.playerControl = getPlayerTurn();
+        if(player==null)
+            unit.playerControl = getPlayerTurn();
+        else
+            unit.playerControl = (int)player;
         BaseUnit tempUnit = Instantiate(unit, new Vector2(x, y), Quaternion.identity, unitList);
         return tempUnit;
     }

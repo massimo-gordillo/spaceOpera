@@ -354,7 +354,7 @@ public class MasterGrid : MonoBehaviour
 
     public bool canUnitAttack(BaseUnit attacker, BaseUnit defender)
     {
-        if (attacker != null && defender != null)
+        if (attacker != null && defender != null && defender.unitName != "seed")
         {
             if (defender.unitTerrainType == UnitTerrainType.Land)
                 return attacker.canAttackLand;
@@ -1675,12 +1675,10 @@ public class MasterGrid : MonoBehaviour
 
     public void createVirixSeed(int x, int y)
     {
-        BaseUnit tempSeed = PrefabManager.getBaseUnitFromName("seed", 1);
-        tempSeed.playerControl = getPlayerTurn();
-        BaseUnit seed = gameMaster.GetInstantiateUnit(tempSeed, x, y);
-        
-        //seed.setNonExhausted(false);
-        //seed.setColor(seed.playerControl, false);
+        BaseUnit seed = PrefabManager.getBaseUnitFromName("seed", 1);
+        //seed.playerControl = getPlayerTurn();
+        seed.setNonExhausted(true);
+        seed = gameMaster.GetInstantiateUnit(seed, x, y, null);
     }
 
     private IEnumerator waitGenerateSaveArrayToCSV()

@@ -39,6 +39,7 @@ public class BaseUnit : MonoBehaviour
     public int yPos;
     private Color baseColor; //currently unused.
     private Color originalLightsColor;
+    private bool originalLightsColorSet = false;
     public bool movementNonExhausted;
     public bool nonExhausted;
     public bool undoingMovement = false;
@@ -92,7 +93,7 @@ public class BaseUnit : MonoBehaviour
         }
 
         baseColor = spriteFillSR.color;
-        originalLightsColor = spriteLightsSR.color;
+        //originalLightsColor = spriteLightsSR.color;
 
         //a good hack will probably want to fix later.
         if ((playerControl+1) % 2 == 1)
@@ -316,6 +317,11 @@ public class BaseUnit : MonoBehaviour
     */
     public void setColor(int player, bool nonExhausted)
     {
+        if (!originalLightsColorSet)
+        {
+            originalLightsColor = spriteLightsSR.color;
+            originalLightsColorSet = true;
+        }
         float hue = ((float)player / 3.0f) * 360f;
         float saturation = nonExhausted ? 0.9f : 0.6f; // Medium difference in saturation
         float value = nonExhausted ? 0.95f : 0.75f;    // Slightly more noticeable difference in brightness
@@ -329,6 +335,7 @@ public class BaseUnit : MonoBehaviour
         float adjustedLightsValue = nonExhausted ? lightsValue : lightsValue * 0.7f; // Darken when exhausted
         Color lightsColor = Color.HSVToRGB(lightsHue, lightsSaturation, adjustedLightsValue);
         spriteLightsSR.color = lightsColor;
+       // Debug.Log($"lights color: {lightsColor}");
 
         cornerSpriteTL.GetComponent<SpriteRenderer>().color = color;
         cornerSpriteTR.GetComponent<SpriteRenderer>().color = color;
