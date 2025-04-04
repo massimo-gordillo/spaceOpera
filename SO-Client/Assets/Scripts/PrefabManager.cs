@@ -48,7 +48,7 @@ public class PrefabManager
         return prefab;
     }
 
-    public BaseUnit getBaseUnitFromPath(string prefabPath)
+    public static BaseUnit getBaseUnitFromPath(string prefabPath)
     {
         BaseUnit prefab = Resources.Load<BaseUnit>(prefabPath.Replace("Assets/Resources/", "").Replace(".prefab", ""));
         if (prefab == null)
@@ -58,7 +58,7 @@ public class PrefabManager
         return prefab;
     }
 
-    public BaseUnit getBaseUnitFromName(string name, int progeny)
+    static public BaseUnit getBaseUnitFromName(string name, int progeny)
     {
         string prefabPath = $"UnitPrefabs/progeny{progeny+1}/{name}Prefab";
         BaseUnit prefab = Resources.Load<BaseUnit>(prefabPath);

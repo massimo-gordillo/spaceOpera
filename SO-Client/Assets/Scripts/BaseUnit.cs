@@ -165,7 +165,8 @@ public class BaseUnit : MonoBehaviour
 
     public void staticSpriteHasBeenClicked()
     {
-        masterGrid.unitHasBeenClicked(this);
+        if(unitName != "seed")
+            masterGrid.unitHasBeenClicked(this);
     }
 
     public void drawCrosshairs()

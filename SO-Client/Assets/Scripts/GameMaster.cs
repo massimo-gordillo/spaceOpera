@@ -15,7 +15,7 @@ public class GameMaster : MonoBehaviour
 
     public MasterGrid masterGrid;
     public TilemapManager tilemapManager;
-    private PrefabManager prefabManager = new PrefabManager();
+    //private PrefabManager prefabManager = new PrefabManager();
     public SupabaseManager supabaseManager;
     public Guid match_id;
 
@@ -111,7 +111,7 @@ public class GameMaster : MonoBehaviour
         else {
             Debug.LogWarning("Progeny set to -1 selected, defaulting to hard values");
             playerProgeny.Add(1, 0);
-            playerProgeny.Add(2, 2);
+            playerProgeny.Add(2, 1);
         }
         //Debug.Log($"player 1 is progeny {getPlayerProgeny(0)}, player 2 is progeny {getPlayerProgeny(1)}");
 
@@ -197,19 +197,22 @@ public class GameMaster : MonoBehaviour
             if (progeny == 0)
             {
                 BaseUnit infantryUnitPrefab = Resources.Load<BaseUnit>("UnitPrefabs/progeny1/InfantryPrefab");
-                BaseUnit unit = Instantiate(infantryUnitPrefab, new Vector2(x, y), Quaternion.identity, unitList);
+                BaseUnit unit = GetInstantiateUnit(infantryUnitPrefab, x, y);
+                //BaseUnit unit = Instantiate(infantryUnitPrefab, new Vector2(x, y), Quaternion.identity, unitList);
                 unit.playerControl = player;
             }
             else if (progeny == 1)
             {
                 BaseUnit sporeUnitPrefab = Resources.Load<BaseUnit>("UnitPrefabs/progeny2/SporePrefab");
-                BaseUnit unit = Instantiate(sporeUnitPrefab, new Vector2(x, y), Quaternion.identity, unitList);
+                BaseUnit unit = GetInstantiateUnit(sporeUnitPrefab, x, y);
+                //BaseUnit unit = Instantiate(sporeUnitPrefab, new Vector2(x, y), Quaternion.identity, unitList);
                 unit.playerControl = player;
             }
             else if (progeny == 2)
             {
                 BaseUnit blacksmithUnitPrefab = Resources.Load<BaseUnit>("UnitPrefabs/progeny3/BlacksmithPrefab");
-                BaseUnit unit = Instantiate(blacksmithUnitPrefab, new Vector2(x, y), Quaternion.identity, unitList);
+                BaseUnit unit = GetInstantiateUnit(blacksmithUnitPrefab, x, y);
+                //BaseUnit unit = Instantiate(blacksmithUnitPrefab, new Vector2(x, y), Quaternion.identity, unitList);
                 unit.playerControl = player;
             }
         }
@@ -295,7 +298,8 @@ public class GameMaster : MonoBehaviour
         
 
         //need a way to set to exhausted from here so the units don't have to start exhausted on the 1st turn.
-        BaseUnit tempUnit = Instantiate(unit, new Vector2(selectedStructure.xPos, selectedStructure.yPos), Quaternion.identity, unitList);
+        BaseUnit tempUnit = GetInstantiateUnit(unit, selectedStructure.xPos, selectedStructure.yPos);
+        //BaseUnit tempUnit = Instantiate(unit, new Vector2(selectedStructure.xPos, selectedStructure.yPos), Quaternion.identity, unitList);
         //tempUnit.setNonExhausted(isNonExhausted);
 
         //GameObject tempInstance = Object.Instantiate(unit, new Vector2(selectedStructure.xPos, selectedStructure.yPos), Quaternion.identity, unitList);
@@ -347,13 +351,29 @@ public class GameMaster : MonoBehaviour
         setPlayerResources(playerTurn);
 
         //Debug.Log("Player " + playerTurn + " turn, progeny:" + getPlayerProgeny((byte)playerTurn));
+
+        //special virix handling
         if (getPlayerProgeny((byte)playerTurn) == 1)
         {
-            foreach(BaseStructure productionStructure in masterGrid.GetProductionStructures(playerTurn)){
+            foreach(BaseStructure structure in masterGrid.GetStructures(playerTurn)){
                 //Debug.Log("Production structure at loc " + productionStructure.xPos + ", " + productionStructure.yPos + " producing a spore");
-                selectedStructure = productionStructure;
-                if(!selectedStructure.IsCoveredByUnit())
-                    ProduceUnit(prefabManager.getBaseUnitFromName("spore",1),playerTurn, true);
+                BaseUnit coveringUnit = masterGrid.whatUnitIsInThisLocation(structure.xPos, structure.yPos);
+                if (coveringUnit != null)
+                    Debug.Log($"structure at {structure.xPos}, {structure.yPos} is being covered by {coveringUnit.unitName}!");
+                else
+                    Debug.Log($"structure at {structure.xPos}, {structure.yPos} not covered ");
+                if (structure.structureType != 0 && structure.structureType != 5)
+                {
+                    selectedStructure = structure;
+                    if (coveringUnit == null)
+                        ProduceUnit(PrefabManager.getBaseUnitFromName("spore", 1), playerTurn, true);
+                }
+                if (coveringUnit!= null && coveringUnit.unitName == "seed")
+                {
+                    
+                    masterGrid.deleteUnit(coveringUnit);
+                }
+
             }
         }
         masterGrid.refreshUnits(playerTurn);
@@ -554,7 +574,7 @@ public async void SubmitTurnToServer(List<GameAction> gameActions, long preTurnH
                     int y = pieceInfo.y;
                     AttributesBaseUnit data = gameValues.GetUnitDataByByte(pieceInfo.typeNum);
 
-                    BaseUnit unit = prefabManager.getBaseUnitFromPath(data.prefabPath);
+                    BaseUnit unit = PrefabManager.getBaseUnitFromPath(data.prefabPath);
                     if (unit == null)
                     {
                         Debug.LogError($"No unit prefab found for byte value {pieceInfo.typeNum}");
@@ -564,7 +584,8 @@ public async void SubmitTurnToServer(List<GameAction> gameActions, long preTurnH
                     unit.setHealth((int)((double)(pieceInfo.healthVal * unit.healthMax) / 100));
                     unit.xPos = x;
                     unit.yPos = y;
-                    Instantiate(unit, new Vector2(x, y), Quaternion.identity, unitList);
+                    InstantiateUnit(unit, x, y);
+                    //Instantiate(unit, new Vector2(x, y), Quaternion.identity, unitList);
                     masterGrid.setUnitInGrid(x, y, unit);
                 }
                 else if (pieceInfo.typeNum >= 200 && pieceInfo.typeNum < 255)
@@ -597,19 +618,32 @@ public async void SubmitTurnToServer(List<GameAction> gameActions, long preTurnH
             Debug.LogError("gameStateList is empty!");
     }
 
-/*    public void ConvertFileToGameState()
+    public void InstantiateUnit(BaseUnit unit, int x, int y)
     {
-        if (File.Exists(gameStateFilePath))
+        Instantiate(unit, new Vector2(x, y), Quaternion.identity, unitList);
+    }
+    
+    public BaseUnit GetInstantiateUnit(BaseUnit unit, int x, int y)
+    {
+        unit.playerControl = getPlayerTurn();
+        BaseUnit tempUnit = Instantiate(unit, new Vector2(x, y), Quaternion.identity, unitList);
+        return tempUnit;
+    }
+
+
+    /*    public void ConvertFileToGameState()
         {
-            byte[] bytes = File.ReadAllBytes(gameStateFilePath);
-            List<GamePieceInfo> gameStateList = MessagePackSerializer.Deserialize<List<GamePieceInfo>>(bytes);
-            ConvertListToGameState(gameStateList);
-        }
-        else
-        {
-            Debug.LogError("Game state file not found at " + gameStateFilePath);
-        }
-    }*/
+            if (File.Exists(gameStateFilePath))
+            {
+                byte[] bytes = File.ReadAllBytes(gameStateFilePath);
+                List<GamePieceInfo> gameStateList = MessagePackSerializer.Deserialize<List<GamePieceInfo>>(bytes);
+                ConvertListToGameState(gameStateList);
+            }
+            else
+            {
+                Debug.LogError("Game state file not found at " + gameStateFilePath);
+            }
+        }*/
 
     public void setMatchId(Guid matchId)
     {

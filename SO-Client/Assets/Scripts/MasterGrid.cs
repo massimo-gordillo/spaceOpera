@@ -41,7 +41,7 @@ public class MasterGrid : MonoBehaviour
     private double defenceMultiplier;
     private double firebackMultiplier;
     private double attackLuckDomain;
-    private bool luckOn =false;
+    private bool luckOn =true;
 
     public Transform movementSquareList;
     public MovementSquare moveSquare;
@@ -400,10 +400,15 @@ public class MasterGrid : MonoBehaviour
                 structure.switchAlliance(selectedUnit.getPlayerControl());*/
             //2 is capture structure
             addGameAction(2, (byte)selectedUnit.gamePieceId, (byte)selectedUnit.xPos, (byte)selectedUnit.yPos, (byte)structure.xPos, (byte)structure.yPos);
-            
+
             //Trying virix implementation where spore kills itself upon capturing
             if (structure.playerControl == selectedUnit.playerControl && selectedUnit.unitName == "Spore")
+            {
+                int xPos = selectedUnit.xPos;
+                int yPos = selectedUnit.yPos;
                 deleteUnit(selectedUnit);
+                createVirixSeed(xPos, yPos);
+            }
             else
                 exhaustSelectedUnit(selectedUnit, true);
         }
@@ -959,7 +964,7 @@ public class MasterGrid : MonoBehaviour
         foreach (var cell in squareQueuesList[1])
         {
             BaseUnit unitInLocation = whatUnitIsInThisLocation(cell.x - 1, cell.y - 1);
-            if (unitInLocation != null && unitInLocation != unit && unitInLocation.playerControl != unit.playerControl)
+            if (unitInLocation != null && unitInLocation != unit && unitInLocation.playerControl != unit.playerControl && unitInLocation.unitName != "seed")
             {
                 setUnitToAttackable(unit, unitInLocation);
             }
@@ -1666,6 +1671,16 @@ public class MasterGrid : MonoBehaviour
             return defenceGridInt[x, y] * defenceMultiplier/100;
         }
         return 0;
+    }
+
+    public void createVirixSeed(int x, int y)
+    {
+        BaseUnit tempSeed = PrefabManager.getBaseUnitFromName("seed", 1);
+        tempSeed.playerControl = getPlayerTurn();
+        BaseUnit seed = gameMaster.GetInstantiateUnit(tempSeed, x, y);
+        
+        //seed.setNonExhausted(false);
+        //seed.setColor(seed.playerControl, false);
     }
 
     private IEnumerator waitGenerateSaveArrayToCSV()
