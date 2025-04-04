@@ -339,7 +339,7 @@ namespace SlimUI.ModernMenu{
 		}
 
 		public void PlaySwoosh(){
-			swooshSound.Play();
+			//swooshSound.Play();
 		}
 
 		// Are You Sure - Quit Panel Pop Up

@@ -15,7 +15,7 @@ public class UIScriptAnimator : MonoBehaviour
 
     public GameObject skipButton;
     public TextMeshPro skipButtonText;
-    float maxSkipButtonOpacity = 0.8f;
+    float maxSkipButtonOpacity = 0.5f;
     //public Color buttonTextColor;
 
     public float typingSpeed;
@@ -55,12 +55,12 @@ public class UIScriptAnimator : MonoBehaviour
 
     public void JumpToStart()
     {
-        Debug.Log("jumpingToStart");
+        //Debug.Log("jumpingToStart");
         isAnimationComplete = true;
         
         StartCoroutine(SettleMainMenu(0.5f));
         StartCoroutine(FadeOutSkipButton(0.1f));
-        textContainer.transform.position = new Vector3(0, 20, 20);
+        textContainer.transform.position = new Vector3(0, 40, 20);
         logoSprite.color = logoColor;
         
     }
@@ -162,7 +162,7 @@ public class UIScriptAnimator : MonoBehaviour
                 scrollElapsedTime += Time.deltaTime;
                 yield return null;  // Wait for next frame
             }
-
+            textContainer.transform.position = new Vector3(0, 40, 20);
 
             float fadeInElapsedTime = 0f;
             float fadeInDuration = 4.0f;
