@@ -19,6 +19,18 @@ PrefabInstance:
       propertyPath: m_Name
       value: productionAirport
       objectReference: {fileID: 0}
+    - target: {fileID: 2685416612695764682, guid: b02aa9d5d64b2414abeba39fe8b377e8, type: 3}
+      propertyPath: m_Size.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2685416612695764682, guid: b02aa9d5d64b2414abeba39fe8b377e8, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: -1956803436, guid: d4f26ccd45a6c9d498d1600c82376cad, type: 3}
+    - target: {fileID: 2685416612695764682, guid: b02aa9d5d64b2414abeba39fe8b377e8, type: 3}
+      propertyPath: m_WasSpriteAssigned
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3397026737060665485, guid: b02aa9d5d64b2414abeba39fe8b377e8, type: 3}
       propertyPath: structureType
       value: 2
@@ -74,6 +86,18 @@ PrefabInstance:
     - target: {fileID: 7500212903833245582, guid: b02aa9d5d64b2414abeba39fe8b377e8, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: 21300000, guid: fd33e997712bc424a8fb043eb23e45a2, type: 3}
+      objectReference: {fileID: -176316167, guid: d4f26ccd45a6c9d498d1600c82376cad, type: 3}
+    - target: {fileID: 7514241308125646422, guid: b02aa9d5d64b2414abeba39fe8b377e8, type: 3}
+      propertyPath: m_Size.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7514241308125646422, guid: b02aa9d5d64b2414abeba39fe8b377e8, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: -1120666003, guid: d4f26ccd45a6c9d498d1600c82376cad, type: 3}
+    - target: {fileID: 7514241308125646422, guid: b02aa9d5d64b2414abeba39fe8b377e8, type: 3}
+      propertyPath: m_WasSpriteAssigned
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b02aa9d5d64b2414abeba39fe8b377e8, type: 3}

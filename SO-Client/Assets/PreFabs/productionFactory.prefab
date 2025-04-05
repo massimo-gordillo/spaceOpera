@@ -86,7 +86,7 @@ PrefabInstance:
     - target: {fileID: 2685416612695764682, guid: b02aa9d5d64b2414abeba39fe8b377e8, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: 21300000, guid: 7c12b0b1098fddc498cefa7579266e32, type: 3}
+      objectReference: {fileID: -1591732557, guid: 34952b01f8fb0e14f9952b9308098929, type: 3}
     - target: {fileID: 2685416612695764682, guid: b02aa9d5d64b2414abeba39fe8b377e8, type: 3}
       propertyPath: m_WasSpriteAssigned
       value: 1
@@ -156,13 +156,17 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7500212903833245582, guid: b02aa9d5d64b2414abeba39fe8b377e8, type: 3}
+      propertyPath: m_Size.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7500212903833245582, guid: b02aa9d5d64b2414abeba39fe8b377e8, type: 3}
       propertyPath: m_Size.y
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7500212903833245582, guid: b02aa9d5d64b2414abeba39fe8b377e8, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: 21300000, guid: ac4b8620ec7d80a49a4ab5924902ead2, type: 3}
+      objectReference: {fileID: 258812034, guid: 34952b01f8fb0e14f9952b9308098929, type: 3}
     - target: {fileID: 7500212903833245582, guid: b02aa9d5d64b2414abeba39fe8b377e8, type: 3}
       propertyPath: m_WasSpriteAssigned
       value: 1
@@ -174,10 +178,10 @@ PrefabInstance:
     - target: {fileID: 7514241308125646422, guid: b02aa9d5d64b2414abeba39fe8b377e8, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: 21300000, guid: 360cb5219fcea2645a37daedace9720e, type: 3}
+      objectReference: {fileID: 1398749591, guid: d4f26ccd45a6c9d498d1600c82376cad, type: 3}
     - target: {fileID: 7514241308125646422, guid: b02aa9d5d64b2414abeba39fe8b377e8, type: 3}
       propertyPath: m_WasSpriteAssigned
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7929936143671255885, guid: b02aa9d5d64b2414abeba39fe8b377e8, type: 3}
       propertyPath: m_Size.y
