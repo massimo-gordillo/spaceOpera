@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Drawing.Imaging;
 using System.IO;
+using System.Linq.Expressions;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 //using MessagePack;
@@ -42,10 +44,11 @@ public class TilemapManager : MonoBehaviour
         gridWidth = bounds.x;// + deltaFromZero.x;
         gridHeight = bounds.y;// + deltaFromZero.y;
 
-        gridTrimOffset = 5;
+        gridTrimOffset = 0;
         gridWidthWithTrim = gridWidth + gridTrimOffset * 2;
         gridHeightWithTrim = gridHeight + gridTrimOffset * 2;
         mapFileLocation = "InitializationData/Maps/Map3";
+        //ColorPalette palette = tilemap.ColorPalette;
 
         InitializeTileDictionaries();
 
@@ -56,8 +59,8 @@ public class TilemapManager : MonoBehaviour
         //TilemapData byteData = ExportTilemapToBytes();
         //ImportTilemapFromBytes(byteData);
 
-        //SaveTilemapToFile("Map3Tilemap.dat");
-        //LoadTilemapFromFile("Map3Tilemap.dat");
+        //SaveTilemapToFile("Map3Tilemap-v5.dat");
+        LoadTilemapFromFile("Map3Tilemap-v5.dat");
 
 
 
@@ -68,7 +71,7 @@ public class TilemapManager : MonoBehaviour
 
     private void InitializeTileDictionaries()
     {
-        string tilemapName = "tilemapv4";
+        string tilemapName = "marsTilemap";
         string basePath = "Tilemap/Tiles/"+tilemapName;
         //string tilesName = "BasicTilemap v3_";
 
@@ -198,7 +201,7 @@ public class TilemapManager : MonoBehaviour
                 string modifiedTileName = null;
                 if (tile.name.Contains("v2"))
                 {
-                    modifiedTileName = tile.name.Replace("v2", "-v4");
+                    modifiedTileName = tile.name.Replace("v2", "-v5");
                 }else
                     modifiedTileName = tile.name;
                 //Debug.Log($"Tile name: {tile.name}, Modified name: {modifiedTileName}");
@@ -408,7 +411,17 @@ public class TilemapManager : MonoBehaviour
             //byte[] serializedTilemapData = File.ReadAllBytes(filePath);
 
             // Pass the serialized data to ImportTilemapFromBytes
-            ImportTilemapFromBytes(TilemapData.Deserialize(File.ReadAllBytes(filePath)));
+            try
+            {
+                ImportTilemapFromBytes(TilemapData.Deserialize(File.ReadAllBytes(filePath)));
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Importing Tilemap from File failed: {ex.Message}");
+            }
+        
+
+            
 
             //MessagePack implementation
             //ImportTilemapFromBytes(TilemapData.DeserializeMP(File.ReadAllBytes(filePath)));
