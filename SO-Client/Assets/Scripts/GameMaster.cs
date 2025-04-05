@@ -75,6 +75,9 @@ public class GameMaster : MonoBehaviour
 
     static int player1ProgenySelected;
     static int player2ProgenySelected;
+    static bool playerColorSet = false;
+    static Color player1Color;
+    static Color player2Color;
     /*    public static GameMaster Instance
         {
             get
@@ -110,8 +113,8 @@ public class GameMaster : MonoBehaviour
         }
         else {
             Debug.LogWarning("Progeny set to -1 selected, defaulting to hard values");
-            playerProgeny.Add(1, 0);
-            playerProgeny.Add(2, 1);
+            playerProgeny.Add(1, 2);
+            playerProgeny.Add(2, 2);
         }
         //Debug.Log($"player 1 is progeny {getPlayerProgeny(0)}, player 2 is progeny {getPlayerProgeny(1)}");
 
@@ -177,6 +180,10 @@ public class GameMaster : MonoBehaviour
         //WaitForSeconds(0.5);
         if(isAnimating)
             AnimateStartTurnCard(1);
+
+        playerColorSet = true;
+        player1Color = new Color(48, 52, 255, 1);
+        player2Color = new Color(255, 48, 48, 1);
 
     }
 

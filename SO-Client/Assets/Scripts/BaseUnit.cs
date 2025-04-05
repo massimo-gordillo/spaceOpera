@@ -201,7 +201,7 @@ public class BaseUnit : MonoBehaviour
         cornerSpriteBR.SetActive(b);
     }
 
-    public void showCombatTooltip(int defence, double floor, double ceiling)
+    public void showCombatTooltip(int defence, int sentusDefence, double floor, double ceiling)
     {
         combatTooltip.SetActive(true);
         if (floor > 1)
@@ -213,6 +213,8 @@ public class BaseUnit : MonoBehaviour
         if (ceiling < 0)
             ceiling = 0;
         defenceValueTextContainer.text = $"Defence: {defence}";
+        if (sentusDefence > 0)
+            defenceValueTextContainer.text += $" + {sentusDefence}";
         damageRangeTextContainer.text = $"{(int)(floor*100)}% - {(int)(ceiling*100)}%";
     }
 

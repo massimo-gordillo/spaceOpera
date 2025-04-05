@@ -992,14 +992,15 @@ public class MasterGrid : MonoBehaviour
         int tileDefenceValue = getTileDefenceValueInt(defender.xPos, defender.yPos);
         double floor = getAttackLuckFloor(damageBeforeLuck, defender.healthMax);
         double ceiling = getAttackLuckCeiling(damageBeforeLuck, defender.healthMax);
+        //if(defender.progeny == Progeny.Sentus )
         if (luckOn)
         {
-            defender.showCombatTooltip(tileDefenceValue, floor, ceiling);
+            defender.showCombatTooltip(tileDefenceValue, defender.progeny == Progeny.Sentus ? defenceGridInt[defender.xPos, defender.yPos] : 0, floor, ceiling);
             //Debug.Log($"For defender {defender.GetInstanceID()}, Tooltip displays floor: {floor}, ceiling: {ceiling}, base dmg before luck: {damageBeforeLuck}.");
         }
         else
         {
-            defender.showCombatTooltip(tileDefenceValue, damageBeforeLuck/defender.healthMax, damageBeforeLuck/defender.healthMax);
+            defender.showCombatTooltip(tileDefenceValue, defender.progeny == Progeny.Sentus ? defenceGridInt[defender.xPos, defender.yPos] : 0,  damageBeforeLuck /defender.healthMax, damageBeforeLuck/defender.healthMax);
             //Debug.Log($"For defender {defender.GetInstanceID()}, Tooltip displays floor: {damageBeforeLuck}, ceiling: {damageBeforeLuck}, base dmg before luck: {damageBeforeLuck}.");
 
         }
