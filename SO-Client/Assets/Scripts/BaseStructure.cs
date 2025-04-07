@@ -17,8 +17,8 @@ public class BaseStructure : MonoBehaviour
     public int maxCaptureHealth;
     public TextMeshPro healthTextContainer;
     public GameObject healthCanvas;
-    private Color baseColor;
-    public GameObject neutralSpriteContainer;
+    //private Color baseColor;
+    public StaticSprite neutralSpriteContainer;
     public SpriteRenderer neutralSpriteFill;
     
 /*    public SpriteRenderer progeny0SpriteRenderer;
@@ -26,9 +26,9 @@ public class BaseStructure : MonoBehaviour
     public SpriteRenderer progeny2SpriteRenderer;*/
 
     public StaticSprite progeny0CaptureSpriteContainer;
-    public SpriteRenderer progeny0spriteFillSR;
-    public SpriteRenderer progeny0spriteTrimSR;
-    public SpriteRenderer progeny0spriteLightsSR;
+    public SpriteRenderer progeny0ResourceCaptureSpriteFillSR;
+    public SpriteRenderer progeny0ResourceCaptureSpriteTrimSR;
+    public SpriteRenderer progeny0ResourceCaptureSpriteLightsSR;
     public StaticSprite progeny1CaptureSpriteContainer;
     public SpriteRenderer progeny1CaptureSpriteFillSR;
     public SpriteRenderer progeny1CaptureSpriteTrimSR;
@@ -61,7 +61,7 @@ public class BaseStructure : MonoBehaviour
             gameMaster.startupInstantiateUnits(xPos,yPos,playerControl );
         }
 
-        baseColor = neutralSpriteFill.color;
+        //baseColor = neutralSpriteFill.color;
         //turnOffCaptureSprites();
 /*        if (structureType != 200)
                 setColor(neutralSpriteFill);
@@ -81,25 +81,9 @@ public class BaseStructure : MonoBehaviour
 
     }
 
-    public void setColor(SpriteRenderer sprite) //Should this be combined with baseUnit.setColor? Maybe Mastergrid does this modification.
-    {
-        int player = playerControl;
-        if (player != 0) {
-            //float hue = ((float)player / (float)gameMaster.numPlayers) * 360f;
-            float hue = ((float)player / 3.0f) * 360f;
-            float saturation = 1.0f;
-            float value = 1.0f;
-            Color color = Color.HSVToRGB(hue / 360f, saturation, value);
-            sprite.color = color;
-            /*if(structureType != 0)
-            {
-                neutralSpriteFill.color = color;
-            }*/
-        }else{
-            sprite.color = baseColor;
-        }
+    
 
-    }
+
 
     public bool isCapturableBy(BaseUnit unit)
     {
@@ -125,44 +109,46 @@ public class BaseStructure : MonoBehaviour
             Debug.Log($"Setting capture sprite for player {playerControl}, progeny: {progeny}, master grid says: {gameMaster.getPlayerProgeny(playerControl)}");
         }*/
         turnOffCaptureSprites();
-/*        if (structureType == 0)
-            setColor(neutralSpriteFill);*/
+        /*        if (structureType == 0)
+                    setColor(neutralSpriteFill);*/
         if (playerControl != 0)
         {
             if (progeny == 0)
             {
                 if (structureType == 0)
                 {
-                    /*                progeny0spriteFillSR.gameObject.SetActive(true);
-                                    progeny0spriteTrimSR.gameObject.SetActive(true);
-                                    progeny0spriteLightsSR.gameObject.SetActive(true);*/
+                    /*                progeny0ResourceCaptureSpriteFillSR.gameObject.SetActive(true);
+                                    progeny0ResourceCaptureSpriteTrimSR.gameObject.SetActive(true);
+                                    progeny0ResourceCaptureSpriteLightsSR.gameObject.SetActive(true);*/
                     progeny0CaptureSpriteContainer.gameObject.SetActive(true);
-                    setColor(progeny0spriteFillSR);
+                    progeny0CaptureSpriteContainer.SetColor(playerControl, true, true);
                 }
                 else
                 {
-                    setColor(neutralSpriteFill);
+                    neutralSpriteContainer.SetColor(playerControl, true, true);
                 }
                 //progeny0SpriteRenderer.gameObject.SetActive(true);
             }
             else if (progeny == 1)
             {
                 progeny1CaptureSpriteContainer.gameObject.SetActive(true);
-                setColor(progeny1CaptureSpriteFillSR);
-                neutralSpriteFill.color = baseColor;
+                progeny1CaptureSpriteContainer.SetColor(playerControl, true, true);
+                neutralSpriteContainer.SetColor(0, true, true);
             }
-            else if (progeny == 2) {
+            else if (progeny == 2)
+            {
                 if (IsProduction())
                 {
                     progeny2ProductionCaptureSpriteContainer.gameObject.SetActive(true);
-                    setColor(progeny2ProductionCaptureSpriteFillSR);
-                    setColor(neutralSpriteFill);
-                    neutralSpriteContainer.gameObject.SetActive(false);
+                    progeny2ProductionCaptureSpriteContainer.SetColor(playerControl, true, true);
+                    neutralSpriteContainer.SetColor((int)playerControl, true, true);
+                    neutralSpriteContainer.ToggleSprites(false);
                 }
                 else// if(structureType == 0)
                 {
                     progeny2ResourceCaptureSpriteContainer.gameObject.SetActive(true);
-                    setColor(progeny2ResourceCaptureSpriteFillSR);
+                    progeny2ResourceCaptureSpriteContainer.SetColor(playerControl, true, true);
+
                     //setColor(neutralSpriteFill);
                 }
             }
@@ -173,7 +159,7 @@ public class BaseStructure : MonoBehaviour
                 Debug.LogError($"No progeny for byte value {progeny} found, unable to set capture sprite");
         }
         else
-            setColor(neutralSpriteFill);
+            neutralSpriteContainer.SetColor(0, true, true);
 
     }
 
@@ -209,14 +195,14 @@ public class BaseStructure : MonoBehaviour
 
     public void turnOffCaptureSprites()
     {
-        neutralSpriteContainer.gameObject.SetActive(true);
+        neutralSpriteContainer.ToggleSprites(true);
         //progeny0SpriteRenderer.gameObject.SetActive(false);
         //progeny1SpriteRenderer.gameObject.SetActive(false);
         progeny1CaptureSpriteContainer.gameObject.SetActive(false);
         //progeny2SpriteRenderer.gameObject.SetActive(false);
-        /*        progeny0spriteFillSR.gameObject.SetActive(false);
-                progeny0spriteTrimSR.gameObject.SetActive(false);
-                progeny0spriteLightsSR.gameObject.SetActive(false);*/
+        /*        progeny0ResourceCaptureSpriteFillSR.gameObject.SetActive(false);
+                progeny0ResourceCaptureSpriteTrimSR.gameObject.SetActive(false);
+                progeny0ResourceCaptureSpriteLightsSR.gameObject.SetActive(false);*/
         progeny0CaptureSpriteContainer.gameObject.SetActive(false);
         progeny2ResourceCaptureSpriteContainer.gameObject.SetActive(false);
         progeny2ProductionCaptureSpriteContainer.gameObject.SetActive(false);

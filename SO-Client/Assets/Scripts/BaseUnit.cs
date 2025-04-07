@@ -37,7 +37,7 @@ public class BaseUnit : MonoBehaviour
     public int orientation = 1;
     public int xPos;
     public int yPos;
-    private Color baseColor; //currently unused.
+    //private Color baseColor; //currently unused.
     private Color originalLightsColor;
     private bool originalLightsColorSet = false;
     public bool movementNonExhausted;
@@ -92,7 +92,7 @@ public class BaseUnit : MonoBehaviour
             onLocation.turnOffCollider();
         }
 
-        baseColor = spriteFillSR.color;
+        //baseColor = spriteFillSR.color;
         //originalLightsColor = spriteLightsSR.color;
 
         //a good hack will probably want to fix later.
@@ -124,7 +124,7 @@ public class BaseUnit : MonoBehaviour
 
         hideCrosshairs();
         hideCombatTooltip();
-        setColor(playerControl, nonExhausted);
+        spriteContainer.SetColor(playerControl, true, false);
         showSelectedCorners(false);
     }
     // Update is called once per frame
@@ -270,7 +270,7 @@ public class BaseUnit : MonoBehaviour
     {
         movementNonExhausted = b;
         nonExhausted = b;
-        setColor(playerControl, b);
+        spriteContainer.SetColor(playerControl, b, false);
     }
 
     /*public void setColour(int player, bool nonExhausted)
@@ -317,33 +317,7 @@ public class BaseUnit : MonoBehaviour
             }
         }
     */
-    public void setColor(int player, bool nonExhausted)
-    {
-        if (!originalLightsColorSet)
-        {
-            originalLightsColor = spriteLightsSR.color;
-            originalLightsColorSet = true;
-        }
-        float hue = ((float)player / 3.0f) * 360f;
-        float saturation = nonExhausted ? 0.9f : 0.6f; // Medium difference in saturation
-        float value = nonExhausted ? 0.95f : 0.75f;    // Slightly more noticeable difference in brightness
-        Color color = Color.HSVToRGB(hue / 360f, saturation, value);
-        spriteFillSR.color = color;
-
-        // Use originalLightsColor to adjust brightness based on exhaustion
-        float lightsHue, lightsSaturation, lightsValue;
-        Color.RGBToHSV(originalLightsColor, out lightsHue, out lightsSaturation, out lightsValue);
-
-        float adjustedLightsValue = nonExhausted ? lightsValue : lightsValue * 0.7f; // Darken when exhausted
-        Color lightsColor = Color.HSVToRGB(lightsHue, lightsSaturation, adjustedLightsValue);
-        spriteLightsSR.color = lightsColor;
-       // Debug.Log($"lights color: {lightsColor}");
-
-        cornerSpriteTL.GetComponent<SpriteRenderer>().color = color;
-        cornerSpriteTR.GetComponent<SpriteRenderer>().color = color;
-        cornerSpriteBL.GetComponent<SpriteRenderer>().color = color;
-        cornerSpriteBR.GetComponent<SpriteRenderer>().color = color;
-    }
+    
 
     public void flipSprites()
     {

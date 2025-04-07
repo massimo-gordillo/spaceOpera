@@ -59,12 +59,12 @@ MonoBehaviour:
   maxCaptureHealth: 0
   healthTextContainer: {fileID: 8286427615747728223}
   healthCanvas: {fileID: 4395657615616999347}
-  neutralSpriteContainer: {fileID: 501965191525121800}
+  neutralSpriteContainer: {fileID: 3517080070534098580}
   neutralSpriteFill: {fileID: 7500212903833245582}
   progeny0CaptureSpriteContainer: {fileID: 3342568581575960035}
-  progeny0spriteFillSR: {fileID: 8555157310403845369}
-  progeny0spriteTrimSR: {fileID: 4316869519262148029}
-  progeny0spriteLightsSR: {fileID: 8569205991115605281}
+  progeny0ResourceCaptureSpriteFillSR: {fileID: 8555157310403845369}
+  progeny0ResourceCaptureSpriteTrimSR: {fileID: 4316869519262148029}
+  progeny0ResourceCaptureSpriteLightsSR: {fileID: 8569205991115605281}
   progeny1CaptureSpriteContainer: {fileID: 3928288898641380239}
   progeny1CaptureSpriteFillSR: {fileID: 7952551712083098261}
   progeny1CaptureSpriteTrimSR: {fileID: 2526445097848062929}
@@ -902,11 +902,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 88268c20a16956b4c9b0579543f1d861, type: 3}
---- !u!1 &501965191525121800 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 6644371550061788981, guid: 88268c20a16956b4c9b0579543f1d861, type: 3}
-  m_PrefabInstance: {fileID: 6540029397176664125}
-  m_PrefabAsset: {fileID: 0}
 --- !u!61 &2724731784728969787 stripped
 BoxCollider2D:
   m_CorrespondingSourceObject: {fileID: 9156639417219105286, guid: 88268c20a16956b4c9b0579543f1d861, type: 3}
@@ -917,6 +912,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 9019121506473607865, guid: 88268c20a16956b4c9b0579543f1d861, type: 3}
   m_PrefabInstance: {fileID: 6540029397176664125}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &3517080070534098580 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7642036437564108457, guid: 88268c20a16956b4c9b0579543f1d861, type: 3}
+  m_PrefabInstance: {fileID: 6540029397176664125}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0f3d2a09ca23d1947822607598e4e193, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!212 &7500212903833245582 stripped
 SpriteRenderer:
   m_CorrespondingSourceObject: {fileID: 3662765650668672947, guid: 88268c20a16956b4c9b0579543f1d861, type: 3}
