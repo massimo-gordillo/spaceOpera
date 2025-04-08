@@ -4,21 +4,21 @@ using UnityEngine;
 
 public class StaticSprite : ClickableObject
 {
-    private GameObject parentGameObject;
-    private BaseUnit parentComponentBaseUnit;
-    private BaseStructure parentComponentBaseStructure;
+    public GameObject parentGameObject;
+    public BaseUnit parentComponentBaseUnit;
+    public BaseStructure parentComponentBaseStructure;
     public Color baseColor;
     public Color lightsColor;
     public SpriteRenderer fillSR;
     public SpriteRenderer trimSR;
     public SpriteRenderer lightsSR;
+
     // Start is called before the first frame update
     protected override void Start()
     {
         base.Start(); //call the start function in ClickableObject class this inherets from.
-        if (transform.parent != null)
+        if (transform.parent != null && parentGameObject!=null)
         {
-            parentGameObject = transform.parent.gameObject;
             //parentGameObject = transform.parent.gameObject;
             parentComponentBaseUnit = parentGameObject.GetComponent<BaseUnit>();
             parentComponentBaseStructure = parentGameObject.GetComponent<BaseStructure>();
@@ -26,7 +26,7 @@ public class StaticSprite : ClickableObject
             //lightsColor = lightsSR.color;
             baseColor = new Color(255, 255, 255, 255);
             lightsColor = new Color(255, 255, 255, 255);
-
+            
         }
         else
         {
@@ -37,7 +37,9 @@ public class StaticSprite : ClickableObject
     // Update is called once per frame
     void Update()
     {
-
+        //SetColor(2, true, true);
+        //if(parentGameObject != null && parentComponentBaseStructure!=null && parentComponentBaseStructure.playerControl != 0) 
+         //   Debug.Log($"Main sprite color for type {parentComponentBaseStructure.structureType} is: {fillSR.color}");
     }
 
     public override void HandleClick()
@@ -64,13 +66,39 @@ public class StaticSprite : ClickableObject
 
     }
 
-    public void SetColor(int player, bool nonExhausted, bool isStructure)
+    public IEnumerator WaitedSetColor(int player, bool nonExhausted, bool isStructure)
     {
+        yield return null; 
+        //Debug.Log($"Setting Color for {this.name}");
         Color playerColor = GameMaster.playerColors[player];
+        Color white = new Color (255, 255, 255, 255);
+        /*        if(parentGameObject == null)
+                {
+                    Debug.Log($"No parent object for sprite {this.name}");
+                    parentGameObject = transform.parent.gameObject;
+                    Debug.Log($"parent set to {parentGameObject.name}");
+                }*/
+        /*        if (isStructure && player != 0)
+                    Debug.LogWarning($"Setting sprite color for stuct type {this.name}, player control = {player}, color = {playerColor}");
+                else if (player != 0)
+                    Debug.LogWarning($"Setting sprite color for unit type {this.name}, player control = {player}, color = {playerColor}");*/
+
+        /*        if (isStructure && fillSR.color != white)
+                {
+                    Debug.Log($"Setting fill color for structure to {playerColor}, player is {player}, original color was {fillSR.color}");
+                    amIColouredSpriteGuy = true;
+                }*/
+
         if (isStructure && player != 0)
         {
-            fillSR.color = playerColor;
-        } else if (!isStructure && player != 0)
+            //Debug.Log($"Setting color for {this.name} to {playerColor}");
+            float h, s, v;
+            Color.RGBToHSV(playerColor, out h, out s, out v);
+
+            s *= 0.95f; // reduce saturation
+            fillSR.color = Color.HSVToRGB(h, Mathf.Clamp01(s), v);
+        }
+        else if (!isStructure && player != 0)
         {
             /*            if (!originalLightsColorSet)
                         {
@@ -80,11 +108,16 @@ public class StaticSprite : ClickableObject
 
             // Convert provided baseColor to HSV so we can modify saturation and value
             float hue, saturation, value;
-            Color.RGBToHSV(baseColor, out hue, out saturation, out value);
+            Color.RGBToHSV(playerColor, out hue, out saturation, out value);
+
+            float oldSaturation = saturation;
+            float oldValue = value;
 
             // Adjust saturation and brightness for exhaustion
             saturation = nonExhausted ? 0.9f : 0.6f;
             value = nonExhausted ? 0.95f : 0.75f;
+
+            Debug.Log($"for nonexhausted unit {nonExhausted}, saturation changed from {oldSaturation} to {saturation}, and value changed from {oldValue}, to {value}");
 
             Color adjustedFillColor = Color.HSVToRGB(hue, saturation, value);
             fillSR.color = adjustedFillColor;
@@ -105,6 +138,13 @@ public class StaticSprite : ClickableObject
         }
     
     }
+
+    public void SetColor(int player, bool nonExhausted, bool isStructure)
+    {
+        // Wait until the next frame to ensure all Start() methods are called
+        StartCoroutine(WaitedSetColor(player, nonExhausted, isStructure));
+    }
+
 
     /*public void setColorStructure(SpriteRenderer sprite) //Should this be combined with baseUnit.setColor? Maybe Mastergrid does this modification.
     {

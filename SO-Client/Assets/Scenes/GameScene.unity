@@ -3010,9 +3010,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0f3d2a09ca23d1947822607598e4e193, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  parentGameObject: {fileID: 0}
+  parentComponentBaseUnit: {fileID: 0}
+  parentComponentBaseStructure: {fileID: 0}
+  baseColor: {r: 0, g: 0, b: 0, a: 0}
+  lightsColor: {r: 0, g: 0, b: 0, a: 0}
   fillSR: {fileID: 0}
   trimSR: {fileID: 0}
   lightsSR: {fileID: 0}
+  amIColouredSpriteGuy: 0
 --- !u!50 &350041783
 Rigidbody2D:
   serializedVersion: 4
@@ -5636,9 +5642,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0f3d2a09ca23d1947822607598e4e193, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  parentGameObject: {fileID: 0}
+  parentComponentBaseUnit: {fileID: 0}
+  parentComponentBaseStructure: {fileID: 0}
+  baseColor: {r: 0, g: 0, b: 0, a: 0}
+  lightsColor: {r: 0, g: 0, b: 0, a: 0}
   fillSR: {fileID: 0}
   trimSR: {fileID: 0}
   lightsSR: {fileID: 0}
+  amIColouredSpriteGuy: 0
 --- !u!50 &580983544
 Rigidbody2D:
   serializedVersion: 4
@@ -7672,9 +7684,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0f3d2a09ca23d1947822607598e4e193, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  parentGameObject: {fileID: 0}
+  parentComponentBaseUnit: {fileID: 0}
+  parentComponentBaseStructure: {fileID: 0}
+  baseColor: {r: 0, g: 0, b: 0, a: 0}
+  lightsColor: {r: 0, g: 0, b: 0, a: 0}
   fillSR: {fileID: 0}
   trimSR: {fileID: 0}
   lightsSR: {fileID: 0}
+  amIColouredSpriteGuy: 0
 --- !u!50 &869400660
 Rigidbody2D:
   serializedVersion: 4
@@ -18486,6 +18504,18 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2749418364556408424, guid: f3b33a139a5eee8489097ff6b2f17063, type: 3}
+      propertyPath: m_Color.b
+      value: 0.89747334
+      objectReference: {fileID: 0}
+    - target: {fileID: 2749418364556408424, guid: f3b33a139a5eee8489097ff6b2f17063, type: 3}
+      propertyPath: m_Color.g
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2749418364556408424, guid: f3b33a139a5eee8489097ff6b2f17063, type: 3}
+      propertyPath: m_Color.r
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6700441464015966968, guid: f3b33a139a5eee8489097ff6b2f17063, type: 3}
       propertyPath: m_Name
       value: productionFactory
@@ -18496,6 +18526,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6995593645576993131, guid: f3b33a139a5eee8489097ff6b2f17063, type: 3}
       propertyPath: playerControl
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 9150983739266010994, guid: f3b33a139a5eee8489097ff6b2f17063, type: 3}
+      propertyPath: amIColouredSpriteGuy
       value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []

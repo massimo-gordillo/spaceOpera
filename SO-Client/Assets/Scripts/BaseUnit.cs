@@ -76,6 +76,7 @@ public class BaseUnit : MonoBehaviour
     public TMP_Text damageRangeTextContainer;
     public GameObject combatTooltip;
     //use healthTextContainer.text= to update text.
+    private Color playerColor;
 
     void Start()
     {
@@ -118,13 +119,14 @@ public class BaseUnit : MonoBehaviour
         else
             Debug.LogError("No unitNameTextContainerFound");
 
-        unitNameTextContainer.color = new Color32(255, 0, 0, 255);
-        defenceValueTextContainer.color = new Color32(255, 0, 0, 255);
-        damageRangeTextContainer.color = new Color32(255, 0, 0, 255);
+        playerColor = GameMaster.playerColors[playerControl];
+        unitNameTextContainer.color = playerColor;
+        defenceValueTextContainer.color = playerColor;
+        damageRangeTextContainer.color = playerColor;
 
         hideCrosshairs();
         hideCombatTooltip();
-        spriteContainer.SetColor(playerControl, true, false);
+        //spriteContainer.SetColor(playerControl, true, false);
         showSelectedCorners(false);
     }
     // Update is called once per frame
@@ -268,6 +270,7 @@ public class BaseUnit : MonoBehaviour
 
     public void setNonExhausted(bool b)
     {
+        Debug.Log($"{this.unitName} is being set to non-exhausted {b}");
         movementNonExhausted = b;
         nonExhausted = b;
         spriteContainer.SetColor(playerControl, b, false);

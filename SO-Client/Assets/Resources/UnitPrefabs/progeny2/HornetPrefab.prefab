@@ -328,6 +328,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0f3d2a09ca23d1947822607598e4e193, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  parentGameObject: {fileID: 2094809000692016112}
+  parentComponentBaseUnit: {fileID: 5408005785603204201}
+  parentComponentBaseStructure: {fileID: 0}
   baseColor: {r: 0, g: 0, b: 0, a: 0}
   lightsColor: {r: 0, g: 0, b: 0, a: 0}
   fillSR: {fileID: 1850135118004165563}
@@ -703,6 +706,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0f3d2a09ca23d1947822607598e4e193, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  parentGameObject: {fileID: 0}
+  parentComponentBaseUnit: {fileID: 0}
+  parentComponentBaseStructure: {fileID: 0}
   baseColor: {r: 0, g: 0, b: 0, a: 0}
   lightsColor: {r: 0, g: 0, b: 0, a: 0}
   fillSR: {fileID: 0}

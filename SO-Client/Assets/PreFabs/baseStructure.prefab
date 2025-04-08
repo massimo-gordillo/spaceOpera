@@ -836,6 +836,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: BaseSprite
       objectReference: {fileID: 0}
+    - target: {fileID: 7642036437564108457, guid: 88268c20a16956b4c9b0579543f1d861, type: 3}
+      propertyPath: parentGameObject
+      value: 
+      objectReference: {fileID: 1354807818261213982}
+    - target: {fileID: 7642036437564108457, guid: 88268c20a16956b4c9b0579543f1d861, type: 3}
+      propertyPath: parentComponentBaseStructure
+      value: 
+      objectReference: {fileID: 3397026737060665485}
     - target: {fileID: 9019121506473607865, guid: 88268c20a16956b4c9b0579543f1d861, type: 3}
       propertyPath: m_RootOrder
       value: 0

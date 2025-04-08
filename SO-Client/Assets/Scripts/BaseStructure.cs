@@ -5,7 +5,7 @@ using TMPro;
 
 public class BaseStructure : MonoBehaviour
 {
-    public byte playerControl;
+    public int playerControl;
     public MasterGrid masterGrid;
     public int xPos;
     public int yPos;
@@ -103,7 +103,7 @@ public class BaseStructure : MonoBehaviour
 
     public void setCaptureSpritesAndColor()
     {
-        byte progeny = gameMaster.getPlayerProgeny(playerControl);
+        byte progeny = gameMaster.getPlayerProgeny((byte)playerControl);
 /*        if (structureType == 0 && playerControl != 0)
         {
             Debug.Log($"Setting capture sprite for player {playerControl}, progeny: {progeny}, master grid says: {gameMaster.getPlayerProgeny(playerControl)}");
@@ -121,6 +121,7 @@ public class BaseStructure : MonoBehaviour
                                     progeny0ResourceCaptureSpriteTrimSR.gameObject.SetActive(true);
                                     progeny0ResourceCaptureSpriteLightsSR.gameObject.SetActive(true);*/
                     progeny0CaptureSpriteContainer.gameObject.SetActive(true);
+                    //Debug.Log("Calling set color from baseStructure");
                     progeny0CaptureSpriteContainer.SetColor(playerControl, true, true);
                 }
                 else
@@ -144,7 +145,7 @@ public class BaseStructure : MonoBehaviour
                     neutralSpriteContainer.SetColor((int)playerControl, true, true);
                     neutralSpriteContainer.ToggleSprites(false);
                 }
-                else// if(structureType == 0)
+                else if(structureType == 0)
                 {
                     progeny2ResourceCaptureSpriteContainer.gameObject.SetActive(true);
                     progeny2ResourceCaptureSpriteContainer.SetColor(playerControl, true, true);
@@ -159,7 +160,10 @@ public class BaseStructure : MonoBehaviour
                 Debug.LogError($"No progeny for byte value {progeny} found, unable to set capture sprite");
         }
         else
+        {
+            //Debug.Log($"Player is 0 for structure {this.name}");
             neutralSpriteContainer.SetColor(0, true, true);
+        }
 
     }
 
