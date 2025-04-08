@@ -143,7 +143,7 @@ public class BaseStructure : MonoBehaviour
                     progeny2ProductionCaptureSpriteContainer.gameObject.SetActive(true);
                     progeny2ProductionCaptureSpriteContainer.SetColor(playerControl, true, true);
                     neutralSpriteContainer.SetColor((int)playerControl, true, true);
-                    neutralSpriteContainer.ToggleSprites(false);
+                    //neutralSpriteContainer.ToggleSprites(false);
                 }
                 else if(structureType == 0)
                 {
