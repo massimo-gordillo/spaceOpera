@@ -17,6 +17,7 @@ public class GameMaster : MonoBehaviour
     public TilemapManager tilemapManager;
     //private PrefabManager prefabManager = new PrefabManager();
     public SupabaseManager supabaseManager;
+    public CPUMananger _CPUMananger;
     public Guid match_id;
 
     public Canvas canvas;
@@ -191,6 +192,7 @@ public class GameMaster : MonoBehaviour
             AnimateStartTurnCard(1);
 
         startupInstantiateUnits();
+        _CPUMananger.naiveV1Start();
     }
 
     private IEnumerator CallConvertGameStateToList()

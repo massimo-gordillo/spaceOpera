@@ -662,7 +662,7 @@ public class MasterGrid : MonoBehaviour
         //Debug.Log("Movement animation complete.");
     }
 
-
+    //Manhattan distance/vector calculation for finding path between to squares. Uses bidirectional search to guarantee shortest path.
     public List<Vector2Int> BidirectionalSearch(
         Vector2Int start,
         Vector2Int end,

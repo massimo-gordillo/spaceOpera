@@ -1443,6 +1443,54 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 155262150}
   m_CullTransparentMesh: 1
+--- !u!1 &205759593
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 205759594}
+  - component: {fileID: 205759595}
+  m_Layer: 0
+  m_Name: CPUManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &205759594
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 205759593}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 450342576}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &205759595
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 205759593}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ea2abbe09c2e73c429ec1451785ee4a4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  structureList: []
+  structureListArray: []
+  gameMaster: {fileID: 1024135144}
+  masterGrid: {fileID: 450342577}
 --- !u!1001 &210657160
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4165,6 +4213,7 @@ Transform:
   - {fileID: 63701448}
   - {fileID: 472514404}
   - {fileID: 533859703}
+  - {fileID: 205759594}
   m_Father: {fileID: 1024135145}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -4192,6 +4241,9 @@ MonoBehaviour:
   moveSquare: {fileID: 6791101968882301709, guid: 45dd1bafd4332f345914066612cff201, type: 3}
   rangeOutlineSprite: {fileID: 4103190339462976243, guid: a83075add6286d147827284276d39395, type: 3}
   turnActionCount: 0
+  structuresList: []
+  prodStructuresList: []
+  commandStructures: []
 --- !u!1 &454932228
 GameObject:
   m_ObjectHideFlags: 0
@@ -8760,6 +8812,7 @@ MonoBehaviour:
   masterGrid: {fileID: 450342577}
   tilemapManager: {fileID: 1002579701}
   supabaseManager: {fileID: 1718293608}
+  _CPUMananger: {fileID: 205759595}
   canvas: {fileID: 471929090}
   selectedStructure: {fileID: 0}
   choicePanel: {fileID: 1454215227}
@@ -8770,8 +8823,8 @@ MonoBehaviour:
   turnNumber: 0
   playerTurnText: {fileID: 2010402610}
   playerResourceText: {fileID: 1998717953}
-  unitList: {fileID: 472514404}
-  structureList: {fileID: 533859703}
+  unitContainer: {fileID: 0}
+  structureContainer: {fileID: 0}
   gameValues: {fileID: 11400000, guid: 78e3fa714feb6dc49b40450b2814e1e1, type: 2}
   infantryUnitPrefab: {fileID: 7803690413202824681, guid: 983ef1501268ffe41b8514bfa205ddc5, type: 3}
   attackButton: {fileID: 99806018}
