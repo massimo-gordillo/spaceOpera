@@ -56,10 +56,7 @@ public class BaseStructure : MonoBehaviour
         captureHealth = maxCaptureHealth;
         masterGrid = GameObject.FindGameObjectWithTag("MasterGridTag").GetComponent<MasterGrid>();
         masterGrid.setStructureInGrid(xPos, yPos, this);
-        if(structureType == 5)
-        {
-            gameMaster.startupInstantiateUnits(xPos,yPos,playerControl );
-        }
+
 
         //baseColor = neutralSpriteFill.color;
         //turnOffCaptureSprites();
@@ -78,6 +75,10 @@ public class BaseStructure : MonoBehaviour
         {
             setCaptureHealth(maxCaptureHealth);
         }*/
+        if (structureType == 5)
+        {
+            masterGrid.commandStructures[playerControl] = this;
+        }
 
     }
 

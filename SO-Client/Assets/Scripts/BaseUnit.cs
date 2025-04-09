@@ -270,7 +270,7 @@ public class BaseUnit : MonoBehaviour
 
     public void setNonExhausted(bool b)
     {
-        Debug.Log($"{this.unitName} is being set to non-exhausted {b}");
+        //Debug.Log($"{this.unitName} is being set to non-exhausted {b}");
         movementNonExhausted = b;
         nonExhausted = b;
         spriteContainer.SetColor(playerControl, b, false);

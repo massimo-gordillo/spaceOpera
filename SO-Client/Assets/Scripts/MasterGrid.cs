@@ -51,6 +51,10 @@ public class MasterGrid : MonoBehaviour
     List<GameAction> gameActions = new List<GameAction>();
     public short turnActionCount = 0;
 
+    public List<BaseStructure> structuresList;
+    public List<BaseStructure> prodStructuresList;
+    public BaseStructure[] commandStructures;
+
     // Called by GameMaster
     public void startup(int x, int y, byte[] tilemapByteArray,
         Dictionary<byte, AttributesTile> inputTileAttributes,
@@ -81,6 +85,12 @@ public class MasterGrid : MonoBehaviour
         firebackMultiplier = 0.7;
         //Dictionary<(byte, byte), GamePieceInfo> gameStateDict = ConvertGameStateToList();
         //printUnitGrid();
+
+        commandStructures = new BaseStructure[gameMaster.numPlayers+1];
+        structuresList = GetStructures(null);
+        prodStructuresList = GetProductionStructures(null);
+        commandStructures[0] = null;
+
     }
 
     public void Start()
@@ -1283,6 +1293,18 @@ public class MasterGrid : MonoBehaviour
         Destroy(deadUnit.gameObject);
         //Destroy(deadUnit.GetComponent<UnitSprite>());
     }
+
+    /*    private IEnumerator waitedDeleteUnit(BaseUnit deadUnit)
+    {
+        yield return null;
+        if (selectedUnit != null && deadUnit == selectedUnit)
+            clearSelectedUnit();
+        removeUnitInGrid(deadUnit.xPos, deadUnit.yPos);
+        //if not null call the function
+        whatStructureIsInThisLocation(deadUnit.xPos, deadUnit.yPos)?.resetCaptureHealth();
+        Destroy(deadUnit.gameObject);
+        //Destroy(deadUnit.GetComponent<UnitSprite>());
+    }*/
 
     public void removeUnitInGrid(int x, int y)
     {

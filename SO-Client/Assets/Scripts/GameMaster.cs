@@ -35,8 +35,8 @@ public class GameMaster : MonoBehaviour
     private int[] playerResources;
     private int baseResourcePerTurn;
     private int structureResourcePerTurn;
-    public Transform unitList;
-    public Transform structureList;
+    public Transform unitContainer;
+    public Transform structureContainer;
     public GameValuesSO gameValues;
     public BaseUnit infantryUnitPrefab;
     public Button attackButton;
@@ -75,10 +75,8 @@ public class GameMaster : MonoBehaviour
 
     static int player1ProgenySelected;
     static int player2ProgenySelected;
-    static bool playerColorSet = false;
-    static Color32 player1Color;
-    static Color32 player2Color;
     public static Color32[] playerColors;
+
     /*    public static GameMaster Instance
         {
             get
@@ -105,7 +103,9 @@ public class GameMaster : MonoBehaviour
         {
             //Debug.LogWarning("MatchSettings.numPlayers is null, defaulting to 2");
             MatchSettings.SetNumPlayers(2);
-        }
+            numPlayers = 2; //will set dynamically later
+        }else
+            numPlayers = 2;
 
         if (MatchSettings.playerProgenys[0]>=0 && MatchSettings.playerProgenys[1] >= 0)
         {   
@@ -117,6 +117,12 @@ public class GameMaster : MonoBehaviour
             playerProgeny.Add(1, 1);
             playerProgeny.Add(2, 2);
         }
+
+        
+        playerColors = new Color32[numPlayers + 1];
+        playerColors[0] = new Color32(255, 255, 255, 255);
+        playerColors[1] = new Color32(63, 44, 255, 255);
+        playerColors[2] = new Color32(230, 19, 53, 255);
         //Debug.Log($"player 1 is progeny {getPlayerProgeny(0)}, player 2 is progeny {getPlayerProgeny(1)}");
 
         //initializes all unit values, modifies their prefab and sprites.
@@ -133,7 +139,7 @@ public class GameMaster : MonoBehaviour
         hideChoicePanel();
         announcementCard.SetActive(false);
         playerTurn = 1; //player 0 is neutral
-        numPlayers = 2; //will set dynamically later
+
         playersNotLost = new bool[numPlayers+1];
         //playerProgeny = new byte[numPlayers + 1];
         
@@ -154,10 +160,7 @@ public class GameMaster : MonoBehaviour
             setPlayerResources(i);
         //startupInstantiateUnits();
         //productionPanel.Start();
-        playerColors = new Color32[numPlayers+1];
-        playerColors[0] = new Color32(255, 255, 255,255);
-        playerColors[1] = new Color32(63,44,255,255);
-        playerColors[2] = new Color32(230,19,53,255);
+
 
     }
 
@@ -187,10 +190,7 @@ public class GameMaster : MonoBehaviour
         if(isAnimating)
             AnimateStartTurnCard(1);
 
-        playerColorSet = true;
-        player1Color = new Color(48, 52, 255, 1);
-        player2Color = new Color(255, 48, 48, 1);
-
+        startupInstantiateUnits();
     }
 
     private IEnumerator CallConvertGameStateToList()
@@ -202,36 +202,55 @@ public class GameMaster : MonoBehaviour
         //ConvertListToGameState(gameState);
     }
 
-    public void startupInstantiateUnits(int x, int y, int player)
+    public void startupInstantiateUnits()
     {
-        byte progeny = getPlayerProgeny((byte)player);
-        if (player != 1)
+
+        for (int player = 1; player <= numPlayers; player++)
         {
-            if (progeny == 0)
+            byte progeny = getPlayerProgeny((byte)player);
+            List <BaseStructure> initProdStructures = masterGrid.GetProductionStructures(player);
+            if (player != 1)
+                initProdStructures.Add(masterGrid.commandStructures[player]);
+            foreach (BaseStructure prod in initProdStructures)
             {
-                BaseUnit infantryUnitPrefab = Resources.Load<BaseUnit>("UnitPrefabs/progeny1/InfantryPrefab");
-                infantryUnitPrefab.playerControl = player;
-                BaseUnit unit = GetInstantiateUnit(infantryUnitPrefab, x, y, player);
-                //BaseUnit unit = Instantiate(infantryUnitPrefab, new Vector2(x, y), Quaternion.identity, unitList);
-                
+                if (progeny == 0)
+                {
+                    //BaseUnit infantryUnitPrefab = Resources.Load<BaseUnit>("UnitPrefabs/progeny1/InfantryPrefab");
+                    BaseUnit infantryUnitPrefab = PrefabManager.getBaseUnitFromName("Infantry", 0);
+                    infantryUnitPrefab.playerControl = player;
+                    BaseUnit unit = GetInstantiateUnit(infantryUnitPrefab, prod.xPos, prod.yPos, player);
+                    unit.setNonExhausted(true);
+                    //BaseUnit unit = Instantiate(infantryUnitPrefab, new Vector2(x, y), Quaternion.identity, unitContainer);
+
+                }
+                else if (progeny == 1)
+                {
+                    BaseUnit sporeUnitPrefab = PrefabManager.getBaseUnitFromName("Spore", 1);
+                    sporeUnitPrefab.playerControl = player;
+                    BaseUnit unit = GetInstantiateUnit(sporeUnitPrefab, prod.xPos, prod.yPos, player);
+                    unit.setNonExhausted(true);
+                    //BaseUnit unit = Instantiate(sporeUnitPrefab, new Vector2(x, y), Quaternion.identity, unitContainer);
+
+                }
+                else if (progeny == 2)
+                {
+                    BaseUnit blacksmithUnitPrefab = PrefabManager.getBaseUnitFromName("Blacksmith", 2);
+                    blacksmithUnitPrefab.playerControl = player;
+                    BaseUnit unit = GetInstantiateUnit(blacksmithUnitPrefab, prod.xPos, prod.yPos, player);
+                    unit.setNonExhausted(true);
+                    //BaseUnit unit = Instantiate(blacksmithUnitPrefab, new Vector2(x, y), Quaternion.identity, unitContainer);
+
+                }
             }
-            else if (progeny == 1)
-            {
-                BaseUnit sporeUnitPrefab = Resources.Load<BaseUnit>("UnitPrefabs/progeny2/SporePrefab");
-                sporeUnitPrefab.playerControl = player;
-                BaseUnit unit = GetInstantiateUnit(sporeUnitPrefab, x, y, player);
-                //BaseUnit unit = Instantiate(sporeUnitPrefab, new Vector2(x, y), Quaternion.identity, unitList);
-                
-            }
-            else if (progeny == 2)
-            {
-                BaseUnit blacksmithUnitPrefab = Resources.Load<BaseUnit>("UnitPrefabs/progeny3/BlacksmithPrefab");
-                blacksmithUnitPrefab.playerControl = player;
-                BaseUnit unit = GetInstantiateUnit(blacksmithUnitPrefab, x, y, player);
-                //BaseUnit unit = Instantiate(blacksmithUnitPrefab, new Vector2(x, y), Quaternion.identity, unitList);
-                
-            }
+        
         }
+
+/*        foreach (BaseStructure prod in masterGrid.GetProductionStructures(player)){
+            if(prod.structureType == 1)
+            {
+
+            }
+        }*/
         
 
 /*        if (infantryUnitPrefab == null)
@@ -239,16 +258,16 @@ public class GameMaster : MonoBehaviour
             Debug.LogError("Infantry prefab not found at the specified path.");
             return;
 }
-      BaseUnit unit = Instantiate(infantryUnitPrefab, new Vector2(20, 17), Quaternion.identity, unitList);
+      BaseUnit unit = Instantiate(infantryUnitPrefab, new Vector2(20, 17), Quaternion.identity, unitContainer);
         unit.playerControl = 1;
 
-        BaseUnit unit2 = Instantiate(infantryUnitPrefab, new Vector2(14, 14), Quaternion.identity, unitList);
+        BaseUnit unit2 = Instantiate(infantryUnitPrefab, new Vector2(14, 14), Quaternion.identity, unitContainer);
         unit2.playerControl = 2;
-        BaseUnit unit3 = Instantiate(infantryUnitPrefab, new Vector2(22, 18), Quaternion.identity, unitList);
+        BaseUnit unit3 = Instantiate(infantryUnitPrefab, new Vector2(22, 18), Quaternion.identity, unitContainer);
         unit3.playerControl = 1;
-        BaseUnit unit4 = Instantiate(infantryUnitPrefab, new Vector2(24, 18), Quaternion.identity, unitList);
+        BaseUnit unit4 = Instantiate(infantryUnitPrefab, new Vector2(24, 18), Quaternion.identity, unitContainer);
         unit4.playerControl = 2;
-        BaseUnit unit5 = Instantiate(infantryUnitPrefab, new Vector2(24, 15), Quaternion.identity, unitList);
+        BaseUnit unit5 = Instantiate(infantryUnitPrefab, new Vector2(24, 15), Quaternion.identity, unitContainer);
         unit5.playerControl = 1;*/
     }
 
@@ -315,10 +334,10 @@ public class GameMaster : MonoBehaviour
 
         //need a way to set to exhausted from here so the units don't have to start exhausted on the 1st turn.
         BaseUnit tempUnit = GetInstantiateUnit(unit, selectedStructure.xPos, selectedStructure.yPos, null);
-        //BaseUnit tempUnit = Instantiate(unit, new Vector2(selectedStructure.xPos, selectedStructure.yPos), Quaternion.identity, unitList);
+        //BaseUnit tempUnit = Instantiate(unit, new Vector2(selectedStructure.xPos, selectedStructure.yPos), Quaternion.identity, unitContainer);
         tempUnit.setNonExhausted(isNonExhausted);
 
-        //GameObject tempInstance = Object.Instantiate(unit, new Vector2(selectedStructure.xPos, selectedStructure.yPos), Quaternion.identity, unitList);
+        //GameObject tempInstance = Object.Instantiate(unit, new Vector2(selectedStructure.xPos, selectedStructure.yPos), Quaternion.identity, unitContainer);
         //BaseUnit tempUnit = tempInstance.GetComponent<BaseUnit>();
 
         //3 is produce a unit
@@ -409,11 +428,11 @@ public async void SubmitTurnToServer(List<GameAction> gameActions, long preTurnH
     {
         playerTurnText.text = "Player Turn: " + (playerTurn);
 
-        float hue = ((float)playerTurn / 3.0f) * 360f;
+/*        float hue = ((float)playerTurn / 3.0f) * 360f;
         float saturation = 1.0f;
         float value = 1.0f;
-        Color color = Color.HSVToRGB(hue / 360f, saturation, value);
-        playerTurnText.color = color;
+        Color color = Color.HSVToRGB(hue / 360f, saturation, value);*/
+        playerTurnText.color = playerColors[playerTurn];
     }
 
     public void showUnitChoicePanel(bool attackableUnitsBool, bool capturableStructureBool, bool hasMoved)
@@ -605,7 +624,7 @@ public async void SubmitTurnToServer(List<GameAction> gameActions, long preTurnH
                     unit.xPos = x;
                     unit.yPos = y;
                     InstantiateUnit(unit, x, y);
-                    //Instantiate(unit, new Vector2(x, y), Quaternion.identity, unitList);
+                    //Instantiate(unit, new Vector2(x, y), Quaternion.identity, unitContainer);
                     masterGrid.setUnitInGrid(x, y, unit);
                 }
                 else if (pieceInfo.typeNum >= 200 && pieceInfo.typeNum < 255)
@@ -627,7 +646,7 @@ public async void SubmitTurnToServer(List<GameAction> gameActions, long preTurnH
                     structure.captureHealth = pieceInfo.healthVal;
                     structure.xPos = x;
                     structure.yPos = y;
-                    Instantiate(structure, new Vector2(x, y), Quaternion.identity, structureList);
+                    Instantiate(structure, new Vector2(x, y), Quaternion.identity, structureContainer);
                     masterGrid.setStructureInGrid(x, y, structure);
                 }
             }
@@ -640,7 +659,7 @@ public async void SubmitTurnToServer(List<GameAction> gameActions, long preTurnH
 
     public void InstantiateUnit(BaseUnit unit, int x, int y)
     {
-        Instantiate(unit, new Vector2(x, y), Quaternion.identity, unitList);
+        Instantiate(unit, new Vector2(x, y), Quaternion.identity, unitContainer);
     }
     
     public BaseUnit GetInstantiateUnit(BaseUnit unit, int x, int y, int? player)
@@ -649,7 +668,7 @@ public async void SubmitTurnToServer(List<GameAction> gameActions, long preTurnH
             unit.playerControl = getPlayerTurn();
         else
             unit.playerControl = (int)player;
-        BaseUnit tempUnit = Instantiate(unit, new Vector2(x, y), Quaternion.identity, unitList);
+        BaseUnit tempUnit = Instantiate(unit, new Vector2(x, y), Quaternion.identity, unitContainer);
         return tempUnit;
     }
 

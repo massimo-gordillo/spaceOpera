@@ -28,10 +28,10 @@ public class StaticSprite : ClickableObject
             lightsColor = new Color(255, 255, 255, 255);
             
         }
-        else
+/*        else
         {
             Debug.Log("No parent found for StaticSprite " + this.GetInstanceID());
-        }
+        }*/
     }
 
     // Update is called once per frame
@@ -117,7 +117,7 @@ public class StaticSprite : ClickableObject
             saturation = nonExhausted ? 0.9f : 0.6f;
             value = nonExhausted ? 0.95f : 0.75f;
 
-            Debug.Log($"for nonexhausted unit {nonExhausted}, saturation changed from {oldSaturation} to {saturation}, and value changed from {oldValue}, to {value}");
+            //Debug.Log($"for nonexhausted unit {nonExhausted}, saturation changed from {oldSaturation} to {saturation}, and value changed from {oldValue}, to {value}");
 
             Color adjustedFillColor = Color.HSVToRGB(hue, saturation, value);
             fillSR.color = adjustedFillColor;
@@ -141,10 +141,11 @@ public class StaticSprite : ClickableObject
 
     public void SetColor(int player, bool nonExhausted, bool isStructure)
     {
-        // Wait until the next frame to ensure all Start() methods are called
-        StartCoroutine(WaitedSetColor(player, nonExhausted, isStructure));
+        if (this.isActiveAndEnabled == true)
+        {
+            StartCoroutine(WaitedSetColor(player, nonExhausted, isStructure));
+        }
     }
-
 
     /*public void setColorStructure(SpriteRenderer sprite) //Should this be combined with baseUnit.setColor? Maybe Mastergrid does this modification.
     {
