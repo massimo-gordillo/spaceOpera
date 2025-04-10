@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 //using Unity.Mathematics;
 using UnityEngine;
+using static UnityEngine.GraphicsBuffer;
 //using UnityEngine.UIElements;
 //using UnityEditor.FilePathAttribute;
 
@@ -17,12 +18,18 @@ public class CPUMananger : MonoBehaviour
     public BaseStructure[] structureListArray;
     public double[,] structuresEuclideanDistance;
     List<Vector2Int> structLocs;
-    public List<(Vector2Int, Vector2Int)> verticies = new List<(Vector2Int, Vector2Int)>();
+    Dictionary<Vector2Int, BaseStructure> structureVectorMap = new();
+    //public List<(Vector2Int, Vector2Int)> edges = new List<(Vector2Int, Vector2Int)>();
+    public List<(Vector2Int, Vector2Int)> edges = new ();
     public GameMaster gameMaster;
     public MasterGrid masterGrid;
 
+    public GameObject debugLinePrefab;
 
-    /*  Ok let's do a euclidean distance operation to find the network paths.
+
+
+    /*  
+        Let's precompute a network between structures for movemenet of units.
         I imagine there's a crawling algorithm that does this in linear complexity, I can explore that at a later time.
         Core idea is start a (0,0) and crawl towards (width, length) horizontally while checking for move legality and structures I've come across
         ChatGPT made a clever suggestion where instead of crawling from 0,0 you crawl outwardly from each structure location which will give you a good approx to the closest neighbour in each direction in a cone sort of fashion.
@@ -30,6 +37,21 @@ public class CPUMananger : MonoBehaviour
      */
 
     /*
+     * Current implementation:
+     * I tried a cardinal direction estimation that works pretty well.
+     * Effectively, you start at a structure and crawl in N/E/S/W directions one step at a time to find a structure in each of those dirs.
+     * There's a fanning operation so your cone of discovery gets wider as you move away from the source. I think this could use some refinement but good for now.
+     * Once you find a structure in a given direction you stop searching in that dir. There's also a search of the diagonals which meets criteria for both adjacent dirs.
+     * You do have to limit the search distance for performance but also to limit the number of redundant connections over large distances.
+     * The downside here is it's possible to create a disconncted graph, I need to make sure that every node can reach every other node. Will be a later improvement.
+     * Might be good to do some logic grouping of structures by proximity and make sure you have at least N paths out of it.
+     * Right now the solution isn't symmetrical but it's close.
+     * 
+ */
+
+    /*
+        First implementation:
+        Ok let's do a euclidean distance operation to find the network paths.
         For this implementation I'm going to compute the euclidean vector distances between all the structures. 
         Then I'm going to take the two shortest paths to nodes which have yet to perform the operation.
         Those two paths will be added to the network, and now that node is no longer a candidate for additional shortest paths.
@@ -39,29 +61,211 @@ public class CPUMananger : MonoBehaviour
         I'll have to implement some tests for that.
     */
 
+
+
     public void naiveV1Start()
     {
         Debug.Log("Calling to start CPUManager");
         structureList = masterGrid.GetStructures(null);
+        structureGrid = masterGrid.structureGrid;
         SortByDistanceFromOrigin(structureList);
+        //structureVectorMap = new();
         //structureListArray = new BaseStructure[structureList.Count];
         structuresEuclideanDistance = new double[structureList.Count, structureList.Count];
         structLocs = new List<Vector2Int>();
         foreach (BaseStructure structure in structureList)
         {
             structLocs.Add(new Vector2Int(structure.xPos, structure.yPos));
+            structureVectorMap.Add(new Vector2Int(structure.xPos, structure.yPos), structure);
             //structureListArray[i] = structure;
             //i++;
         }
         //SortByDistanceFromOrigin(structureListArray);
         //Vector2[] structLocs = 
 
-        generatePairwiseEuclideanDistanceArray(structLocs);
+        //generatePairwiseEuclideanDistanceArray(structLocs);
         //WriteArrayToCSV("EuclideanDistanceArray.csv");
-        GenerateNaiveStructureNetwork();
-        ExportVerticiesToCSV();
+        //GenerateNaiveStructureNetwork();
+        //ExportVerticiesToCSV();
+
+
+        //ConnectBaseStructureNeighbors(structureList, 6);
+        ConnectStructurePairsIter();
+        //StartCoroutine(DrawStructureDebugLines());
+        //OnDrawGizmosSelected();
+    }
+
+    public void ConnectStructurePairsIter()
+    {
+        foreach(BaseStructure s in structureList)
+        {
+            ConnectStructurePairs(s, 6); //specifically 6 as it's two infantry traverse distances
+        }
+        Debug.Log("Done searching pairs");
+    }
+
+    public void ConnectStructurePairs(BaseStructure node, int maxDistance)
+    {
+
+        Vector2Int origin = new Vector2Int (node.xPos, node.yPos);
+
+        //bool isCurious = origin == new Vector2Int(1, 1);
+
+        bool northSet = node.Npair != null;
+        bool southSet = node.Spair != null;
+        bool eastSet = node.Epair != null;
+        bool westSet = node.Wpair != null;
+        int dist;
+
+        for (dist = 1; dist <= maxDistance; dist++)
+        {
+            // Cardinal directions
+            TrySetCardinal(ref northSet, new Vector2Int(0, 1));
+            TrySetCardinal(ref southSet, new Vector2Int(0, -1));
+            TrySetCardinal(ref eastSet, new Vector2Int(1, 0));
+            TrySetCardinal(ref westSet, new Vector2Int(-1, 0));
+
+            // Only try diagonals if relevant cardinal directions have been found
+            if (!northSet && !eastSet) TrySetDiagonal(new Vector2Int(1, 1));
+            if (!northSet && !westSet) TrySetDiagonal(new Vector2Int(-1, 1));
+            if (!southSet && !eastSet) TrySetDiagonal(new Vector2Int(1, -1));
+            if (!southSet && !westSet) TrySetDiagonal(new Vector2Int(-1, -1));
+        }
+
+        /*        // Local helper for cardinal crawl
+                void TrySetCardinal(ref bool alreadySet, Vector2Int dir, Action<BaseStructure, BaseStructure> setPair, Action<BaseStructure, BaseStructure> setReverse)
+                {
+                    if (alreadySet) return;
+
+                    // Now we fan out with increasing distance
+                    for (int offset = 1; offset <= dist; offset++)
+                    {
+                        Vector2Int checkPos = origin + dir * offset; // This is the main direction we're crawling
+                        if (structureVectorMap.TryGetValue(checkPos, out BaseStructure neighbor))
+                        {
+                            setPair(node, neighbor);
+                            setReverse(neighbor, node);
+                            alreadySet = true;
+                            break; // We stop searching in this direction once we find a valid pair
+                        }
+                    }
+                }*/
+        void TrySetCardinal(ref bool alreadySet, Vector2Int dir)
+        {
+            if (alreadySet) return;
+            int offsetCheck = dist - 1;
+
+            // Iterate over the fan distance range (this can still work like before)
+            for (int offset = -offsetCheck; offset <= offsetCheck; offset++)
+            {
+                Vector2Int offsetVector = new (dir.y,-dir.x); //perpendicular vector in the clockwise dir. looks counterclockwise because offset starts neg.
+                Vector2Int checkPos = origin + dir * dist + offsetVector*offset;
+/*                if (isCurious)
+                {
+                    Debug.Log($"Location count: {checkPos}");
+                    Debug.Log($"Checking location: {checkPos}, given {origin} with distance {dist} and offset {offsetVector}");
+                }*/
+                if (structureVectorMap.TryGetValue(checkPos, out BaseStructure neighbor))
+                {
+                    // Add the pair to the vertices list with their positions
+                    edges.Add((new Vector2Int(node.xPos, node.yPos), new Vector2Int(neighbor.xPos, neighbor.yPos)));
+
+                    // Set the correct direction for both the sender and receiver
+                    if (dir == Vector2Int.up) // Npair
+                    {
+                        node.Npair = neighbor;
+                        if (neighbor.Spair == null) neighbor.Spair = node;
+                    }
+                    else if (dir == Vector2Int.down) // Spair
+                    {
+                        node.Spair = neighbor;
+                        if (neighbor.Npair == null) neighbor.Npair = node;
+                    }
+                    else if (dir == Vector2Int.left) // Wpair
+                    {
+                        node.Wpair = neighbor;
+                        if (neighbor.Epair == null) neighbor.Epair = node;
+                    }
+                    else if (dir == Vector2Int.right) // Epair
+                    {
+                        node.Epair = neighbor;
+                        if (neighbor.Wpair == null) neighbor.Wpair = node;
+                    }
+
+                    alreadySet = true;
+                    break;
+                }
+            }
+        }
+        void TrySetDiagonal(Vector2Int dir)
+        {
+            /*            if (dist <= 1)
+                            return;
+                        int newDist = dist - 1;*/
+            int newDist = dist;
+
+            // Only attempt if diagonal is needed (i.e., one cardinal direction is missing)
+            Vector2Int checkPos = origin + dir * newDist; 
+            if (structureVectorMap.TryGetValue(checkPos, out BaseStructure diagNeighbor))
+            {
+                // Add the diagonal pair to the vertices list
+                edges.Add((new Vector2Int(node.xPos, node.yPos), new Vector2Int(diagNeighbor.xPos, diagNeighbor.yPos)));
+
+                // Set the appropriate pairs in both directions
+                if (dir.x == 1 && dir.y == 1) // NE: Need Npair and Epair
+                {
+                    if (node.Npair == null)
+                        node.Npair = diagNeighbor;
+                    if (node.Epair == null)
+                        node.Epair = diagNeighbor;
+
+                    if (diagNeighbor.Spair == null)
+                        diagNeighbor.Spair = node;
+                    if (diagNeighbor.Wpair == null)
+                        diagNeighbor.Wpair = node;
+                }
+                else if (dir.x == -1 && dir.y == 1) // NW: Need Npair and Wpair
+                {
+                    if (node.Npair == null)
+                        node.Npair = diagNeighbor;
+                    if (node.Wpair == null)
+                        node.Wpair = diagNeighbor;
+
+                    if (diagNeighbor.Spair == null)
+                        diagNeighbor.Spair = node;
+                    if (diagNeighbor.Epair == null)
+                        diagNeighbor.Epair = node;
+                }
+                else if (dir.x == 1 && dir.y == -1) // SE: Need Spair and Epair
+                {
+                    if (node.Spair == null)
+                        node.Spair = diagNeighbor;
+                    if (node.Epair == null)
+                        node.Epair = diagNeighbor;
+
+                    if (diagNeighbor.Npair == null)
+                        diagNeighbor.Npair = node;
+                    if (diagNeighbor.Wpair == null)
+                        diagNeighbor.Wpair = node;
+                }
+                else if (dir.x == -1 && dir.y == -1) // SW: Need Spair and Wpair
+                {
+                    if (node.Spair == null)
+                        node.Spair = diagNeighbor;
+                    if (node.Wpair == null)
+                        node.Wpair = diagNeighbor;
+
+                    if (diagNeighbor.Npair == null)
+                        diagNeighbor.Npair = node;
+                    if (diagNeighbor.Epair == null)
+                        diagNeighbor.Epair = node;
+                }
+            }
+        }
 
     }
+
+
 
     /*    public static void SortByDistanceFromOrigin(BaseStructure[] structures)
         {
@@ -75,7 +279,7 @@ public class CPUMananger : MonoBehaviour
 
     /*    private void Update()
         {
-            foreach (var (from, to) in verticies)
+            foreach (var (from, to) in edges)
             {
                 Vector3 fromPos = new Vector3(from.x, from.y, 0);
                 Vector3 toPos = new Vector3(to.x, to.y, 0);
@@ -83,13 +287,72 @@ public class CPUMananger : MonoBehaviour
             }
         }*/
 
+    public IEnumerator DrawStructureDebugLines()
+    {
+
+        foreach ((Vector2Int, Vector2Int) vectorPair in edges)
+        {
+            yield return new WaitForSeconds(0.25f);
+            //if (structure == null) continue;
+
+            //Vector3 start = new Vector3(structure.xPos, structure.yPos, 0);
+            Vector2Int startV2 = vectorPair.Item1;
+            Vector3 start = new Vector3(startV2.x, startV2.y, 0);
+            Vector2Int targetV2 = vectorPair.Item2;
+
+            Vector3 target = new Vector3(targetV2.x, targetV2.y, 0);
+
+
+            if (startV2 != null && targetV2!=null)
+            {
+
+                GameObject line = Instantiate(debugLinePrefab);
+                LineRenderer lr = line.GetComponent<LineRenderer>();
+                lr.positionCount = 2;
+                lr.SetPosition(0, start);
+                lr.SetPosition(1, target);
+            }
+
+/*            DrawTo(structure.NEpair);
+            DrawTo(structure.NWpair);
+            DrawTo(structure.SEpair);
+            DrawTo(structure.SWpair);*/
+        }
+    }
+    /*private void OnDrawGizmosSelected()
+    {
+        foreach (BaseStructure target in structureList)
+        {
+            Gizmos.color = Color.green;
+            List<BaseStructure> pairList = new List<BaseStructure>();
+            pairList.Add(target.Npair);
+            pairList.Add(target.Spair);
+            pairList.Add(target.Wpair);
+            pairList.Add(target.Epair);
+            *//*        DrawLineTo(NWpair);
+                    DrawLineTo(NEpair);
+                    DrawLineTo(SWpair);
+                    DrawLineTo(SEpair);*//*
+            foreach(BaseStructure pair in pairList)
+            {
+                if (target == null)
+                    continue;
+                Vector3 start = new Vector3(target.xPos, target.yPos, 0);
+                Vector3 end = new Vector3(target.xPos, target.yPos, 0);
+                Gizmos.DrawLine(start, end);
+            }
+        }
+    }*/
+
+
+
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.cyan;
 
-        if (verticies == null) return;
+        if (edges == null) return;
 
-        foreach (var (from, to) in verticies)
+        foreach (var (from, to) in edges)
         {
             Vector3 fromPos = new Vector3(from.x, from.y, 0);
             Vector3 toPos = new Vector3(to.x, to.y, 0);
@@ -208,7 +471,7 @@ public class CPUMananger : MonoBehaviour
 
 
 
-            //I can purge this and just have it add to the verticies directly.
+            //I can purge this and just have it add to the edges directly.
             if (smallest != null && nextSmallestV != null)
             {
                 smallestPairingsArray[i, 0] = (Vector2Int)smallestV;
@@ -249,7 +512,7 @@ public class CPUMananger : MonoBehaviour
                 for (int i = 0; i < count; i++)
                 {
                     Vector2Int sourceLocation = 
-                    //verticies.Add(smallestPairingsArray[i,0]);
+                    //edges.Add(smallestPairingsArray[i,0]);
                 }*/
         i = 0;
         foreach(Vector2Int location in structLocs)
@@ -265,7 +528,7 @@ public class CPUMananger : MonoBehaviour
                 {
                     Debug.Log($"For {location}, adding pairing {smallestPairingsArray[i, n]}, pointing to {endingLocation}");
 
-                    verticies.Add((startingLocation, endingLocation));
+                    edges.Add((startingLocation, endingLocation));
                 }
             }
             i++;
@@ -312,7 +575,7 @@ public class CPUMananger : MonoBehaviour
             // Optional header
             writer.WriteLine("FromX,FromY,ToX,ToY");
 
-            foreach (var (from, to) in verticies)
+            foreach (var (from, to) in edges)
             {
                 writer.WriteLine($"{from.x},{from.y},{to.x},{to.y}");
             }

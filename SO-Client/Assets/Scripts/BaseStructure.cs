@@ -42,6 +42,11 @@ public class BaseStructure : MonoBehaviour
     public SpriteRenderer progeny2ProductionCaptureSpriteTrimSR;
     public SpriteRenderer progeny2ProductionCaptureSpriteLightsSR;
 
+    public BaseStructure Npair;
+    public BaseStructure Spair;
+    public BaseStructure Wpair;
+    public BaseStructure Epair;
+
 
 
     // Start is called before the first frame update
