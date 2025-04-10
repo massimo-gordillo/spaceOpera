@@ -484,7 +484,7 @@ public class MasterGrid : MonoBehaviour
         checkedCells[xpos + 1, ypos + 1] = true;
         if (mTarget.canMoveAndAttack)
         {
-            cellsToCheck.Enqueue((new Vector2Int(xpos + 1, ypos + 1), movementRange + 1));//assuming unit only has 1 attack range for the first A* search.
+            cellsToCheck.Enqueue((new Vector2Int(xpos + 1, ypos + 1), movementRange + 1));//assuming unit only has 1 attack range for the first vectorA* search.
             //List<Queue<Vector2Int>> squareQueuesList = AStarSearchRecursive(mTarget, movementRange, attackRange, cellsToCheck, checkedCells, new List<Queue<Vector2Int>> { new Queue<Vector2Int>(), new Queue<Vector2Int>(), new Queue<Vector2Int>() }, true);
             List<Queue<Vector2Int>> squareQueuesList = null;
             if (attackRange >= 1)
@@ -632,7 +632,8 @@ public class MasterGrid : MonoBehaviour
     {
 
         //Debug.Log($"Animating movement from {start} to {end}");
-        List<Vector2Int> path = BidirectionalSearch(start, end, unit);
+        List<Vector2Int> path = BidirectionalSearch(start, end, unit, unit.movementRange+1);
+        //List<Vector2Int> path = BidirectionalSearch(start, end, unit);
 
         //movement animation speed
         float speed = 12.0f;
@@ -662,7 +663,7 @@ public class MasterGrid : MonoBehaviour
         //Debug.Log("Movement animation complete.");
     }
 
-    //Manhattan distance/vector calculation for finding path between to squares. Uses bidirectional search to guarantee shortest path.
+    /*//Manhattan distance/vector calculation for finding path between to squares. Uses bidirectional search to guarantee shortest path.
     public List<Vector2Int> BidirectionalSearch(
         Vector2Int start,
         Vector2Int end,
@@ -705,9 +706,9 @@ public class MasterGrid : MonoBehaviour
         if (!pathFound) return new List<Vector2Int>(); // No valid path found
 
         return ReconstructPath(meetingPoint, parentStart, parentEnd);
-    }
+    }*/
 
-    private bool ExpandFrontier(
+    /*private bool ExpandFrontier(
         Queue<Vector2Int> queue,
         Dictionary<Vector2Int, Vector2Int> parents,
         Dictionary<Vector2Int, Vector2Int> otherParents,
@@ -735,7 +736,7 @@ public class MasterGrid : MonoBehaviour
         }
 
         return false;
-    }
+    }*/
 
     private static List<Vector2Int> ReconstructPath(
     Vector2Int meetingPoint,
@@ -764,6 +765,93 @@ public class MasterGrid : MonoBehaviour
 
         return path;
     }
+
+    public List<Vector2Int> BidirectionalSearch(
+    Vector2Int start,
+    Vector2Int end,
+    BaseUnit unit,
+    int depthLimitPerSide)
+    {
+        if (start == end) return new List<Vector2Int> { start };
+
+        Queue<Vector2Int> queueStart = new Queue<Vector2Int>();
+        Queue<Vector2Int> queueEnd = new Queue<Vector2Int>();
+
+        Dictionary<Vector2Int, Vector2Int> parentStart = new Dictionary<Vector2Int, Vector2Int>();
+        Dictionary<Vector2Int, Vector2Int> parentEnd = new Dictionary<Vector2Int, Vector2Int>();
+
+        Dictionary<Vector2Int, int> depthStart = new Dictionary<Vector2Int, int>();
+        Dictionary<Vector2Int, int> depthEnd = new Dictionary<Vector2Int, int>();
+
+        queueStart.Enqueue(start);
+        parentStart[start] = start;
+        depthStart[start] = 0;
+
+        queueEnd.Enqueue(end);
+        parentEnd[end] = end;
+        depthEnd[end] = 0;
+
+        Vector2Int meetingPoint = Vector2Int.zero;
+        bool pathFound = false;
+
+        while (queueStart.Count > 0 && queueEnd.Count > 0)
+        {
+            if (ExpandFrontier(queueStart, parentStart, parentEnd, depthStart, depthLimitPerSide, ref meetingPoint, unit))
+            {
+                pathFound = true;
+                break;
+            }
+
+            if (ExpandFrontier(queueEnd, parentEnd, parentStart, depthEnd, depthLimitPerSide, ref meetingPoint, unit))
+            {
+                pathFound = true;
+                break;
+            }
+        }
+
+        if (!pathFound) return new List<Vector2Int>(); // No path found within depth
+
+        return ReconstructPath(meetingPoint, parentStart, parentEnd);
+    }
+
+    private bool ExpandFrontier(
+    Queue<Vector2Int> queue,
+    Dictionary<Vector2Int, Vector2Int> parents,
+    Dictionary<Vector2Int, Vector2Int> otherParents,
+    Dictionary<Vector2Int, int> depths,
+    int depthLimit,
+    ref Vector2Int meetingPoint,
+    BaseUnit unit)
+    {
+        if (queue.Count == 0) return false;
+
+        Vector2Int current = queue.Dequeue();
+        int currentDepth = depths[current];
+
+        if (currentDepth >= depthLimit) return false;
+
+        foreach (Vector2Int dir in DirectionList())
+        {
+            Vector2Int neighbor = current + dir;
+
+            if (depths.ContainsKey(neighbor) || legalMove(neighbor.x, neighbor.y, unit) <= 0)
+                continue;
+
+            depths[neighbor] = currentDepth + 1;
+            parents[neighbor] = current;
+            queue.Enqueue(neighbor);
+
+            if (otherParents.ContainsKey(neighbor))
+            {
+                meetingPoint = neighbor;
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+
 
     // Helper function to check if a cell is in bounds
     private bool IsCellInBounds(int x, int y)

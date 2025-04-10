@@ -19,8 +19,8 @@ public class CPUMananger : MonoBehaviour
     public double[,] structuresEuclideanDistance;
     List<Vector2Int> structLocs;
     Dictionary<Vector2Int, BaseStructure> structureVectorMap = new();
-    //public List<(Vector2Int, Vector2Int)> edges = new List<(Vector2Int, Vector2Int)>();
-    public List<(Vector2Int, Vector2Int)> edges = new ();
+    //public List<(Vector2Int, Vector2Int)> graphEdges = new List<(Vector2Int, Vector2Int)>();
+    public List<GraphEdge> graphEdges = new ();
     public GameMaster gameMaster;
     public MasterGrid masterGrid;
 
@@ -33,7 +33,7 @@ public class CPUMananger : MonoBehaviour
         I imagine there's a crawling algorithm that does this in linear complexity, I can explore that at a later time.
         Core idea is start a (0,0) and crawl towards (width, length) horizontally while checking for move legality and structures I've come across
         ChatGPT made a clever suggestion where instead of crawling from 0,0 you crawl outwardly from each structure location which will give you a good approx to the closest neighbour in each direction in a cone sort of fashion.
-        Maybe I can leverage my recursive A* search function in masterGrid but that sounds painfully complex with passing of functions etc, gross.
+        Maybe I can leverage my recursive vectorA* search function in masterGrid but that sounds painfully complex with passing of functions etc, gross.
      */
 
     /*
@@ -91,6 +91,7 @@ public class CPUMananger : MonoBehaviour
 
         //ConnectBaseStructureNeighbors(structureList, 6);
         ConnectStructurePairsIter();
+        CorrectManhattanDistances();
         //StartCoroutine(DrawStructureDebugLines());
         //OnDrawGizmosSelected();
     }
@@ -168,7 +169,8 @@ public class CPUMananger : MonoBehaviour
                 if (structureVectorMap.TryGetValue(checkPos, out BaseStructure neighbor))
                 {
                     // Add the pair to the vertices list with their positions
-                    edges.Add((new Vector2Int(node.xPos, node.yPos), new Vector2Int(neighbor.xPos, neighbor.yPos)));
+                    AddEdge(new Vector2Int(node.xPos, node.yPos), new Vector2Int(neighbor.xPos, neighbor.yPos));
+
 
                     // Set the correct direction for both the sender and receiver
                     if (dir == Vector2Int.up) // Npair
@@ -204,12 +206,12 @@ public class CPUMananger : MonoBehaviour
                         int newDist = dist - 1;*/
             int newDist = dist;
 
-            // Only attempt if diagonal is needed (i.e., one cardinal direction is missing)
+            // Only attempt if diagonal is needed (i.edge., one cardinal direction is missing)
             Vector2Int checkPos = origin + dir * newDist; 
             if (structureVectorMap.TryGetValue(checkPos, out BaseStructure diagNeighbor))
             {
                 // Add the diagonal pair to the vertices list
-                edges.Add((new Vector2Int(node.xPos, node.yPos), new Vector2Int(diagNeighbor.xPos, diagNeighbor.yPos)));
+                AddEdge(new Vector2Int(node.xPos, node.yPos), new Vector2Int(diagNeighbor.xPos, diagNeighbor.yPos));
 
                 // Set the appropriate pairs in both directions
                 if (dir.x == 1 && dir.y == 1) // NE: Need Npair and Epair
@@ -279,7 +281,7 @@ public class CPUMananger : MonoBehaviour
 
     /*    private void Update()
         {
-            foreach (var (from, to) in edges)
+            foreach (var (from, to) in graphEdges)
             {
                 Vector3 fromPos = new Vector3(from.x, from.y, 0);
                 Vector3 toPos = new Vector3(to.x, to.y, 0);
@@ -290,15 +292,16 @@ public class CPUMananger : MonoBehaviour
     public IEnumerator DrawStructureDebugLines()
     {
 
-        foreach ((Vector2Int, Vector2Int) vectorPair in edges)
+        foreach (GraphEdge edge in graphEdges)
         {
+            
             yield return new WaitForSeconds(0.25f);
             //if (structure == null) continue;
 
             //Vector3 start = new Vector3(structure.xPos, structure.yPos, 0);
-            Vector2Int startV2 = vectorPair.Item1;
+            Vector2Int startV2 = edge.vectorA;
             Vector3 start = new Vector3(startV2.x, startV2.y, 0);
-            Vector2Int targetV2 = vectorPair.Item2;
+            Vector2Int targetV2 = edge.vectorB;
 
             Vector3 target = new Vector3(targetV2.x, targetV2.y, 0);
 
@@ -350,10 +353,12 @@ public class CPUMananger : MonoBehaviour
     {
         Gizmos.color = Color.cyan;
 
-        if (edges == null) return;
+        if (graphEdges == null) return;
 
-        foreach (var (from, to) in edges)
+        foreach (GraphEdge e in graphEdges)
         {
+            Vector2Int from = e.vectorA;
+            Vector2Int to = e.vectorB;
             Vector3 fromPos = new Vector3(from.x, from.y, 0);
             Vector3 toPos = new Vector3(to.x, to.y, 0);
 
@@ -372,7 +377,22 @@ public class CPUMananger : MonoBehaviour
         });
     }
 
-    private void generatePairwiseEuclideanDistanceArray(List<Vector2Int> locations)
+    public void CorrectManhattanDistances()
+    {
+        foreach (GraphEdge edge in graphEdges)
+        {
+            List<Vector2Int> dirs = new ();
+            //a little hacky using speficially infantry for this but that will be the source of truth for now.
+            dirs = masterGrid.BidirectionalSearch(edge.vectorA, edge.vectorB, PrefabManager.getBaseUnitFromName("Infantry",0), edge.Distance * 2 + 1);
+            if (dirs.Count == 0) {
+                edge.isLandAccessible = false;
+                Debug.Log($"GraphEdge {edge.vectorA}{edge.vectorB} is not land accessible");
+            }
+        }
+        Debug.Log("Done checking land accessibility");
+    }
+
+    /*private void generatePairwiseEuclideanDistanceArray(List<Vector2Int> locations)
     {
         Vector2Int[] locationsA = new Vector2Int[locations.Count];
         double[,] distances = new double[locations.Count, locations.Count];
@@ -399,10 +419,10 @@ public class CPUMananger : MonoBehaviour
         }
 
         structuresEuclideanDistance = distances;
-    }
+    }*/
 
     //function to generate the new connections with still outstanding nodes.
-    private void GenerateNaiveStructureNetwork()
+    /*private void GenerateNaiveStructureNetwork()
     {
         int numNewConnections = 2; //we're gonna assume 2 for this implementation. We can scale the smallest/nextSmallest implementation should we wanna get fancy.
         int count = structureList.Count;
@@ -417,7 +437,7 @@ public class CPUMananger : MonoBehaviour
             double? nextSmallest = null;
             Vector2Int? nextSmallestV = null;
             //initial condition setting. The first two items are sorted and then the algorithm proceeds. This doesn't check for 0s.
-        /*          int j = i;
+        *//*          int j = i;
                     if (j + 2 < count)
                     {
                         bool flip = structuresEuclideanDistance[i, j + 1] <= structuresEuclideanDistance[i, j + 2];
@@ -426,7 +446,7 @@ public class CPUMananger : MonoBehaviour
                         nextSmallest = !flip ? structuresEuclideanDistance[i, j + 1] : structuresEuclideanDistance[i, j + 2];
                         nextSmallestV = !flip ? new Vector2Int(i, j + 1) : new Vector2Int(i, j + 2);
 
-                    }//else (what if it doesn't?)*/
+                    }//else (what if it doesn't?)*//*
             
             for (int j = i; j < count; j++)
             {
@@ -471,7 +491,7 @@ public class CPUMananger : MonoBehaviour
 
 
 
-            //I can purge this and just have it add to the edges directly.
+            //I can purge this and just have it add to the graphEdges directly.
             if (smallest != null && nextSmallestV != null)
             {
                 smallestPairingsArray[i, 0] = (Vector2Int)smallestV;
@@ -508,12 +528,12 @@ public class CPUMananger : MonoBehaviour
 
             
         }
-        /*
+        *//*
                 for (int i = 0; i < count; i++)
                 {
                     Vector2Int sourceLocation = 
-                    //edges.Add(smallestPairingsArray[i,0]);
-                }*/
+                    //graphEdges.Add(smallestPairingsArray[i,0]);
+                }*//*
         i = 0;
         foreach(Vector2Int location in structLocs)
         {
@@ -527,14 +547,14 @@ public class CPUMananger : MonoBehaviour
                 if (smallestPairingsArray[i, n] != null)
                 {
                     Debug.Log($"For {location}, adding pairing {smallestPairingsArray[i, n]}, pointing to {endingLocation}");
+                    AddEdge(startingLocation, endingLocation);
 
-                    edges.Add((startingLocation, endingLocation));
                 }
             }
             i++;
         }
 
-    }
+    }*/
 
     public void WriteArrayToCSV(string fileName)
     {
@@ -574,14 +594,72 @@ public class CPUMananger : MonoBehaviour
         {
             // Optional header
             writer.WriteLine("FromX,FromY,ToX,ToY");
-
-            foreach (var (from, to) in edges)
+            foreach (GraphEdge e in graphEdges)
             {
+                Vector2Int from = e.vectorA;
+                Vector2Int to = e.vectorB;
                 writer.WriteLine($"{from.x},{from.y},{to.x},{to.y}");
             }
         }
 
         Debug.Log($"Verticies CSV exported to: {filePath}");
     }
+
+    public void AddEdge(Vector2Int a, Vector2Int b)
+    {
+        GraphEdge newEdge = new GraphEdge(a, b);
+
+        // Check if the edge already exists in the list (undirected graph, so vectorA-vectorB is the same as vectorB-vectorA)
+        if (!graphEdges.Contains(newEdge))
+        {
+            graphEdges.Add(newEdge);
+            //Debug.Log($"Added edge: {a} <-> {b} with distance: {newEdge.Distance}");
+        }
+        else
+        {
+            Debug.Log($"Edge already exists: {a} <-> {b}");
+        }
+    }
+
+    public class GraphEdge
+    {
+        public Vector2Int vectorA { get; private set; }
+        public Vector2Int vectorB { get; private set; }
+        public int Distance { get; private set; }
+
+        public bool isLandAccessible = true;
+
+        // Constructor to initialize the GraphEdge
+        public GraphEdge(Vector2Int a, Vector2Int b)
+        {
+            vectorA = a;
+            vectorB = b;
+            Distance = CalculateManhattanDistance(a, b);
+        }
+
+        // Method to calculate Manhattan distance
+        private int CalculateManhattanDistance(Vector2Int a, Vector2Int b)
+        {
+            return Mathf.Abs(a.x - b.x) + Mathf.Abs(a.y - b.y);
+        }
+
+        // Override Equals to ensure that edges are treated the same regardless of order
+        public override bool Equals(object obj)
+        {
+            if (obj is GraphEdge edge)
+            {
+                return (vectorA == edge.vectorA && vectorB == edge.vectorB) || (vectorA == edge.vectorB && vectorB == edge.vectorA);
+            }
+            return false;
+        }
+
+        // Override GetHashCode to ensure consistent hashing for equal edges
+        public override int GetHashCode()
+        {
+            // Combine the hash codes of vectorA and vectorB, ensuring order doesn't matter
+            return vectorA.GetHashCode() ^ vectorB.GetHashCode();
+        }
+    }
+
 
 }
