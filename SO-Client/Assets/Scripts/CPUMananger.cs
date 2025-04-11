@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks.Triggers;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -88,21 +89,14 @@ public class CPUMananger : MonoBehaviour
         //GenerateNaiveStructureNetwork();
         //ExportVerticiesToCSV();
 
-
-        //ConnectBaseStructureNeighbors(structureList, 6);
-        ConnectStructurePairsIter();
-        CorrectManhattanDistances();
-        //StartCoroutine(DrawStructureDebugLines());
-        //OnDrawGizmosSelected();
-    }
-
-    public void ConnectStructurePairsIter()
-    {
-        foreach(BaseStructure s in structureList)
+        foreach (BaseStructure s in structureList)
         {
             ConnectStructurePairs(s, 6); //specifically 6 as it's two infantry traverse distances
         }
-        Debug.Log("Done searching pairs");
+        //Debug.Log($"Done searching pairs, edge count is {graphEdges.Count}");
+
+        CorrectManhattanDistances();
+        //StartCoroutine(DrawStructureDebugLines());
     }
 
     public void ConnectStructurePairs(BaseStructure node, int maxDistance)
@@ -291,11 +285,10 @@ public class CPUMananger : MonoBehaviour
 
     public IEnumerator DrawStructureDebugLines()
     {
-
+        GameObject prevLine = null;
         foreach (GraphEdge edge in graphEdges)
         {
-            
-            yield return new WaitForSeconds(0.25f);
+            yield return new WaitForSeconds(0.75f);
             //if (structure == null) continue;
 
             //Vector3 start = new Vector3(structure.xPos, structure.yPos, 0);
@@ -306,14 +299,28 @@ public class CPUMananger : MonoBehaviour
             Vector3 target = new Vector3(targetV2.x, targetV2.y, 0);
 
 
-            if (startV2 != null && targetV2!=null)
+            if (prevLine != null)
+            {
+                LineRenderer prevlr = prevLine.GetComponent<LineRenderer>();
+                if (prevlr != null)
+                {
+                    prevlr.startColor = new Color (Color.white.r, Color.white.g, Color.white.b, 0.7f);
+                    prevlr.endColor = new Color(Color.white.r, Color.white.g, Color.white.b, 0.7f);
+                }
+            }
+
+            if (startV2 != null && targetV2 != null)
             {
 
                 GameObject line = Instantiate(debugLinePrefab);
                 LineRenderer lr = line.GetComponent<LineRenderer>();
+
                 lr.positionCount = 2;
                 lr.SetPosition(0, start);
                 lr.SetPosition(1, target);
+                lr.startColor = Color.red;
+                lr.endColor = Color.red;
+                prevLine = line;
             }
 
 /*            DrawTo(structure.NEpair);
@@ -379,15 +386,44 @@ public class CPUMananger : MonoBehaviour
 
     public void CorrectManhattanDistances()
     {
+        
         foreach (GraphEdge edge in graphEdges)
         {
+            //bool curiousCheck = false;
+            //curiousCheck = edge.Equals(new GraphEdge(new Vector2Int(8,2), new Vector2Int(10, 2)));
+                
+
             List<Vector2Int> dirs = new ();
             //a little hacky using speficially infantry for this but that will be the source of truth for now.
-            dirs = masterGrid.BidirectionalSearch(edge.vectorA, edge.vectorB, PrefabManager.getBaseUnitFromName("Infantry",0), edge.Distance * 2 + 1);
+            dirs = masterGrid.BidirectionalSearch(edge.vectorA, edge.vectorB, PrefabManager.getBaseUnitFromName("Infantry",0), edge.Distance + 1);
             if (dirs.Count == 0) {
                 edge.isLandAccessible = false;
                 Debug.Log($"GraphEdge {edge.vectorA}{edge.vectorB} is not land accessible");
             }
+            int total = 0;
+            Vector2Int start = edge.vectorA;
+            foreach (Vector2Int dir in dirs)
+            {
+                Vector2Int delta = dir - start;
+                start = dir;
+/*                if (curiousCheck)
+                {
+                    Debug.Log($"vector is {dir} with a delta {delta}");
+                }*/
+                total += Math.Abs(delta.x) + Math.Abs(delta.y);
+            }
+/*            if (curiousCheck)
+            {
+                Debug.Log($"Edge {edge.vectorA} to {edge.vectorB} has distance {total}");
+            }*/
+
+            if (total > edge.Distance)
+            {
+                edge.Distance = total;
+                //Debug.Log($"Edge distance for {edge.vectorA} to {edge.vectorB} is overwritten to {edge.Distance}");
+
+            }
+
         }
         Debug.Log("Done checking land accessibility");
     }
@@ -625,7 +661,7 @@ public class CPUMananger : MonoBehaviour
     {
         public Vector2Int vectorA { get; private set; }
         public Vector2Int vectorB { get; private set; }
-        public int Distance { get; private set; }
+        public int Distance { get; set; }
 
         public bool isLandAccessible = true;
 

@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Drawing.Imaging;
 using System.IO;
-using System.Linq.Expressions;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 //using MessagePack;
@@ -56,11 +54,11 @@ public class TilemapManager : MonoBehaviour
 
         //uncomment the appropriate function for testing.
 
-        //TilemapData byteData = ExportTilemapToBytes();
-        //ImportTilemapFromBytes(byteData);
+        TilemapData byteData = ExportTilemapToBytes();
+        ImportTilemapFromBytes(byteData);
 
         //SaveTilemapToFile("Map3Tilemap-v5.dat");
-        LoadTilemapFromFile("Map3Tilemap-v5.dat");
+        //LoadTilemapFromFile("Map3Tilemap-v5.dat");
 
 
 
@@ -202,7 +200,10 @@ public class TilemapManager : MonoBehaviour
                 if (tile.name.Contains("v2"))
                 {
                     modifiedTileName = tile.name.Replace("v2", "-v5");
-                }else
+                    
+                }else if(tile.name.Contains("v4"))
+                    modifiedTileName = tile.name.Replace("v4", "v5");
+                else
                     modifiedTileName = tile.name;
                 //Debug.Log($"Tile name: {tile.name}, Modified name: {modifiedTileName}");
                 if (tile != null && tileNameToByteDictionary.TryGetValue(modifiedTileName, out byte tileByte))
