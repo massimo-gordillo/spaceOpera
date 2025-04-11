@@ -96,7 +96,7 @@ public class CPUMananger : MonoBehaviour
         //Debug.Log($"Done searching pairs, edge count is {graphEdges.Count}");
 
         CorrectManhattanDistances();
-        //StartCoroutine(DrawStructureDebugLines());
+        StartCoroutine(DrawStructureDebugLines());
     }
 
     public void ConnectStructurePairs(BaseStructure node, int maxDistance)
@@ -104,16 +104,20 @@ public class CPUMananger : MonoBehaviour
 
         Vector2Int origin = new Vector2Int (node.xPos, node.yPos);
 
-        //bool isCurious = origin == new Vector2Int(1, 1);
+        //bool isCurious = origin == new Vector2Int(0, 0);
 
-        bool northSet = node.Npair != null;
-        bool southSet = node.Spair != null;
-        bool eastSet = node.Epair != null;
-        bool westSet = node.Wpair != null;
+
         int dist;
 
         for (dist = 1; dist <= maxDistance; dist++)
         {
+            bool northSet = node.Npair != null;
+            bool southSet = node.Spair != null;
+            bool eastSet = node.Epair != null;
+            bool westSet = node.Wpair != null;
+
+/*            if (isCurious)
+                Debug.Log($"checking {origin},         N: {northSet}       S: {southSet}      E: {eastSet}      W: {westSet}");*/
             // Cardinal directions
             TrySetCardinal(ref northSet, new Vector2Int(0, 1));
             TrySetCardinal(ref southSet, new Vector2Int(0, -1));
@@ -153,13 +157,16 @@ public class CPUMananger : MonoBehaviour
             // Iterate over the fan distance range (this can still work like before)
             for (int offset = -offsetCheck; offset <= offsetCheck; offset++)
             {
-                Vector2Int offsetVector = new (dir.y,-dir.x); //perpendicular vector in the clockwise dir. looks counterclockwise because offset starts neg.
-                Vector2Int checkPos = origin + dir * dist + offsetVector*offset;
-/*                if (isCurious)
-                {
-                    Debug.Log($"Location count: {checkPos}");
-                    Debug.Log($"Checking location: {checkPos}, given {origin} with distance {dist} and offset {offsetVector}");
-                }*/
+                Vector2Int initSearchVector = origin + dir * dist;
+                
+                //if the center of the search section is outside of the map then we can ignore the rest of that search. Can't do this for checkPos because you can breadth outside.
+                if (initSearchVector.x < 0 || initSearchVector.y < 0 || initSearchVector.x >= gameMaster.gridX || initSearchVector.y >= gameMaster.gridY)
+                    continue;
+
+                Vector2Int offsetVector = new(dir.y, -dir.x); //perpendicular vector in the clockwise dir. looks counterclockwise because offset starts neg.
+                Vector2Int checkPos = initSearchVector + offsetVector * offset;
+
+
                 if (structureVectorMap.TryGetValue(checkPos, out BaseStructure neighbor))
                 {
                     // Add the pair to the vertices list with their positions
@@ -187,6 +194,11 @@ public class CPUMananger : MonoBehaviour
                         node.Epair = neighbor;
                         if (neighbor.Wpair == null) neighbor.Wpair = node;
                     }
+
+/*                    if (isCurious)
+                    {
+                        Debug.Log($"Pairing location: {origin} with location: {checkPos} with distance {dist} and offset {offsetVector}");
+                    }*/
 
                     alreadySet = true;
                     break;
@@ -298,7 +310,7 @@ public class CPUMananger : MonoBehaviour
 
             Vector3 target = new Vector3(targetV2.x, targetV2.y, 0);
 
-
+/*
             if (prevLine != null)
             {
                 LineRenderer prevlr = prevLine.GetComponent<LineRenderer>();
@@ -307,7 +319,7 @@ public class CPUMananger : MonoBehaviour
                     prevlr.startColor = new Color (Color.white.r, Color.white.g, Color.white.b, 0.7f);
                     prevlr.endColor = new Color(Color.white.r, Color.white.g, Color.white.b, 0.7f);
                 }
-            }
+            }*/
 
             if (startV2 != null && targetV2 != null)
             {
@@ -318,7 +330,7 @@ public class CPUMananger : MonoBehaviour
                 lr.positionCount = 2;
                 lr.SetPosition(0, start);
                 lr.SetPosition(1, target);
-                lr.startColor = Color.red;
+                lr.startColor = Color.white;
                 lr.endColor = Color.red;
                 prevLine = line;
             }
@@ -329,34 +341,11 @@ public class CPUMananger : MonoBehaviour
             DrawTo(structure.SWpair);*/
         }
     }
-    /*private void OnDrawGizmosSelected()
-    {
-        foreach (BaseStructure target in structureList)
-        {
-            Gizmos.color = Color.green;
-            List<BaseStructure> pairList = new List<BaseStructure>();
-            pairList.Add(target.Npair);
-            pairList.Add(target.Spair);
-            pairList.Add(target.Wpair);
-            pairList.Add(target.Epair);
-            *//*        DrawLineTo(NWpair);
-                    DrawLineTo(NEpair);
-                    DrawLineTo(SWpair);
-                    DrawLineTo(SEpair);*//*
-            foreach(BaseStructure pair in pairList)
-            {
-                if (target == null)
-                    continue;
-                Vector3 start = new Vector3(target.xPos, target.yPos, 0);
-                Vector3 end = new Vector3(target.xPos, target.yPos, 0);
-                Gizmos.DrawLine(start, end);
-            }
-        }
-    }*/
+    
 
 
 
-    private void OnDrawGizmos()
+/*    private void OnDrawGizmos()
     {
         Gizmos.color = Color.cyan;
 
@@ -372,7 +361,7 @@ public class CPUMananger : MonoBehaviour
             Gizmos.DrawLine(fromPos, toPos);
         }
     }
-
+*/
     public static void SortByDistanceFromOrigin(List<BaseStructure> structures)
     {
         structures.Sort((a, b) =>
