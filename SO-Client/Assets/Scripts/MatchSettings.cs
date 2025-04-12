@@ -18,6 +18,9 @@ public static class MatchSettings {
         {
             playerProgenys[i] = -1;
         }
+        MasterGrid.playerUnits = new List<BaseUnit>[numPlayers+1];
+        for(int i = 0;i <= numPlayers; i++)
+            MasterGrid.playerUnits[i] = new List<BaseUnit>();
         isInit = true;
     }
 

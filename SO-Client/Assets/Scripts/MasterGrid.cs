@@ -34,6 +34,7 @@ public class MasterGrid : MonoBehaviour
     public List<BaseStructure> spriteOffStructures;
     //public List<BaseStructure> resourceStructures;
     public GameObject[] allUnits;
+    public static List<BaseUnit>[] playerUnits;
     public GameMaster gameMaster;
     //public int playerTurn;
     private Dictionary<byte, AttributesTile> tileAttributes;
@@ -447,7 +448,7 @@ public class MasterGrid : MonoBehaviour
             if (selectedUnit.isResourceUnit && selectedUnit.prevStructureCaptureVal != null && oldStructure != null && oldStructure.playerControl != selectedUnit.playerControl)
                 oldStructure.captureHealth = (int)selectedUnit.prevStructureCaptureVal;
 
-            moveTarget((int)oldX, (int)oldY);
+            moveSelectedUnit((int)oldX, (int)oldY);
         }
         clearSelectedUnit();
     }
@@ -849,6 +850,28 @@ public class MasterGrid : MonoBehaviour
         }
 
         return false;
+    }
+
+    public Vector2Int GetFurthestTileByMovement(List<Vector2Int> path, int maxMovement)
+    {
+        if (path == null || path.Count == 0)
+            return Vector2Int.zero;
+
+        int distance = 0;
+        Vector2Int current = path[0];
+
+        for (int i = 1; i < path.Count; i++)
+        {
+            Vector2Int next = path[i];
+            int stepCost = Mathf.Abs(next.x - current.x) + Mathf.Abs(next.y - current.y); // Manhattan step
+            if (distance + stepCost > maxMovement)
+                break;
+
+            distance += stepCost;
+            current = next;
+        }
+
+        return current;
     }
 
 
@@ -1296,9 +1319,9 @@ public class MasterGrid : MonoBehaviour
         attackableUnits.Clear();
     }
 
-    public void moveTarget(int x, int y)
+    public void moveSelectedUnit(int x, int y)
     {
-        //print("moveTarget. SelectedUnit is: "+selectedUnit);
+        //print("moveSelectedUnit. SelectedUnit is: "+selectedUnit);
         if (selectedUnit != null && whatUnitIsInThisLocation(x, y) == null)
         {
             clearAttackableUnits();
@@ -1353,6 +1376,7 @@ public class MasterGrid : MonoBehaviour
 
         }
     }
+
 
     //you should do better position checking but this is fine for now
     public void setUnitInGrid(int x, int y, BaseUnit unit)

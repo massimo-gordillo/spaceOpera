@@ -714,7 +714,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &63701448
 Transform:
   m_ObjectHideFlags: 0
@@ -1487,10 +1487,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ea2abbe09c2e73c429ec1451785ee4a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  structureList: []
   structureListArray: []
   gameMaster: {fileID: 1024135144}
   masterGrid: {fileID: 450342577}
+  playersAsCPU: 
   debugLinePrefab: {fileID: 399456013}
 --- !u!1001 &210657160
 PrefabInstance:
@@ -8787,6 +8787,9 @@ MonoBehaviour:
   defenceValueTextContainer: {fileID: 0}
   damageRangeTextContainer: {fileID: 0}
   combatTooltip: {fileID: 0}
+  CPU_controlled: 0
+  CPU_Heading: {x: 0, y: 0}
+  CPU_IsCapturing: 0
 --- !u!4 &1022985285 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 579629524903404737, guid: ddb92d03861e68e40a31738e120ba8ac, type: 3}
@@ -8824,14 +8827,13 @@ MonoBehaviour:
   masterGrid: {fileID: 450342577}
   tilemapManager: {fileID: 1002579701}
   supabaseManager: {fileID: 1718293608}
-  _CPUMananger: {fileID: 205759595}
+  CPUMananger: {fileID: 205759595}
   canvas: {fileID: 471929090}
   selectedStructure: {fileID: 0}
   choicePanel: {fileID: 1454215227}
   productionPanel: {fileID: 657177016}
   unitChoicePanel: {fileID: 1781273296}
   playerTurn: 0
-  numPlayers: 0
   turnNumber: 0
   playerTurnText: {fileID: 2010402610}
   playerResourceText: {fileID: 1998717953}
@@ -19361,6 +19363,9 @@ MonoBehaviour:
   defenceValueTextContainer: {fileID: 0}
   damageRangeTextContainer: {fileID: 0}
   combatTooltip: {fileID: 0}
+  CPU_controlled: 0
+  CPU_Heading: {x: 0, y: 0}
+  CPU_IsCapturing: 0
 --- !u!1 &1844876244
 GameObject:
   m_ObjectHideFlags: 0
@@ -20220,6 +20225,9 @@ MonoBehaviour:
   defenceValueTextContainer: {fileID: 0}
   damageRangeTextContainer: {fileID: 0}
   combatTooltip: {fileID: 0}
+  CPU_controlled: 0
+  CPU_Heading: {x: 0, y: 0}
+  CPU_IsCapturing: 0
 --- !u!1 &1921249645
 GameObject:
   m_ObjectHideFlags: 0

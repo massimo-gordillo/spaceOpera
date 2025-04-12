@@ -78,7 +78,10 @@ public class BaseUnit : MonoBehaviour
     //use healthTextContainer.text= to update text.
     private Color playerColor;
 
+    //public bool CPU_isOn = true;
+    public bool CPU_controlled = false;
     public Vector2Int CPU_Heading;
+    public NetworkNode CPU_TargetNode;
     public bool CPU_IsCapturing;
 
     void Start()
@@ -88,6 +91,8 @@ public class BaseUnit : MonoBehaviour
         //print("BaseUnit initiated. xPos: " + transform.position.x + "ypos: " + transform.position.y +"instanceID: "+this.GetInstanceID());
         masterGrid = GameObject.FindGameObjectWithTag("MasterGridTag").GetComponent<MasterGrid>();
         masterGrid.setUnitInGrid(xPos, yPos, this);
+        Debug.Log($"Length of playerControl = {MasterGrid.playerUnits.Length}, number of players {GameMaster.numPlayers}");
+        MasterGrid.playerUnits[playerControl].Add(this);
 
         //if the unit is created after the structure on start, turn off the collider. BaseStructure has a similar check on start.
         BaseStructure onLocation = masterGrid.whatStructureIsInThisLocation(xPos, yPos);
@@ -131,6 +136,12 @@ public class BaseUnit : MonoBehaviour
         hideCombatTooltip();
         //spriteContainer.SetColor(playerControl, true, false);
         showSelectedCorners(false);
+
+        
+
+/*        if (GameMaster.CPU_isOn && GameMaster.CPU_PlayersList[playerControl])
+            CPU_AssignNewTarget();*/
+
     }
     // Update is called once per frame
     void Update()
@@ -278,51 +289,6 @@ public class BaseUnit : MonoBehaviour
         nonExhausted = b;
         spriteContainer.SetColor(playerControl, b, false);
     }
-
-    /*public void setColour(int player, bool nonExhausted)
-    {
-        Color color = baseColor;
-        int nonExhaustInt;
-        if (nonExhausted)
-            nonExhaustInt = 0;
-        else
-            nonExhaustInt = 1;
-        //Color newColor = new Color((float)nonExhaustInt/2, (float)player/7, (float)player / 7, color.a);
-        Color newColor = new Color((float)(player / 9), (float)(player/9), (float)(player / 9), color.a);
-        //Color newColor = new Color(0.5f,0f,0f, 1f);
-        print(newColor);
-        spriteFillSR.color = newColor;
-    }
-
-    public void setColour(int player, bool nonExhausted)
-    {
-        int nonExhaustInt;
-        if (nonExhausted)
-            nonExhaustInt = 0;
-        else
-            nonExhaustInt = 1;
-        float t = Mathf.InverseLerp(1, 3, player);
-        Color finalColor = Color.Lerp(Color.red, Color.blue, t);
-        spriteFillSR.color = finalColor;
-    }*/
-
-    /*    public void setSpritesFromSpriteAtlas(string atlasPath)
-        {       
-            SpriteAtlas spriteAtlas = Resources.Load<SpriteAtlas>(atlasPath);
-            string name = unitName.ToLower().Replace(" ", "");
-            if (spriteAtlas != null)
-            {
-                // Assign sprites from the atlas to the SpriteRenderers
-                spriteFillSR.sprite = spriteAtlas.GetSprite($"{name}Sprite_Fill");
-                spriteTrimSR.sprite = spriteAtlas.GetSprite($"{name}Sprite_Trim");
-                spriteLightsSR.sprite = spriteAtlas.GetSprite($"{name}Sprite_Lights");
-            }
-            else
-            {
-                Debug.LogWarning($"Failed to load spriteAtlas for {unitName} at path: {atlasPath}");
-            }
-        }
-    */
     
 
     public void flipSprites()
@@ -342,5 +308,12 @@ public class BaseUnit : MonoBehaviour
     {
         masterGrid.deleteUnit(this);
     }
+
+    public void CPU_AssignNewTarget()
+    {
+        CPU_TargetNode = CPUMananger.GetUnitAssignment(this);
+        CPU_Heading = CPU_TargetNode.pos;
+    }
+
 
 }

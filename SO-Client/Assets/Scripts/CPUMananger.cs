@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 //using Unity.Mathematics;
 using UnityEngine;
+using static UnityEngine.GraphicsBuffer;
 
 
 public class CPUMananger : MonoBehaviour
@@ -13,7 +14,7 @@ public class CPUMananger : MonoBehaviour
     public BaseUnit[,] unitGrid;
     public BaseStructure[,] structureGrid;
     public byte[,] terrainGrid;
-    public List<NetworkNode> nodeList = new();
+    public static List<NetworkNode> nodeList = new();
     public BaseStructure[] structureListArray;
     public double[,] structuresEuclideanDistance;
     //List<Vector2Int> structLocs;
@@ -22,6 +23,9 @@ public class CPUMananger : MonoBehaviour
     public List<NetworkEdge> graphEdges = new();
     public GameMaster gameMaster;
     public MasterGrid masterGrid;
+
+    public bool[] playersAsCPU = new bool[GameMaster.numPlayers+1];
+    public List<BaseUnit>[] CPU_Units = new List<BaseUnit>[GameMaster.numPlayers+1];
 
     public GameObject debugLinePrefab;
 
@@ -349,6 +353,37 @@ public class CPUMananger : MonoBehaviour
         }
     }
 
+    public void CommandUnits(int player)
+    {
+        if (!(GameMaster.CPU_PlayersList[player] && player == gameMaster.getPlayerTurn() && GameMaster.CPU_isOn)) //probably a duplicate check but can't hurt, no cheating!
+        {
+            return;
+        }
+
+        foreach (BaseUnit unit in MasterGrid.playerUnits[player])
+        {
+            Vector2Int unitPos = new Vector2Int(unit.xPos, unit.yPos);
+            Vector2Int nodePos = unit.CPU_TargetNode.pos;
+            int delta = (int)((unitPos-nodePos).magnitude);
+            if (unit != null && unit.isResourceUnit)
+            {
+                List<Vector2Int> availPath = masterGrid.BidirectionalSearch(unitPos, nodePos, unit, delta * 2);
+                if (availPath.Count > 0)
+                {
+                    Vector2Int target = masterGrid.GetFurthestTileByMovement(availPath, unit.movementRange);
+                    if(target.magnitude != 0)
+                    {
+                        masterGrid.selectedUnit = unit;
+                        masterGrid.moveSelectedUnit(target.x, target.y);
+                    }
+                }
+
+            }
+
+
+        }
+    }
+
 
 
 
@@ -424,169 +459,43 @@ public class CPUMananger : MonoBehaviour
         Debug.Log("Done checking land accessibility");
     }
 
-    /*private void generatePairwiseEuclideanDistanceArray(List<Vector2Int> locations)
+    
+
+    public static NetworkNode GetUnitAssignment(BaseUnit unit)
     {
-        Vector2Int[] locationsA = new Vector2Int[locations.Count];
-        double[,] distances = new double[locations.Count, locations.Count];
-        int l = 0;
-        foreach (Vector2Int location in locations)
+        Vector2Int unitPos = new Vector2Int(unit.xPos,unit.yPos);
+
+        NetworkNode currentNode = nodeList.Find(n => n.pos == unitPos);
+
+        if (currentNode == null)
         {
-            locationsA[l] = location;
-            l++;
+            currentNode = GetClosestNodeAgnostic(unitPos);
         }
 
-        for (int i = 0; i < locationsA.Length; i++)
-        {
-            for (int j = i; j < locationsA.Length; j++) 
-            {
-                if (j == i)
-                {
-                    distances[i, j] = 0;
-                    continue;
-                }
-                Vector2Int diff = locations[i] - locations[j];
-                distances[i, j] = diff.magnitude;
-                distances[j, i] = diff.magnitude;
-            }
-        }
-
-        structuresEuclideanDistance = distances;
-    }*/
-
-    //function to generate the new connections with still outstanding nodes.
-    /*private void GenerateNaiveStructureNetwork()
+        NetworkNode targetNode = currentNode.closestUnclaimed[unit.playerControl];
+        targetNode.ClaimByUnit(unit);
+        return targetNode;
+    }
+    public static  NetworkNode GetClosestNodeAgnostic(Vector2Int targetPos)
     {
-        int numNewConnections = 2; //we're gonna assume 2 for this implementation. We can scale the smallest/nextSmallest implementation should we wanna get fancy.
-        int count = structureList.Count;
-        Vector2Int[,] smallestPairingsArray = new Vector2Int[count, numNewConnections];
-        double[,] SED = structuresEuclideanDistance;
-        int i;
-        for (i = 0; i < count; i++) 
+        NetworkNode closestNode = null;
+        int closestDistance = int.MaxValue;
+
+        foreach (var node in nodeList)
         {
-            
-            double? smallest = null;
-            Vector2Int? smallestV = null;
-            double? nextSmallest = null;
-            Vector2Int? nextSmallestV = null;
-            //initial condition setting. The first two items are sorted and then the algorithm proceeds. This doesn't check for 0s.
-        *//*          int j = i;
-                    if (j + 2 < count)
-                    {
-                        bool flip = structuresEuclideanDistance[i, j + 1] <= structuresEuclideanDistance[i, j + 2];
-                        smallest = flip ? structuresEuclideanDistance[i, j + 1] : structuresEuclideanDistance[i, j + 2];
-                        smallestV = flip ? new Vector2Int(i, j + 1) : new Vector2Int(i, j + 2);
-                        nextSmallest = !flip ? structuresEuclideanDistance[i, j + 1] : structuresEuclideanDistance[i, j + 2];
-                        nextSmallestV = !flip ? new Vector2Int(i, j + 1) : new Vector2Int(i, j + 2);
+            int distance = Mathf.Abs(node.pos.x - targetPos.x) + Mathf.Abs(node.pos.y - targetPos.y); // Manhattan distance
 
-                    }//else (what if it doesn't?)*//*
-            
-            for (int j = i; j < count; j++)
+            if (distance < closestDistance)
             {
-                //Debug.Log($"Checking location {i},{j} in SED, it has value {SED[i, j]}. Smallest is {smallest}, nextSmallest is {nextSmallest} ");
-                if (SED[i, j] == 0)
-                    continue;
-
-                if(smallest == null)
-                {
-                    smallest = SED[i, j];
-                    smallestV = new Vector2Int(i,j);
-                }
-                else if(smallest != null && nextSmallest == null)
-                {
-                    if (SED[i, j] < smallest)
-                    {
-                        nextSmallest = smallest;
-                        nextSmallestV = smallestV;
-                        smallest = SED[i, j];
-                        smallestV = new Vector2Int(i, j);
-                    }
-                    else
-                    {
-                        nextSmallest = SED[i, j];
-                        nextSmallestV = new Vector2Int(i, j);
-                    }
-                }
-                else if (SED[i, j] <= smallest)
-                {
-                    nextSmallest = smallest;
-                    nextSmallestV = smallestV;
-                    smallest = SED[i, j];
-                    smallestV = new Vector2Int(i, j);
-                }
-                else if (SED[i, j] > smallest && SED[i, j] < nextSmallest) //we're missing the case where there are ties for nextSmallest but I think that's ok.
-                {
-                    nextSmallest = SED[i, j];
-                    nextSmallestV = new Vector2Int(i, j);
-                }
-
+                closestDistance = distance;
+                closestNode = node;
             }
-
-
-
-            //I can purge this and just have it add to the graphEdges directly.
-            if (smallest != null && nextSmallestV != null)
-            {
-                smallestPairingsArray[i, 0] = (Vector2Int)smallestV;
-                //Debug.Log($"For structureNum {i}, adding pairing {smallestPairingsArray[i, 0]}");
-
-            }
-            else
-                Debug.LogWarning($"Structure number {i} does not have both a smallest");
-
-            if (nextSmallest != null && nextSmallestV != null)
-            {
-                smallestPairingsArray[i, 1] = (Vector2Int)nextSmallestV;
-                //Debug.Log($"For structureNum {i}, adding pairing {smallestPairingsArray[i, 1]}");
-
-            }
-            else
-                Debug.LogWarning($"Structure number {i} does not have a 2nd smallest");
-
-
-
-            if (smallest != null)
-            {
-                SED[((Vector2Int)smallestV).x, ((Vector2Int)smallestV).y] = 0;
-            }
-            if (nextSmallest != null)
-            {
-                SED[((Vector2Int)nextSmallestV).x, ((Vector2Int)nextSmallestV).y] = 0;
-            }
-            for (int j = 0; j < count; j++)
-            {
-                SED[i, j] = 0;
-                SED[j, i] = 0;
-            }
-
-            
         }
-        *//*
-                for (int i = 0; i < count; i++)
-                {
-                    Vector2Int sourceLocation = 
-                    //graphEdges.Add(smallestPairingsArray[i,0]);
-                }*//*
-        i = 0;
-        foreach(Vector2Int location in structLocs)
-        {
+        if (closestNode == null)
+            Debug.LogError($"unable to find a node close to {targetPos}");
 
-            for (int n = 0; n < numNewConnections; n++)
-            {
-                Vector2Int startingLocation = location;
-                Vector2Int endingLocation = structLocs[(smallestPairingsArray[i, n].y)];
-                if (endingLocation == new Vector2Int(0, 0))
-                    continue;
-                if (smallestPairingsArray[i, n] != null)
-                {
-                    Debug.Log($"For {location}, adding pairing {smallestPairingsArray[i, n]}, pointing to {endingLocation}");
-                    AddEdge(startingLocation, endingLocation);
-
-                }
-            }
-            i++;
-        }
-
-    }*/
+        return closestNode;
+    }
 
     public void WriteArrayToCSV(string fileName)
     {
@@ -757,12 +666,12 @@ public class NetworkNode
 
     public void ClaimByUnit(BaseUnit unit)
     {
-        int playerControl = unit.playerControl;
-        claimingUnits[playerControl] = unit;
-        hasPlayerClaimed[playerControl] = true;
+        int playerClaiming = unit.playerControl;
+        claimingUnits[playerClaiming] = unit;
+        hasPlayerClaimed[playerClaiming] = true;
         foreach (NetworkNode nieghbour in localNodes)
         {
-            NieghbourHasSetThemselvesClaimed(this, playerControl);
+            NieghbourHasSetThemselvesClaimed(this, playerClaiming);
         }
     }
 

@@ -17,7 +17,7 @@ public class GameMaster : MonoBehaviour
     public TilemapManager tilemapManager;
     //private PrefabManager prefabManager = new PrefabManager();
     public SupabaseManager supabaseManager;
-    public CPUMananger _CPUMananger;
+    public CPUMananger CPUMananger;
     public Guid match_id;
 
     public Canvas canvas;
@@ -77,6 +77,9 @@ public class GameMaster : MonoBehaviour
     static int player1ProgenySelected;
     static int player2ProgenySelected;
     public static Color32[] playerColors;
+
+    public static bool CPU_isOn = false;
+    public static bool[] CPU_PlayersList = new bool[numPlayers+1];
 
     /*    public static GameMaster Instance
         {
@@ -163,6 +166,11 @@ public class GameMaster : MonoBehaviour
         //productionPanel.Start();
 
 
+        if (CPU_isOn)
+            CPU_PlayersList[2] = true;
+
+
+
     }
 
     void Start()
@@ -192,7 +200,7 @@ public class GameMaster : MonoBehaviour
             AnimateStartTurnCard(1);
 
         startupInstantiateUnits();
-        _CPUMananger.naiveV1Start();
+        CPUMananger.naiveV1Start();
     }
 
     private IEnumerator CallConvertGameStateToList()
