@@ -1,27 +1,25 @@
-using Cysharp.Threading.Tasks.Triggers;
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 //using Unity.Mathematics;
 using UnityEngine;
-using static UnityEngine.GraphicsBuffer;
-//using UnityEngine.UIElements;
-//using UnityEditor.FilePathAttribute;
 
-public class CPUMananger : MonoBehaviour 
+
+public class CPUMananger : MonoBehaviour
 {
 
     public BaseUnit[,] unitGrid;
-    public BaseStructure[,] structureGrid; 
+    public BaseStructure[,] structureGrid;
     public byte[,] terrainGrid;
-    public List<BaseStructure> structureList;
+    public List<NetworkNode> nodeList = new();
     public BaseStructure[] structureListArray;
     public double[,] structuresEuclideanDistance;
-    List<Vector2Int> structLocs;
-    Dictionary<Vector2Int, BaseStructure> structureVectorMap = new();
+    //List<Vector2Int> structLocs;
+    Dictionary<Vector2Int, NetworkNode> nodeVectorMap = new();
     //public List<(Vector2Int, Vector2Int)> graphEdges = new List<(Vector2Int, Vector2Int)>();
-    public List<GraphEdge> graphEdges = new ();
+    public List<NetworkEdge> graphEdges = new();
     public GameMaster gameMaster;
     public MasterGrid masterGrid;
 
@@ -46,7 +44,7 @@ public class CPUMananger : MonoBehaviour
      * You do have to limit the search distance for performance but also to limit the number of redundant connections over large distances.
      * The downside here is it's possible to create a disconncted graph, I need to make sure that every node can reach every other node. Will be a later improvement.
      * Might be good to do some logic grouping of structures by proximity and make sure you have at least N paths out of it.
-     * Right now the solution isn't symmetrical but it's close.
+     * Right now the solution isn't symmetrical but it's close. I could add a rendundancy check for symmetry by repeating at each corner and adding new edges found.
      * 
  */
 
@@ -62,22 +60,25 @@ public class CPUMananger : MonoBehaviour
         I'll have to implement some tests for that.
     */
 
+    /*
+     * Pretty impressed with myself for doing the NetworkNode / NetwordEdge implementation. It feels elegant but time will tell.
+     */
 
 
     public void naiveV1Start()
     {
         Debug.Log("Calling to start CPUManager");
-        structureList = masterGrid.GetStructures(null);
+        List<BaseStructure> structureList = masterGrid.GetStructures(null);
         structureGrid = masterGrid.structureGrid;
         SortByDistanceFromOrigin(structureList);
-        //structureVectorMap = new();
+        //nodeVectorMap = new();
         //structureListArray = new BaseStructure[structureList.Count];
         structuresEuclideanDistance = new double[structureList.Count, structureList.Count];
-        structLocs = new List<Vector2Int>();
         foreach (BaseStructure structure in structureList)
         {
-            structLocs.Add(new Vector2Int(structure.xPos, structure.yPos));
-            structureVectorMap.Add(new Vector2Int(structure.xPos, structure.yPos), structure);
+            NetworkNode node = new NetworkNode(structure);
+            nodeList.Add(node);
+            nodeVectorMap.Add(node.pos, node);
             //structureListArray[i] = structure;
             //i++;
         }
@@ -89,20 +90,26 @@ public class CPUMananger : MonoBehaviour
         //GenerateNaiveStructureNetwork();
         //ExportVerticiesToCSV();
 
-        foreach (BaseStructure s in structureList)
+        foreach (NetworkNode n in nodeList)
         {
-            ConnectStructurePairs(s, 6); //specifically 6 as it's two infantry traverse distances
+            ConnectStructurePairs(n, 6); //specifically 6 as it's two infantry traverse distances
         }
-        //Debug.Log($"Done searching pairs, edge count is {graphEdges.Count}");
+
+        foreach(NetworkNode n in nodeList)
+        {
+            for (int p = 1; p <= GameMaster.numPlayers; p++)
+                n.CalculateClosestUnclaimedNieghbour(p);
+        }
+        //Debug.Log($"Done searching pairs, node count is {graphEdges.Count}");
 
         CorrectManhattanDistances();
-        StartCoroutine(DrawStructureDebugLines());
+        //StartCoroutine(DrawStructureDebugLines());
     }
 
-    public void ConnectStructurePairs(BaseStructure node, int maxDistance)
+    public void ConnectStructurePairs(NetworkNode node, int maxDistance)
     {
 
-        Vector2Int origin = new Vector2Int (node.xPos, node.yPos);
+        Vector2Int origin = node.pos;
 
         //bool isCurious = origin == new Vector2Int(0, 0);
 
@@ -116,8 +123,8 @@ public class CPUMananger : MonoBehaviour
             bool eastSet = node.Epair != null;
             bool westSet = node.Wpair != null;
 
-/*            if (isCurious)
-                Debug.Log($"checking {origin},         N: {northSet}       S: {southSet}      E: {eastSet}      W: {westSet}");*/
+            /*            if (isCurious)
+                            Debug.Log($"checking {origin},         N: {northSet}       S: {southSet}      E: {eastSet}      W: {westSet}");*/
             // Cardinal directions
             TrySetCardinal(ref northSet, new Vector2Int(0, 1));
             TrySetCardinal(ref southSet, new Vector2Int(0, -1));
@@ -140,7 +147,7 @@ public class CPUMananger : MonoBehaviour
                     for (int offset = 1; offset <= dist; offset++)
                     {
                         Vector2Int checkPos = origin + dir * offset; // This is the main direction we're crawling
-                        if (structureVectorMap.TryGetValue(checkPos, out BaseStructure neighbor))
+                        if (nodeVectorMap.TryGetValue(checkPos, out BaseStructure neighbor))
                         {
                             setPair(node, neighbor);
                             setReverse(neighbor, node);
@@ -158,7 +165,7 @@ public class CPUMananger : MonoBehaviour
             for (int offset = -offsetCheck; offset <= offsetCheck; offset++)
             {
                 Vector2Int initSearchVector = origin + dir * dist;
-                
+
                 //if the center of the search section is outside of the map then we can ignore the rest of that search. Can't do this for checkPos because you can breadth outside.
                 if (initSearchVector.x < 0 || initSearchVector.y < 0 || initSearchVector.x >= gameMaster.gridX || initSearchVector.y >= gameMaster.gridY)
                     continue;
@@ -167,10 +174,10 @@ public class CPUMananger : MonoBehaviour
                 Vector2Int checkPos = initSearchVector + offsetVector * offset;
 
 
-                if (structureVectorMap.TryGetValue(checkPos, out BaseStructure neighbor))
+                if (nodeVectorMap.TryGetValue(checkPos, out NetworkNode neighbor))
                 {
                     // Add the pair to the vertices list with their positions
-                    AddEdge(new Vector2Int(node.xPos, node.yPos), new Vector2Int(neighbor.xPos, neighbor.yPos));
+                    AddEdge(node.pos, neighbor.pos, node, neighbor);
 
 
                     // Set the correct direction for both the sender and receiver
@@ -195,10 +202,10 @@ public class CPUMananger : MonoBehaviour
                         if (neighbor.Wpair == null) neighbor.Wpair = node;
                     }
 
-/*                    if (isCurious)
-                    {
-                        Debug.Log($"Pairing location: {origin} with location: {checkPos} with distance {dist} and offset {offsetVector}");
-                    }*/
+                    /*                    if (isCurious)
+                                        {
+                                            Debug.Log($"Pairing location: {origin} with location: {checkPos} with distance {dist} and offset {offsetVector}");
+                                        }*/
 
                     alreadySet = true;
                     break;
@@ -212,12 +219,12 @@ public class CPUMananger : MonoBehaviour
                         int newDist = dist - 1;*/
             int newDist = dist;
 
-            // Only attempt if diagonal is needed (i.edge., one cardinal direction is missing)
-            Vector2Int checkPos = origin + dir * newDist; 
-            if (structureVectorMap.TryGetValue(checkPos, out BaseStructure diagNeighbor))
+            // Only attempt if diagonal is needed (i.node., one cardinal direction is missing)
+            Vector2Int checkPos = origin + dir * newDist;
+            if (nodeVectorMap.TryGetValue(checkPos, out NetworkNode diagNeighbor))
             {
                 // Add the diagonal pair to the vertices list
-                AddEdge(new Vector2Int(node.xPos, node.yPos), new Vector2Int(diagNeighbor.xPos, diagNeighbor.yPos));
+                AddEdge(node.pos, diagNeighbor.pos, node, diagNeighbor);
 
                 // Set the appropriate pairs in both directions
                 if (dir.x == 1 && dir.y == 1) // NE: Need Npair and Epair
@@ -298,7 +305,7 @@ public class CPUMananger : MonoBehaviour
     public IEnumerator DrawStructureDebugLines()
     {
         GameObject prevLine = null;
-        foreach (GraphEdge edge in graphEdges)
+        foreach (NetworkEdge edge in graphEdges)
         {
             yield return new WaitForSeconds(0.75f);
             //if (structure == null) continue;
@@ -310,16 +317,16 @@ public class CPUMananger : MonoBehaviour
 
             Vector3 target = new Vector3(targetV2.x, targetV2.y, 0);
 
-/*
-            if (prevLine != null)
-            {
-                LineRenderer prevlr = prevLine.GetComponent<LineRenderer>();
-                if (prevlr != null)
-                {
-                    prevlr.startColor = new Color (Color.white.r, Color.white.g, Color.white.b, 0.7f);
-                    prevlr.endColor = new Color(Color.white.r, Color.white.g, Color.white.b, 0.7f);
-                }
-            }*/
+            /*
+                        if (prevLine != null)
+                        {
+                            LineRenderer prevlr = prevLine.GetComponent<LineRenderer>();
+                            if (prevlr != null)
+                            {
+                                prevlr.startColor = new Color (Color.white.r, Color.white.g, Color.white.b, 0.7f);
+                                prevlr.endColor = new Color(Color.white.r, Color.white.g, Color.white.b, 0.7f);
+                            }
+                        }*/
 
             if (startV2 != null && targetV2 != null)
             {
@@ -335,23 +342,23 @@ public class CPUMananger : MonoBehaviour
                 prevLine = line;
             }
 
-/*            DrawTo(structure.NEpair);
-            DrawTo(structure.NWpair);
-            DrawTo(structure.SEpair);
-            DrawTo(structure.SWpair);*/
+            /*            DrawTo(structure.NEpair);
+                        DrawTo(structure.NWpair);
+                        DrawTo(structure.SEpair);
+                        DrawTo(structure.SWpair);*/
         }
     }
-    
 
 
 
-/*    private void OnDrawGizmos()
+
+    private void OnDrawGizmos()
     {
         Gizmos.color = Color.cyan;
 
         if (graphEdges == null) return;
 
-        foreach (GraphEdge e in graphEdges)
+        foreach (NetworkEdge e in graphEdges)
         {
             Vector2Int from = e.vectorA;
             Vector2Int to = e.vectorB;
@@ -361,7 +368,7 @@ public class CPUMananger : MonoBehaviour
             Gizmos.DrawLine(fromPos, toPos);
         }
     }
-*/
+
     public static void SortByDistanceFromOrigin(List<BaseStructure> structures)
     {
         structures.Sort((a, b) =>
@@ -375,16 +382,16 @@ public class CPUMananger : MonoBehaviour
 
     public void CorrectManhattanDistances()
     {
-        
-        foreach (GraphEdge edge in graphEdges)
+
+        foreach (NetworkEdge edge in graphEdges)
         {
             //bool curiousCheck = false;
-            //curiousCheck = edge.Equals(new GraphEdge(new Vector2Int(8,2), new Vector2Int(10, 2)));
-                
+            //curiousCheck = node.Equals(new NetworkEdge(new Vector2Int(8,2), new Vector2Int(10, 2)));
 
-            List<Vector2Int> dirs = new ();
+
+            List<Vector2Int> dirs = new();
             //a little hacky using speficially infantry for this but that will be the source of truth for now.
-            dirs = masterGrid.BidirectionalSearch(edge.vectorA, edge.vectorB, PrefabManager.getBaseUnitFromName("Infantry",0), edge.Distance + 1);
+            dirs = masterGrid.BidirectionalSearch(edge.vectorA, edge.vectorB, PrefabManager.getBaseUnitFromName("Infantry", 0), edge.Distance + 1);
             if (dirs.Count == 0) {
                 edge.isLandAccessible = false;
                 Debug.Log($"GraphEdge {edge.vectorA}{edge.vectorB} is not land accessible");
@@ -395,21 +402,21 @@ public class CPUMananger : MonoBehaviour
             {
                 Vector2Int delta = dir - start;
                 start = dir;
-/*                if (curiousCheck)
-                {
-                    Debug.Log($"vector is {dir} with a delta {delta}");
-                }*/
+                /*                if (curiousCheck)
+                                {
+                                    Debug.Log($"vector is {dir} with a delta {delta}");
+                                }*/
                 total += Math.Abs(delta.x) + Math.Abs(delta.y);
             }
-/*            if (curiousCheck)
-            {
-                Debug.Log($"Edge {edge.vectorA} to {edge.vectorB} has distance {total}");
-            }*/
+            /*            if (curiousCheck)
+                        {
+                            Debug.Log($"Edge {node.vectorA} to {node.vectorB} has distance {total}");
+                        }*/
 
             if (total > edge.Distance)
             {
                 edge.Distance = total;
-                //Debug.Log($"Edge distance for {edge.vectorA} to {edge.vectorB} is overwritten to {edge.Distance}");
+                //Debug.Log($"Edge distance for {node.vectorA} to {node.vectorB} is overwritten to {node.Distance}");
 
             }
 
@@ -619,7 +626,7 @@ public class CPUMananger : MonoBehaviour
         {
             // Optional header
             writer.WriteLine("FromX,FromY,ToX,ToY");
-            foreach (GraphEdge e in graphEdges)
+            foreach (NetworkEdge e in graphEdges)
             {
                 Vector2Int from = e.vectorA;
                 Vector2Int to = e.vectorB;
@@ -630,15 +637,17 @@ public class CPUMananger : MonoBehaviour
         Debug.Log($"Verticies CSV exported to: {filePath}");
     }
 
-    public void AddEdge(Vector2Int a, Vector2Int b)
+    public void AddEdge(Vector2Int a, Vector2Int b, NetworkNode nodeA, NetworkNode nodeB)
     {
-        GraphEdge newEdge = new GraphEdge(a, b);
+        NetworkEdge newEdge = new NetworkEdge(nodeA, nodeB);
 
-        // Check if the edge already exists in the list (undirected graph, so vectorA-vectorB is the same as vectorB-vectorA)
+        // Check if the node already exists in the list (undirected graph, so vectorA-vectorB is the same as vectorB-vectorA)
         if (!graphEdges.Contains(newEdge))
         {
             graphEdges.Add(newEdge);
-            //Debug.Log($"Added edge: {a} <-> {b} with distance: {newEdge.Distance}");
+            //Debug.Log($"Added node: {a} <-> {b} with distance: {newEdge.Distance}");
+            nodeA.AddEdge(newEdge, nodeB);
+            nodeB.AddEdge(newEdge, nodeA);
         }
         else
         {
@@ -646,45 +655,176 @@ public class CPUMananger : MonoBehaviour
         }
     }
 
-    public class GraphEdge
+    
+
+}
+
+public class NetworkEdge
+{
+    public NetworkNode nodeA { get; private set; }
+    public NetworkNode nodeB { get; private set; }
+    public Vector2Int vectorA { get; private set; }
+    public Vector2Int vectorB { get; private set; }
+
+    public Vector2Int relativeVector;
+    public int Distance { get; set; }
+
+    public bool isLandAccessible = true;
+
+    // Constructor to initialize the NetworkEdge
+    public NetworkEdge(NetworkNode A, NetworkNode B)
     {
-        public Vector2Int vectorA { get; private set; }
-        public Vector2Int vectorB { get; private set; }
-        public int Distance { get; set; }
+        nodeA = A;
+        nodeB = B;
+        vectorA = A.pos;
+        vectorB = B.pos;
+        relativeVector = vectorA - vectorB;
+        Distance = Mathf.Abs(relativeVector.x) + Mathf.Abs(relativeVector.y);
+        //Distance = CalculateManhattanDistance(vectorA, vectorB);
+    }
 
-        public bool isLandAccessible = true;
-
-        // Constructor to initialize the GraphEdge
-        public GraphEdge(Vector2Int a, Vector2Int b)
+    // Method to calculate Manhattan distance
+/*    private int CalculateManhattanDistance(Vector2Int a, Vector2Int b)
+    {
+        return Mathf.Abs(a.x - b.x) + Mathf.Abs(a.y - b.y);
+    }
+*/
+    // Override Equals to ensure that edges are treated the same regardless of order
+    public override bool Equals(object obj)
+    {
+        if (obj is NetworkEdge edge)
         {
-            vectorA = a;
-            vectorB = b;
-            Distance = CalculateManhattanDistance(a, b);
+            return (vectorA == edge.vectorA && vectorB == edge.vectorB) || (vectorA == edge.vectorB && vectorB == edge.vectorA);
         }
+        return false;
+    }
 
-        // Method to calculate Manhattan distance
-        private int CalculateManhattanDistance(Vector2Int a, Vector2Int b)
+    // Override GetHashCode to ensure consistent hashing for equal edges
+    public override int GetHashCode()
+    {
+        // Combine the hash codes of vectorA and vectorB, ensuring order doesn't matter
+        return vectorA.GetHashCode() ^ vectorB.GetHashCode();
+    }
+
+    public NetworkNode GetOtherNode(NetworkNode notMe)
+    {
+        //Debug.Log($"Edge {vectorA} to {vectorB} is being asked to provide NOT {notMe.pos} between {nodeA.pos} and {nodeB.pos}");
+        if (notMe.Equals(nodeA)) //using the overridden equals function. I should /maybe/ double check I'm not making a bunch of duplicates, maybe I should pull them from the node list.
+            return nodeB;
+        else if (notMe.Equals(nodeB))
+            return nodeA;
+        else
         {
-            return Mathf.Abs(a.x - b.x) + Mathf.Abs(a.y - b.y);
+            Debug.LogError($"Edge {vectorA},{vectorB} being asked to return a pair node but foreign node provided");
+            return null;
         }
+    }
+}
 
-        // Override Equals to ensure that edges are treated the same regardless of order
-        public override bool Equals(object obj)
-        {
-            if (obj is GraphEdge edge)
-            {
-                return (vectorA == edge.vectorA && vectorB == edge.vectorB) || (vectorA == edge.vectorB && vectorB == edge.vectorA);
-            }
-            return false;
-        }
+public class NetworkNode
+{ //we're gonna assume only 2 players for now, rather not make arrays of lists.... Nevermind.
 
-        // Override GetHashCode to ensure consistent hashing for equal edges
-        public override int GetHashCode()
+    public List<NetworkEdge> localEdges = new();
+    public List<NetworkNode> localNodes = new();
+    public NetworkNode[] closestUnclaimed = new NetworkNode[GameMaster.numPlayers+1];
+    public int[] closestUnclaimedDistance = new int[GameMaster.numPlayers + 1];
+    public BaseStructure structure;
+    public Vector2Int pos;
+    public BaseUnit[] claimingUnits = new BaseUnit[GameMaster.numPlayers + 1];
+    public bool isCaptured;
+    public int playerControl;
+    public bool[] hasPlayerClaimed = new bool[GameMaster.numPlayers + 1];
+    //public List<NetworkNode>[] pointingNodes = new List<NetworkNode>[GameMaster.numPlayers]; //list of nodes which see me as their closest unclaimed neighbour
+
+    public NetworkNode Npair;
+    public NetworkNode Spair;
+    public NetworkNode Wpair;
+    public NetworkNode Epair;
+
+    public NetworkNode(BaseStructure structure)
+    {
+        this.structure = structure;
+        pos = new Vector2Int(structure.xPos, structure.yPos);
+        isCaptured = structure.playerControl != 0;
+        playerControl = structure.playerControl;
+    }
+
+    public void AddEdge(NetworkEdge networkEdge, NetworkNode localNode)
+    {
+        localEdges.Add(networkEdge);
+        localNodes.Add(localNode);
+    }
+
+    public void ClaimByUnit(BaseUnit unit)
+    {
+        int playerControl = unit.playerControl;
+        claimingUnits[playerControl] = unit;
+        hasPlayerClaimed[playerControl] = true;
+        foreach (NetworkNode nieghbour in localNodes)
         {
-            // Combine the hash codes of vectorA and vectorB, ensuring order doesn't matter
-            return vectorA.GetHashCode() ^ vectorB.GetHashCode();
+            NieghbourHasSetThemselvesClaimed(this, playerControl);
         }
     }
 
+    public void NieghbourHasSetThemselvesClaimed(NetworkNode nieghbour, int playerControl)
+    {
+        if (closestUnclaimed[playerControl] == nieghbour)
+        {
+            CalculateClosestUnclaimedNieghbour(playerControl);
+        }
+    }
+
+    public void CalculateClosestUnclaimedNieghbour(int playerControl)
+    {
+        int? shortest = null;
+        NetworkNode shortestNeighbour = null;
+        foreach (NetworkEdge neighbourEdge in localEdges)
+        {
+            NetworkNode neighbourNode = neighbourEdge.GetOtherNode(this);
+            //Debug.Log($"Node {pos} says its neighbour is {neighbourNode.pos}, which player {playerControl} controls? {playerControl == neighbourNode.playerControl}. Has this player claimed it? {neighbourNode.hasPlayerClaimed[playerControl]}");
+
+            if (!(neighbourNode.playerControl == playerControl || neighbourNode.hasPlayerClaimed[playerControl] ))
+            {
+                if (shortest == null || neighbourEdge.Distance < shortest) //MG 25-04-11: what if they tie?
+                {
+                    shortest = neighbourEdge.Distance;
+                    shortestNeighbour = neighbourNode;
+                }
+            }
+        }
+        if (shortest == null || shortestNeighbour == null)
+        {
+            DefaultClosestNeighbour();
+        }else
+        {
+            closestUnclaimed[playerControl] = shortestNeighbour;
+            closestUnclaimedDistance[playerControl] = (int)shortest;
+            //Debug.Log($"Node {pos} says its closest unclaimed neighbour for player {playerControl} is {shortestNeighbour.pos}");
+        }
+    }
+
+    public void DefaultClosestNeighbour()
+    {
+        //I dunno.
+    }
+
+    public void SetCaptured(int player)
+    {
+        playerControl = player;
+    }
+
+    public override bool Equals(object obj)
+    {
+        if (obj is NetworkNode node)
+        {
+            return (pos == node.pos);
+        }
+        return false;
+    }
+
+    public override int GetHashCode()
+    {
+        return pos.GetHashCode();
+    }
 
 }

@@ -78,6 +78,9 @@ public class BaseUnit : MonoBehaviour
     //use healthTextContainer.text= to update text.
     private Color playerColor;
 
+    public Vector2Int CPU_Heading;
+    public bool CPU_IsCapturing;
+
     void Start()
     {
         xPos = (int)transform.position.x;

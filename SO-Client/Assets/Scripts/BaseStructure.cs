@@ -42,10 +42,7 @@ public class BaseStructure : MonoBehaviour
     public SpriteRenderer progeny2ProductionCaptureSpriteTrimSR;
     public SpriteRenderer progeny2ProductionCaptureSpriteLightsSR;
 
-    public BaseStructure Npair;
-    public BaseStructure Spair;
-    public BaseStructure Wpair;
-    public BaseStructure Epair;
+
 
 
 

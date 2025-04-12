@@ -86,7 +86,7 @@ public class MasterGrid : MonoBehaviour
         //Dictionary<(byte, byte), GamePieceInfo> gameStateDict = ConvertGameStateToList();
         //printUnitGrid();
 
-        commandStructures = new BaseStructure[gameMaster.numPlayers+1];
+        commandStructures = new BaseStructure[GameMaster.numPlayers+1];
         structuresList = GetStructures(null);
         prodStructuresList = GetProductionStructures(null);
         commandStructures[0] = null;
