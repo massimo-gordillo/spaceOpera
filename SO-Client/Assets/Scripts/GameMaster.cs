@@ -78,8 +78,8 @@ public class GameMaster : MonoBehaviour
     static int player2ProgenySelected;
     public static Color32[] playerColors;
 
-    public static bool CPU_isOn = false;
-    public static bool[] CPU_PlayersList = new bool[numPlayers+1];
+    public static bool CPU_isOn = true;
+    public static bool[] CPU_PlayersList;
 
     /*    public static GameMaster Instance
         {
@@ -261,24 +261,7 @@ public class GameMaster : MonoBehaviour
 
             }
         }*/
-        
 
-/*        if (infantryUnitPrefab == null)
-        {
-            Debug.LogError("Infantry prefab not found at the specified path.");
-            return;
-}
-      BaseUnit unit = Instantiate(infantryUnitPrefab, new Vector2(20, 17), Quaternion.identity, unitContainer);
-        unit.playerControl = 1;
-
-        BaseUnit unit2 = Instantiate(infantryUnitPrefab, new Vector2(14, 14), Quaternion.identity, unitContainer);
-        unit2.playerControl = 2;
-        BaseUnit unit3 = Instantiate(infantryUnitPrefab, new Vector2(22, 18), Quaternion.identity, unitContainer);
-        unit3.playerControl = 1;
-        BaseUnit unit4 = Instantiate(infantryUnitPrefab, new Vector2(24, 18), Quaternion.identity, unitContainer);
-        unit4.playerControl = 2;
-        BaseUnit unit5 = Instantiate(infantryUnitPrefab, new Vector2(24, 15), Quaternion.identity, unitContainer);
-        unit5.playerControl = 1;*/
     }
 
     public int getIncomeForPlayer(int player)
@@ -426,6 +409,11 @@ public class GameMaster : MonoBehaviour
             }
         }
         masterGrid.refreshUnits(playerTurn);
+
+        if(CPU_isOn && CPU_PlayersList[playerTurn])
+        {
+            CPUMananger.CommandUnits(playerTurn);
+        }
     }
 
     

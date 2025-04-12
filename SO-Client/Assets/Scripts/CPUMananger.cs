@@ -363,6 +363,11 @@ public class CPUMananger : MonoBehaviour
         foreach (BaseUnit unit in MasterGrid.playerUnits[player])
         {
             Vector2Int unitPos = new Vector2Int(unit.xPos, unit.yPos);
+            if (unit.CPU_TargetNode == null)
+            {
+                GiveUnitAssignment(unit);
+            }
+
             Vector2Int nodePos = unit.CPU_TargetNode.pos;
             int delta = (int)((unitPos-nodePos).magnitude);
             if (unit != null && unit.isResourceUnit)
@@ -459,7 +464,13 @@ public class CPUMananger : MonoBehaviour
         Debug.Log("Done checking land accessibility");
     }
 
-    
+    public static void GiveUnitAssignment(BaseUnit unit)
+    {
+        Vector2Int unitPos = new Vector2Int(unit.xPos, unit.yPos);
+        NetworkNode currentNode = GetClosestNodeAgnostic(unitPos);
+        NetworkNode targetNode = currentNode.closestUnclaimed[unit.playerControl];
+        targetNode.ClaimByUnit(unit);
+    }
 
     public static NetworkNode GetUnitAssignment(BaseUnit unit)
     {
@@ -666,6 +677,8 @@ public class NetworkNode
 
     public void ClaimByUnit(BaseUnit unit)
     {
+        unit.CPU_TargetNode = this;
+        unit.CPU_Heading = this.pos;
         int playerClaiming = unit.playerControl;
         claimingUnits[playerClaiming] = unit;
         hasPlayerClaimed[playerClaiming] = true;

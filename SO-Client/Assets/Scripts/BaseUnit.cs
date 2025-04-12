@@ -79,7 +79,7 @@ public class BaseUnit : MonoBehaviour
     private Color playerColor;
 
     //public bool CPU_isOn = true;
-    public bool CPU_controlled = false;
+    //public bool CPU_controlled = false;
     public Vector2Int CPU_Heading;
     public NetworkNode CPU_TargetNode;
     public bool CPU_IsCapturing;
