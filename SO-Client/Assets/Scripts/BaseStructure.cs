@@ -7,8 +7,7 @@ public class BaseStructure : MonoBehaviour
 {
     public int playerControl;
     public MasterGrid masterGrid;
-    public int xPos;
-    public int yPos;
+    public Vector2Int pos;
     public int structureType; //0: resource, 1: factory, 2: airport, 5:command
     public int gamePieceId;
     public BoxCollider2D spriteCollider;
@@ -50,14 +49,14 @@ public class BaseStructure : MonoBehaviour
     void Start()
     {
         gamePieceId = 200 + structureType; //structure ids start at 200.
-        xPos = (int)transform.position.x;
-        yPos = (int)transform.position.y;
+        pos.x = (int)transform.position.x;
+        pos.y = (int)transform.position.y;
         //private GameObject boxColliderComponent;
         gameMaster = GameObject.FindGameObjectWithTag("GameMasterTag").GetComponent<GameMaster>();
         maxCaptureHealth = 200;
         captureHealth = maxCaptureHealth;
         masterGrid = GameObject.FindGameObjectWithTag("MasterGridTag").GetComponent<MasterGrid>();
-        masterGrid.setStructureInGrid(xPos, yPos, this);
+        masterGrid.setStructureInGrid(pos, this);
 
 
         //baseColor = neutralSpriteFill.color;
@@ -244,6 +243,6 @@ public class BaseStructure : MonoBehaviour
 
     public bool IsCoveredByUnit()
     {
-        return (masterGrid.whatUnitIsInThisLocation(xPos, yPos) != null);
+        return (masterGrid.whatUnitIsInThisLocation(pos) != null);
     }
 }

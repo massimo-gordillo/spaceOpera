@@ -29,7 +29,7 @@ public class MovementSquare : ClickableObject
     {
         mg = GameObject.FindGameObjectWithTag("MasterGridTag").GetComponent<MasterGrid>();
         //print("Movement square moves you to: "+(int)transform.position.x +", "+ (int)transform.position.y);
-        mg.moveSelectedUnit((int)transform.position.x, (int)transform.position.y);
+        mg.moveSelectedUnit(new Vector2Int((int)transform.position.x, (int)transform.position.y));
     }
 
     public void setColor(Color c)

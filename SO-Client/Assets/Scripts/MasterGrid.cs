@@ -197,7 +197,7 @@ public class MasterGrid : MonoBehaviour
             {
                 clearMovement();
                 setSelectedUnit(unit);
-                presentChoicesAtLocation(unit.xPos, unit.yPos, unit);
+                presentChoicesAtLocation(unit.pos, unit);
 
                 //MG 25-02-26: I don't think this is necessary anymore, I'm ok locking a player into doing all their game actions with a given unit in one shot.
                 if (unit.movementNonExhausted == true) //if the unit hasn't moved already this turn.
@@ -258,7 +258,7 @@ public class MasterGrid : MonoBehaviour
         //addGameAction(0, (byte)attacker.gamePieceId, (byte)attacker.oldXPos, (byte)attacker.oldYPos, (byte)attacker.xPos, (byte)attacker.yPos);
 
         //1 is attack
-        addGameAction(1, (byte)attacker.gamePieceId, (byte)attacker.xPos, (byte)attacker.yPos, (byte)defender.xPos, (byte)defender.yPos);
+        addGameAction(1, (byte)attacker.gamePieceId, (byte)attacker.pos.x, (byte)attacker.pos.y, (byte)defender.pos.x, (byte)defender.pos.y);
 
 
 
@@ -410,15 +410,13 @@ public class MasterGrid : MonoBehaviour
             else
                 structure.switchAlliance(selectedUnit.getPlayerControl());*/
             //2 is capture structure
-            addGameAction(2, (byte)selectedUnit.gamePieceId, (byte)selectedUnit.xPos, (byte)selectedUnit.yPos, (byte)structure.xPos, (byte)structure.yPos);
+            addGameAction(2, (byte)selectedUnit.gamePieceId, (byte)selectedUnit.pos.x, (byte)selectedUnit.pos.y, (byte)structure.pos.x, (byte)structure.pos.y);
 
             //Trying virix implementation where spore kills itself upon capturing
             if (structure.playerControl == selectedUnit.playerControl && selectedUnit.unitName == "Spore")
             {
-                int xPos = selectedUnit.xPos;
-                int yPos = selectedUnit.yPos;
                 deleteUnit(selectedUnit);
-                createVirixSeed(xPos, yPos);
+                createVirixSeed(structure.pos);
             }
             else
                 exhaustSelectedUnit(selectedUnit, true);
@@ -435,12 +433,11 @@ public class MasterGrid : MonoBehaviour
     public void undoMovementButtonPressed()
     {
         selectedUnit.undoingMovement = true;
-        int? oldX = selectedUnit.oldXPos;
-        int? oldY = selectedUnit.oldYPos;
-        if (oldX != null && oldY != null)
+        if (selectedUnit.oldPos != null)  
         {
-
-            BaseStructure oldStructure = whatStructureIsInThisLocation((int)oldX, (int)oldY);
+            Vector2Int oldPos = new Vector2Int();
+            oldPos = (Vector2Int)selectedUnit.oldPos;
+            BaseStructure oldStructure = whatStructureIsInThisLocation(oldPos);
             //debug the values in the if statement below
             //Debug.Log($"oldX: {oldX}, oldY: {oldY}, isResourceUnit {selectedUnit.isResourceUnit}, prevCaptureVal {selectedUnit.prevStructureCaptureVal}, oldStructure: {oldStructure}, oldStructure.playerControl: {oldStructure.playerControl}, selectedUnit.playerControl: {selectedUnit.playerControl}");
 
@@ -448,7 +445,7 @@ public class MasterGrid : MonoBehaviour
             if (selectedUnit.isResourceUnit && selectedUnit.prevStructureCaptureVal != null && oldStructure != null && oldStructure.playerControl != selectedUnit.playerControl)
                 oldStructure.captureHealth = (int)selectedUnit.prevStructureCaptureVal;
 
-            moveSelectedUnit((int)oldX, (int)oldY);
+            moveSelectedUnit(oldPos);
         }
         clearSelectedUnit();
     }
@@ -464,8 +461,9 @@ public class MasterGrid : MonoBehaviour
         int movementRange = mTarget.movementRange;
         int attackRange = mTarget.attackRange;
         int totalRange = movementRange + attackRange;
-        int xpos = (int)mTarget.xPos;
-        int ypos = (int)mTarget.yPos;
+        int xpos = (int)mTarget.pos.x;
+        int ypos = (int)mTarget.pos.y;
+        //Vector2Int targetPos = mTarget.pos;
         /*if (!drawing)
         {
             drawing = true;
@@ -577,14 +575,14 @@ public class MasterGrid : MonoBehaviour
                 checkedCells[xCheck, yCheck] = true;
 
                 // Legal move validation
-                if (legalMove(xCheck - 1, yCheck - 1, mTarget) >= 1 && movementRange > 0) //if its a legal move AND the unit isn't only searching for additional attack locations
+                if (legalMove(new Vector2Int(xCheck - 1, yCheck - 1), mTarget) >= 1 && movementRange > 0) //if its a legal move AND the unit isn't only searching for additional attack locations
                 {
                     // Enqueue the cell with updated range if not already in the queue
                     if (!cellsToCheck.Contains((new Vector2Int(xCheck, yCheck), range - 1)))
                         cellsToCheck.Enqueue((new Vector2Int(xCheck, yCheck), range - 1));
 
                     // Differentiate between movement and attack squares based on range
-                    if (legalMove(xCheck - 1, yCheck - 1, mTarget) == 1 && range > attackRange) //totalRange - movementRange
+                    if (legalMove(new Vector2Int(xCheck - 1, yCheck - 1), mTarget) == 1 && range > attackRange) //totalRange - movementRange
                     {
                         squareQueuesList[0].Enqueue(new Vector2Int(xCheck, yCheck)); // Movement square
                     }
@@ -594,13 +592,13 @@ public class MasterGrid : MonoBehaviour
                     }
 
                     // Handle structures in the current cell
-                    BaseStructure structure = whatStructureIsInThisLocation(xCheck - 1, yCheck - 1);
+                    BaseStructure structure = whatStructureIsInThisLocation(new Vector2Int(xCheck - 1, yCheck - 1));
                     if (structure != null)
                         squareQueuesList[2].Enqueue(new Vector2Int(xCheck, yCheck)); // Structure square
                 }
                 else if (IsCellInBounds(xCheck, yCheck))
                 {
-                    BaseUnit unitAtLocation = whatUnitIsInThisLocation(xCheck - 1, yCheck - 1);
+                    BaseUnit unitAtLocation = whatUnitIsInThisLocation(new Vector2Int(xCheck - 1, yCheck - 1));
 
                     // If it's not the player's turn or the unit can be attacked, mark as attack square. Also, if there's no unit there and you can attack and move.
                     if ((mTarget.playerControl != getPlayerTurn() || canUnitAttack(mTarget, unitAtLocation) || unitAtLocation == null) && mTarget.canMoveAndAttack)
@@ -835,7 +833,7 @@ public class MasterGrid : MonoBehaviour
         {
             Vector2Int neighbor = current + dir;
 
-            if (depths.ContainsKey(neighbor) || legalMove(neighbor.x, neighbor.y, unit) <= 0)
+            if (depths.ContainsKey(neighbor) || legalMove(neighbor, unit) <= 0)
                 continue;
 
             depths[neighbor] = currentDepth + 1;
@@ -956,7 +954,7 @@ public class MasterGrid : MonoBehaviour
         while (structureQueue.Count > 0)
         {
             Vector2Int cell = structureQueue.Dequeue();
-            BaseStructure s = whatStructureIsInThisLocation(cell.x - 1, cell.y - 1);
+            BaseStructure s = whatStructureIsInThisLocation(new Vector2Int(cell.x - 1, cell.y - 1));
             if (s != null)
             {
                 turnOffStructureCollider(s);
@@ -990,7 +988,7 @@ public class MasterGrid : MonoBehaviour
         while (attackQueue.Count > 0)
         {
             Vector2Int cell = attackQueue.Dequeue();
-            BaseUnit unitAtLocation = whatUnitIsInThisLocation(cell.x - 1, cell.y - 1);
+            BaseUnit unitAtLocation = whatUnitIsInThisLocation(new Vector2Int(cell.x - 1, cell.y - 1));
             if (unitAtLocation != null && unitAtLocation.playerControl != getPlayerTurn())
             {
                 drawDamageSquare(cell.x - 1, cell.y - 1, drawMovementUnit.playerControl == getPlayerTurn());
@@ -1001,7 +999,7 @@ public class MasterGrid : MonoBehaviour
                 }*/
             }
 
-            Vector2Int unitLocation = new Vector2Int(mTarget.xPos, mTarget.yPos);
+            Vector2Int unitLocation = mTarget.pos;
             Vector2Int attackLocation = new Vector2Int(cell.x - 1, cell.y - 1);
             int xDiff = attackLocation.x - unitLocation.x;
             int yDiff = attackLocation.y - unitLocation.y;
@@ -1071,8 +1069,8 @@ public class MasterGrid : MonoBehaviour
 
     public void checkEnemiesInRange(BaseUnit unit) 
     {
-        int xPos = (int)unit.xPos;
-        int yPos = (int)unit.yPos;
+        int xPos = (int)unit.pos.x;
+        int yPos = (int)unit.pos.y;
         int range = unit.attackRange;
 
         Queue<(Vector2Int cell, int range)> cellsToCheck = new Queue<(Vector2Int, int)>();
@@ -1084,7 +1082,7 @@ public class MasterGrid : MonoBehaviour
         //ManualTestAndPrintLogQueueSizes(squareQueuesList);
         foreach (var cell in squareQueuesList[1])
         {
-            BaseUnit unitInLocation = whatUnitIsInThisLocation(cell.x - 1, cell.y - 1);
+            BaseUnit unitInLocation = whatUnitIsInThisLocation(new Vector2Int(cell.x - 1, cell.y - 1));
             if (unitInLocation != null && unitInLocation != unit && unitInLocation.playerControl != unit.playerControl && unitInLocation.unitName != "seed")
             {
                 setUnitToAttackable(unit, unitInLocation);
@@ -1110,33 +1108,33 @@ public class MasterGrid : MonoBehaviour
         attackableUnits.Add(defender);
         defender.drawCrosshairs();
         double damageBeforeLuck = getDamageBeforeLuck(attacker, defender, false);
-        int tileDefenceValue = getTileDefenceValueInt(defender.xPos, defender.yPos);
+        int tileDefenceValue = getTileDefenceValueInt(defender.pos);
         double floor = getAttackLuckFloor(damageBeforeLuck, defender.healthMax);
         double ceiling = getAttackLuckCeiling(damageBeforeLuck, defender.healthMax);
         //if(defender.progeny == Progeny.Sentus )
         if (luckOn)
         {
-            defender.showCombatTooltip(tileDefenceValue, defender.progeny == Progeny.Sentus ? defenceGridInt[defender.xPos, defender.yPos] : 0, floor, ceiling);
+            defender.showCombatTooltip(tileDefenceValue, defender.progeny == Progeny.Sentus ? defenceGridInt[defender.pos.x, defender.pos.y] : 0, floor, ceiling);
             //Debug.Log($"For defender {defender.GetInstanceID()}, Tooltip displays floor: {floor}, ceiling: {ceiling}, base dmg before luck: {damageBeforeLuck}.");
         }
         else
         {
-            defender.showCombatTooltip(tileDefenceValue, defender.progeny == Progeny.Sentus ? defenceGridInt[defender.xPos, defender.yPos] : 0,  damageBeforeLuck /defender.healthMax, damageBeforeLuck/defender.healthMax);
+            defender.showCombatTooltip(tileDefenceValue, defender.progeny == Progeny.Sentus ? defenceGridInt[defender.pos.x, defender.pos.y] : 0,  damageBeforeLuck /defender.healthMax, damageBeforeLuck/defender.healthMax);
             //Debug.Log($"For defender {defender.GetInstanceID()}, Tooltip displays floor: {damageBeforeLuck}, ceiling: {damageBeforeLuck}, base dmg before luck: {damageBeforeLuck}.");
 
         }
     }
 
-    public BaseUnit whatUnitIsInThisLocation(int x, int y)
+    public BaseUnit whatUnitIsInThisLocation(Vector2Int pos)
     {
 
-        if (x >= 0 && y >= 0 && x < gridX && y < gridY)
-            if (unitGrid[x, y] is BaseUnit)
+        if (pos.x >= 0 && pos.y >= 0 && pos.x < gridX && pos.y < gridY)
+            if (unitGrid[pos.x, pos.y] is BaseUnit)
             {
                 //Debug.Log($"Checking for unit at location {x},{y}");
-                if (unitGrid[x, y] == null)
-                    Debug.LogError($"UnitGrid at location {x},{y} is null");
-                return unitGrid[x, y];
+                if (unitGrid[pos.x, pos.y] == null)
+                    Debug.LogError($"UnitGrid at location {pos} is null");
+                return unitGrid[pos.x, pos.y];
             }
             else
                 return null;
@@ -1148,11 +1146,11 @@ public class MasterGrid : MonoBehaviour
 
     }
 
-    public BaseStructure whatStructureIsInThisLocation(int x, int y)
+    public BaseStructure whatStructureIsInThisLocation(Vector2Int pos)
     {
-        if (x >= 0 && y >= 0 && x < gridX && y < gridY)
-            if (structureGrid[x, y] is BaseStructure)
-                return structureGrid[x, y];
+        if (pos.x >= 0 && pos.y >= 0 && pos.x < gridX && pos.y < gridY)
+            if (structureGrid[pos.x, pos.y] is BaseStructure)
+                return structureGrid[pos.x, pos.y];
             else
                 return null;
         else
@@ -1160,26 +1158,26 @@ public class MasterGrid : MonoBehaviour
 
     }
 
-    public byte whatTileIsInThisLocation(int x, int y)
+    public byte whatTileIsInThisLocation(Vector2Int pos)
     {
-        return terrainGrid[x, y];
+        return terrainGrid[pos.x, pos.y];
     }
 
-    public double getTileDefenceValueMultiplier(int x, int y)
+    public double getTileDefenceValueMultiplier(Vector2Int pos)
     {
-        return (double)getTileDefenceValueInt(x, y) / 100.0 * defenceMultiplier;
+        return (double)getTileDefenceValueInt(pos) / 100.0 * defenceMultiplier;
     }
 
-    public int getTileDefenceValueInt(int x, int y)
+    public int getTileDefenceValueInt(Vector2Int pos)
     {
         AttributesTile tile;
-        if (tileAttributes.TryGetValue(whatTileIsInThisLocation(x, y), out tile))
+        if (tileAttributes.TryGetValue(whatTileIsInThisLocation(pos), out tile))
         {
             return tile.defenceValue;
         }
         else
         {
-            Debug.LogError($"Cannot get tile at location {x},{y} for byteValue {whatTileIsInThisLocation(x, y)}");
+            Debug.LogError($"Cannot get tile at location {pos} for byteValue {whatTileIsInThisLocation(pos)}");
             return 0;
         }
     }
@@ -1192,12 +1190,12 @@ public class MasterGrid : MonoBehaviour
         //Sentus implementation #1.
         if (defender.progeny == Progeny.Sentus)
         {
-            defenceGridDouble = GetSentusDefenceMultiplier(defender.xPos, defender.yPos);
+            defenceGridDouble = GetSentusDefenceMultiplier(defender.pos);
         }
         if (defender.unitTerrainType != UnitTerrainType.Air)
         {
 
-            tileMultiplier = getTileDefenceValueMultiplier(defender.xPos, defender.yPos);
+            tileMultiplier = getTileDefenceValueMultiplier(defender.pos);
         }
         Debug.Log($"Defence: Tile: {tileMultiplier} defence: {defenceGridDouble}");
         return 1 - tileMultiplier - defenceGridDouble;
@@ -1239,22 +1237,22 @@ public class MasterGrid : MonoBehaviour
     //this will return 1 if a legal move, 0 if illegal move, 2 if allied unit but not a landing square.
     //-1 if it's the same unit
     //eventually this can decrement the number of additional movements (due to terrain) the unit has but that's for later.
-    public int legalMove(float xPos, float yPos, BaseUnit mTarget)
+    public int legalMove(Vector2Int pos, BaseUnit mTarget)
     {
-        int x = (int)xPos;
-        int y = (int)yPos;
+        int x = pos.x;
+        int y = pos.y;
 
         if (x < 0 || y < 0 || x >= gridX || y >= gridY)
             return 0;
-        else if (!canUnitMoveToByteValue(mTarget, whatTileIsInThisLocation(x, y)))
+        else if (!canUnitMoveToByteValue(mTarget, whatTileIsInThisLocation(pos)))
             return 0;
-        else if (whatUnitIsInThisLocation(x, y) == null)
+        else if (whatUnitIsInThisLocation(pos) == null)
             return 1;
-        else if (whatUnitIsInThisLocation(x, y) == mTarget)
+        else if (whatUnitIsInThisLocation(pos) == mTarget)
             return -1;
         else if (drawMovementUnit != null && drawing) //if we're drawing movement squares
         {
-            if (whatUnitIsInThisLocation(x, y).playerControl == drawMovementUnit.playerControl)
+            if (whatUnitIsInThisLocation(pos).playerControl == drawMovementUnit.playerControl)
                 return 2;
             else
                 return 0; //true as long as future conditions also return 0. Might become a headache if that's not the case.
@@ -1319,16 +1317,15 @@ public class MasterGrid : MonoBehaviour
         attackableUnits.Clear();
     }
 
-    public void moveSelectedUnit(int x, int y)
+    public void moveSelectedUnit(Vector2Int pos)
     {
         //print("moveSelectedUnit. SelectedUnit is: "+selectedUnit);
-        if (selectedUnit != null && whatUnitIsInThisLocation(x, y) == null)
+        if (selectedUnit != null && whatUnitIsInThisLocation(pos) == null)
         {
             clearAttackableUnits();
-            selectedUnit.oldXPos = selectedUnit.xPos;
-            selectedUnit.oldYPos = selectedUnit.yPos;
-            // do we want to try and define this just within the if statement?
-            BaseStructure oldStructure = whatStructureIsInThisLocation(selectedUnit.xPos, selectedUnit.yPos);
+            selectedUnit.oldPos = selectedUnit.pos;
+            // do we want to try and define ths just within the if statement?
+            BaseStructure oldStructure = whatStructureIsInThisLocation(selectedUnit.pos);
             if (oldStructure != null)
             {
                 //in case of undo, hold the previous capture % in case it needs to be restored.
@@ -1338,28 +1335,27 @@ public class MasterGrid : MonoBehaviour
                 oldStructure.turnOnCollider();
                 oldStructure.resetCaptureHealth();
             }
-            AnimateMovement(selectedUnit, new Vector2Int(selectedUnit.xPos, selectedUnit.yPos), new Vector2Int(x, y));
+            AnimateMovement(selectedUnit, selectedUnit.pos, pos);
             //selectedUnit.transform.position = new Vector2(x, y); //you can't define this as a Vector2Int bc the game engine requires conversion to Vector3
 
             // if you're undoing movement, don't add it to the action list
             if (!selectedUnit.undoingMovement)
-                addGameAction(0, (byte)selectedUnit.gamePieceId, (byte)selectedUnit.xPos, (byte)selectedUnit.yPos, (byte)x, (byte)y);
+                addGameAction(0, (byte)selectedUnit.gamePieceId, (byte)selectedUnit.pos.x, (byte)selectedUnit.pos.y, (byte)pos.x, (byte)pos.y);
 
-            removeUnitInGrid(selectedUnit.xPos, selectedUnit.yPos);
-            setUnitInGrid(x, y, selectedUnit);
+            removeUnitInGrid(selectedUnit.pos);
+            setUnitInGrid(pos, selectedUnit);
 
             if (!selectedUnit.undoingMovement)
             {
                 selectedUnit.movementNonExhausted = false;
-                presentChoicesAtLocation(x, y, selectedUnit);
+                presentChoicesAtLocation(pos, selectedUnit);
             }
             else
             {
                 selectedUnit.movementNonExhausted = true;
                 selectedUnit.undoingMovement = false;
-                selectedUnit.oldXPos = null;
-                selectedUnit.oldYPos = null;
-                whatStructureIsInThisLocation(selectedUnit.xPos, selectedUnit.yPos)?.turnOffCollider();
+                selectedUnit.oldPos = null;
+                whatStructureIsInThisLocation(selectedUnit.pos)?.turnOffCollider();
                 exhaustSelectedUnit(selectedUnit, false);
 
                 //if undoing movement remove the action from the gameActions list
@@ -1379,29 +1375,27 @@ public class MasterGrid : MonoBehaviour
 
 
     //you should do better position checking but this is fine for now
-    public void setUnitInGrid(int x, int y, BaseUnit unit)
+    public void setUnitInGrid(Vector2Int pos, BaseUnit unit)
     {
         //unitGrid[gridX-x, gridY-y] = unit;
-        unitGrid[x, y] = unit;
-        unit.xPos = x;
-        unit.yPos = y;
+        unitGrid[pos.x, pos.y] = unit;
+        unit.pos = pos;
     }
 
-    public void setStructureInGrid(int x, int y, BaseStructure structure)
+    public void setStructureInGrid(Vector2Int pos, BaseStructure structure)
     {
         //unitGrid[gridX-x, gridY-y] = unit;
-        structureGrid[x, y] = structure;
-        structure.xPos = x;
-        structure.yPos = y;
+        structureGrid[pos.x, pos.y] = structure;
+        structure.pos = pos;
     }
 
     public void deleteUnit(BaseUnit deadUnit)
     {
         if(selectedUnit != null && deadUnit == selectedUnit)
             clearSelectedUnit();
-        removeUnitInGrid(deadUnit.xPos, deadUnit.yPos);
+        removeUnitInGrid(deadUnit.pos);
         //if not null call the function
-        whatStructureIsInThisLocation(deadUnit.xPos, deadUnit.yPos)?.resetCaptureHealth();
+        whatStructureIsInThisLocation(deadUnit.pos)?.resetCaptureHealth();
         Destroy(deadUnit.gameObject);
         //Destroy(deadUnit.GetComponent<UnitSprite>());
     }
@@ -1418,10 +1412,10 @@ public class MasterGrid : MonoBehaviour
         //Destroy(deadUnit.GetComponent<UnitSprite>());
     }*/
 
-    public void removeUnitInGrid(int x, int y)
+    public void removeUnitInGrid(Vector2Int pos)
     {
         //unitGrid[gridX-x, gridY-y] = null;
-        unitGrid[x, y] = null;
+        unitGrid[pos.x, pos.y] = null;
     }
 
 
@@ -1476,8 +1470,7 @@ public class MasterGrid : MonoBehaviour
             if (unit.playerControl == playerTurn)
             {
                 unit.setNonExhausted(true);
-                unit.oldXPos = null;
-                unit.oldYPos = null;
+                unit.oldPos = null;
 
             }
         }
@@ -1493,8 +1486,7 @@ public class MasterGrid : MonoBehaviour
             if (unit.playerControl == player)
             {
                 unit.setNonExhausted(false);
-                unit.oldXPos = null;
-                unit.oldYPos = null;
+                unit.oldPos = null;
             }
             else
                 unit.deleteMe();
@@ -1512,11 +1504,11 @@ public class MasterGrid : MonoBehaviour
         return num;
     }
 
-    public void presentChoicesAtLocation(int x, int y, BaseUnit unit)
+    public void presentChoicesAtLocation(Vector2Int pos, BaseUnit unit)
     {
         if(unit.canMoveAndAttack || unit.movementNonExhausted)
             checkEnemiesInRange(unit);
-        BaseStructure structure = manageStructureAtLocation(unit.xPos, unit.yPos);
+        BaseStructure structure = manageStructureAtLocation(pos);
         bool canStructureBeCapturedHere = (structure != null && structure.isCapturableBy(unit));
         if (canStructureBeCapturedHere)
         {
@@ -1527,9 +1519,9 @@ public class MasterGrid : MonoBehaviour
             exhaustSelectedUnit(unit, true);
     }
 
-    public BaseStructure manageStructureAtLocation(int x, int y)
+    public BaseStructure manageStructureAtLocation(Vector2Int pos)
     {
-        BaseStructure structure = whatStructureIsInThisLocation(x, y);
+        BaseStructure structure = whatStructureIsInThisLocation(pos);
         if (structure != null)
         {
             turnOffStructureCollider(structure);
@@ -1548,7 +1540,7 @@ public class MasterGrid : MonoBehaviour
         List<BaseStructure> tempSpriteOffStructures = new List<BaseStructure>();
         foreach (BaseStructure s in spriteOffStructures)
         {
-            if (whatUnitIsInThisLocation(s.xPos, s.yPos) == null)
+            if (whatUnitIsInThisLocation(s.pos) == null)
             {
                 s.turnOnCollider();
                 tempSpriteOffStructures.Add(s);
@@ -1679,8 +1671,8 @@ public class MasterGrid : MonoBehaviour
             long healthMultiplier = unit.healthCurrent == unit.healthMax ? 1 : unit.healthCurrent;
             long unitHash = (long)(unit.gamePieceId+1)
                            * (unit.playerControl + 1)
-                           * (unit.xPos + 1)
-                           * (unit.yPos + 1)
+                           * (unit.pos.x + 1)
+                           * (unit.pos.y + 1)
                            * healthMultiplier;
 
             //Debug.Log($"Unit Hash: {unitHash}");
@@ -1695,8 +1687,8 @@ public class MasterGrid : MonoBehaviour
             long healthMultiplier = structure.captureHealth == structure.maxCaptureHealth ? 1 : structure.captureHealth;
             long structureHash = (long)(structure.gamePieceId+1)
                                * (structure.playerControl + 1)
-                               * (structure.xPos + 1)
-                               * (structure.yPos + 1)
+                               * (structure.pos.x + 1)
+                               * (structure.pos.y + 1)
                                * healthMultiplier;
             hash += structureHash;
         }
@@ -1766,8 +1758,8 @@ public class MasterGrid : MonoBehaviour
         {
             if (s != null && s.gamePieceId == 200)
             {
-                int x = s.xPos;
-                int y = s.yPos;
+                int x = s.pos.x;
+                int y = s.pos.y;
                 //Debug.Log($"Checking Structure at {x},{y}");
                 //defenceGridInt[x, y] += 1;
                 for (int i = -distance; i <= distance; i++)
@@ -1792,8 +1784,10 @@ public class MasterGrid : MonoBehaviour
         return defenceGridInt;
     }
 
-    public double GetSentusDefenceMultiplier (int x, int y)
+    public double GetSentusDefenceMultiplier (Vector2Int pos)
     {
+        int x = pos.x;
+        int y = pos.y;
         if (defenceGridInt==null || defenceGridInt[x, y] < 0)
         {
             Debug.LogWarning("Sentus Defence Grid not properly initialized");
@@ -1808,12 +1802,12 @@ public class MasterGrid : MonoBehaviour
         return 0;
     }
 
-    public void createVirixSeed(int x, int y)
+    public void createVirixSeed(Vector2Int pos)
     {
         BaseUnit seed = PrefabManager.getBaseUnitFromName("seed", 1);
         //seed.playerControl = getPlayerTurn();
         seed.setNonExhausted(true);
-        seed = gameMaster.GetInstantiateUnit(seed, x, y, null);
+        seed = gameMaster.GetInstantiateUnit(seed, pos, null);
     }
 
     private IEnumerator waitGenerateSaveArrayToCSV()
@@ -1824,7 +1818,7 @@ public class MasterGrid : MonoBehaviour
         foreach(BaseStructure s in structureGrid)
         {
             if(s != null)
-                structureGridInt[s.xPos, s.yPos] = s.gamePieceId;
+                structureGridInt[s.pos.x, s.pos.y] = s.gamePieceId;
         }
         SaveArrayToCSV("StructureGrid.csv", structureGridInt);
         //SaveArrayToCSV("SentusDefenceGridPyramid3.csv", populateSentusDefenceGrid(3, 1));

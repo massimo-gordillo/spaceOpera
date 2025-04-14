@@ -362,24 +362,24 @@ public class CPUMananger : MonoBehaviour
 
         foreach (BaseUnit unit in MasterGrid.playerUnits[player])
         {
-            Vector2Int unitPos = new Vector2Int(unit.xPos, unit.yPos);
             if (unit.CPU_TargetNode == null)
             {
                 GiveUnitAssignment(unit);
             }
 
             Vector2Int nodePos = unit.CPU_TargetNode.pos;
-            int delta = (int)((unitPos-nodePos).magnitude);
+            int delta = (int)((unit.pos-nodePos).magnitude);
             if (unit != null && unit.isResourceUnit)
             {
-                List<Vector2Int> availPath = masterGrid.BidirectionalSearch(unitPos, nodePos, unit, delta * 2);
+                List<Vector2Int> availPath = masterGrid.BidirectionalSearch(unit.pos, nodePos, unit, delta * 2);
                 if (availPath.Count > 0)
                 {
                     Vector2Int target = masterGrid.GetFurthestTileByMovement(availPath, unit.movementRange);
                     if(target.magnitude != 0)
                     {
                         masterGrid.selectedUnit = unit;
-                        masterGrid.moveSelectedUnit(target.x, target.y);
+                        masterGrid.moveSelectedUnit(target);
+                        
                     }
                 }
 
@@ -414,8 +414,8 @@ public class CPUMananger : MonoBehaviour
         structures.Sort((a, b) =>
         {
             // Compute squared distances to avoid expensive sqrt calls
-            int da = a.xPos * a.xPos + a.yPos * a.yPos;
-            int db = b.xPos * b.xPos + b.yPos * b.yPos;
+            int da = a.pos.x * a.pos.x + a.pos.y * a.pos.y;
+            int db = b.pos.x * b.pos.x + b.pos.y * b.pos.y;
             return da.CompareTo(db);
         });
     }
@@ -466,21 +466,19 @@ public class CPUMananger : MonoBehaviour
 
     public static void GiveUnitAssignment(BaseUnit unit)
     {
-        Vector2Int unitPos = new Vector2Int(unit.xPos, unit.yPos);
-        NetworkNode currentNode = GetClosestNodeAgnostic(unitPos);
+        NetworkNode currentNode = GetClosestNodeAgnostic(unit.pos);
         NetworkNode targetNode = currentNode.closestUnclaimed[unit.playerControl];
         targetNode.ClaimByUnit(unit);
     }
 
     public static NetworkNode GetUnitAssignment(BaseUnit unit)
     {
-        Vector2Int unitPos = new Vector2Int(unit.xPos,unit.yPos);
 
-        NetworkNode currentNode = nodeList.Find(n => n.pos == unitPos);
+        NetworkNode currentNode = nodeList.Find(n => n.pos == unit.pos);
 
         if (currentNode == null)
         {
-            currentNode = GetClosestNodeAgnostic(unitPos);
+            currentNode = GetClosestNodeAgnostic(unit.pos);
         }
 
         NetworkNode targetNode = currentNode.closestUnclaimed[unit.playerControl];
@@ -664,7 +662,7 @@ public class NetworkNode
     public NetworkNode(BaseStructure structure)
     {
         this.structure = structure;
-        pos = new Vector2Int(structure.xPos, structure.yPos);
+        pos = structure.pos;
         isCaptured = structure.playerControl != 0;
         playerControl = structure.playerControl;
     }

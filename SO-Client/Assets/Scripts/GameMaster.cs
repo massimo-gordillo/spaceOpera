@@ -78,7 +78,7 @@ public class GameMaster : MonoBehaviour
     static int player2ProgenySelected;
     public static Color32[] playerColors;
 
-    public static bool CPU_isOn = true;
+    public static bool CPU_isOn = false;
     public static bool[] CPU_PlayersList;
 
     /*    public static GameMaster Instance
@@ -228,7 +228,7 @@ public class GameMaster : MonoBehaviour
                     //BaseUnit infantryUnitPrefab = Resources.Load<BaseUnit>("UnitPrefabs/progeny1/InfantryPrefab");
                     BaseUnit infantryUnitPrefab = PrefabManager.getBaseUnitFromName("Infantry", 0);
                     infantryUnitPrefab.playerControl = player;
-                    BaseUnit unit = GetInstantiateUnit(infantryUnitPrefab, prod.xPos, prod.yPos, player);
+                    BaseUnit unit = GetInstantiateUnit(infantryUnitPrefab, prod.pos, player);
                     unit.setNonExhausted(true);
                     //BaseUnit unit = Instantiate(infantryUnitPrefab, new Vector2(x, y), Quaternion.identity, unitContainer);
 
@@ -237,7 +237,7 @@ public class GameMaster : MonoBehaviour
                 {
                     BaseUnit sporeUnitPrefab = PrefabManager.getBaseUnitFromName("Spore", 1);
                     sporeUnitPrefab.playerControl = player;
-                    BaseUnit unit = GetInstantiateUnit(sporeUnitPrefab, prod.xPos, prod.yPos, player);
+                    BaseUnit unit = GetInstantiateUnit(sporeUnitPrefab, prod.pos, player);
                     unit.setNonExhausted(true);
                     //BaseUnit unit = Instantiate(sporeUnitPrefab, new Vector2(x, y), Quaternion.identity, unitContainer);
 
@@ -246,7 +246,7 @@ public class GameMaster : MonoBehaviour
                 {
                     BaseUnit blacksmithUnitPrefab = PrefabManager.getBaseUnitFromName("Blacksmith", 2);
                     blacksmithUnitPrefab.playerControl = player;
-                    BaseUnit unit = GetInstantiateUnit(blacksmithUnitPrefab, prod.xPos, prod.yPos, player);
+                    BaseUnit unit = GetInstantiateUnit(blacksmithUnitPrefab, prod.pos, player);
                     unit.setNonExhausted(true);
                     //BaseUnit unit = Instantiate(blacksmithUnitPrefab, new Vector2(x, y), Quaternion.identity, unitContainer);
 
@@ -326,7 +326,7 @@ public class GameMaster : MonoBehaviour
         
 
         //need a way to set to exhausted from here so the units don't have to start exhausted on the 1st turn.
-        BaseUnit tempUnit = GetInstantiateUnit(unit, selectedStructure.xPos, selectedStructure.yPos, null);
+        BaseUnit tempUnit = GetInstantiateUnit(unit, selectedStructure.pos, null);
         //BaseUnit tempUnit = Instantiate(unit, new Vector2(selectedStructure.xPos, selectedStructure.yPos), Quaternion.identity, unitContainer);
         tempUnit.setNonExhausted(isNonExhausted);
 
@@ -335,7 +335,7 @@ public class GameMaster : MonoBehaviour
 
         //3 is produce a unit
         //not sure why the unit x and y coordiantes aren't available here but this works.
-        masterGrid.addGameAction(3, (byte)tempUnit.gamePieceId, (byte)selectedStructure.xPos, (byte)selectedStructure.yPos, (byte)selectedStructure.xPos, (byte)selectedStructure.yPos);
+        masterGrid.addGameAction(3, (byte)tempUnit.gamePieceId, (byte)selectedStructure.pos.x, (byte)selectedStructure.pos.y, (byte)selectedStructure.pos.x, (byte)selectedStructure.pos.y);
         playerResourceText.text = "" + playerResources[playerTurn];
         selectedStructure.turnOffCollider();
     }
@@ -363,7 +363,7 @@ public class GameMaster : MonoBehaviour
         {
             foreach (BaseStructure structure in masterGrid.GetStructures(playerTurn))
             {
-                BaseUnit coveringUnit = masterGrid.whatUnitIsInThisLocation(structure.xPos, structure.yPos);
+                BaseUnit coveringUnit = masterGrid.whatUnitIsInThisLocation(structure.pos);
                 if (coveringUnit != null && coveringUnit.unitName == "seed")
                 {
                     masterGrid.deleteUnit(coveringUnit);
@@ -401,7 +401,7 @@ public class GameMaster : MonoBehaviour
                 if (turnNumber > numPlayers)
                 {
                     selectedStructure = structure;
-                    if (masterGrid.whatUnitIsInThisLocation(structure.xPos, structure.yPos) == null)
+                    if (masterGrid.whatUnitIsInThisLocation(structure.pos) == null)
                         ProduceUnit(PrefabManager.getBaseUnitFromName("spore", 1), playerTurn, true);
                 }
 
@@ -539,7 +539,7 @@ public async void SubmitTurnToServer(List<GameAction> gameActions, long preTurnH
         {
             for (int y = 0; y < gridY; y++)
             {
-                BaseUnit unit = masterGrid.whatUnitIsInThisLocation(x, y);
+                BaseUnit unit = masterGrid.whatUnitIsInThisLocation(new Vector2Int(x, y));
                 if (unit != null)
                 {
                     GamePieceInfo info = new GamePieceInfo
@@ -554,7 +554,7 @@ public async void SubmitTurnToServer(List<GameAction> gameActions, long preTurnH
                     gameStateList.Add(info);
                 }
 
-                BaseStructure structure = masterGrid.whatStructureIsInThisLocation(x, y);
+                BaseStructure structure = masterGrid.whatStructureIsInThisLocation(new Vector2Int(x, y));
                 if (structure != null)
                 {
                     GamePieceInfo info = new GamePieceInfo(
@@ -619,11 +619,10 @@ public async void SubmitTurnToServer(List<GameAction> gameActions, long preTurnH
                     }
                     unit.playerControl = pieceInfo.playerID;
                     unit.setHealth((int)((double)(pieceInfo.healthVal * unit.healthMax) / 100));
-                    unit.xPos = x;
-                    unit.yPos = y;
-                    InstantiateUnit(unit, x, y);
+                    unit.pos = new Vector2Int(x, y);
+                    InstantiateUnit(unit, unit.pos);
                     //Instantiate(unit, new Vector2(x, y), Quaternion.identity, unitContainer);
-                    masterGrid.setUnitInGrid(x, y, unit);
+                    masterGrid.setUnitInGrid(unit.pos, unit);
                 }
                 else if (pieceInfo.typeNum >= 200 && pieceInfo.typeNum < 255)
                 {
@@ -642,10 +641,9 @@ public async void SubmitTurnToServer(List<GameAction> gameActions, long preTurnH
                         Debug.LogError($"No structure for byte value {pieceInfo.typeNum} found.");
                     structure.playerControl = pieceInfo.playerID;
                     structure.captureHealth = pieceInfo.healthVal;
-                    structure.xPos = x;
-                    structure.yPos = y;
+                    structure.pos = new Vector2Int(x, y);
                     Instantiate(structure, new Vector2(x, y), Quaternion.identity, structureContainer);
-                    masterGrid.setStructureInGrid(x, y, structure);
+                    masterGrid.setStructureInGrid(structure.pos, structure);
                 }
             }
 
@@ -655,18 +653,18 @@ public async void SubmitTurnToServer(List<GameAction> gameActions, long preTurnH
             Debug.LogError("gameStateList is empty!");
     }
 
-    public void InstantiateUnit(BaseUnit unit, int x, int y)
+    public void InstantiateUnit(BaseUnit unit, Vector2Int pos)
     {
-        Instantiate(unit, new Vector2(x, y), Quaternion.identity, unitContainer);
+        Instantiate(unit, (Vector2)pos, Quaternion.identity, unitContainer);
     }
     
-    public BaseUnit GetInstantiateUnit(BaseUnit unit, int x, int y, int? player)
+    public BaseUnit GetInstantiateUnit(BaseUnit unit, Vector2Int pos, int? player)
     {
         if(player==null)
             unit.playerControl = getPlayerTurn();
         else
             unit.playerControl = (int)player;
-        BaseUnit tempUnit = Instantiate(unit, new Vector2(x, y), Quaternion.identity, unitContainer);
+        BaseUnit tempUnit = Instantiate(unit, (Vector2)pos, Quaternion.identity, unitContainer);
         return tempUnit;
     }
 

@@ -35,16 +35,14 @@ public class BaseUnit : MonoBehaviour
     public int playerControl;
     public int team;
     public int orientation = 1;
-    public int xPos;
-    public int yPos;
+    public Vector2Int pos;
     //private Color baseColor; //currently unused.
     private Color originalLightsColor;
     private bool originalLightsColorSet = false;
     public bool movementNonExhausted;
     public bool nonExhausted;
     public bool undoingMovement = false;
-    public int? oldXPos = null;
-    public int? oldYPos = null;
+    public Vector2Int? oldPos = null;
     //if infantry unit was capturing a structure, this will hold the value of the structure capture progress in case of an undo.
     public int? prevStructureCaptureVal = null;
     //public Sprite sprite; //MG 24-08-04: You cannot kill this var. It is used by AttributesBaseUnit, GameValuesSO and PrefabManager to work with the sprite values.
@@ -86,16 +84,16 @@ public class BaseUnit : MonoBehaviour
 
     void Start()
     {
-        xPos = (int)transform.position.x;
-        yPos = (int)transform.position.y;
+        pos.x = (int)transform.position.x;
+        pos.y = (int)transform.position.y;
         //print("BaseUnit initiated. xPos: " + transform.position.x + "ypos: " + transform.position.y +"instanceID: "+this.GetInstanceID());
         masterGrid = GameObject.FindGameObjectWithTag("MasterGridTag").GetComponent<MasterGrid>();
-        masterGrid.setUnitInGrid(xPos, yPos, this);
+        masterGrid.setUnitInGrid(pos, this);
         Debug.Log($"Length of playerControl = {MasterGrid.playerUnits.Length}, number of players {GameMaster.numPlayers}");
         MasterGrid.playerUnits[playerControl].Add(this);
 
         //if the unit is created after the structure on start, turn off the collider. BaseStructure has a similar check on start.
-        BaseStructure onLocation = masterGrid.whatStructureIsInThisLocation(xPos, yPos);
+        BaseStructure onLocation = masterGrid.whatStructureIsInThisLocation(pos);
         if (onLocation != null)
         {
             onLocation.turnOffCollider();
