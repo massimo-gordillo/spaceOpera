@@ -307,11 +307,7 @@ public class BaseUnit : MonoBehaviour
         masterGrid.deleteUnit(this);
     }
 
-    public void CPU_AssignNewTarget()
-    {
-        CPU_TargetNode = CPUMananger.GetUnitAssignment(this);
-        CPU_Heading = CPU_TargetNode.pos;
-    }
+
 
 
 }

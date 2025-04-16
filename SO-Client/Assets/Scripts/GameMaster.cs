@@ -78,7 +78,7 @@ public class GameMaster : MonoBehaviour
     static int player2ProgenySelected;
     public static Color32[] playerColors;
 
-    public static bool CPU_isOn = false;
+    public static bool CPU_isOn = true;
     public static bool[] CPU_PlayersList;
 
     /*    public static GameMaster Instance

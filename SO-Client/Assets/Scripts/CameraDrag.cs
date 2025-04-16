@@ -262,7 +262,7 @@ public class CameraDrag : MonoBehaviour
         if (isInputHeld)
         {
             if (isMouseDownOnClickableObject) return;
-            if (!isDragging && Vector3.Distance(dragOrigin, currentInputPosition) > dragThreshold)
+            if (!isDragging && Vector3.distance(dragOrigin, currentInputPosition) > dragThreshold)
                 isDragging = true;
             if (isDragging)
             {
@@ -290,7 +290,7 @@ public class CameraDrag : MonoBehaviour
         if (isSnappingBack)
         {
             cam.transform.position = Vector3.Lerp(cam.transform.position, snapBackTarget, snapBackSpeed * Time.deltaTime);
-            if (Vector3.Distance(cam.transform.position, snapBackTarget) < 0.01f)
+            if (Vector3.distance(cam.transform.position, snapBackTarget) < 0.01f)
             {
                 cam.transform.position = snapBackTarget;
                 isSnappingBack = false;
@@ -422,7 +422,7 @@ public class CameraDrag : MonoBehaviour
         if (Mouse.current.leftButton.isPressed || (Touchscreen.current?.primaryTouch.press.isPressed ?? false))
         {
             Vector2 currentPos = GetInputPosition();
-            if (!isDragging && Vector2.Distance(dragOrigin, currentPos) > dragThreshold)
+            if (!isDragging && Vector2.distance(dragOrigin, currentPos) > dragThreshold)
             {
                 isDragging = true;
             }
@@ -456,7 +456,7 @@ public class CameraDrag : MonoBehaviour
         if (isSnappingBack)
         {
             cam.transform.position = Vector3.Lerp(cam.transform.position, snapBackTarget, snapBackSpeed * Time.deltaTime);
-            if (Vector3.Distance(cam.transform.position, snapBackTarget) < 0.01f)
+            if (Vector3.distance(cam.transform.position, snapBackTarget) < 0.01f)
             {
                 cam.transform.position = snapBackTarget;
                 isSnappingBack = false;
@@ -608,7 +608,7 @@ public class CameraDrag : MonoBehaviour
             }
 
             Vector3 currentMousePosition = Mouse.current.position.ReadValue(); // Get the current mouse position
-            if (!isDragging && Vector3.Distance(dragOrigin, currentMousePosition) > dragThreshold)
+            if (!isDragging && Vector3.distance(dragOrigin, currentMousePosition) > dragThreshold)
             {
                 isDragging = true;
             }
@@ -670,7 +670,7 @@ public class CameraDrag : MonoBehaviour
         if (isSnappingBack)
         {
             cam.transform.position = Vector3.Lerp(cam.transform.position, snapBackTarget, snapBackSpeed * Time.deltaTime);
-            if (Vector3.Distance(cam.transform.position, snapBackTarget) < 0.01f)
+            if (Vector3.distance(cam.transform.position, snapBackTarget) < 0.01f)
             {
                 cam.transform.position = snapBackTarget;
                 isSnappingBack = false;
