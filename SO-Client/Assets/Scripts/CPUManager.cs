@@ -11,7 +11,7 @@ using UnityEngine;
 using static UnityEngine.GraphicsBuffer;
 
 
-public class CPUMananger : MonoBehaviour
+public class CPUManager : MonoBehaviour
 {
 
     public BaseUnit[,] unitGrid;
@@ -22,7 +22,7 @@ public class CPUMananger : MonoBehaviour
     public BaseStructure[] structureListArray;
     public double[,] structuresEuclideanDistance;
     //List<Vector2Int> structLocs;
-    Dictionary<Vector2Int, NetworkNode> nodeVectorMap = new();
+    public static Dictionary<Vector2Int, NetworkNode> nodeVectorMap = new();
     //public List<(Vector2Int, Vector2Int)> graphEdges = new List<(Vector2Int, Vector2Int)>();
     public List<NetworkEdge> graphEdges = new();
     public GameMaster gameMaster;
@@ -102,17 +102,94 @@ public class CPUMananger : MonoBehaviour
         {
             ConnectStructurePairs(n, 6); //specifically 6 as it's two infantry traverse distances
         }
+        
 
-        foreach(NetworkNode n in nodeList)
-        {
-            for (int p = 1; p <= GameMaster.numPlayers; p++)
-                n.CalculateClosestUnclaimedNieghbour(p);
-        }
         //Debug.Log($"Done searching pairs, node count is {graphEdges.Count}");
 
         CorrectManhattanDistances();
+        InitClosestNeighbour();
         //StartCoroutine(DrawStructureDebugLines());
     }
+
+    public void InitClosestNeighbour()
+    {
+        for (int p = 1; p <= GameMaster.numPlayers; p++)
+        {
+            Queue<NetworkNode> bfsQueue = new Queue<NetworkNode>();
+            HashSet<NetworkNode> visited = new HashSet<NetworkNode>();
+
+            // First pass: assign closestUnclaimed to direct neighbors
+            foreach (NetworkNode n in nodeList)
+            {
+                n.CalculateClosestUnclaimedNeighbour(p);
+                if (n.closestUnclaimed[p] != null)
+                {
+                    bfsQueue.Enqueue(n);
+                    visited.Add(n);
+                }
+            }
+
+            // Second pass: BFS to assign unclaimed from neighbors
+            while (bfsQueue.Count > 0)
+            {
+                NetworkNode current = bfsQueue.Dequeue();
+
+                foreach (NetworkEdge edge in current.localEdges.OrderBy(e => e.distance))
+                {
+                    NetworkNode neighbor = edge.GetOtherNode(current);
+                    if (neighbor == null || visited.Contains(neighbor))
+                        continue;
+
+                    // Inherit closest unclaimed from current node
+                    neighbor.closestUnclaimed[p] = current.closestUnclaimed[p];
+                    bfsQueue.Enqueue(neighbor);
+                    visited.Add(neighbor);
+                }
+            }
+
+            // Optional: Warn if any nodes still didn't get assigned
+            foreach (NetworkNode n in nodeList)
+            {
+                if (n.closestUnclaimed[p] == null)
+                {
+                    Debug.LogWarning($"Node {n.pos} for player {p} has no unclaimed neighbor!");
+                }
+            }
+        }
+    }
+
+
+    /*    public void initClosestNeighbour()
+        {
+            for (int p = 1; p <= GameMaster.numPlayers; p++)
+            {
+                List<NetworkNode> nodesWithNoNeighbours = new List<NetworkNode>();
+                foreach (NetworkNode n in nodeList)
+                {
+                    n.CalculateClosestUnclaimedNeighbour(p);
+                    if (n.closestUnclaimed[p] == null)
+                        nodesWithNoNeighbours.Add(n);
+                }
+                while (nodesWithNoNeighbours.Count > 0)
+                {
+                    NetworkNode n = nodesWithNoNeighbours[0];
+                    var closest = n.GetClosestUnclaimedNotMe(p, n);
+                    n.closestUnclaimed[p] = closest;
+
+                    if (closest == null)
+                    {
+                        Debug.LogWarning($"Node {n.pos} does not have any closest unclaimed after recursion");
+                        nodesWithNoNeighbours.RemoveAt(0); // Remove anyway to prevent infinite loop
+                    }
+                    else
+                    {
+                        nodesWithNoNeighbours.RemoveAt(0);
+                    }
+                }
+
+
+            }
+        }*/
 
     public void ConnectStructurePairs(NetworkNode node, int maxDistance)
     {
@@ -496,14 +573,23 @@ public class CPUMananger : MonoBehaviour
         NetworkNode targetNode = null;
         if (currentNode == null) {
             currentNode = GetClosestNodeAgnostic(unit.pos);
-            if (currentNode.IsClaimableBy(unit))
+            if (currentNode.IsClaimableBy(unit.playerControl))
             {
                 targetNode = currentNode;
             }
         }
+        if (currentNode.closestUnclaimed[unit.playerControl] == null)
+        {
+            Debug.LogWarning($"Current node {currentNode.pos} does not have a closest unclaimed, trying to set");//{currentNode.closestUnclaimed[unit.playerControl].pos} ");
+            //currentNode.closestUnclaimed[unit.playerControl] = currentNode.GetClosestUnclaimedNotMe(unit.playerControl, currentNode);
+            currentNode.closestUnclaimed[unit.playerControl] = currentNode.FindNearestUnclaimedBFS(currentNode,unit.playerControl,3);
+            Debug.LogWarning($"Node {currentNode.pos} assigned new unclaimed {currentNode.closestUnclaimed[unit.playerControl].pos}");
+        }
+
         if (targetNode == null) {
            targetNode = currentNode.closestUnclaimed[unit.playerControl];
         }
+        Debug.LogWarning($"Unit {unit.pos} has been given assignment {targetNode.pos} by node {currentNode.pos}, its closest unclaimed is {currentNode.closestUnclaimed[unit.playerControl].pos} ");
         targetNode.ClaimByUnit(unit);
     }
 
@@ -662,7 +748,7 @@ public class NetworkEdge
 
     public NetworkNode GetOtherNode(NetworkNode notMe)
     {
-        //Debug.Log($"Edge {vectorA} to {vectorB} is being asked to provide NOT {notMe.pos} between {nodeA.pos} and {nodeB.pos}");
+        //Debug.Log($"Edge {vectorA} to {vectorB} is being asked to provide NOT {lonelyNode.pos} between {nodeA.pos} and {nodeB.pos}");
         if (notMe.Equals(nodeA)) //using the overridden equals function. I should /maybe/ double check I'm not making a bunch of duplicates, maybe I should pull them from the node list.
             return nodeB;
         else if (notMe.Equals(nodeB))
@@ -711,15 +797,17 @@ public class NetworkNode
 
     public void ClaimByUnit(BaseUnit unit)
     {
-        if (IsClaimableBy(unit)){
+        if (IsClaimableBy(unit.playerControl)){
             unit.CPU_TargetNode = this;
             unit.CPU_Heading = this.pos;
             int playerClaiming = unit.playerControl;
             claimingUnits[playerClaiming] = unit;
             hasPlayerClaimed[playerClaiming] = true;
-            foreach (NetworkNode nieghbour in localNodes)
+            foreach (NetworkNode neighbour in localNodes)
             {
                 NeighbourHasSetThemselvesClaimed(this, playerClaiming, true);
+                if (neighbour.closestUnclaimed[playerClaiming] == null)
+                    neighbour.closestUnclaimed[playerClaiming] = this.closestUnclaimed[playerClaiming];
             }
         }else
         {
@@ -732,17 +820,60 @@ public class NetworkNode
         if(captured)
             if (closestUnclaimed[playerControl] == neighbour)
             {
-                CalculateClosestUnclaimedNieghbour(playerControl);
+                CalculateClosestUnclaimedNeighbour(playerControl);
             }
         else //losing control
             {
                 //in theory we could have a dict of nodes, edge, and raw vector distance but this shorthand is ok for now.
-                CalculateClosestUnclaimedNieghbour(playerControl);
+                CalculateClosestUnclaimedNeighbour(playerControl);
             }
     }
 
-    public void CalculateClosestUnclaimedNieghbour(int playerControl)
+    //this implementation had an issue where nodes down the chain didn't know if a non-naitive node swaped from claimed to unclaimed. I would need to also track which nodes are pointing to me.
+    /*public NetworkNode GetClosestUnclaimedNotMe(int playerControl, NetworkNode lonelyNode)
     {
+        Queue<NetworkNode> queue = new Queue<NetworkNode>();
+        HashSet<NetworkNode> visited = new HashSet<NetworkNode>();
+
+        queue.Enqueue(this);
+        visited.Add(this);
+
+        while (queue.Count > 0)
+        {
+            NetworkNode current = queue.Dequeue();
+
+            // If current has a known unclaimed and it's not the lonely node
+            if (current.closestUnclaimed[playerControl] != null && current.closestUnclaimed[playerControl] != lonelyNode && current.closestUnclaimed[playerControl].IsClaimableBy(playerControl))
+            {
+                lonelyNode.closestUnclaimed[playerControl] = current.closestUnclaimed[playerControl];
+                return current.closestUnclaimed[playerControl];
+            }
+
+            // Enqueue neighbors
+            foreach (var edge in current.localEdges.OrderBy(e => e.distance))
+            {
+                NetworkNode neighbor = edge.GetOtherNode(current);
+                if (neighbor == null || visited.Contains(neighbor))
+                    continue;
+
+                queue.Enqueue(neighbor);
+                visited.Add(neighbor);
+            }
+        }
+
+        // If we get here, no valid unclaimed was found
+        Debug.LogWarning($"No closest unclaimed found for lonely node at {lonelyNode.pos} for player {playerControl}");
+        return null;
+    }*/
+
+
+   
+
+
+
+    public void CalculateClosestUnclaimedNeighbour(int playerControl)
+    {
+        NetworkNode prev = closestUnclaimed[playerControl];
         int? shortest = null;
         NetworkNode shortestNeighbour = null;
         foreach (NetworkEdge neighbourEdge in localEdges)
@@ -761,8 +892,13 @@ public class NetworkNode
         }
         if (shortest == null || shortestNeighbour == null)
         {
-            DefaultClosestNeighbour(this.playerControl);
-        }else
+            // if all its neighbours are claimed, ask its neighbours (recursively) to give their target node.
+
+            //closestUnclaimed[playerControl]  = GetClosestUnclaimedNotMe(playerControl, this);
+
+            DefaultClosestNeighbour(playerControl);
+        }
+        else
         {
             closestUnclaimed[playerControl] = shortestNeighbour;
             closestUnclaimedDistance[playerControl] = (int)shortest;
@@ -777,8 +913,9 @@ public class NetworkNode
         closestUnclaimed[player] = FindNearestUnclaimedBFS(this, player, 3);
         if(closestUnclaimed[player] == null)
         {
+            
             Debug.LogWarning($"Node {this.pos} unable to find closest unclaimed in DFS 3 steps");
-            closestUnclaimed[player] = this;
+            closestUnclaimed[player] = CPUManager.nodeVectorMap[MasterGrid.GetEnemyCommand(player)];
         }
     }
 
@@ -859,9 +996,9 @@ public class NetworkNode
         }
     }
 
-    public bool IsClaimableBy(BaseUnit unit)
+    public bool IsClaimableBy(int claimingPlayer)
     {
-        if (playerControl == unit.playerControl || hasPlayerClaimed[unit.playerControl])
+        if (playerControl == claimingPlayer || hasPlayerClaimed[claimingPlayer])
             return false;
         else
             return true;

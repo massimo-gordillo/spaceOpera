@@ -17,7 +17,7 @@ public class GameMaster : MonoBehaviour
     public TilemapManager tilemapManager;
     //private PrefabManager prefabManager = new PrefabManager();
     public SupabaseManager supabaseManager;
-    public CPUMananger CPUMananger;
+    public CPUManager CPUMananger;
     public Guid match_id;
 
     public Canvas canvas;
@@ -220,7 +220,7 @@ public class GameMaster : MonoBehaviour
             byte progeny = getPlayerProgeny((byte)player);
             List <BaseStructure> initProdStructures = masterGrid.GetProductionStructures(player);
             if (player != 1)
-                initProdStructures.Add(masterGrid.commandStructures[player]);
+                initProdStructures.Add(MasterGrid.commandStructures[player]);
             foreach (BaseStructure prod in initProdStructures)
             {
                 if (progeny == 0)

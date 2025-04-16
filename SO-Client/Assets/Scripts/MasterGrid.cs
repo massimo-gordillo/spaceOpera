@@ -54,7 +54,7 @@ public class MasterGrid : MonoBehaviour
 
     public List<BaseStructure> structuresList;
     public List<BaseStructure> prodStructuresList;
-    public BaseStructure[] commandStructures;
+    public static BaseStructure[] commandStructures;
 
     // Called by GameMaster
     public void startup(int x, int y, byte[] tilemapByteArray,
@@ -1808,6 +1808,27 @@ public class MasterGrid : MonoBehaviour
         //seed.playerControl = getPlayerTurn();
         seed.setNonExhausted(true);
         seed = gameMaster.GetInstantiateUnit(seed, pos, null);
+    }
+
+    public static Vector2Int GetEnemyCommand(int p)
+    {
+        if(GameMaster.numPlayers ==2)
+        {
+            if (p == 1)
+                return commandStructures[2].pos;
+            else if (p == 2)
+                return commandStructures[1].pos;
+            else
+            {
+                Debug.LogError("Asking to get Enemy Command for a player not 1 or 2");
+                return commandStructures[p].pos;
+            }
+        }
+        else
+        {
+            Debug.LogError("Get Enemy Command but more than 2 players");
+            return commandStructures[p].pos;
+        }
     }
 
     private IEnumerator waitGenerateSaveArrayToCSV()

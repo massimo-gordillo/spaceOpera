@@ -78,7 +78,7 @@ public class BaseStructure : MonoBehaviour
         }*/
         if (structureType == 5)
         {
-            masterGrid.commandStructures[playerControl] = this;
+            MasterGrid.commandStructures[playerControl] = this;
         }
 
     }
