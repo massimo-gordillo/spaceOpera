@@ -651,11 +651,12 @@ public class MasterGrid : MonoBehaviour
         foreach (var position in path)
         {
             Vector3 targetPosition = new Vector3(position.x, position.y, unit.transform.position.z);
-
             while (Vector3.Distance(unit.transform.position, targetPosition) > 0.01f)
             {
                 unit.transform.position = Vector3.MoveTowards(unit.transform.position, targetPosition, speed * Time.deltaTime);
                 yield return null; // Waits until next frame before continuing loop
+                if (unit == null)
+                    yield break;
             }
         }
 

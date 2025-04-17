@@ -18,7 +18,7 @@ public class CPUManager : MonoBehaviour
     public BaseUnit[,] unitGrid;
     public BaseStructure[,] structureGrid;
     public BaseStructure[] commandStructures;
-    public static NetworkNode[] defaultTargets = new NetworkNode[GameMaster.numPlayers + 1];
+    public static NetworkNode[] defaultTargets;
     public byte[,] terrainGrid;
     public static List<NetworkNode> networkNodes = new();
     public BaseStructure[] structureListArray;
@@ -167,21 +167,22 @@ public class CPUManager : MonoBehaviour
     public void SetDefaultTargets() //assuming two players for now.
     {
         commandStructures = new BaseStructure[GameMaster.numPlayers + 1];
+        defaultTargets = new NetworkNode[GameMaster.numPlayers + 1];
         for (int p=1; p<=GameMaster.numPlayers; p++)
         {
-            if(MasterGrid.commandStructures[p] != null)
-                Debug.Log($"Command structure for player {p} is {MasterGrid.commandStructures[p].pos}");
-            else
-                Debug.Log($"Command structure for player {p} is null");
             commandStructures[p] = MasterGrid.commandStructures[p];
+        }
+        for (int p = 1; p <= GameMaster.numPlayers; p++)
+        {
             if (p == 1)
             {
                 defaultTargets[p] = new NetworkNode(commandStructures[2]);
             }
-            else if (p == 2) 
+            else if (p == 2)
             {
                 defaultTargets[p] = new NetworkNode(commandStructures[1]);
-            }else
+            }
+            else
             {
                 Debug.LogWarning($"Player {p} being assigned a default target");
                 defaultTargets[p] = new NetworkNode(commandStructures[1]);
@@ -237,7 +238,7 @@ public class CPUManager : MonoBehaviour
 
         Vector2Int origin = node.pos;
 
-        //bool isCurious = origin == new Vector2Int(0, 0);
+        bool isCurious = origin == new Vector2Int(0, 0);
 
 
         int dist;
@@ -249,8 +250,8 @@ public class CPUManager : MonoBehaviour
             bool eastSet = node.Epair != null;
             bool westSet = node.Wpair != null;
 
-            /*            if (isCurious)
-                            Debug.Log($"checking {origin},         N: {northSet}       S: {southSet}      E: {eastSet}      W: {westSet}");*/
+            if (isCurious)
+                Debug.Log($"checking {origin},         N: {northSet}       S: {southSet}      E: {eastSet}      W: {westSet}");
             // Cardinal directions
             TrySetCardinal(ref northSet, new Vector2Int(0, 1));
             TrySetCardinal(ref southSet, new Vector2Int(0, -1));
@@ -328,10 +329,10 @@ public class CPUManager : MonoBehaviour
                         if (neighbor.Wpair == null) neighbor.Wpair = node;
                     }
 
-                    /*                    if (isCurious)
-                                        {
-                                            Debug.Log($"Pairing location: {origin} with location: {checkPos} with distance {dist} and offset {offsetVector}");
-                                        }*/
+                    if (isCurious)
+                    {
+                        Debug.Log($"Pairing location: {origin} with location: {checkPos} with distance {dist} and offset {offsetVector}");
+                    }
 
                     alreadySet = true;
                     break;
@@ -484,6 +485,8 @@ public class CPUManager : MonoBehaviour
 
         foreach (BaseUnit unit in MasterGrid.playerUnits[player])
         {
+            if (GameMaster.isGameComplete)
+                return;
             NetworkNode targetNode = unit.CPU_TargetNode;
             if (targetNode == null)
             {
@@ -502,15 +505,28 @@ public class CPUManager : MonoBehaviour
                 if (delta > 0)
                 {
                     List<Vector2Int> availPath = masterGrid.BidirectionalSearch(unit.pos, nodePos, unit, delta * 2);
+/*                    if (unit.pos == new Vector2Int(1, 1))
+                    {
+                        Debug.Log($"Checking avail path for {unit.pos} has count {availPath.Count}");
+                    }*/
                     if (availPath.Count > 0)
                     {
                         Vector2Int target = masterGrid.GetFurthestTileByMovement(availPath, unit.movementRange);
-                        if (target.magnitude != 0)
+                        /*                        if (unit.pos == new Vector2Int(1, 1))
+                                                {
+                                                    Debug.Log($"Setting target for {unit.pos} to {target}");
+                                                }*/
+                        if ((unit.pos - target).magnitude != 0)
                         {
+
+                            //Debug.Log($"Moving unit {unit.pos} to {target}");
                             masterGrid.selectedUnit = unit;
                             masterGrid.moveSelectedUnit(target);
 
                         }
+                        /*else
+                            Debug.Log($"Unit {unit.pos} has magnitude {(unit.pos - target).magnitude} to target {target}");
+                        */
                     }
                 }
                 delta = (int)((unit.pos - nodePos).magnitude);
@@ -674,12 +690,21 @@ public class CPUManager : MonoBehaviour
 
         }
         //very very hacky but hopefully works for now.
-        if (targetNode.closestUnclaimed[unit.playerControl].IsClaimableBy(unit.playerControl))
+/*        if (targetNode.closestUnclaimed[unit.playerControl].IsClaimableBy(unit.playerControl))
             targetNode.closestUnclaimed[unit.playerControl].ClaimByUnit(unit);
         else
         {
             Debug.LogWarning($"Unit {unit.pos} is being given assignment by {targetNode.pos} but a 1 step recursive call is still illegal");
+        }*/
+        if (unit.CPU_TargetNode == null)
+        {
+            Debug.LogError($"[Assignment Fail] Unit {unit.pos} ended up with no target node. Last attempted target was: {targetNode?.pos}");
         }
+/*        if(unit.CPU_TargetNode.pos == new Vector2Int(0, 0))
+        {
+            Debug.LogError($"Unit {unit.pos} is assigned to  {unit.CPU_TargetNode.pos}");
+
+        }*/
     }
 
     public static NetworkNode GetUnitAssignment(BaseUnit unit)
@@ -767,12 +792,21 @@ public class CPUManager : MonoBehaviour
     }
 
     public void AddEdge(Vector2Int a, Vector2Int b, NetworkNode nodeA, NetworkNode nodeB)
+
     {
+/*        bool isCurious = false;
+        if (nodeA.pos == new Vector2Int(0, 0) || nodeB.pos == new Vector2Int(0, 0))
+            isCurious = true;*/
+
         NetworkEdge newEdge = new NetworkEdge(nodeA, nodeB);
 
         // Check if the node already exists in the list (undirected graph, so vectorA-vectorB is the same as vectorB-vectorA)
         if (!networkEdges.Contains(newEdge))
         {
+/*            if (isCurious)
+            {
+                Debug.Log($"nodeA {nodeA.pos} creating edge with node B {nodeB.pos}");
+            }*/
             networkEdges.Add(newEdge);
             //Debug.Log($"Added node: {a} <-> {b} with distance: {newEdge.distance}");
             nodeA.AddEdge(newEdge, nodeB);
@@ -873,6 +907,10 @@ public class NetworkNode
     public NetworkNode(BaseStructure structure)
     {
         this.structure = structure;
+        if (structure == null)
+        {
+            Debug.LogWarning($"Structure for node is null at import");
+        }
         pos = structure.pos;
         isCaptured = structure.playerControl != 0;
         playerControl = structure.playerControl;
@@ -962,12 +1000,12 @@ public class NetworkNode
 
     public void CalculateClosestUnclaimedNeighbour(int playerControl)
     {
- /*       bool isCurious = false;
-        if(this.pos == new Vector2Int(11, 15))
+        bool isCurious = false;
+        if (this.pos == new Vector2Int(1, 1))
         {
             isCurious = true;
             Debug.Log($"isCurious {this.pos}");
-        }*/
+        }
         NetworkNode prev = closestUnclaimed[playerControl];
         int? shortest = null;
         NetworkNode shortestNeighbour = null;
@@ -975,10 +1013,10 @@ public class NetworkNode
         {
             NetworkNode neighbourNode = neighbourEdge.GetOtherNode(this);
             //Debug.Log($"Node {pos} says its neighbour is {neighbourNode.pos}, which player {playerControl} controls? {playerControl == neighbourNode.playerControl}. Has this player claimed it? {neighbourNode.hasPlayerClaimed[playerControl]}");
-/*            if (isCurious)
+            if (isCurious)
             {
                 Debug.Log($"Node {this.pos} is checking edge to {neighbourNode.pos}");
-            }*/
+            }
 
             if (!(neighbourNode.playerControl == playerControl || neighbourNode.hasPlayerClaimed[playerControl] ))
             {
@@ -987,10 +1025,10 @@ public class NetworkNode
 
                     shortest = neighbourEdge.distance;
                     shortestNeighbour = neighbourNode;
-/*                    if (isCurious)
+                    if (isCurious)
                     {
                         Debug.Log($"Node {this.pos} is adding a closest neighbour {shortestNeighbour.pos}");
-                    }*/
+                    }
                 }
             }
 
@@ -1088,7 +1126,7 @@ public class NetworkNode
             }
         }
 
-        Debug.Log($"No unclaimed node found in {maxSteps} for node {start.pos}, defaulting to {CPUManager.defaultTargets[player].pos}");
+        //Debug.Log($"No unclaimed node found in {maxSteps} for node {start.pos}, defaulting to {CPUManager.defaultTargets[player].pos}");
         return CPUManager.defaultTargets[player]; // No unclaimed node found within maxSteps
     }
 
@@ -1144,10 +1182,10 @@ public class NetworkNode
 
     public bool IsClaimableBy(int claimingPlayer)
     {
-        if (playerControl == claimingPlayer || hasPlayerClaimed[claimingPlayer])
-            return false;
-        else
+        if ((playerControl != claimingPlayer && !hasPlayerClaimed[claimingPlayer]) || (structure.structureType ==5 && structure.playerControl != claimingPlayer))
             return true;
+        else
+            return false;
     }
 
     public override bool Equals(object obj)

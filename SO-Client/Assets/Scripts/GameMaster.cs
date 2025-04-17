@@ -29,6 +29,7 @@ public class GameMaster : MonoBehaviour
     public static int numPlayers;
     public short turnNumber;
     private bool[] playersNotLost;
+    public static bool isGameComplete = false;
     /*public byte[] playerProgeny;*/
     Dictionary<byte, byte> playerProgeny = new Dictionary<byte, byte>();
     public TMP_Text playerTurnText;
@@ -118,7 +119,7 @@ public class GameMaster : MonoBehaviour
         }
         else {
             Debug.LogWarning("Progeny set to -1 selected, defaulting to hard values");
-            playerProgeny.Add(1, 1);
+            playerProgeny.Add(1, 0);
             playerProgeny.Add(2, 2);
         }
 
@@ -167,7 +168,10 @@ public class GameMaster : MonoBehaviour
 
 
         if (CPU_isOn)
+        {
+            CPU_PlayersList[1] = true;
             CPU_PlayersList[2] = true;
+        }
 
 
 
@@ -200,7 +204,11 @@ public class GameMaster : MonoBehaviour
             AnimateStartTurnCard(1);
 
         startupInstantiateUnits();
-        CPUMananger.naiveV1Start();
+
+        if (CPU_isOn)
+        {
+            StartCoroutine(WaitForCPUFirstTurn());
+        }
     }
 
     private IEnumerator CallConvertGameStateToList()
@@ -210,6 +218,17 @@ public class GameMaster : MonoBehaviour
         // Now it is safe to call ConvertGameStateToList
         //SaveGameStateListToFile(ConvertGameStateToList());
         //ConvertListToGameState(gameState);
+    }
+
+    private IEnumerator WaitForCPUFirstTurn()
+    {
+        yield return null;
+        CPUMananger.naiveV1Start();
+        if (CPU_isOn && CPU_PlayersList[playerTurn] && !isGameComplete)
+        {
+            Debug.Log($"Running player 1 CPU actions");
+            RunCPUForPlayer(playerTurn);
+        }
     }
 
     public void startupInstantiateUnits()
@@ -436,15 +455,20 @@ public class GameMaster : MonoBehaviour
         }
         masterGrid.refreshUnits(playerTurn);
 
-        if (CPU_isOn && CPU_PlayersList[playerTurn])
+        if (CPU_isOn && CPU_PlayersList[playerTurn] && !isGameComplete)
         {
-            CPUMananger.CommandUnits(playerTurn);
-            CPUMananger.CreateUnits(playerTurn);
+            RunCPUForPlayer(playerTurn);
         }
     }
 
+    public void RunCPUForPlayer(int playerTurn)
+    {
+        CPUMananger.CommandUnits(playerTurn);
+        CPUMananger.CreateUnits(playerTurn);
+    }
+
     
-public async void SubmitTurnToServer(List<GameAction> gameActions, long preTurnHash, long postTurnHash)
+    public async void SubmitTurnToServer(List<GameAction> gameActions, long preTurnHash, long postTurnHash)
     {
         bool success = await supabaseManager.SendSubmitTurn(gameActions, preTurnHash, postTurnHash);
     }
@@ -462,6 +486,8 @@ public async void SubmitTurnToServer(List<GameAction> gameActions, long preTurnH
 
     public void showUnitChoicePanel(bool attackableUnitsBool, bool capturableStructureBool, bool hasMoved)
     {
+        if (CPU_PlayersList[playerTurn]) //don't display player choices if it's a cpu player
+            return;
         //print(structure);
         if (attackableUnitsBool || capturableStructureBool )
         {
@@ -536,6 +562,7 @@ public async void SubmitTurnToServer(List<GameAction> gameActions, long preTurnH
             Debug.LogError($"Player {player} has won the game, this is a failcase");
         else
         {
+            isGameComplete = true;
             concedeMenuButton.interactable = false;
             backToMenuButton.interactable = true;
             endTurnButton.interactable = false;
@@ -764,10 +791,10 @@ public async void SubmitTurnToServer(List<GameAction> gameActions, long preTurnH
         ConcedePlayer(playerTurn);
     }
 
-    public void ConcedePlayer(int i)
+    public void ConcedePlayer(int p)
     {
-        playersNotLost[playerTurn] = false;
-        if(i == playerTurn)
+        playersNotLost[p] = false;
+        if(p == playerTurn)
         {
             endTurnButtonPressed();
         }
@@ -779,8 +806,9 @@ public async void SubmitTurnToServer(List<GameAction> gameActions, long preTurnH
         int? winner = null;
         int playerNotLostCount = 0;
 
-        for (int i = 1; i < playersNotLost.Length; i++)
+        for (int i = 1; i <= GameMaster.numPlayers; i++)
         {
+            //Debug.LogError($"PlayersNotLost {i} = {playersNotLost[i]}");
             if (playersNotLost[i] == true)
             {
                 playerNotLostCount++;
@@ -788,7 +816,7 @@ public async void SubmitTurnToServer(List<GameAction> gameActions, long preTurnH
             }
         }
 
-        if (winner!=null && playerNotLostCount == 1)
+        if (winner!=null && playerNotLostCount == GameMaster.numPlayers - 1)
         {
             playerWins((int)winner);
         }else if(playerNotLostCount > 1)
