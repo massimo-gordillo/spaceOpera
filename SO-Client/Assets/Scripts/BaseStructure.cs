@@ -49,8 +49,7 @@ public class BaseStructure : MonoBehaviour
     void Start()
     {
         gamePieceId = 200 + structureType; //structure ids start at 200.
-        pos.x = (int)transform.position.x;
-        pos.y = (int)transform.position.y;
+        pos = new Vector2Int((int)transform.position.x, (int)transform.position.y);
         //private GameObject boxColliderComponent;
         gameMaster = GameObject.FindGameObjectWithTag("GameMasterTag").GetComponent<GameMaster>();
         maxCaptureHealth = 200;
@@ -178,7 +177,7 @@ public class BaseStructure : MonoBehaviour
                 captureHealth -= percentCapturing;
             else
                 switchAlliance(playerCapturing);
-            Debug.Log("capture health: " + captureHealth + "selectedUnithealth " + percentCapturing);
+            //Debug.Log("capture health: " + captureHealth + "selectedUnithealth " + percentCapturing);
             setCaptureHealth(captureHealth);
         }else
             Debug.LogError("Player " + playerCapturing + " tried to capture their own structure");

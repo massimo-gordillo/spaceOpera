@@ -165,8 +165,8 @@ public class CameraDrag : MonoBehaviour
     {
        
         RaycastHit2D hit = Physics2D.Raycast(cam.ScreenToWorldPoint(position), Vector2.zero);
-        if (hit.collider == null)
-            Debug.LogWarning("hit collider is null");
+/*        if (hit.collider == null)
+            Debug.LogWarning("hit collider is null");*/
         return hit.collider != null && hit.collider.GetComponent<ClickableObject>() != null;
     }
 

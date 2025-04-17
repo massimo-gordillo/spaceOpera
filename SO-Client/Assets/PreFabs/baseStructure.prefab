@@ -49,8 +49,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerControl: 0
   masterGrid: {fileID: 0}
-  xPos: 0
-  yPos: 0
+  pos: {x: 0, y: 0}
   structureType: 0
   gamePieceId: 0
   spriteCollider: {fileID: 2724731784728969787}
@@ -86,7 +85,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8840128176492631792}
-  - component: {fileID: 7693159705326949257}
   - component: {fileID: 2111772904530830076}
   - component: {fileID: 8286427615747728223}
   m_Layer: 5
@@ -116,14 +114,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0.04498291, y: 0.02999878}
   m_SizeDelta: {x: 0.8, y: 0.19999999}
   m_Pivot: {x: 1, y: 1}
---- !u!222 &7693159705326949257
-CanvasRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1456300835492126892}
-  m_CullTransparentMesh: 1
 --- !u!23 &2111772904530830076
 MeshRenderer:
   m_ObjectHideFlags: 0

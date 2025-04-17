@@ -319,6 +319,30 @@ public class GameMaster : MonoBehaviour
             print("You must mine more minerals!");
     }
 
+    public void ProduceBaseUnit(BaseStructure prod, int player)
+    {
+        if (masterGrid.whatUnitIsInThisLocation(prod.pos) != null)
+            return;
+
+        if (playerResources[player] >= 100) //assumes base unit cost 100
+        {
+            selectedStructure = prod;
+            int progeny = getPlayerProgeny((byte)player);
+            if (progeny == 0)
+            {
+                ProduceUnit(PrefabManager.getBaseUnitFromName("Infantry", 0), player, false);
+            }
+            if (progeny == 1)
+            {
+                ProduceUnit(PrefabManager.getBaseUnitFromName("Spore", 1), player, true); //true for virix in current implementation
+            }
+            if (progeny == 2)
+            {
+                ProduceUnit(PrefabManager.getBaseUnitFromName("Blacksmith", 2), player, false);
+            }
+        }
+    }
+
     public void ProduceUnit(BaseUnit unit, int playerControl, bool isNonExhausted)
     {
         playerResources[playerTurn] -= unit.price;
@@ -370,6 +394,11 @@ public class GameMaster : MonoBehaviour
                 }
             }
         }
+        StartTurn();
+    }
+
+    public void StartTurn()
+    {
 
         int i = -1;
         do
@@ -385,7 +414,7 @@ public class GameMaster : MonoBehaviour
             playerWins(-1); //error case
         turnNumber++;
 
-        if(isAnimating)
+        if (isAnimating)
             AnimateStartTurnCard(playerTurn);
 
         setPlayerTurnText(playerTurn);
@@ -396,23 +425,21 @@ public class GameMaster : MonoBehaviour
         //special virix handling
         if (getPlayerProgeny((byte)playerTurn) == 1)
         {
-            foreach(BaseStructure structure in masterGrid.GetProductionStructures(playerTurn)){
+            foreach (BaseStructure structure in masterGrid.GetProductionStructures(playerTurn))
+            {
                 //create a virix spore on all production structures except on the first turn.
                 if (turnNumber > numPlayers)
                 {
-                    selectedStructure = structure;
-                    if (masterGrid.whatUnitIsInThisLocation(structure.pos) == null)
-                        ProduceUnit(PrefabManager.getBaseUnitFromName("spore", 1), playerTurn, true);
+                    ProduceBaseUnit(structure, playerTurn);
                 }
-
-
             }
         }
         masterGrid.refreshUnits(playerTurn);
 
-        if(CPU_isOn && CPU_PlayersList[playerTurn])
+        if (CPU_isOn && CPU_PlayersList[playerTurn])
         {
             CPUMananger.CommandUnits(playerTurn);
+            CPUMananger.CreateUnits(playerTurn);
         }
     }
 
@@ -773,5 +800,10 @@ public async void SubmitTurnToServer(List<GameAction> gameActions, long preTurnH
             Debug.LogError("No players have not lost");
         }
 
+    }
+
+    public int GetPlayerResources(int p)
+    {
+        return playerResources[p];
     }
 }
