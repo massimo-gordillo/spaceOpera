@@ -1,10 +1,7 @@
 using UnityEngine;
 using System.Reflection;
-using UnityEngine.U2D;
-using System.Diagnostics;
 using System;
 using System.Collections.Generic;
-//using System.Diagnostics;
 
 public class PrefabManager
 {
@@ -33,6 +30,11 @@ public class PrefabManager
             string basePrefabPath = "UnitPrefabs/BaseUnitBasePrefab";
             ClonePrefab(basePrefabPath, prefabPath);
             modifyPrefab(prefabPath, unitAttributes);
+        }
+
+        if (prefab != null) {
+            //Debug.Log($"popoulating unit price list for progeny num {(int)prefab.progeny}");
+            GameMaster.unitCosts[(int)prefab.progeny].Add((prefab, prefab.price));
         }
 /*        else
         {

@@ -2,14 +2,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
-using System.Linq;
-
-
-//using Unity.Mathematics;
 using UnityEngine;
-using static UnityEngine.GraphicsBuffer;
 
 
 public class CPUManager : MonoBehaviour
@@ -20,7 +14,9 @@ public class CPUManager : MonoBehaviour
     public BaseStructure[] commandStructures;
     public static NetworkNode[] defaultTargets;
     public byte[,] terrainGrid;
-    public static List<NetworkNode> networkNodes = new();
+    public static List<NetworkNode> resourceNetworkNodes = new();
+    public static List<NetworkNode> priorityNetworkNodes = new();
+    public static List<NetworkNode> priorityNetworkNodesAir = new();
     public BaseStructure[] structureListArray;
     public double[,] structuresEuclideanDistance;
     //List<Vector2Int> structLocs;
@@ -87,8 +83,13 @@ public class CPUManager : MonoBehaviour
         foreach (BaseStructure structure in structureList)
         {
             NetworkNode node = new NetworkNode(structure);
-            networkNodes.Add(node);
+            resourceNetworkNodes.Add(node);
             nodeVectorMap.Add(node.pos, node);
+            if(structure.structureType != 0)
+            {
+                NetworkNode priorityNode = new NetworkNode(structure);
+                priorityNetworkNodesAir.Add(priorityNode);
+            }
             //structureListArray[i] = structure;
             //i++;
         }
@@ -100,9 +101,14 @@ public class CPUManager : MonoBehaviour
         //GenerateNaiveStructureNetwork();
         //ExportVerticiesToCSV();
 
-        foreach (NetworkNode n in networkNodes)
+        foreach (NetworkNode n in resourceNetworkNodes)
         {
             ConnectStructurePairs(n, 6); //specifically 6 as it's two infantry traverse distances
+        }
+
+        foreach(NetworkNode n in priorityNetworkNodesAir)
+        {
+            ConnectStructurePairs(n, (int)((gameMaster.gridX + gameMaster.gridY)/2));
         }
         
 
@@ -126,7 +132,7 @@ public class CPUManager : MonoBehaviour
             HashSet<NetworkNode> visited = new HashSet<NetworkNode>();
 
             // First pass: assign closestUnclaimed to direct neighbors
-            foreach (NetworkNode n in networkNodes)
+            foreach (NetworkNode n in resourceNetworkNodes)
             {
                 n.CalculateClosestUnclaimedNeighbour(p);
                 if (n.closestUnclaimed[p] != null)
@@ -155,7 +161,7 @@ public class CPUManager : MonoBehaviour
             }
 
             // Optional: Warn if any nodes still didn't get assigned
-            foreach (NetworkNode n in networkNodes)
+            foreach (NetworkNode n in resourceNetworkNodes)
             {
                 if (n.closestUnclaimed[p] == null)
                 {
@@ -190,13 +196,111 @@ public class CPUManager : MonoBehaviour
         }
     }
 
+    public void CollectPotentialGameActions(BaseUnit unit)
+    {
+        Queue<(Vector2Int cell, int range)> cellsToCheck = new Queue<(Vector2Int, int)>();
+        bool[,] checkedCells = new bool[masterGrid.gridX + 2, masterGrid.gridY + 2];
+        checkedCells[unit.pos.x + 1, unit.pos.y + 1] = true;
+        cellsToCheck.Enqueue((new Vector2Int(unit.pos.x + 1, unit.pos.y + 1), unit.movementRange + 1));//assuming unit only has 1 attack range for the first vectorA* search.
+        List<Queue<Vector2Int>> squareQueuesList = null;
+        if (unit.attackRange >= 1)
+            squareQueuesList = masterGrid.AStarSearchRecursive(unit, unit.movementRange, 1, cellsToCheck, checkedCells, new List<Queue<Vector2Int>> { new Queue<Vector2Int>(), new Queue<Vector2Int>(), new Queue<Vector2Int>() });
+        //masterGrid.ManualTestAndPrintLogQueueSizes(squareQueuesList);
+        //Debug.LogError($"unit {unit.pos} has printed it's queue sizes ^");
+        Queue<Vector2Int> movementQueue = squareQueuesList[0];
+        Queue<Vector2Int> attackQueue = squareQueuesList[1];
+        Queue<Vector2Int> structureQueue = squareQueuesList[2];
+
+        List<BaseUnit> attackableUnitList = new List<BaseUnit>();
+        foreach(Vector2Int attackSquare in attackQueue)
+        {
+            BaseUnit attackable = masterGrid.whatUnitIsInThisLocation(attackSquare);
+            if(attackable != null)
+            {
+                if (masterGrid.canUnitAttack(unit, attackable))
+                {
+                    attackableUnitList.Add(attackable);
+                }
+            }
+
+        }
+        foreach (BaseUnit attack in attackableUnitList)
+        {
+            Debug.Log($"Unit {unit.pos} can attack {attack.pos}");
+        }
+        List<BaseStructure> structureList = new List<BaseStructure>();
+        List<BaseStructure> capturableStructureList = new List<BaseStructure>();
+        List<BaseUnit> capturingUnitList = new List<BaseUnit>();
+        foreach(Vector2Int structureLoc in structureQueue)
+        {
+            BaseStructure structure = masterGrid.whatStructureIsInThisLocation(structureLoc);
+            BaseUnit unitAtLoc = masterGrid.whatUnitIsInThisLocation(structureLoc);
+            if (structure != null)
+                structureList.Add(structure);
+            if (structure != null && unit.playerControl != structure.playerControl)
+                capturableStructureList.Add(structure);
+            if (structure != null && unitAtLoc != null && unitAtLoc.CPU_IsCapturing && masterGrid.canUnitAttack(unit, unitAtLoc))
+                capturingUnitList.Add(unitAtLoc);
+        }
+        ChooseGameAction(unit);
+
+        void ChooseGameAction(BaseUnit unit)
+        {
+            if (!unit.isResourceUnit)
+            {
+                if (attackableUnitList.Count > 0)
+                {
+                    BaseUnit candidate = null;
+                    double mostDamage = 0;
+                    foreach (BaseUnit attackableUnit in attackableUnitList)
+                    {
+                        double damage = masterGrid.getDamageBeforeLuck(unit, attackableUnit, false);
+                        if(damage > mostDamage)
+                        {
+                            candidate = attackableUnit;
+                            mostDamage = damage;
+                        }
+                    }
+                    if (candidate != null)
+                    {
+                        Vector2Int diffV = unit.pos - candidate.pos;
+                        int diff = Math.Abs(diffV.x) + Math.Abs(diffV.y);
+                        if(diff > 1 && diff<=unit.movementRange)
+                        {
+                            List<Vector2Int> path = masterGrid.BidirectionalSearch(unit.pos, candidate.pos, unit, ((unit.movementRange + unit.movementRange % 2) / 2 + 1));
+                            masterGrid.selectedUnit = unit;
+                            masterGrid.moveSelectedUnit(GetAdjacentPosFromBidirectionalSearch(path, candidate.pos));
+                            masterGrid.unitCombat(unit, candidate);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    public Vector2Int GetAdjacentPosFromBidirectionalSearch(List<Vector2Int> path, Vector2Int target)
+    {
+        for (int i = path.Count - 1; i >= 0; i--)
+        {
+            Vector2Int pos = path[i];
+            int manhattanDist = Mathf.Abs(pos.x - target.x) + Mathf.Abs(pos.y - target.y);
+            if (manhattanDist == 1)
+            {
+                return pos;
+            }
+        }
+
+        Debug.LogWarning($"No adjacent tile found near {target} in path of length {path.Count}. Returning unit's current position as fallback.");
+        return path.Count > 0 ? path[0] : target; // fallback to unit.pos if needed
+    }
+
 
     public void InitClosestNeighbour()
     {
         for (int p = 1; p <= GameMaster.numPlayers; p++)
         {
             List<NetworkNode> nodesWithNoNeighbours = new List<NetworkNode>();
-            foreach (NetworkNode n in networkNodes)
+            foreach (NetworkNode n in resourceNetworkNodes)
             {
                 n.CalculateClosestUnclaimedNeighbour(p);
                 if (n.closestUnclaimed[p] == null)
@@ -238,7 +342,7 @@ public class CPUManager : MonoBehaviour
 
         Vector2Int origin = node.pos;
 
-        bool isCurious = origin == new Vector2Int(0, 0);
+        //bool isCurious = origin == new Vector2Int(0, 0);
 
 
         int dist;
@@ -250,8 +354,9 @@ public class CPUManager : MonoBehaviour
             bool eastSet = node.Epair != null;
             bool westSet = node.Wpair != null;
 
-            if (isCurious)
-                Debug.Log($"checking {origin},         N: {northSet}       S: {southSet}      E: {eastSet}      W: {westSet}");
+            /* if (isCurious)
+                 Debug.Log($"checking {origin},         N: {northSet}       S: {southSet}      E: {eastSet}      W: {westSet}");
+             */
             // Cardinal directions
             TrySetCardinal(ref northSet, new Vector2Int(0, 1));
             TrySetCardinal(ref southSet, new Vector2Int(0, -1));
@@ -329,10 +434,10 @@ public class CPUManager : MonoBehaviour
                         if (neighbor.Wpair == null) neighbor.Wpair = node;
                     }
 
-                    if (isCurious)
+/*                    if (isCurious)
                     {
                         Debug.Log($"Pairing location: {origin} with location: {checkPos} with distance {dist} and offset {offsetVector}");
-                    }
+                    }*/
 
                     alreadySet = true;
                     break;
@@ -487,6 +592,7 @@ public class CPUManager : MonoBehaviour
         {
             if (GameMaster.isGameComplete)
                 return;
+            CollectPotentialGameActions(unit);
             NetworkNode targetNode = unit.CPU_TargetNode;
             if (targetNode == null)
             {
@@ -553,22 +659,117 @@ public class CPUManager : MonoBehaviour
         }
     }
 
-    public void CreateUnits(int player)
+    public void CreateUnits(int player, int progeny)
     {
         //simple make base unit check
+        List<BaseStructure> structures = masterGrid.GetStructures(player);
         List<BaseStructure> prods = masterGrid.GetProductionStructures(player);
         int cash = gameMaster.GetPlayerResources(player);
-        foreach (BaseStructure structure in prods) 
-        { 
-            if(structure.playerControl == player && structure.structureType == 1)
+        List<BaseStructure> factories = new();
+        List<BaseStructure> airports = new();
+        List<(BaseUnit, int)> factoryProdList = new();
+        List<(BaseUnit, int)> airportProdList = new();
+        if (progeny == 0)
+        {
+/*            int factoryCount = 0;
+            int airportCount = 0;*/
+            foreach (BaseStructure structure in prods)
             {
-                //Debug.Log($"Creating base unit for {player} at {structure.pos}, they have progeny {gameMaster.getPlayerProgeny((byte)player)}");
-                if(gameMaster.getPlayerProgeny((byte)player) != 1)
-                    gameMaster.ProduceBaseUnit(structure, player);
+                if (structure.structureType == 1)
+                    factories.Add(structure);
+                if (structure.structureType == 2)
+                    airports.Add(structure);
             }
+            GenerateSpendErtrian();
+/*            foreach (BaseStructure structure in prods)
+            {
+                if (structure.playerControl == player && structure.structureType == 1)
+                {
+                    //Debug.Log($"Creating base unit for {player} at {structure.pos}, they have progeny {gameMaster.getPlayerProgeny((byte)player)}");
+                    if (gameMaster.getPlayerProgeny((byte)player) != 1)
+                        gameMaster.ProduceBaseUnit(structure, player);
+                }
+            }*/
         }
 
-    }
+        void GenerateSpendErtrian()
+        {
+            List<(BaseUnit, int)> priceList = GameMaster.unitCosts[0];
+
+
+            int cashRemain = cash - 100 * factories.Count;
+
+            foreach ((BaseUnit unit, int price) in priceList)
+            {
+                if (unit.unitTerrainType == UnitTerrainType.Land)
+                    factoryProdList.Add((unit, price));
+                if (unit.unitTerrainType == UnitTerrainType.Air)
+                    airportProdList.Add((unit, price));
+            }
+            if (airports.Count > 0)
+                foreach (BaseStructure airport in airports)
+                {
+                    BaseUnit candidateAirUnit = null;
+                    int highestPrice = 0;
+                    foreach ((BaseUnit unit, int price) in airportProdList)
+                    {
+                        if (price < cashRemain && price > highestPrice)
+                        {
+                            highestPrice = price;
+                            candidateAirUnit = unit;
+                        }
+                    }
+                    if (candidateAirUnit != null)
+                    {
+                        gameMaster.selectedStructure = airport;
+                        gameMaster.ProduceUnit(candidateAirUnit, player, false);
+                        cashRemain -= candidateAirUnit.price;
+                    }
+                }
+            if (factories.Count > 0)
+            {
+                //gameMaster.selectedStructure = factories[0];
+                gameMaster.ProduceBaseUnit(factories[0], player);
+                for (int i = 1; i < factories.Count; i++)
+                {
+                    BaseUnit candidateFactoryUnit = null;
+                    int highestPrice = 0;
+                    foreach ((BaseUnit unit, int price) in factoryProdList)
+                    {
+                        if ((price - 100) < cashRemain && price > highestPrice)
+                        {
+                            highestPrice = price;
+                            candidateFactoryUnit = unit;
+                            Debug.Log($"setting {unit.name} to candidate unit");
+                        }
+                    }
+                    if (candidateFactoryUnit != null)
+                    {
+                        Debug.Log($"Unit {candidateFactoryUnit.unitName} has price {candidateFactoryUnit.price} compared to cash {cashRemain}");
+                        gameMaster.selectedStructure = factories[i];
+                        gameMaster.ProduceUnit(candidateFactoryUnit, player, false);
+                        cashRemain -= (candidateFactoryUnit.price - 100);
+                    }
+                }
+                /*            if(factories.Count == 1)
+                            {
+                                //produceBaseUnit
+                                //cashRemain = cashRemain;
+                            }else
+                            {
+
+                            }*/
+
+            }
+
+        }
+
+
+
+}
+    
+
+
 
 
 
@@ -710,7 +911,7 @@ public class CPUManager : MonoBehaviour
     public static NetworkNode GetUnitAssignment(BaseUnit unit)
     {
 
-        NetworkNode currentNode = networkNodes.Find(n => n.pos == unit.pos);
+        NetworkNode currentNode = resourceNetworkNodes.Find(n => n.pos == unit.pos);
 
         if (currentNode == null)
         {
@@ -726,7 +927,7 @@ public class CPUManager : MonoBehaviour
         NetworkNode closestNode = null;
         int closestDistance = int.MaxValue;
 
-        foreach (var node in networkNodes)
+        foreach (var node in resourceNetworkNodes)
         {
             int distance = Mathf.Abs(node.pos.x - targetPos.x) + Mathf.Abs(node.pos.y - targetPos.y); // Manhattan distance
 
@@ -822,384 +1023,4 @@ public class CPUManager : MonoBehaviour
 
 }
 
-public class NetworkEdge
-{
-    public NetworkNode nodeA { get; private set; }
-    public NetworkNode nodeB { get; private set; }
-    public Vector2Int vectorA { get; private set; }
-    public Vector2Int vectorB { get; private set; }
 
-    public Vector2Int relativeVector;
-    public int distance { get; set; }
-
-    public bool isLandAccessible = true;
-
-    // Constructor to initialize the NetworkEdge
-    public NetworkEdge(NetworkNode A, NetworkNode B)
-    {
-        nodeA = A;
-        nodeB = B;
-        vectorA = A.pos;
-        vectorB = B.pos;
-        relativeVector = vectorA - vectorB;
-        distance = Mathf.Abs(relativeVector.x) + Mathf.Abs(relativeVector.y);
-        //distance = CalculateManhattanDistance(vectorA, vectorB);
-    }
-
-    // Method to calculate Manhattan distance
-/*    private int CalculateManhattanDistance(Vector2Int a, Vector2Int b)
-    {
-        return Mathf.Abs(a.x - b.x) + Mathf.Abs(a.y - b.y);
-    }
-*/
-    // Override Equals to ensure that edges are treated the same regardless of order
-    public override bool Equals(object obj)
-    {
-        if (obj is NetworkEdge edge)
-        {
-            return (vectorA == edge.vectorA && vectorB == edge.vectorB) || (vectorA == edge.vectorB && vectorB == edge.vectorA);
-        }
-        return false;
-    }
-
-    // Override GetHashCode to ensure consistent hashing for equal edges
-    public override int GetHashCode()
-    {
-        // Combine the hash codes of vectorA and vectorB, ensuring order doesn't matter
-        return vectorA.GetHashCode() ^ vectorB.GetHashCode();
-    }
-
-    public NetworkNode GetOtherNode(NetworkNode notMe)
-    {
-        //Debug.Log($"Edge {vectorA} to {vectorB} is being asked to provide NOT {lonelyNode.pos} between {nodeA.pos} and {nodeB.pos}");
-        if (notMe.Equals(nodeA)) //using the overridden equals function. I should /maybe/ double check I'm not making a bunch of duplicates, maybe I should pull them from the node list.
-            return nodeB;
-        else if (notMe.Equals(nodeB))
-            return nodeA;
-        else
-        {
-            Debug.LogError($"Edge {vectorA},{vectorB} being asked to return a pair node but foreign node provided");
-            return null;
-        }
-    }
-}
-
-public class NetworkNode
-{ //we're gonna assume only 2 players for now, rather not make arrays of lists.... Nevermind.
-
-    public List<NetworkEdge> localEdges = new();
-    public List<NetworkNode> localNodes = new();
-    public NetworkNode[] closestUnclaimed = new NetworkNode[GameMaster.numPlayers+1];
-    public int[] closestUnclaimedDistance = new int[GameMaster.numPlayers + 1];
-    public BaseStructure structure;
-    public Vector2Int pos;
-    public BaseUnit[] claimingUnits = new BaseUnit[GameMaster.numPlayers + 1];
-    public bool isCaptured;
-    public int playerControl;
-    public bool[] hasPlayerClaimed = new bool[GameMaster.numPlayers + 1];
-    //public List<NetworkNode>[] pointingNodes = new List<NetworkNode>[GameMaster.numPlayers]; //list of nodes which see me as their closest unclaimed neighbour
-
-    public NetworkNode Npair;
-    public NetworkNode Spair;
-    public NetworkNode Wpair;
-    public NetworkNode Epair;
-
-    public NetworkNode(BaseStructure structure)
-    {
-        this.structure = structure;
-        if (structure == null)
-        {
-            Debug.LogWarning($"Structure for node is null at import");
-        }
-        pos = structure.pos;
-        isCaptured = structure.playerControl != 0;
-        playerControl = structure.playerControl;
-    }
-
-    public void AddEdge(NetworkEdge networkEdge, NetworkNode localNode)
-    {
-        localEdges.Add(networkEdge);
-        localNodes.Add(localNode);
-    }
-
-    public void ClaimByUnit(BaseUnit unit)
-    {
-        if (IsClaimableBy(unit.playerControl)){
-            unit.CPU_TargetNode = this;
-            unit.CPU_Heading = this.pos;
-            int playerClaiming = unit.playerControl;
-            claimingUnits[playerClaiming] = unit;
-            hasPlayerClaimed[playerClaiming] = true;
-            foreach (NetworkNode neighbour in localNodes)
-            {
-                NeighbourHasSetThemselvesClaimed(this, playerClaiming, true);
-                if (neighbour.closestUnclaimed[playerClaiming] == null)
-                    neighbour.closestUnclaimed[playerClaiming] = this.closestUnclaimed[playerClaiming];
-            }
-        }else
-        {
-            Debug.LogWarning($"Node {this.pos} trying to be claimed by unit {unit.pos} but not legal to be claimed, recomputing");
-        }
-    }
-
-    public void NeighbourHasSetThemselvesClaimed(NetworkNode neighbour, int playerControl, bool captured)
-    {
-        if(captured)
-            if (closestUnclaimed[playerControl] == neighbour)
-            {
-                CalculateClosestUnclaimedNeighbour(playerControl);
-            }
-        else //losing control
-            {
-                //in theory we could have a dict of nodes, edge, and raw vector distance but this shorthand is ok for now.
-                CalculateClosestUnclaimedNeighbour(playerControl);
-            }
-    }
-
-    //this implementation had an issue where nodes down the chain didn't know if a non-naitive node swaped from claimed to unclaimed. I would need to also track which nodes are pointing to me.
-    /*public NetworkNode GetClosestUnclaimedNotMe(int playerControl, NetworkNode lonelyNode)
-    {
-        Queue<NetworkNode> queue = new Queue<NetworkNode>();
-        HashSet<NetworkNode> visited = new HashSet<NetworkNode>();
-
-        queue.Enqueue(this);
-        visited.Add(this);
-
-        while (queue.Count > 0)
-        {
-            NetworkNode current = queue.Dequeue();
-
-            // If current has a known unclaimed and it's not the lonely node
-            if (current.closestUnclaimed[playerControl] != null && current.closestUnclaimed[playerControl] != lonelyNode && current.closestUnclaimed[playerControl].IsClaimableBy(playerControl))
-            {
-                lonelyNode.closestUnclaimed[playerControl] = current.closestUnclaimed[playerControl];
-                return current.closestUnclaimed[playerControl];
-            }
-
-            // Enqueue neighbors
-            foreach (var edge in current.localEdges.OrderBy(e => e.distance))
-            {
-                NetworkNode neighbor = edge.GetOtherNode(current);
-                if (neighbor == null || visited.Contains(neighbor))
-                    continue;
-
-                queue.Enqueue(neighbor);
-                visited.Add(neighbor);
-            }
-        }
-
-        // If we get here, no valid unclaimed was found
-        Debug.LogWarning($"No closest unclaimed found for lonely node at {lonelyNode.pos} for player {playerControl}");
-        return null;
-    }*/
-
-
-   
-
-
-
-    public void CalculateClosestUnclaimedNeighbour(int playerControl)
-    {
-        bool isCurious = false;
-        if (this.pos == new Vector2Int(1, 1))
-        {
-            isCurious = true;
-            Debug.Log($"isCurious {this.pos}");
-        }
-        NetworkNode prev = closestUnclaimed[playerControl];
-        int? shortest = null;
-        NetworkNode shortestNeighbour = null;
-        foreach (NetworkEdge neighbourEdge in localEdges)
-        {
-            NetworkNode neighbourNode = neighbourEdge.GetOtherNode(this);
-            //Debug.Log($"Node {pos} says its neighbour is {neighbourNode.pos}, which player {playerControl} controls? {playerControl == neighbourNode.playerControl}. Has this player claimed it? {neighbourNode.hasPlayerClaimed[playerControl]}");
-            if (isCurious)
-            {
-                Debug.Log($"Node {this.pos} is checking edge to {neighbourNode.pos}");
-            }
-
-            if (!(neighbourNode.playerControl == playerControl || neighbourNode.hasPlayerClaimed[playerControl] ))
-            {
-                if ((shortest == null || neighbourEdge.distance < shortest )&& neighbourEdge.isLandAccessible) //MG 25-04-11: what if they tie?
-                {
-
-                    shortest = neighbourEdge.distance;
-                    shortestNeighbour = neighbourNode;
-                    if (isCurious)
-                    {
-                        Debug.Log($"Node {this.pos} is adding a closest neighbour {shortestNeighbour.pos}");
-                    }
-                }
-            }
-
-        }
-        if (shortest == null || shortestNeighbour == null)
-        {
-            // if all its neighbours are claimed, ask its neighbours (recursively) to give their target node.
-
-            //closestUnclaimed[playerControl]  = GetClosestUnclaimedNotMe(playerControl, this);
-
-            DefaultClosestNeighbour(playerControl);
-        }
-        else
-        {
-            closestUnclaimed[playerControl] = shortestNeighbour;
-            closestUnclaimedDistance[playerControl] = (int)shortest;
-            //Debug.Log($"Node {pos} says its closest unclaimed neighbour for player {playerControl} is {shortestNeighbour.pos}");
-        }
-    }
-
-    public void DefaultClosestNeighbour(int player)
-    {
-        //some DFS
-        //closestUnclaimed[player] = this;
-        closestUnclaimed[player] = FindNearestUnclaimedBFS(this, player);
-        if(closestUnclaimed[player] == null)
-        {
-            
-            Debug.LogWarning($"Node {this.pos} unable to find closest unclaimed in DFS 3 steps");
-            closestUnclaimed[player] = CPUManager.nodeVectorMap[MasterGrid.GetEnemyCommand(player)];
-        }
-    }
-
-    /*public NetworkNode FindNearestUnclaimedDFS(NetworkNode current, int player, int remainingSteps, HashSet<NetworkNode> visited)
-    {
-        if (current == null || remainingSteps < 0 || visited.Contains(current))
-            return null;
-
-        visited.Add(current);
-
-        // Found an unclaimed node
-        if (!current.hasPlayerClaimed[player])
-            return current;
-
-        // Sort neighbors by closeness (optional, can use other heuristics)
-        var sortedNeighbors = current.localEdges
-            .Where(edge => !visited.Contains(edge.GetOtherNode(current)))
-            .OrderBy(edge => edge.distance)
-            .Select(edge => edge.GetOtherNode(current))
-            .ToList();
-
-
-        foreach (var neighbor in sortedNeighbors)
-        {
-            var result = FindNearestUnclaimedDFS(neighbor, player, remainingSteps - 1, visited);
-            if (result != null)
-                return result;
-        }
-
-        return null;
-    }*/
-
-    public NetworkNode FindNearestUnclaimedBFS(NetworkNode start, int player)
-    {
-        int maxSteps = 4; // override for now
-        if (start == null) return null;
-
-        Queue<(NetworkNode node, int steps)> queue = new Queue<(NetworkNode, int)>();
-        HashSet<NetworkNode> visited = new HashSet<NetworkNode>();
-
-        queue.Enqueue((start, 0));
-        visited.Add(start);
-
-        while (queue.Count > 0)
-        {
-            var (current, steps) = queue.Dequeue();
-
-            if (!current.hasPlayerClaimed[player] && current.IsClaimableBy(player))
-                return current;
-
-            if (steps >= maxSteps)
-                continue;
-
-            foreach (var edge in current.localEdges)
-            {
-                if (!edge.isLandAccessible)
-                    continue;
-
-                NetworkNode neighbor = edge.GetOtherNode(current);
-                if (neighbor != null && !visited.Contains(neighbor))
-                {
-                    visited.Add(neighbor);
-                    queue.Enqueue((neighbor, steps + 1));
-                }
-            }
-        }
-
-        //Debug.Log($"No unclaimed node found in {maxSteps} for node {start.pos}, defaulting to {CPUManager.defaultTargets[player].pos}");
-        return CPUManager.defaultTargets[player]; // No unclaimed node found within maxSteps
-    }
-
-
-    /*    public NetworkNode FindNearestUnclaimedBFS(NetworkNode start, int player, int maxSteps)
-        {
-            maxSteps = 4; //override for now
-            if (start == null) return null;
-
-            Queue<(NetworkNode node, int steps)> queue = new Queue<(NetworkNode, int)>();
-            HashSet<NetworkNode> visited = new HashSet<NetworkNode>();
-
-            queue.Enqueue((start, 0));
-            visited.Add(start);
-
-            while (queue.Count > 0)
-            {
-                var (current, steps) = queue.Dequeue();
-
-                if (!current.hasPlayerClaimed[player] && current.IsClaimableBy(player))
-                    return current;
-
-                if (steps >= maxSteps)
-                    continue;
-
-                var sortedNeighbors = current.localEdges
-                    .Where(edge => !visited.Contains(edge.GetOtherNode(current)))
-                    .OrderBy(edge => edge.distance)
-                    .Select(edge => edge.GetOtherNode(current))
-                    .ToList();
-
-                foreach (var neighbor in sortedNeighbors)
-                {
-                    visited.Add(neighbor);
-                    queue.Enqueue((neighbor, steps + 1));
-                }
-            }
-
-            return null; // No unclaimed node found within maxSteps
-        }*/
-
-
-
-    public void SetCaptured(int newPlayer, int oldPlayer)
-    {
-        playerControl = newPlayer;
-        foreach (NetworkNode neighbourNode in localNodes)
-        {
-            neighbourNode.NeighbourHasSetThemselvesClaimed(this, playerControl, true);
-            neighbourNode.NeighbourHasSetThemselvesClaimed(this, oldPlayer, false);
-        }
-    }
-
-    public bool IsClaimableBy(int claimingPlayer)
-    {
-        if ((playerControl != claimingPlayer && !hasPlayerClaimed[claimingPlayer]) || (structure.structureType ==5 && structure.playerControl != claimingPlayer))
-            return true;
-        else
-            return false;
-    }
-
-    public override bool Equals(object obj)
-    {
-        if (obj is NetworkNode node)
-        {
-            return (pos == node.pos);
-        }
-        return false;
-    }
-
-    public override int GetHashCode()
-    {
-        return pos.GetHashCode();
-    }
-
-}

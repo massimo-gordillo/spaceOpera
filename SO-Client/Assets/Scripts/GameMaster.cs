@@ -17,7 +17,7 @@ public class GameMaster : MonoBehaviour
     public TilemapManager tilemapManager;
     //private PrefabManager prefabManager = new PrefabManager();
     public SupabaseManager supabaseManager;
-    public CPUManager CPUMananger;
+    public CPUManager CPUManager;
     public Guid match_id;
 
     public Canvas canvas;
@@ -81,6 +81,7 @@ public class GameMaster : MonoBehaviour
 
     public static bool CPU_isOn = true;
     public static bool[] CPU_PlayersList;
+    public static List<(BaseUnit, int)>[] unitCosts; 
 
     /*    public static GameMaster Instance
         {
@@ -120,7 +121,7 @@ public class GameMaster : MonoBehaviour
         else {
             Debug.LogWarning("Progeny set to -1 selected, defaulting to hard values");
             playerProgeny.Add(1, 0);
-            playerProgeny.Add(2, 2);
+            playerProgeny.Add(2, 0);
         }
 
         
@@ -130,6 +131,15 @@ public class GameMaster : MonoBehaviour
         playerColors[2] = new Color32(230, 19, 53, 255);
         //Debug.Log($"player 1 is progeny {getPlayerProgeny(0)}, player 2 is progeny {getPlayerProgeny(1)}");
 
+        unitCosts = new List<(BaseUnit, int)>[3];
+        for(int i = 0; i<3; i++)
+        {
+            unitCosts[i] = new List<(BaseUnit, int)>();
+        }
+/*        foreach(List<(BaseUnit, int)> pair in unitCosts)
+        {
+            pair = new List<(BaseUnit, int)>();
+        }*/
         //initializes all unit values, modifies their prefab and sprites.
         //initializes all Tilebases for tilemap
         //only does anything if it hasn't already been initialized.
@@ -166,10 +176,10 @@ public class GameMaster : MonoBehaviour
         //startupInstantiateUnits();
         //productionPanel.Start();
 
-
+        //unitCosts = new List<(BaseUnit, int)>[numPlayers];
         if (CPU_isOn)
         {
-            CPU_PlayersList[1] = true;
+            //CPU_PlayersList[1] = true;
             CPU_PlayersList[2] = true;
         }
 
@@ -223,7 +233,7 @@ public class GameMaster : MonoBehaviour
     private IEnumerator WaitForCPUFirstTurn()
     {
         yield return null;
-        CPUMananger.naiveV1Start();
+        CPUManager.naiveV1Start();
         if (CPU_isOn && CPU_PlayersList[playerTurn] && !isGameComplete)
         {
             Debug.Log($"Running player 1 CPU actions");
@@ -364,6 +374,13 @@ public class GameMaster : MonoBehaviour
 
     public void ProduceUnit(BaseUnit unit, int playerControl, bool isNonExhausted)
     {
+        if(masterGrid.whatUnitIsInThisLocation(selectedStructure.pos) != null)
+        {
+            Debug.LogWarning($"Trying to produce a unit at {selectedStructure.pos} but it is covered by a unit");
+            selectedStructure = null;
+            return;
+        }
+
         playerResources[playerTurn] -= unit.price;
         //unit.playerControl = playerTurn;
         
@@ -463,8 +480,9 @@ public class GameMaster : MonoBehaviour
 
     public void RunCPUForPlayer(int playerTurn)
     {
-        CPUMananger.CommandUnits(playerTurn);
-        CPUMananger.CreateUnits(playerTurn);
+        //CPUManager.GetUnitAssignment(playerTurn);
+        CPUManager.CommandUnits(playerTurn);
+        CPUManager.CreateUnits(playerTurn, playerProgeny[(byte)playerTurn]);
     }
 
     

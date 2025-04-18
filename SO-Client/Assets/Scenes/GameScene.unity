@@ -1487,6 +1487,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ea2abbe09c2e73c429ec1451785ee4a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  commandStructures: []
   structureListArray: []
   gameMaster: {fileID: 1024135144}
   masterGrid: {fileID: 450342577}
@@ -4255,7 +4256,6 @@ MonoBehaviour:
   turnActionCount: 0
   structuresList: []
   prodStructuresList: []
-  commandStructures: []
 --- !u!1 &454932228
 GameObject:
   m_ObjectHideFlags: 0
@@ -8758,8 +8758,7 @@ MonoBehaviour:
   playerControl: 1
   team: 0
   orientation: 3
-  xPos: 0
-  yPos: 0
+  pos: {x: 0, y: 0}
   movementNonExhausted: 0
   nonExhausted: 0
   undoingMovement: 0
@@ -8787,7 +8786,6 @@ MonoBehaviour:
   defenceValueTextContainer: {fileID: 0}
   damageRangeTextContainer: {fileID: 0}
   combatTooltip: {fileID: 0}
-  CPU_controlled: 0
   CPU_Heading: {x: 0, y: 0}
   CPU_IsCapturing: 0
 --- !u!4 &1022985285 stripped
@@ -8827,7 +8825,7 @@ MonoBehaviour:
   masterGrid: {fileID: 450342577}
   tilemapManager: {fileID: 1002579701}
   supabaseManager: {fileID: 1718293608}
-  CPUMananger: {fileID: 205759595}
+  CPUManager: {fileID: 205759595}
   canvas: {fileID: 471929090}
   selectedStructure: {fileID: 0}
   choicePanel: {fileID: 1454215227}
@@ -19334,8 +19332,7 @@ MonoBehaviour:
   playerControl: 1
   team: 0
   orientation: 3
-  xPos: 0
-  yPos: 0
+  pos: {x: 0, y: 0}
   movementNonExhausted: 0
   nonExhausted: 0
   undoingMovement: 0
@@ -19363,7 +19360,6 @@ MonoBehaviour:
   defenceValueTextContainer: {fileID: 0}
   damageRangeTextContainer: {fileID: 0}
   combatTooltip: {fileID: 0}
-  CPU_controlled: 0
   CPU_Heading: {x: 0, y: 0}
   CPU_IsCapturing: 0
 --- !u!1 &1844876244
@@ -20196,8 +20192,7 @@ MonoBehaviour:
   playerControl: 2
   team: 0
   orientation: 3
-  xPos: 0
-  yPos: 0
+  pos: {x: 0, y: 0}
   movementNonExhausted: 0
   nonExhausted: 0
   undoingMovement: 0
@@ -20225,7 +20220,6 @@ MonoBehaviour:
   defenceValueTextContainer: {fileID: 0}
   damageRangeTextContainer: {fileID: 0}
   combatTooltip: {fileID: 0}
-  CPU_controlled: 0
   CPU_Heading: {x: 0, y: 0}
   CPU_IsCapturing: 0
 --- !u!1 &1921249645

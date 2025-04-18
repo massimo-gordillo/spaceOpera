@@ -365,7 +365,11 @@ public class MasterGrid : MonoBehaviour
 
     public bool canUnitAttack(BaseUnit attacker, BaseUnit defender)
     {
-        if (attacker != null && defender != null && defender.unitName != "seed")
+        if (attacker == null || defender == null)
+            return false;
+        if (attacker.playerControl == defender.playerControl)
+            return false;
+        if (defender.unitName != "seed")
         {
             if (defender.unitTerrainType == UnitTerrainType.Land)
                 return attacker.canAttackLand;
@@ -881,7 +885,7 @@ public class MasterGrid : MonoBehaviour
         return (x - 1) < gridX && (x - 1) >= 0 && (y - 1) < gridY && (y - 1) >= 0;
     }
 
-    void ManualTestAndPrintLogQueueSizes(List<Queue<Vector2Int>> squareQueuesList)
+    public void ManualTestAndPrintLogQueueSizes(List<Queue<Vector2Int>> squareQueuesList)
     {
         // Ensure the list has exactly 3 queues
         if (squareQueuesList == null || squareQueuesList.Count != 3)
