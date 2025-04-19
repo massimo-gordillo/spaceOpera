@@ -23,6 +23,7 @@ public class CPUManager : MonoBehaviour
     public static Dictionary<Vector2Int, NetworkNode> nodeVectorMap = new();
     //public List<(Vector2Int, Vector2Int)> networkEdges = new List<(Vector2Int, Vector2Int)>();
     public List<NetworkEdge> networkEdges = new();
+    public List<NetworkEdge> priorityNetworkEdgesAir = new();
     public GameMaster gameMaster;
     public MasterGrid masterGrid;
 
@@ -87,6 +88,7 @@ public class CPUManager : MonoBehaviour
             nodeVectorMap.Add(node.pos, node);
             if(structure.structureType != 0)
             {
+                Debug.Log($"Adding node {structure.pos} with type {structure.structureType} to priority list");
                 NetworkNode priorityNode = new NetworkNode(structure);
                 priorityNetworkNodesAir.Add(priorityNode);
             }
@@ -103,12 +105,12 @@ public class CPUManager : MonoBehaviour
 
         foreach (NetworkNode n in resourceNetworkNodes)
         {
-            ConnectStructurePairs(n, 6); //specifically 6 as it's two infantry traverse distances
+            ConnectStructurePairs(n, 6, false); //specifically 6 as it's two infantry traverse distances
         }
 
         foreach(NetworkNode n in priorityNetworkNodesAir)
         {
-            ConnectStructurePairs(n, (int)((gameMaster.gridX + gameMaster.gridY)/2));
+            ConnectStructurePairs(n, (int)((gameMaster.gridX + gameMaster.gridY)/2), true);
         }
         
 
@@ -337,7 +339,7 @@ public class CPUManager : MonoBehaviour
         }
     }
 
-    public void ConnectStructurePairs(NetworkNode node, int maxDistance)
+    public void ConnectStructurePairs(NetworkNode node, int maxDistance, bool isPriority)
     {
 
         Vector2Int origin = node.pos;
@@ -409,7 +411,7 @@ public class CPUManager : MonoBehaviour
                 if (nodeVectorMap.TryGetValue(checkPos, out NetworkNode neighbor))
                 {
                     // Add the pair to the vertices list with their positions
-                    AddEdge(node.pos, neighbor.pos, node, neighbor);
+                    AddEdge(node.pos, neighbor.pos, node, neighbor, isPriority);
 
 
                     // Set the correct direction for both the sender and receiver
@@ -453,10 +455,17 @@ public class CPUManager : MonoBehaviour
 
             // Only attempt if diagonal is needed (i.node., one cardinal direction is missing)
             Vector2Int checkPos = origin + dir * newDist;
-            if (nodeVectorMap.TryGetValue(checkPos, out NetworkNode diagNeighbor))
+            //bool tryGet = nodeVectorMap.TryGetValue(checkPos, out NetworkNode diagNeighbor);
+            //always add the edge if not priority, if priority, only add the edge if the structure is a priority structure.
+            //if ( tryGet && ((!isPriority) || (isPriority && diagNeighbor.structure.structureType != 0)))
+            if(nodeVectorMap.TryGetValue(checkPos, out NetworkNode diagNeighbor))
             {
                 // Add the diagonal pair to the vertices list
-                AddEdge(node.pos, diagNeighbor.pos, node, diagNeighbor);
+                if (isPriority)
+                {
+                    Debug.Log($"Priority Adding edge {node.pos}, {diagNeighbor.pos}");
+                }
+                AddEdge(node.pos, diagNeighbor.pos, node, diagNeighbor, isPriority);
 
                 // Set the appropriate pairs in both directions
                 if (dir.x == 1 && dir.y == 1) // NE: Need Npair and Epair
@@ -767,11 +776,6 @@ public class CPUManager : MonoBehaviour
 
 
 }
-    
-
-
-
-
 
 
     private void OnDrawGizmos()
@@ -780,7 +784,8 @@ public class CPUManager : MonoBehaviour
 
         if (networkEdges == null) return;
 
-        foreach (NetworkEdge e in networkEdges)
+        foreach (NetworkEdge e in priorityNetworkEdgesAir)
+        //foreach (NetworkEdge e in networkEdges)
         {
             Vector2Int from = e.vectorA;
             Vector2Int to = e.vectorB;
@@ -992,24 +997,16 @@ public class CPUManager : MonoBehaviour
         Debug.Log($"Verticies CSV exported to: {filePath}");
     }
 
-    public void AddEdge(Vector2Int a, Vector2Int b, NetworkNode nodeA, NetworkNode nodeB)
-
+    public void AddEdge(Vector2Int a, Vector2Int b, NetworkNode nodeA, NetworkNode nodeB, bool isPriority)
     {
-/*        bool isCurious = false;
-        if (nodeA.pos == new Vector2Int(0, 0) || nodeB.pos == new Vector2Int(0, 0))
-            isCurious = true;*/
-
         NetworkEdge newEdge = new NetworkEdge(nodeA, nodeB);
+        newEdge.isPriorityAir = isPriority && nodeA.structure.structureType != 0 && nodeB.structure.structureType != 0;
 
-        // Check if the node already exists in the list (undirected graph, so vectorA-vectorB is the same as vectorB-vectorA)
-        if (!networkEdges.Contains(newEdge))
+        List<NetworkEdge> edgeList = isPriority ? priorityNetworkEdgesAir : networkEdges;
+
+        if (!edgeList.Contains(newEdge))
         {
-/*            if (isCurious)
-            {
-                Debug.Log($"nodeA {nodeA.pos} creating edge with node B {nodeB.pos}");
-            }*/
-            networkEdges.Add(newEdge);
-            //Debug.Log($"Added node: {a} <-> {b} with distance: {newEdge.distance}");
+            edgeList.Add(newEdge);
             nodeA.AddEdge(newEdge, nodeB);
             nodeB.AddEdge(newEdge, nodeA);
         }
@@ -1019,7 +1016,9 @@ public class CPUManager : MonoBehaviour
         }
     }
 
-    
+
+
+
 
 }
 
