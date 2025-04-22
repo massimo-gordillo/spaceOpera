@@ -16,7 +16,6 @@ public class CPUManager : MonoBehaviour
     public byte[,] terrainGrid;
     public static List<NetworkNode> resourceNetworkNodes = new();
     public static List<NetworkNode> priorityNetworkNodes = new();
-    public static List<NetworkNode> priorityNetworkNodesAir = new();
     public BaseStructure[] structureListArray;
     public double[,] structuresEuclideanDistance;
     //List<Vector2Int> structLocs;
@@ -24,6 +23,7 @@ public class CPUManager : MonoBehaviour
     //public List<(Vector2Int, Vector2Int)> networkEdges = new List<(Vector2Int, Vector2Int)>();
     public List<NetworkEdge> networkEdges = new();
     public List<NetworkEdge> priorityNetworkEdgesAir = new();
+    public List<NetworkEdge> priorityNetworkEdgesGround = new();
     public GameMaster gameMaster;
     public MasterGrid masterGrid;
 
@@ -88,9 +88,9 @@ public class CPUManager : MonoBehaviour
             nodeVectorMap.Add(node.pos, node);
             if(structure.structureType != 0)
             {
-                Debug.Log($"Adding node {structure.pos} with type {structure.structureType} to priority list");
+                //Debug.Log($"Adding node {structure.pos} with type {structure.structureType} to priority list");
                 NetworkNode priorityNode = new NetworkNode(structure);
-                priorityNetworkNodesAir.Add(priorityNode);
+                priorityNetworkNodes.Add(priorityNode);
             }
             //structureListArray[i] = structure;
             //i++;
@@ -108,7 +108,7 @@ public class CPUManager : MonoBehaviour
             ConnectStructurePairs(n, 6, false); //specifically 6 as it's two infantry traverse distances
         }
 
-        foreach(NetworkNode n in priorityNetworkNodesAir)
+        foreach(NetworkNode n in priorityNetworkNodes)
         {
             ConnectStructurePairs(n, (int)((gameMaster.gridX + gameMaster.gridY)/2), true);
         }
@@ -117,6 +117,8 @@ public class CPUManager : MonoBehaviour
         //Debug.Log($"Done searching pairs, node count is {networkEdges.Count}");
 
         CorrectManhattanDistances();
+        SetGroundPriorityNetwork();
+
         InitClosestNeighbour();
         //StartCoroutine(DrawStructureDebugLines());
     }
@@ -408,8 +410,9 @@ public class CPUManager : MonoBehaviour
                 Vector2Int checkPos = initSearchVector + offsetVector * offset;
 
 
-                if (nodeVectorMap.TryGetValue(checkPos, out NetworkNode neighbor))
+                if (nodeVectorMap.TryGetValue(checkPos, out NetworkNode neighbor) && (!isPriority || (isPriority && neighbor.structure.structureType != 0)))
                 {
+
                     // Add the pair to the vertices list with their positions
                     AddEdge(node.pos, neighbor.pos, node, neighbor, isPriority);
 
@@ -458,13 +461,16 @@ public class CPUManager : MonoBehaviour
             //bool tryGet = nodeVectorMap.TryGetValue(checkPos, out NetworkNode diagNeighbor);
             //always add the edge if not priority, if priority, only add the edge if the structure is a priority structure.
             //if ( tryGet && ((!isPriority) || (isPriority && diagNeighbor.structure.structureType != 0)))
-            if(nodeVectorMap.TryGetValue(checkPos, out NetworkNode diagNeighbor))
+            if(nodeVectorMap.TryGetValue(checkPos, out NetworkNode diagNeighbor) && (!isPriority || (isPriority && diagNeighbor.structure.structureType != 0)))
             {
+
+
                 // Add the diagonal pair to the vertices list
-                if (isPriority)
-                {
-                    Debug.Log($"Priority Adding edge {node.pos}, {diagNeighbor.pos}");
-                }
+                /*                if (isPriority)
+                                {
+                                    Debug.Log($"Priority Adding edge {node.pos}, {diagNeighbor.pos}");
+                                }*/
+
                 AddEdge(node.pos, diagNeighbor.pos, node, diagNeighbor, isPriority);
 
                 // Set the appropriate pairs in both directions
@@ -784,7 +790,7 @@ public class CPUManager : MonoBehaviour
 
         if (networkEdges == null) return;
 
-        foreach (NetworkEdge e in priorityNetworkEdgesAir)
+        foreach (NetworkEdge e in priorityNetworkEdgesGround)
         //foreach (NetworkEdge e in networkEdges)
         {
             Vector2Int from = e.vectorA;
@@ -849,6 +855,19 @@ public class CPUManager : MonoBehaviour
 
         }
         Debug.Log("Done checking land accessibility");
+    }
+
+    public void SetGroundPriorityNetwork()
+    {
+        foreach(NetworkEdge edge in priorityNetworkEdgesAir)
+        {
+            List<Vector2Int> dirs = new();
+            dirs = masterGrid.BidirectionalSearch(edge.vectorA, edge.vectorB, PrefabManager.getBaseUnitFromName("LightTank", 0), (int)(edge.distance *0.75));
+            if (dirs.Count == 0)
+                Debug.Log($"Priority GraphEdge {edge.vectorA}{edge.vectorB} is not vehicle accessible");
+            else
+                priorityNetworkEdgesGround.Add(edge);
+        }
     }
 
     public static void GiveUnitAssignment(BaseUnit unit)
@@ -1006,6 +1025,10 @@ public class CPUManager : MonoBehaviour
 
         if (!edgeList.Contains(newEdge))
         {
+/*            if (isPriority)
+            {
+                Debug.Log($"adding edge {nodeA.pos}, {nodeB.pos} to priority list");
+            }*/
             edgeList.Add(newEdge);
             nodeA.AddEdge(newEdge, nodeB);
             nodeB.AddEdge(newEdge, nodeA);
