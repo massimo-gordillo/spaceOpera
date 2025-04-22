@@ -81,6 +81,14 @@ public class BaseUnit : MonoBehaviour
     public Vector2Int CPU_Heading;
     public NetworkNode CPU_TargetNode;
     public bool CPU_IsCapturing;
+    public List<BaseStructure> CPU_StructureList = new List<BaseStructure>();
+    public List<BaseStructure> CPU_CapturableStructureList = new List<BaseStructure>();
+    public List<BaseUnit> CPU_CapturingUnitList = new List<BaseUnit>();
+    public List<BaseUnit> CPU_AttackableUnitList = new List<BaseUnit>();
+    public List<BaseUnit> CPU_AttackableResourceUnitList = new List<BaseUnit>();
+
+
+
 
     void Start()
     {

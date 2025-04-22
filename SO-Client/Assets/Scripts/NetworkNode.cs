@@ -11,6 +11,8 @@ public class NetworkNode
     public List<NetworkNode> localNodes = new();
     public NetworkNode[] closestUnclaimed = new NetworkNode[GameMaster.numPlayers + 1];
     public int[] closestUnclaimedDistance = new int[GameMaster.numPlayers + 1];
+    public NetworkNode[] priorityNextNodeToTarget = new NetworkNode[GameMaster.numPlayers + 1];
+    public int[] priorityCostToTarget = new int[GameMaster.numPlayers + 1];
     public BaseStructure structure;
     public Vector2Int pos;
     public BaseUnit[] claimingUnits = new BaseUnit[GameMaster.numPlayers + 1];
@@ -18,6 +20,7 @@ public class NetworkNode
     public int playerControl;
     public bool[] hasPlayerClaimed = new bool[GameMaster.numPlayers + 1];
     //public List<NetworkNode>[] pointingNodes = new List<NetworkNode>[GameMaster.numPlayers]; //list of nodes which see me as their closest unclaimed neighbour
+
 
     public NetworkNode Npair;
     public NetworkNode Spair;
