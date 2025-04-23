@@ -50,7 +50,7 @@ public class NetworkNode
         if (IsClaimableBy(unit.playerControl))
         {
             unit.CPU_TargetNode = this;
-            unit.CPU_Heading = this.pos;
+            //unit.CPU_Heading = this.pos;
             int playerClaiming = unit.playerControl;
             claimingUnits[playerClaiming] = unit;
             hasPlayerClaimed[playerClaiming] = true;

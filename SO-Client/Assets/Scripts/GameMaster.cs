@@ -348,10 +348,10 @@ public class GameMaster : MonoBehaviour
             print("You must mine more minerals!");
     }
 
-    public void ProduceBaseUnit(BaseStructure prod, int player)
+    public BaseUnit ProduceResourceUnit(BaseStructure prod, int player)
     {
         if (masterGrid.whatUnitIsInThisLocation(prod.pos) != null)
-            return;
+            return null;
 
         if (playerResources[player] >= 100) //assumes base unit cost 100
         {
@@ -359,17 +359,24 @@ public class GameMaster : MonoBehaviour
             int progeny = getPlayerProgeny((byte)player);
             if (progeny == 0)
             {
-                ProduceUnit(PrefabManager.getBaseUnitFromName("Infantry", 0), player, false);
+                BaseUnit infantry = PrefabManager.getBaseUnitFromName("Infantry", 0);
+                ProduceUnit(infantry, player, false);
+                return infantry;
             }
             if (progeny == 1)
             {
-                ProduceUnit(PrefabManager.getBaseUnitFromName("Spore", 1), player, true); //true for virix in current implementation
+                BaseUnit spore = PrefabManager.getBaseUnitFromName("Spore", 1);
+                ProduceUnit(spore, player, true); //true for virix in current implementation
+                return spore;
             }
             if (progeny == 2)
             {
-                ProduceUnit(PrefabManager.getBaseUnitFromName("Blacksmith", 2), player, false);
+                BaseUnit blacksmith = PrefabManager.getBaseUnitFromName("Blacksmith", 2);
+                ProduceUnit(blacksmith, player, false);
+                return blacksmith;
             }
         }
+        return null;
     }
 
     public void ProduceUnit(BaseUnit unit, int playerControl, bool isNonExhausted)
@@ -466,7 +473,7 @@ public class GameMaster : MonoBehaviour
                 //create a virix spore on all production structures except on the first turn.
                 if (turnNumber > numPlayers)
                 {
-                    ProduceBaseUnit(structure, playerTurn);
+                    ProduceResourceUnit(structure, playerTurn);
                 }
             }
         }

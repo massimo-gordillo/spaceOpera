@@ -78,7 +78,7 @@ public class BaseUnit : MonoBehaviour
 
     //public bool CPU_isOn = true;
     //public bool CPU_controlled = false;
-    public Vector2Int CPU_Heading;
+    //public Vector2Int CPU_Heading;
     public NetworkNode CPU_TargetNode;
     public bool CPU_IsCapturing;
     public List<BaseStructure> CPU_StructureList = new List<BaseStructure>();

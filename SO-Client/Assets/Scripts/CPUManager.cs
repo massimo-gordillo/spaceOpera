@@ -6,6 +6,10 @@ using System.IO;
 using UnityEngine;
 using System.Linq;
 
+
+using System.Runtime.CompilerServices;
+
+
 public class CPUManager : MonoBehaviour
 {
 
@@ -20,6 +24,7 @@ public class CPUManager : MonoBehaviour
     public double[,] structuresEuclideanDistance;
     //List<Vector2Int> structLocs;
     public static Dictionary<Vector2Int, NetworkNode> nodeVectorMap = new();
+    public static Dictionary<Vector2Int, NetworkNode> priorityNodeVectorMap = new();
     //public List<(Vector2Int, Vector2Int)> networkEdges = new List<(Vector2Int, Vector2Int)>();
     public List<NetworkEdge> networkEdges = new();
     public List<NetworkEdge> priorityNetworkEdgesAir = new();
@@ -89,8 +94,10 @@ public class CPUManager : MonoBehaviour
             if(structure.structureType != 0)
             {
                 //Debug.Log($"Adding node {structure.pos} with type {structure.structureType} to priority list");
+                //NetworkNode priorityNode = node;
                 NetworkNode priorityNode = new NetworkNode(structure);
                 priorityNetworkNodes.Add(priorityNode);
+                priorityNodeVectorMap.Add(priorityNode.pos, priorityNode);
             }
             //structureListArray[i] = structure;
             //i++;
@@ -117,12 +124,19 @@ public class CPUManager : MonoBehaviour
         //Debug.Log($"Done searching pairs, node count is {networkEdges.Count}");
 
         CorrectManhattanDistances();
-        SetGroundPriorityNetwork();
         AssignPriorityHeadingsToHQ();
-        foreach (var node in priorityNetworkNodes)
+        SetGroundPriorityNetwork();
+        //DebugEdges();
+        //DebugNodes();
+
+
+
+        //Debug.Log($"Priority node count: {priorityNetworkNodes.Count}, Priority edge air count: {priorityNetworkEdgesAir.Count}, Priority edge ground count: {priorityNetworkEdgesGround.Count}");
+/*        foreach (NetworkNode node in priorityNetworkNodes)
         {
+            if(node != null) 
             Debug.Log($"Node {node.pos} has priority direction to {node.priorityNextNodeToTarget[1].pos} for player 1");
-        }
+        }*/
 
         InitClosestNeighbour();
         //StartCoroutine(DrawStructureDebugLines());
@@ -131,6 +145,100 @@ public class CPUManager : MonoBehaviour
     public void Start()
     {
         SetDefaultTargets();
+    }
+
+    public void DebugNodes()
+    {
+        Debug.Log($"Starting Debug Nodes. num nodes: {priorityNetworkNodes.Count}, num edges: {priorityNetworkEdgesAir.Count}");
+
+        foreach (NetworkNode node in priorityNetworkNodes)
+        {
+            // --- Validate localEdges ---
+            foreach (NetworkEdge edge in node.localEdges)
+            {
+                bool edgeFound = false;
+                foreach (NetworkEdge edgeRef in priorityNetworkEdgesAir)
+                {
+                    if (edgeRef.Equals(edge)) // Optional: use this if you implemented Equals()
+                    {
+                        if (!object.ReferenceEquals(edge, edgeRef))
+                        {
+                            Debug.LogError($"Edge in node {node.pos} matches by value but not by reference.");
+                            Debug.Log($"EdgeRef Hash: {RuntimeHelpers.GetHashCode(edgeRef)}, Edge Hash: {RuntimeHelpers.GetHashCode(edge)}");
+                        }
+                        edgeFound = true;
+                        break;
+                    }
+                }
+
+                if (!edgeFound)
+                {
+                    Debug.LogError($"Edge in node {node.pos} not found in priorityNetworkEdgesAir.");
+                }
+
+                // Check the edge’s connected nodes too
+                NetworkNode other = edge.GetOtherNode(node);
+                NetworkNode matchOther = priorityNetworkNodes.Find(n => n.pos == other.pos);
+                if (matchOther == null)
+                {
+                    Debug.LogError($"Edge from node {node.pos} points to node at {other.pos} not found in priorityNetworkNodes.");
+                }
+                else if (!object.ReferenceEquals(other, matchOther))
+                {
+                    Debug.LogError($"Edge from node {node.pos} points to different instance of node at {other.pos}.");
+                    Debug.Log($"Other Hash: {RuntimeHelpers.GetHashCode(other)}, Match Hash: {RuntimeHelpers.GetHashCode(matchOther)}");
+                }
+            }
+
+            // --- Validate localNodes ---
+            foreach (NetworkNode neighbor in node.localNodes)
+            {
+                NetworkNode matchNeighbor = priorityNetworkNodes.Find(n => n.pos == neighbor.pos);
+                if (matchNeighbor == null)
+                {
+                    Debug.LogError($"Node {node.pos} has neighbor at {neighbor.pos} not found in priorityNetworkNodes.");
+                }
+                else if (!object.ReferenceEquals(neighbor, matchNeighbor))
+                {
+                    Debug.LogError($"Node {node.pos} has neighbor at {neighbor.pos} that is a different instance.");
+                    Debug.Log($"Neighbor Hash: {RuntimeHelpers.GetHashCode(neighbor)}, Match Hash: {RuntimeHelpers.GetHashCode(matchNeighbor)}");
+                }
+            }
+        }
+        Debug.Log("Debug Nodes complete");
+    }
+
+    public void DebugEdges()
+    {
+        foreach (NetworkEdge edge in priorityNetworkEdgesAir)
+        {
+            NetworkNode nodeA = edge.nodeA;
+            NetworkNode nodeB = edge.nodeB;
+
+            // Try to find a node in the list that matches by pos
+            NetworkNode matchA = priorityNetworkNodes.Find(n => n.pos == nodeA.pos);
+            NetworkNode matchB = priorityNetworkNodes.Find(n => n.pos == nodeB.pos);
+
+            // Check nodeA
+            if (matchA != null && !object.ReferenceEquals(nodeA, matchA))
+            {
+                Debug.LogError($"NodeA mismatch at {nodeA.pos}. Instance mismatch! (edge node vs node list)");
+                Debug.Log($"NodeA Hash: {RuntimeHelpers.GetHashCode(nodeA)}, MatchA Hash: {RuntimeHelpers.GetHashCode(matchA)}");
+            }
+
+            // Check nodeB
+            if (matchB != null && !object.ReferenceEquals(nodeB, matchB))
+            {
+                Debug.LogError($"NodeB mismatch at {nodeB.pos}. Instance mismatch! (edge node vs node list)");
+                Debug.Log($"NodeB Hash: {RuntimeHelpers.GetHashCode(nodeB)}, MatchB Hash: {RuntimeHelpers.GetHashCode(matchB)}");
+            }
+
+            // Optional: error if no match at all (i.e. the edge points to a node not in priorityNetworkNodes)
+            if (matchA == null)
+                Debug.LogError($"No match in priorityNetworkNodes for nodeA at {nodeA.pos}");
+            if (matchB == null)
+                Debug.LogError($"No match in priorityNetworkNodes for nodeB at {nodeB.pos}");
+        }
     }
 
     /*public void InitClosestNeighbour()
@@ -260,6 +368,10 @@ public class CPUManager : MonoBehaviour
                 unit.CPU_CapturingUnitList.Add(unitAtLoc);
         }
 
+        if (!unit.isResourceUnit)
+        {
+            Debug.Log($"Unit {unit.pos} has an attack list of length {unit.CPU_AttackableUnitList.Count}");
+        }
         
     }
 
@@ -392,6 +504,7 @@ public class CPUManager : MonoBehaviour
         Vector2Int origin = node.pos;
 
         //bool isCurious = origin == new Vector2Int(0, 0);
+        Dictionary<Vector2Int, NetworkNode> specificNodeVectorMap = isPriority ? priorityNodeVectorMap : nodeVectorMap;
 
 
         int dist;
@@ -455,11 +568,15 @@ public class CPUManager : MonoBehaviour
                 Vector2Int checkPos = initSearchVector + offsetVector * offset;
 
 
-                if (nodeVectorMap.TryGetValue(checkPos, out NetworkNode neighbor) && (!isPriority || (isPriority && neighbor.structure.structureType != 0)))
-                {
 
+                if (specificNodeVectorMap.TryGetValue(checkPos, out NetworkNode neighbor) && (!isPriority || (isPriority && neighbor!=null && neighbor.structure.structureType != 0)))
+                {
+/*                    if (isPriority)
+                    {
+                        Debug.Log($"Adding priority edge {node.pos}, {neighbor.pos}");
+                    }*/
                     // Add the pair to the vertices list with their positions
-                    AddEdge(node.pos, neighbor.pos, node, neighbor, isPriority);
+                    AddEdge(node, neighbor, isPriority);
 
 
                     // Set the correct direction for both the sender and receiver
@@ -506,7 +623,7 @@ public class CPUManager : MonoBehaviour
             //bool tryGet = nodeVectorMap.TryGetValue(checkPos, out NetworkNode diagNeighbor);
             //always add the edge if not priority, if priority, only add the edge if the structure is a priority structure.
             //if ( tryGet && ((!isPriority) || (isPriority && diagNeighbor.structure.structureType != 0)))
-            if(nodeVectorMap.TryGetValue(checkPos, out NetworkNode diagNeighbor) && (!isPriority || (isPriority && diagNeighbor.structure.structureType != 0)))
+            if(specificNodeVectorMap.TryGetValue(checkPos, out NetworkNode diagNeighbor) && (!isPriority || (isPriority && diagNeighbor != null && diagNeighbor.structure.structureType != 0)))
             {
 
 
@@ -516,7 +633,7 @@ public class CPUManager : MonoBehaviour
                                     Debug.Log($"Priority Adding edge {node.pos}, {diagNeighbor.pos}");
                                 }*/
 
-                AddEdge(node.pos, diagNeighbor.pos, node, diagNeighbor, isPriority);
+                AddEdge(node, diagNeighbor, isPriority);
 
                 // Set the appropriate pairs in both directions
                 if (dir.x == 1 && dir.y == 1) // NE: Need Npair and Epair
@@ -679,9 +796,15 @@ public class CPUManager : MonoBehaviour
             {
                 if (unit.CPU_AttackableUnitList.Count > 0)
                 {
+                    Debug.Log($"Combat Unit {unit.pos} is being told to attack");
                     CPU_GameActionAttack(unit);
-                }else
+                }
+                else
+                {
+                    Debug.Log($"Combat Unit {unit.pos} is being told to move");
+
                     CPU_MoveUnitTowardsTargetNode(unit);
+                }
             }
             
 
@@ -736,10 +859,10 @@ public class CPUManager : MonoBehaviour
         else //if non-resource unit.
         {
             int minDistanceFromTarget = 3;
-            if (unit.pos == nodePos)
+            if (unit.pos == nodePos || unit.CPU_TargetNode == null)
             {
                 //get a new target node
-                GiveResourceUnitNodeAssignment(unit);
+                GiveCombatUnitNodeAssignment(unit);
             }
             // Full path to target
             List<Vector2Int> fullPath = masterGrid.BidirectionalSearch(unit.pos, nodePos, unit, unit.movementRange/2 + minDistanceFromTarget);
@@ -830,7 +953,7 @@ public class CPUManager : MonoBehaviour
                 {
                     //Debug.Log($"Creating base unit for {player} at {structure.pos}, they have progeny {gameMaster.getPlayerProgeny((byte)player)}");
                     if (gameMaster.getPlayerProgeny((byte)player) != 1)
-                        gameMaster.ProduceBaseUnit(structure, player);
+                        gameMaster.ProduceResourceUnit(structure, player);
                 }
             }*/
         }
@@ -866,13 +989,20 @@ public class CPUManager : MonoBehaviour
                     {
                         gameMaster.selectedStructure = airport;
                         gameMaster.ProduceUnit(candidateAirUnit, player, false);
+                        //get the node it's created at, then ask for a new heading.
+                        priorityNodeVectorMap.TryGetValue(airport.pos, out candidateAirUnit.CPU_TargetNode);
+                        GiveCombatUnitNodeAssignment(candidateAirUnit);
+                        //CPU_MoveUnitTowardsTargetNode(candidateAirUnit);
                         cashRemain -= candidateAirUnit.price;
                     }
                 }
             if (factories.Count > 0)
             {
                 //gameMaster.selectedStructure = factories[0];
-                gameMaster.ProduceBaseUnit(factories[0], player);
+                //BaseUnit progenyResourceUnit = gameMaster.ProduceResourceUnit(factories[0], player);
+                gameMaster.ProduceResourceUnit(factories[0], player);
+                
+                //CPU_MoveUnitTowardsTargetNode(progenyResourceUnit);
                 for (int i = 1; i < factories.Count; i++)
                 {
                     BaseUnit candidateFactoryUnit = null;
@@ -883,14 +1013,16 @@ public class CPUManager : MonoBehaviour
                         {
                             highestPrice = price;
                             candidateFactoryUnit = unit;
-                            Debug.Log($"setting {unit.name} to candidate unit");
+                            //Debug.Log($"setting {unit.name} to candidate unit");
                         }
                     }
                     if (candidateFactoryUnit != null)
                     {
-                        Debug.Log($"Unit {candidateFactoryUnit.unitName} has price {candidateFactoryUnit.price} compared to cash {cashRemain}");
+                        //Debug.Log($"Unit {candidateFactoryUnit.unitName} has price {candidateFactoryUnit.price} compared to cash {cashRemain}");
                         gameMaster.selectedStructure = factories[i];
                         gameMaster.ProduceUnit(candidateFactoryUnit, player, false);
+                        priorityNodeVectorMap.TryGetValue(factories[i].pos, out candidateFactoryUnit.CPU_TargetNode);
+                        GiveCombatUnitNodeAssignment(candidateFactoryUnit);
                         cashRemain -= (candidateFactoryUnit.price - 100);
                     }
                 }
@@ -930,6 +1062,7 @@ public class CPUManager : MonoBehaviour
         }
     }
 
+
     public void AssignPriorityHeadingsToHQ()
     {
         int numPlayers = GameMaster.numPlayers;
@@ -939,11 +1072,14 @@ public class CPUManager : MonoBehaviour
         {
             node.priorityCostToTarget = new int[numPlayers + 1];
             node.priorityNextNodeToTarget = new NetworkNode[numPlayers + 1];
+            //Debug.Log($"node at {node.pos} has id {RuntimeHelpers.GetHashCode(node)}");
 
             for (int i = 0; i <= numPlayers; i++)
             {
+
                 node.priorityCostToTarget[i] = int.MaxValue;
                 node.priorityNextNodeToTarget[i] = null;
+                //Debug.Log($"Setting {node.pos} to cost {node.priorityCostToTarget[i]}");
             }
         }
 
@@ -954,6 +1090,7 @@ public class CPUManager : MonoBehaviour
             NetworkNode hq = priorityNetworkNodes.FirstOrDefault(node => node.pos == hqPos);
             Queue<NetworkNode> queue = new Queue<NetworkNode>();
             hq.priorityCostToTarget[player] = 0;
+            hq.priorityNextNodeToTarget[player] = hq;
             queue.Enqueue(hq);
 
             if (priorityNetworkNodes.Contains(hq))
@@ -972,14 +1109,42 @@ public class CPUManager : MonoBehaviour
                 int currentDist = current.priorityCostToTarget[player];
 
                 foreach (NetworkEdge edge in current.localEdges)
+                //foreach (NetworkNode neighbor in current.localNodes)
                 {
                     NetworkNode neighbor = edge.GetOtherNode(current);
+                    //Debug.Log($"Node {current.pos} has neighbour {neighbor.pos}");
+                    //Debug.Log($"neighbor at {neighbor.pos} has id {RuntimeHelpers.GetHashCode(neighbor)}");
+
+                    /*if (!priorityNetworkNodes.Contains(neighbor))
+                    {
+                        Debug.LogWarning($"[WARNING] Neighbor {neighbor.pos} is not part of priorityNetworkNodes!");
+                    }
+                    if (neighbor.priorityNextNodeToTarget == null)
+                    {
+                        neighbor.priorityNextNodeToTarget = new NetworkNode[GameMaster.numPlayers + 1];
+                        Debug.Log($"Node {neighbor.pos} priorityNextNode not initialized");
+                    }                    
+                    if(neighbor.priorityCostToTarget == null)
+                    {
+                        neighbor.priorityCostToTarget = new int[GameMaster.numPlayers + 1];
+                        Debug.Log($"Node {neighbor.pos} priorityNextNodeCost not initialized");
+
+
+                    }*/
                     int newDist = Manhattan(hq.pos, neighbor.pos);
+
+                    //Debug.Log($"Node {current.pos} has local neighbour {neighbor.pos} with distance {newDist} vs {neighbor.priorityCostToTarget[player]}");
+
+                    if (neighbor.priorityCostToTarget[player] == 0 && neighbor != hq)
+                    {
+                        Debug.LogWarning($"[COST WARNING] Node at {neighbor.pos} has cost 0 but isn't HQ! Investigate who changed this.");
+                    }
 
                     if (newDist < neighbor.priorityCostToTarget[player])
                     {
                         neighbor.priorityCostToTarget[player] = newDist;
                         neighbor.priorityNextNodeToTarget[player] = current; // "To get to HQ, go through current"
+                        //Debug.Log($"Updating {current.pos} with neighbour {neighbor.pos} with cost {neighbor.priorityCostToTarget[player]} and target {neighbor.priorityNextNodeToTarget[player]}");
                         queue.Enqueue(neighbor);
                     }
                 }
@@ -1117,7 +1282,16 @@ public class CPUManager : MonoBehaviour
 
     public void GiveCombatUnitNodeAssignment(BaseUnit unit)
     {
+        if(unit.CPU_TargetNode == null)
+        {
+            Debug.LogWarning($"Combat unit {unit.pos} does not have a target node assignment");
+            return;        
+        }
 
+        NetworkNode currentNode = unit.CPU_TargetNode;
+        //MG 25-04-2: realizing now this implementation doesn't properly handle ground units moving through unpassable terrain, I think.
+        NetworkNode nextTargetNode = currentNode.priorityNextNodeToTarget[unit.playerControl];
+        unit.CPU_TargetNode = nextTargetNode;
     }
 
     public static NetworkNode GetUnitAssignment(BaseUnit unit)
@@ -1204,7 +1378,7 @@ public class CPUManager : MonoBehaviour
         Debug.Log($"Verticies CSV exported to: {filePath}");
     }
 
-    public void AddEdge(Vector2Int a, Vector2Int b, NetworkNode nodeA, NetworkNode nodeB, bool isPriority)
+    public void AddEdge(NetworkNode nodeA, NetworkNode nodeB, bool isPriority)
     {
         NetworkEdge newEdge = new NetworkEdge(nodeA, nodeB);
         newEdge.isPriorityAir = isPriority && nodeA.structure.structureType != 0 && nodeB.structure.structureType != 0;
@@ -1215,7 +1389,7 @@ public class CPUManager : MonoBehaviour
         {
 /*            if (isPriority)
             {
-                Debug.Log($"adding edge {nodeA.pos}, {nodeB.pos} to priority list");
+                Debug.Log($"adding edge {nodeA.pos}, {nodeB.pos} to list with count {edgeList.Count}");
             }*/
             edgeList.Add(newEdge);
             nodeA.AddEdge(newEdge, nodeB);
@@ -1223,7 +1397,10 @@ public class CPUManager : MonoBehaviour
         }
 /*        else
         {
-            Debug.Log($"Edge already exists: {a} <-> {b}");
+            if (isPriority)
+            {
+                Debug.Log($"Setting Edge: {nodeA.pos} <-> {nodeB.pos} to priority edge");
+            }
         }*/
     }
 
