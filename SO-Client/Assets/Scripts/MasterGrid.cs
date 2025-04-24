@@ -488,12 +488,12 @@ public class MasterGrid : MonoBehaviour
         if (mTarget.canMoveAndAttack)
         {
             cellsToCheck.Enqueue((new Vector2Int(xpos + 1, ypos + 1), movementRange + 1));//assuming unit only has 1 attack range for the first vectorA* search.
-            //List<Queue<Vector2Int>> squareQueuesList = AStarSearchRecursive(mTarget, movementRange, attackRange, cellsToCheck, checkedCells, new List<Queue<Vector2Int>> { new Queue<Vector2Int>(), new Queue<Vector2Int>(), new Queue<Vector2Int>() }, true);
+            //List<Queue<Vector2Int>> squareQueuesList = FloodFillSearch(mTarget, movementRange, attackRange, cellsToCheck, checkedCells, new List<Queue<Vector2Int>> { new Queue<Vector2Int>(), new Queue<Vector2Int>(), new Queue<Vector2Int>() }, true);
             List<Queue<Vector2Int>> squareQueuesList = null;
             if (attackRange >= 1)
-                squareQueuesList = AStarSearchRecursive(mTarget, movementRange, 1, cellsToCheck, checkedCells, new List<Queue<Vector2Int>> { new Queue<Vector2Int>(), new Queue<Vector2Int>(), new Queue<Vector2Int>() });
+                squareQueuesList = FloodFillSearch(mTarget, movementRange, 1, cellsToCheck, checkedCells, new List<Queue<Vector2Int>> { new Queue<Vector2Int>(), new Queue<Vector2Int>(), new Queue<Vector2Int>() });
             else
-                squareQueuesList = AStarSearchRecursive(mTarget, movementRange, 0, cellsToCheck, checkedCells, new List<Queue<Vector2Int>> { new Queue<Vector2Int>(), new Queue<Vector2Int>(), new Queue<Vector2Int>() });
+                squareQueuesList = FloodFillSearch(mTarget, movementRange, 0, cellsToCheck, checkedCells, new List<Queue<Vector2Int>> { new Queue<Vector2Int>(), new Queue<Vector2Int>(), new Queue<Vector2Int>() });
             if (attackRange > 1)
             {
                 cellsToCheck.Clear();
@@ -505,7 +505,7 @@ public class MasterGrid : MonoBehaviour
                     }
                 }
 
-                List<Queue<Vector2Int>> squareQueuesListRangedAttack = AStarSearchRecursive(mTarget, 0, attackRange - 1, cellsToCheck, checkedCells, new List<Queue<Vector2Int>> { new Queue<Vector2Int>(), new Queue<Vector2Int>(), new Queue<Vector2Int>() });
+                List<Queue<Vector2Int>> squareQueuesListRangedAttack = FloodFillSearch(mTarget, 0, attackRange - 1, cellsToCheck, checkedCells, new List<Queue<Vector2Int>> { new Queue<Vector2Int>(), new Queue<Vector2Int>(), new Queue<Vector2Int>() });
 
 
                 //ManualTestAndPrintLogQueueSizes(squareQueuesListRangedAttack);
@@ -525,24 +525,76 @@ public class MasterGrid : MonoBehaviour
         else //unit can't move and attack
         {
             cellsToCheck.Enqueue((new Vector2Int(xpos + 1, ypos + 1), movementRange));
-            //List<Queue<Vector2Int>> movementSquareQueuesList = AStarSearchRecursive(mTarget, movementRange, 0, cellsToCheck, checkedCells, new List<Queue<Vector2Int>> { new Queue<Vector2Int>(), new Queue<Vector2Int>(), new Queue<Vector2Int>()}, true);
-            List<Queue<Vector2Int>> movementSquareQueuesList = AStarSearchRecursive(mTarget, movementRange, 0, cellsToCheck, checkedCells, new List<Queue<Vector2Int>> { new Queue<Vector2Int>(), new Queue<Vector2Int>(), new Queue<Vector2Int>()});
+            //List<Queue<Vector2Int>> movementSquareQueuesList = FloodFillSearch(mTarget, movementRange, 0, cellsToCheck, checkedCells, new List<Queue<Vector2Int>> { new Queue<Vector2Int>(), new Queue<Vector2Int>(), new Queue<Vector2Int>()}, true);
+            List<Queue<Vector2Int>> movementSquareQueuesList = FloodFillSearch(mTarget, movementRange, 0, cellsToCheck, checkedCells, new List<Queue<Vector2Int>> { new Queue<Vector2Int>(), new Queue<Vector2Int>(), new Queue<Vector2Int>()});
             DrawSquaresFromSearch(movementSquareQueuesList);
 
             cellsToCheck = new Queue<(Vector2Int, int)>();
             cellsToCheck.Enqueue((new Vector2Int(xpos + 1, ypos + 1), attackRange));
             checkedCells = new bool[gridX + 2, gridY + 2];
             checkedCells[xpos + 1, ypos + 1] = true;
-            //List<Queue<Vector2Int>> attackOutlineLocationsQueuesList = AStarSearchRecursive(mTarget, 0, attackRange, cellsToCheck, checkedCells, new List<Queue<Vector2Int>> { new Queue<Vector2Int>(), new Queue<Vector2Int>(), new Queue<Vector2Int>()}, true);
-            List<Queue<Vector2Int>> attackOutlineLocationsQueuesList = AStarSearchRecursive(mTarget, 0, attackRange, cellsToCheck, checkedCells, new List<Queue<Vector2Int>> { new Queue<Vector2Int>(), new Queue<Vector2Int>(), new Queue<Vector2Int>()});
+            //List<Queue<Vector2Int>> attackOutlineLocationsQueuesList = FloodFillSearch(mTarget, 0, attackRange, cellsToCheck, checkedCells, new List<Queue<Vector2Int>> { new Queue<Vector2Int>(), new Queue<Vector2Int>(), new Queue<Vector2Int>()}, true);
+            List<Queue<Vector2Int>> attackOutlineLocationsQueuesList = FloodFillSearch(mTarget, 0, attackRange, cellsToCheck, checkedCells, new List<Queue<Vector2Int>> { new Queue<Vector2Int>(), new Queue<Vector2Int>(), new Queue<Vector2Int>()});
             ManualTestAndPrintLogQueueSizes(attackOutlineLocationsQueuesList);
             DrawAttackOutline(attackOutlineLocationsQueuesList, mTarget);
         }
     }
 
+    public List<Queue<Vector2Int>> FloodFillSearch(
+    BaseUnit mTarget,
+    int movementRange,
+    int attackRange,
+    Queue<(Vector2Int cell, int range)> cellsToCheck,
+    bool[,] checkedCells,
+    List<Queue<Vector2Int>> squareQueuesList)
+    {
+        List<Queue<Vector2Int>> offsetQueue = RecursiveFloodFillSearchOffset(mTarget, movementRange, attackRange, cellsToCheck, checkedCells, squareQueuesList);
+        List<Queue<Vector2Int>> correctedQueue = new List<Queue<Vector2Int>>();
+
+        // Throw an error if the list has more than 3 items
+        if (squareQueuesList == null)
+        {
+            Debug.LogWarning($"The squareQueuesList is null. Filling with empty lists");
+            squareQueuesList = new List<Queue<Vector2Int>>();
+            //populating the first 3 items in the list with empty queues to avoid null reference exceptions.
+            while (squareQueuesList.Count < 3)
+            {
+                squareQueuesList.Add(new Queue<Vector2Int>());
+            }
+        }
+        if (squareQueuesList.Count > 3)
+        {
+            Debug.LogError($"The squareQueuesList contains more than 3 lists. It actually has {squareQueuesList.Count} lists.");
+            return new List<Queue<Vector2Int>>();
+        }
+
+        // Ensure the first three items are not null
+        for (int i = 0; i < 3; i++)
+        {
+            if (i >= squareQueuesList.Count || squareQueuesList[i] == null)
+            {
+                if (squareQueuesList[i] == null)
+                {
+                    squareQueuesList[i] = new Queue<Vector2Int>();
+                }
+            }
+        }
+
+        for(int i=0; i< squareQueuesList.Count; i++)
+        {
+            correctedQueue.Add(new Queue<Vector2Int>());
+            while (squareQueuesList[i].Count > 0)
+            {
+                Vector2Int v = squareQueuesList[i].Dequeue();
+                correctedQueue[i].Enqueue(new Vector2Int(v.x - 1, v.y - 1));
+            }
+        }
+
+        return correctedQueue;
+    }
 
 
-    public List<Queue<Vector2Int>> AStarSearchRecursive(
+    public List<Queue<Vector2Int>> RecursiveFloodFillSearchOffset(
     BaseUnit mTarget,
     int movementRange,
     int attackRange,
@@ -628,7 +680,7 @@ public class MasterGrid : MonoBehaviour
         }
 
         // Recursion
-        return AStarSearchRecursive(mTarget, movementRange, attackRange, cellsToCheck, checkedCells, squareQueuesList);
+        return RecursiveFloodFillSearchOffset(mTarget, movementRange, attackRange, cellsToCheck, checkedCells, squareQueuesList);
     }
 
     public void AnimateMovement(BaseUnit unit, Vector2Int start, Vector2Int end)
@@ -944,15 +996,15 @@ public class MasterGrid : MonoBehaviour
         // Draw movement squares
         while (movementQueue.Count > 0)
         {
-            Vector2Int cell = movementQueue.Dequeue();
-            drawMoveSquare(cell.x - 1, cell.y - 1, drawMovementUnit.playerControl == getPlayerTurn());
+            //Vector2Int cell = movementQueue.Dequeue();
+            drawMoveSquare(movementQueue.Dequeue(), drawMovementUnit.playerControl == getPlayerTurn());
         }
 
         // Draw attack squares
         while (attackQueue.Count > 0)
         {
-            Vector2Int cell = attackQueue.Dequeue();
-            drawDamageSquare(cell.x - 1, cell.y - 1, drawMovementUnit.playerControl == getPlayerTurn());
+            //Vector2Int cell = attackQueue.Dequeue();
+            drawDamageSquare(attackQueue.Dequeue(), drawMovementUnit.playerControl == getPlayerTurn());
         }
 
         // Turn off structure colliders
@@ -993,10 +1045,10 @@ public class MasterGrid : MonoBehaviour
         while (attackQueue.Count > 0)
         {
             Vector2Int cell = attackQueue.Dequeue();
-            BaseUnit unitAtLocation = whatUnitIsInThisLocation(new Vector2Int(cell.x - 1, cell.y - 1));
+            BaseUnit unitAtLocation = whatUnitIsInThisLocation(cell);
             if (unitAtLocation != null && unitAtLocation.playerControl != getPlayerTurn())
             {
-                drawDamageSquare(cell.x - 1, cell.y - 1, drawMovementUnit.playerControl == getPlayerTurn());
+                drawDamageSquare(cell, drawMovementUnit.playerControl == getPlayerTurn());
 /*                BaseStructure s = whatStructureIsInThisLocation(cell.x - 1, cell.y - 1);
                 if (s != null)
                 {
@@ -1005,7 +1057,7 @@ public class MasterGrid : MonoBehaviour
             }
 
             Vector2Int unitLocation = mTarget.pos;
-            Vector2Int attackLocation = new Vector2Int(cell.x - 1, cell.y - 1);
+            Vector2Int attackLocation = cell;
             int xDiff = attackLocation.x - unitLocation.x;
             int yDiff = attackLocation.y - unitLocation.y;
 
@@ -1046,7 +1098,7 @@ public class MasterGrid : MonoBehaviour
 
 
 
-    public void drawMoveSquare(int x, int y, bool isControllersTurn)
+    public void drawMoveSquare(Vector2Int pos, bool isControllersTurn)
     {
         MovementSquare blueSquare = moveSquare;
         Color color = new Color(0.678f, 0.847f, 0.902f, 0.6f);
@@ -1056,12 +1108,12 @@ public class MasterGrid : MonoBehaviour
         if(drawMovementUnit.progeny == Progeny.Sentus)
         {
             //Debug.Log($"Showing shields at {x},{y}, is {defenceGridInt[x, y]}");
-            blueSquare.showShields(defenceGridInt[x, y]);
+            blueSquare.showShields(defenceGridInt[pos.x, pos.y]);
         }
-        Instantiate(blueSquare, new Vector2(x, y), Quaternion.identity, movementSquareList);
+        Instantiate(blueSquare, (Vector2)pos, Quaternion.identity, movementSquareList);
     }
 
-    public void drawDamageSquare(int x, int y, bool isControllersTurn)
+    public void drawDamageSquare(Vector2Int pos, bool isControllersTurn)
     {
         MovementSquare redSquare = moveSquare;
         Color c = new Color(1.0f, 0.6f, 0.6f, 0.6f);
@@ -1069,7 +1121,7 @@ public class MasterGrid : MonoBehaviour
         redSquare.boxCollider2D.enabled = false;
         redSquare.stripeSprite.gameObject.SetActive(!isControllersTurn);
         redSquare.showShields(0);
-        Instantiate(redSquare, new Vector2(x, y), Quaternion.identity, movementSquareList);
+        Instantiate(redSquare, (Vector2)pos, Quaternion.identity, movementSquareList);
     }
 
     public void checkEnemiesInRange(BaseUnit unit) 
@@ -1083,7 +1135,7 @@ public class MasterGrid : MonoBehaviour
 
         bool[,] checkedCells = new bool[gridX + 2, gridY + 2];
         checkedCells[xPos + 1, yPos + 1] = true;
-        List<Queue<Vector2Int>> squareQueuesList = AStarSearchRecursive(unit, 0, range, cellsToCheck, checkedCells, new List<Queue<Vector2Int>> { new Queue<Vector2Int>(), new Queue<Vector2Int>(), new Queue<Vector2Int>() });
+        List<Queue<Vector2Int>> squareQueuesList = FloodFillSearch(unit, 0, range, cellsToCheck, checkedCells, new List<Queue<Vector2Int>> { new Queue<Vector2Int>(), new Queue<Vector2Int>(), new Queue<Vector2Int>() });
         //ManualTestAndPrintLogQueueSizes(squareQueuesList);
         foreach (var cell in squareQueuesList[1])
         {
