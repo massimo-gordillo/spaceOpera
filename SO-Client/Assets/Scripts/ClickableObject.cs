@@ -4,12 +4,12 @@ using UnityEngine.EventSystems;
 public class ClickableObject : MonoBehaviour
 {
     private bool isDragging = false;
-    private CameraDrag cameraDrag;
+    private CameraManager cameraManager;
 
     protected virtual void Start()
     {
-        cameraDrag = Camera.main.GetComponent<CameraDrag>();
-        if (cameraDrag == null)
+        cameraManager = Camera.main.GetComponent<CameraManager>();
+        if (cameraManager == null)
         {
             Debug.LogError("CameraDrag component not found on the main camera.");
         }
@@ -21,10 +21,10 @@ public class ClickableObject : MonoBehaviour
         // Update the dragging status from CameraDrag
         if (Camera.main != null)
         {
-            //cameraDrag = Camera.main.GetComponent<CameraDrag>();
-            if (cameraDrag != null)
+            //cameraManager = Camera.main.GetComponent<CameraDrag>();
+            if (cameraManager != null)
             {
-                isDragging = cameraDrag.IsDragging();
+                isDragging = cameraManager.IsDragging();
             }
         }
     }
@@ -32,8 +32,8 @@ public class ClickableObject : MonoBehaviour
 /*    private void OnMouseUpAsButton()
     {
         print("onMouseUpAsButton");
-        // Ensure cameraDrag is not null before calling the method
-        if (!isDragging && cameraDrag.isMouseDownOnClickableObject)
+        // Ensure cameraManager is not null before calling the method
+        if (!isDragging && cameraManager.isMouseDownOnClickableObject)
         //if (!isDragging)
         {
             
@@ -43,8 +43,8 @@ public class ClickableObject : MonoBehaviour
 
 /*    public void OnPointerClick(PointerEventData eventData)
     {
-        // Ensure cameraDrag is not null before calling the method
-        //if (!isDragging && cameraDrag.isMouseDownOnClickableObject)
+        // Ensure cameraManager is not null before calling the method
+        //if (!isDragging && cameraManager.isMouseDownOnClickableObject)
         //{
             HandleClick();
         //}

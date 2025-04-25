@@ -97,7 +97,6 @@ public class BaseUnit : MonoBehaviour
         //print("BaseUnit initiated. xPos: " + transform.position.x + "ypos: " + transform.position.y +"instanceID: "+this.GetInstanceID());
         masterGrid = GameObject.FindGameObjectWithTag("MasterGridTag").GetComponent<MasterGrid>();
         masterGrid.setUnitInGrid(pos, this);
-        Debug.Log($"Length of playerControl = {MasterGrid.playerUnits.Length}, number of players {GameMaster.numPlayers}");
         MasterGrid.playerUnits[playerControl].Add(this);
 
         //if the unit is created after the structure on start, turn off the collider. BaseStructure has a similar check on start.

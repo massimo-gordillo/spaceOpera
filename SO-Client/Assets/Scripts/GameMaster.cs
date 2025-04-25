@@ -488,11 +488,17 @@ public class GameMaster : MonoBehaviour
     public void RunCPUForPlayer(int playerTurn)
     {
         //CPUManager.GetUnitAssignment(playerTurn);
-        CPUManager.CommandUnits(playerTurn);
+        StartCoroutine(RunCPUForPlayerDelay(playerTurn));
+        //CPUManager.CreateUnits(playerTurn, playerProgeny[(byte)playerTurn]);
+    }
+
+    public IEnumerator RunCPUForPlayerDelay(int playerTurn)
+    {
+        yield return StartCoroutine(CPUManager.CommandUnits(playerTurn));
         CPUManager.CreateUnits(playerTurn, playerProgeny[(byte)playerTurn]);
     }
 
-    
+
     public async void SubmitTurnToServer(List<GameAction> gameActions, long preTurnHash, long postTurnHash)
     {
         bool success = await supabaseManager.SendSubmitTurn(gameActions, preTurnHash, postTurnHash);

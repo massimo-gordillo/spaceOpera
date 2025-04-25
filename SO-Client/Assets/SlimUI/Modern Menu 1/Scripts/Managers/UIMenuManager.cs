@@ -159,7 +159,7 @@ namespace SlimUI.ModernMenu{
 
         void Start(){
 			CameraObject = transform.GetComponent<Animator>();
-            //keep initial camera still
+            //keep initial cameraManager still
             CameraObject.SetFloat("Animate", 0);
 
             playMenu.SetActive(false);

@@ -116,7 +116,7 @@ public class UIScriptAnimator : MonoBehaviour
         }
         
 
-        //set camera position to menu
+        //set cameraManager position to menu
         //manager.Position1();
         
         //isTypingComplete = true;
@@ -186,7 +186,7 @@ public class UIScriptAnimator : MonoBehaviour
                 yield return null;
             }
 
-            //set camera position to menu
+            //set cameraManager position to menu
             manager.Position1();
 
             yield return new WaitForSeconds(1.5f);

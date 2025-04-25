@@ -1493,6 +1493,7 @@ MonoBehaviour:
   masterGrid: {fileID: 450342577}
   playersAsCPU: 
   debugLinePrefab: {fileID: 399456013}
+  CPU_AnimationWaitTime: 0.1
 --- !u!1001 &210657160
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4250,6 +4251,7 @@ MonoBehaviour:
   spriteOffStructures: []
   allUnits: []
   gameMaster: {fileID: 1024135144}
+  cameraManager: {fileID: 519420030}
   movementSquareList: {fileID: 1480701702}
   moveSquare: {fileID: 6791101968882301709, guid: 45dd1bafd4332f345914066612cff201, type: 3}
   rangeOutlineSprite: {fileID: 4103190339462976243, guid: a83075add6286d147827284276d39395, type: 3}
@@ -5024,6 +5026,8 @@ MonoBehaviour:
   isMenuDisplayed: 0
   menuWidth: 5
   gameMaster: {fileID: 1024135144}
+  camTransform: {fileID: 519420034}
+  followLerpSpeed: 5
 --- !u!20 &519420031
 Camera:
   m_ObjectHideFlags: 0

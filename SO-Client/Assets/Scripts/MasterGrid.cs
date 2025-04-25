@@ -36,6 +36,7 @@ public class MasterGrid : MonoBehaviour
     public GameObject[] allUnits;
     public static List<BaseUnit>[] playerUnits;
     public GameMaster gameMaster;
+    public CameraManager cameraManager;
     //public int playerTurn;
     private Dictionary<byte, AttributesTile> tileAttributes;
     private Dictionary<string, Dictionary<string, double>> combatMultipliers;
@@ -684,7 +685,7 @@ public class MasterGrid : MonoBehaviour
 
     public void AnimateMovement(BaseUnit unit, Vector2Int start, Vector2Int end)
     {
-
+        
         //Debug.Log($"Animating movement from {start} to {end}");
         List<Vector2Int> path = BidirectionalSearch(start, end, unit, unit.movementRange+1);
         //List<Vector2Int> path = BidirectionalSearch(start, end, unit);
@@ -697,12 +698,13 @@ public class MasterGrid : MonoBehaviour
             Debug.LogError("No valid path found for movement animation.");
             return;
         }
-
+        
         StartCoroutine(AnimateMovementVisual(unit, path, speed));
         //Debug.Log("Movement animation complete.");
     }
     public IEnumerator AnimateMovementVisual(BaseUnit unit, List<Vector2Int> path, float speed)
     {
+        cameraManager.SetFollowTarget(unit.transform);
         foreach (var position in path)
         {
             Vector3 targetPosition = new Vector3(position.x, position.y, unit.transform.position.z);
@@ -714,6 +716,7 @@ public class MasterGrid : MonoBehaviour
                     yield break;
             }
         }
+        cameraManager.ClearFollowTarget();
 
         //Debug.Log("Movement animation complete.");
     }

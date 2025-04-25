@@ -36,6 +36,7 @@ public class CPUManager : MonoBehaviour
     public List<BaseUnit>[] CPU_Units = new List<BaseUnit>[GameMaster.numPlayers+1];
 
     public GameObject debugLinePrefab;
+    public float CPU_AnimationWaitTime = 10.0f;
 
 
 
@@ -126,7 +127,7 @@ public class CPUManager : MonoBehaviour
         }*/
 
         InitClosestNeighbour();
-        StartCoroutine(DrawStructureDebugLines());
+        //StartCoroutine(DrawStructureDebugLines());
     }
 
     public void Start()
@@ -424,7 +425,7 @@ public class CPUManager : MonoBehaviour
             }
             foreach (BaseUnit attackableUnit in unit.CPU_AttackableUnitList)
             {
-                //Debug.Log($"Unit {unit.pos} is checking if it should attack {attackableUnit.pos}");
+                Debug.Log($"Unit {unit.pos} is checking if it should attack {attackableUnit.pos}");
                 double damageDelta = GetDamageCostDelta(unit, attackableUnit);
                 //Debug.Log($"Unit {unit.pos} attacking {attackableUnit.pos} has damage delta {damageDelta}");
                 if (damageDelta > mostDamageDelta)
@@ -451,6 +452,12 @@ public class CPUManager : MonoBehaviour
                     masterGrid.unitCombat(unit, candidate);
                     unit.setNonExhausted(false);
                 }
+                //failcase if the unit attacks while landing on the enemy HQ, remove softlocks.
+                if (unit.pos == defaultTargets[unit.playerControl].pos && unit.CPU_TargetNode == defaultTargets[unit.playerControl])
+                {
+                    masterGrid.deleteUnit(unit);
+                }
+                
             }
             else
             {
@@ -469,7 +476,10 @@ public class CPUManager : MonoBehaviour
         //might be nice to prioritize full destroying units over just maxing out cost, but that's good enough for now.
 
         double attackCost = Math.Min(masterGrid.getDamageBeforeLuck(attacker, defender, false), defender.healthCurrent) * defender.price;
-        double firebackCost = Math.Min(masterGrid.getDamageBeforeLuck(defender, attacker, true), attacker.healthCurrent) * attacker.price;
+        double firebackCost = 0;
+        //if unit will fire back calculate that
+        if (masterGrid.getDamageBeforeLuck(attacker, defender, false) < defender.healthCurrent)
+            firebackCost = Math.Min(masterGrid.getDamageBeforeLuck(defender, attacker, true), attacker.healthCurrent) * attacker.price;
         double delta = attackCost - firebackCost;
         if (delta > 0)
             return delta;
@@ -796,17 +806,19 @@ public class CPUManager : MonoBehaviour
         }
     }
 
-    public void CommandUnits(int player)
+    public IEnumerator CommandUnits(int player)
     {
         if (!(GameMaster.CPU_PlayersList[player] && player == gameMaster.getPlayerTurn() && GameMaster.CPU_isOn)) //probably a duplicate check but can't hurt, no cheating!
         {
-            return;
+            yield return null;
         }
-
-        foreach (BaseUnit unit in MasterGrid.playerUnits[player])
+        List<BaseUnit> unitsToCommand = new List<BaseUnit>(MasterGrid.playerUnits[player]);
+        
+        foreach (BaseUnit unit in unitsToCommand)
         {
+            yield return new WaitForSeconds(CPU_AnimationWaitTime);
             if (GameMaster.isGameComplete)
-                return;
+                break;
             CollectPotentialGameActions(unit);
             NetworkNode targetNode = unit.CPU_TargetNode;
             if (targetNode == null)
@@ -847,8 +859,8 @@ public class CPUManager : MonoBehaviour
                     CPU_MoveUnitTowardsTargetNode(unit);
                 }
             }
-            
 
+            yield return new WaitForSeconds(CPU_AnimationWaitTime);
 
 
         }
@@ -882,7 +894,8 @@ public class CPUManager : MonoBehaviour
                                             {
                                                 Debug.Log($"Setting target for {unit.pos} to {target}");
                                             }*/
-                    if ((unit.pos - target).magnitude != 0)
+                    //don't land on enemyHQ unless it's your capture target
+                    if ((unit.pos - target).magnitude != 0 && (target != defaultTargets[unit.playerControl].pos || unit.CPU_TargetNode == defaultTargets[unit.playerControl]))
                     {
 
                         //Debug.Log($"Moving unit {unit.pos} to {target}");
@@ -966,88 +979,22 @@ public class CPUManager : MonoBehaviour
 
                 furthestStep = step;
             }
-
-            if (furthestStep != unit.pos)
+            //don't land on the enemy HQ.
+            if (furthestStep != unit.pos && furthestStep != defaultTargets[unit.playerControl].pos)
             {
-                masterGrid.selectedUnit = unit;
+                if(Manhattan(furthestStep, unit.pos) != unit.movementRange )
+                {
+                    Debug.Log($"Unit {unit.pos} did not move full range, stopped at {furthestStep}");
+                }
+                masterGrid.selectedUnit = unit;                
                 masterGrid.moveSelectedUnit(furthestStep);
+                
             }
             else
             {
                 Debug.Log($"Unit {unit.pos} had no legal movement this turn");
             }
         }
-
-
-        /*else // if non-resource unit (combat unit)
-        {
-            int minDistanceFromTarget = 3;
-
-            // If we don’t have a target, or we are standing on it, ask for a new one
-            if (unit.pos == nodePos || unit.CPU_TargetNode == null)
-            {
-                GiveCombatUnitNextNodeAssignment(unit);
-                nodePos = unit.CPU_TargetNode.pos; // Update nodePos in case it changed
-            }
-
-            // Calculate a path toward the current target
-            List<Vector2Int> fullPath = masterGrid.BidirectionalSearch(
-                unit.pos,
-                nodePos,
-                unit,
-                unit.movementRange / 2 + minDistanceFromTarget
-            );
-
-            if (fullPath.Count == 0)
-            {
-                Debug.Log($"Unit {unit.pos} could not find a path to min distance from target");
-                return;
-            }
-
-            bool passedThroughAcceptableRange = false;
-            Vector2Int rerouteStartTile = unit.pos;
-            Vector2Int furthestTile = unit.pos;
-
-            foreach (Vector2Int step in fullPath)
-            {
-                int distToTarget = Manhattan(step, nodePos);
-                int distFromStart = Manhattan(step, unit.pos);
-
-                if (distToTarget <= minDistanceFromTarget && !passedThroughAcceptableRange)
-                {
-                    passedThroughAcceptableRange = true;
-
-                    // Reroute from here
-                    GiveCombatUnitNextNodeAssignment(unit);
-                    nodePos = unit.CPU_TargetNode.pos;
-
-                    // Recalculate the path starting from this step
-                    fullPath = masterGrid.BidirectionalSearch(step, nodePos, unit, unit.movementRange);
-                    // If rerouting fails, just keep going toward the current one
-                    if (fullPath.Count == 0)
-                        break;
-
-                    // Reset loop from reroute point
-                    rerouteStartTile = step;
-                    furthestTile = step;
-                    distFromStart = 0; // We're starting fresh
-                }
-
-                if (distFromStart <= unit.movementRange)
-                    furthestTile = step;
-
-                if (distFromStart >= unit.movementRange)
-                    break;
-            }
-
-            // Move the unit if they actually made progress
-            if (furthestTile != unit.pos)
-            {
-                masterGrid.selectedUnit = unit;
-                masterGrid.moveSelectedUnit(furthestTile);
-            }
-        }*/
-
 
     }
 
@@ -1095,7 +1042,7 @@ public class CPUManager : MonoBehaviour
                 if (structure.structureType == 2)
                     airports.Add(structure);
             }
-            GenerateSpendErtrian();
+            StartCoroutine(GenerateSpendErtrian());
 /*            foreach (BaseStructure structure in prods)
             {
                 if (structure.playerControl == player && structure.structureType == 1)
@@ -1107,7 +1054,7 @@ public class CPUManager : MonoBehaviour
             }*/
         }
 
-        void GenerateSpendErtrian()
+        IEnumerator GenerateSpendErtrian()
         {
             List<(BaseUnit, int)> priceList = GameMaster.unitCosts[0];
 
@@ -1143,14 +1090,17 @@ public class CPUManager : MonoBehaviour
                         GiveCombatUnitNextNodeAssignment(candidateAirUnit);
                         //CPU_MoveUnitTowardsTargetNode(candidateAirUnit);
                         cashRemain -= candidateAirUnit.price;
+                        yield return new WaitForSeconds(CPU_AnimationWaitTime);
                     }
                 }
             if (factories.Count > 0)
             {
                 //gameMaster.selectedStructure = factories[0];
                 //BaseUnit progenyResourceUnit = gameMaster.ProduceResourceUnit(factories[0], player);
+                yield return new WaitForSeconds(CPU_AnimationWaitTime);
                 gameMaster.ProduceResourceUnit(factories[0], player);
-                
+                yield return new WaitForSeconds(CPU_AnimationWaitTime);
+
                 //CPU_MoveUnitTowardsTargetNode(progenyResourceUnit);
                 for (int i = 1; i < factories.Count; i++)
                 {
@@ -1173,6 +1123,7 @@ public class CPUManager : MonoBehaviour
                         priorityNodeVectorMap.TryGetValue(factories[i].pos, out candidateFactoryUnit.CPU_TargetNode);
                         GiveCombatUnitNextNodeAssignment(candidateFactoryUnit);
                         cashRemain -= (candidateFactoryUnit.price - 100);
+                        yield return new WaitForSeconds(CPU_AnimationWaitTime);
                     }
                 }
                 /*            if(factories.Count == 1)
@@ -1306,13 +1257,13 @@ public class CPUManager : MonoBehaviour
             }
         }
 
-        for (int p = 1;  p <= GameMaster.numPlayers; p++){
+/*        for (int p = 1;  p <= GameMaster.numPlayers; p++){
 
             foreach (NetworkNode node in priorityNetworkNodes)
             {
                 Debug.Log($"Node {node.pos} is pointing at {node.priorityNextNodeToTarget[p].pos} with cost {node.priorityCostToTarget[p]} for player {p}");
             }
-        }
+        }*/
     }
 
 
@@ -1463,7 +1414,12 @@ public class CPUManager : MonoBehaviour
         //MG 25-04-2: realizing now this implementation doesn't properly handle ground units moving through unpassable terrain, I think.
         NetworkNode nextTargetNode = currentNode.priorityNextNodeToTarget[unit.playerControl];
         unit.CPU_TargetNode = nextTargetNode;
-        Debug.Log($"Setting {unit.pos}'s target node to {unit.CPU_TargetNode.pos}");
+        if (unit.CPU_TargetNode == null)
+        {
+            Debug.Log($"{unit.pos}'s target node is null because {currentNode} doesn't have a target");
+        }
+        else
+            Debug.Log($"Setting {unit.pos}'s target node to {unit.CPU_TargetNode.pos}");
     }
 
 /*    public static NetworkNode GetUnitAssignment(BaseUnit unit)
