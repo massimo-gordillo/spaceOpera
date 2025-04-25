@@ -439,8 +439,7 @@ public class MasterGrid : MonoBehaviour
         selectedUnit.undoingMovement = true;
         if (selectedUnit.oldPos != null)  
         {
-            Vector2Int oldPos = new Vector2Int();
-            oldPos = (Vector2Int)selectedUnit.oldPos;
+            Vector2Int oldPos = (Vector2Int)selectedUnit.oldPos;
             BaseStructure oldStructure = whatStructureIsInThisLocation(oldPos);
             //debug the values in the if statement below
             //Debug.Log($"oldX: {oldX}, oldY: {oldY}, isResourceUnit {selectedUnit.isResourceUnit}, prevCaptureVal {selectedUnit.prevStructureCaptureVal}, oldStructure: {oldStructure}, oldStructure.playerControl: {oldStructure.playerControl}, selectedUnit.playerControl: {selectedUnit.playerControl}");
@@ -1011,7 +1010,7 @@ public class MasterGrid : MonoBehaviour
         while (structureQueue.Count > 0)
         {
             Vector2Int cell = structureQueue.Dequeue();
-            BaseStructure s = whatStructureIsInThisLocation(new Vector2Int(cell.x - 1, cell.y - 1));
+            BaseStructure s = whatStructureIsInThisLocation(cell);
             if (s != null)
             {
                 turnOffStructureCollider(s);
@@ -1137,9 +1136,10 @@ public class MasterGrid : MonoBehaviour
         checkedCells[xPos + 1, yPos + 1] = true;
         List<Queue<Vector2Int>> squareQueuesList = FloodFillSearch(unit, 0, range, cellsToCheck, checkedCells, new List<Queue<Vector2Int>> { new Queue<Vector2Int>(), new Queue<Vector2Int>(), new Queue<Vector2Int>() });
         //ManualTestAndPrintLogQueueSizes(squareQueuesList);
-        foreach (var cell in squareQueuesList[1])
+        foreach (Vector2Int cell in squareQueuesList[1])
         {
-            BaseUnit unitInLocation = whatUnitIsInThisLocation(new Vector2Int(cell.x - 1, cell.y - 1));
+            BaseUnit unitInLocation = whatUnitIsInThisLocation(cell);
+            //BaseUnit unitInLocation = whatUnitIsInThisLocation(new Vector2Int(cell.x - 1, cell.y - 1));
             if (unitInLocation != null && unitInLocation != unit && unitInLocation.playerControl != unit.playerControl && unitInLocation.unitName != "seed")
             {
                 setUnitToAttackable(unit, unitInLocation);

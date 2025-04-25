@@ -8786,8 +8786,12 @@ MonoBehaviour:
   defenceValueTextContainer: {fileID: 0}
   damageRangeTextContainer: {fileID: 0}
   combatTooltip: {fileID: 0}
-  CPU_Heading: {x: 0, y: 0}
   CPU_IsCapturing: 0
+  CPU_StructureList: []
+  CPU_CapturableStructureList: []
+  CPU_CapturingUnitList: []
+  CPU_AttackableUnitList: []
+  CPU_AttackableResourceUnitList: []
 --- !u!4 &1022985285 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 579629524903404737, guid: ddb92d03861e68e40a31738e120ba8ac, type: 3}
@@ -19360,8 +19364,12 @@ MonoBehaviour:
   defenceValueTextContainer: {fileID: 0}
   damageRangeTextContainer: {fileID: 0}
   combatTooltip: {fileID: 0}
-  CPU_Heading: {x: 0, y: 0}
   CPU_IsCapturing: 0
+  CPU_StructureList: []
+  CPU_CapturableStructureList: []
+  CPU_CapturingUnitList: []
+  CPU_AttackableUnitList: []
+  CPU_AttackableResourceUnitList: []
 --- !u!1 &1844876244
 GameObject:
   m_ObjectHideFlags: 0
@@ -20220,8 +20228,12 @@ MonoBehaviour:
   defenceValueTextContainer: {fileID: 0}
   damageRangeTextContainer: {fileID: 0}
   combatTooltip: {fileID: 0}
-  CPU_Heading: {x: 0, y: 0}
   CPU_IsCapturing: 0
+  CPU_StructureList: []
+  CPU_CapturableStructureList: []
+  CPU_CapturingUnitList: []
+  CPU_AttackableUnitList: []
+  CPU_AttackableResourceUnitList: []
 --- !u!1 &1921249645
 GameObject:
   m_ObjectHideFlags: 0

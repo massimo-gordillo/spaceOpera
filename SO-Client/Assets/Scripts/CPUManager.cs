@@ -60,21 +60,6 @@ public class CPUManager : MonoBehaviour
      * 
  */
 
-    /*
-        First implementation:
-        Ok let's do a euclidean distance operation to find the network paths.
-        For this implementation I'm going to compute the euclidean vector distances between all the structures. 
-        Then I'm going to take the two shortest paths to nodes which have yet to perform the operation.
-        Those two paths will be added to the network, and now that node is no longer a candidate for additional shortest paths.
-        The nodes to which I just made paths will now perform the same "add 2 shortest" operation. This should approximate a sparse shortest path node/vector network.
-        After that is complete, I'm going to update the distances from euclidean to manhattan using the BidirectionalSearch function in GameMaster.
-        There will have to be some finessing here for manhattan distances which exceed shortest distance, say if there's a long line of water in the way.
-        I'll have to implement some tests for that.
-    */
-
-    /*
-     * Pretty impressed with myself for doing the NetworkNode / NetwordEdge implementation. It feels elegant but time will tell.
-     */
 
 
     public void naiveV1Start()
@@ -123,9 +108,11 @@ public class CPUManager : MonoBehaviour
 
         //Debug.Log($"Done searching pairs, node count is {networkEdges.Count}");
 
-        CorrectManhattanDistances();
+        CorrectManhattanDistances(networkEdges);
+        CorrectManhattanDistances(priorityNetworkEdgesAir);
+
         AssignPriorityHeadingsToHQ();
-        SetGroundPriorityNetwork();
+        SetGroundPriorityNetwork(); //not implemented properly rn.
         //DebugEdges();
         //DebugNodes();
 
@@ -139,7 +126,7 @@ public class CPUManager : MonoBehaviour
         }*/
 
         InitClosestNeighbour();
-        //StartCoroutine(DrawStructureDebugLines());
+        StartCoroutine(DrawStructureDebugLines());
     }
 
     public void Start()
@@ -266,14 +253,14 @@ public class CPUManager : MonoBehaviour
 
                 foreach (NetworkEdge edge in current.localEdges.OrderBy(e => e.distance))
                 {
-                    NetworkNode neighbor = edge.GetOtherNode(current);
-                    if (neighbor == null || visited.Contains(neighbor))
+                    NetworkNode currentNeighbor = edge.GetOtherNode(current);
+                    if (currentNeighbor == null || visited.Contains(currentNeighbor))
                         continue;
 
                     // Inherit closest unclaimed from current node
-                    neighbor.closestUnclaimed[p] = current.closestUnclaimed[p];
-                    bfsQueue.Enqueue(neighbor);
-                    visited.Add(neighbor);
+                    currentNeighbor.closestUnclaimed[p] = current.closestUnclaimed[p];
+                    bfsQueue.Enqueue(currentNeighbor);
+                    visited.Add(currentNeighbor);
                 }
             }
 
@@ -282,7 +269,7 @@ public class CPUManager : MonoBehaviour
             {
                 if (n.closestUnclaimed[p] == null)
                 {
-                    Debug.LogWarning($"Node {n.pos} for player {p} has no unclaimed neighbor!");
+                    Debug.LogWarning($"Node {n.pos} for player {p} has no unclaimed currentNeighbor!");
                 }
             }
         }
@@ -456,14 +443,20 @@ public class CPUManager : MonoBehaviour
                     masterGrid.selectedUnit = unit;
                     masterGrid.moveSelectedUnit(GetAdjacentPosFromBidirectionalSearch(path, candidate.pos));
                     masterGrid.unitCombat(unit, candidate);
-                }else if(diff == 1)
+                    unit.setNonExhausted(false);
+                }
+                else if (diff == 1)
                 {
                     masterGrid.selectedUnit = unit;
                     masterGrid.unitCombat(unit, candidate);
+                    unit.setNonExhausted(false);
                 }
             }
             else
-                Debug.LogWarning($"Unit {unit.pos} told to attack but unable to find a cadidate unit to attack even though attack list is not empty");
+            {
+                Debug.LogWarning($"Unit {unit.pos} told to attack but unable to find a cadidate unit to attack even though attack list is not empty, defaulting to movement.");
+                CPU_MoveUnitTowardsTargetNode(unit);
+            }
         }
         
     }
@@ -586,10 +579,10 @@ public class CPUManager : MonoBehaviour
                     for (int offset = 1; offset <= dist; offset++)
                     {
                         Vector2Int checkPos = origin + dir * offset; // This is the main direction we're crawling
-                        if (nodeVectorMap.TryGetValue(checkPos, out BaseStructure neighbor))
+                        if (nodeVectorMap.TryGetValue(checkPos, out BaseStructure currentNeighbor))
                         {
-                            setPair(node, neighbor);
-                            setReverse(neighbor, node);
+                            setPair(node, currentNeighbor);
+                            setReverse(currentNeighbor, node);
                             alreadySet = true;
                             break; // We stop searching in this direction once we find a valid pair
                         }
@@ -618,7 +611,7 @@ public class CPUManager : MonoBehaviour
                 {
 /*                    if (isPriority)
                     {
-                        Debug.Log($"Adding priority edge {node.pos}, {neighbor.pos}");
+                        Debug.Log($"Adding priority edge {node.pos}, {currentNeighbor.pos}");
                     }*/
                     // Add the pair to the vertices list with their positions
                     AddEdge(node, neighbor, isPriority);
@@ -756,22 +749,22 @@ public class CPUManager : MonoBehaviour
             }
         }*/
 
-   /* public IEnumerator DrawStructureDebugLines()
+    public IEnumerator DrawStructureDebugLines()
     {
         GameObject prevLine = null;
-        foreach (NetworkEdge edge in networkEdges)
+        foreach (NetworkNode node in priorityNetworkNodes)
         {
             yield return new WaitForSeconds(0.75f);
             //if (structure == null) continue;
 
             //Vector3 start = new Vector3(structure.xPos, structure.yPos, 0);
-            Vector2Int startV2 = edge.vectorA;
+            Vector2Int startV2 = node.pos;
             Vector3 start = new Vector3(startV2.x, startV2.y, 0);
-            Vector2Int targetV2 = edge.vectorB;
+            Vector2Int targetV2 = node.priorityNextNodeToTarget[1].pos;
 
             Vector3 target = new Vector3(targetV2.x, targetV2.y, 0);
 
-            *//*
+            
                         if (prevLine != null)
                         {
                             LineRenderer prevlr = prevLine.GetComponent<LineRenderer>();
@@ -780,7 +773,7 @@ public class CPUManager : MonoBehaviour
                                 prevlr.startColor = new Color (Color.white.r, Color.white.g, Color.white.b, 0.7f);
                                 prevlr.endColor = new Color(Color.white.r, Color.white.g, Color.white.b, 0.7f);
                             }
-                        }*//*
+                        }
 
             if (startV2 != null && targetV2 != null)
             {
@@ -796,12 +789,12 @@ public class CPUManager : MonoBehaviour
                 prevLine = line;
             }
 
-            *//*            DrawTo(structure.NEpair);
+/*                        DrawTo(structure.NEpair);
                         DrawTo(structure.NWpair);
                         DrawTo(structure.SEpair);
-                        DrawTo(structure.SWpair);*//*
+                        DrawTo(structure.SWpair);*/
         }
-    }*/
+    }
 
     public void CommandUnits(int player)
     {
@@ -907,6 +900,88 @@ public class CPUManager : MonoBehaviour
         else // if non-resource unit (combat unit)
         {
             int minDistanceFromTarget = 3;
+            int movementLeft = unit.movementRange;
+
+            // If no target or we're on the target, get a new one
+            if (unit.pos == nodePos || unit.CPU_TargetNode == null)
+            {
+                GiveCombatUnitNextNodeAssignment(unit);
+                nodePos = unit.CPU_TargetNode.pos;
+            }
+
+            if (Manhattan(unit.pos, nodePos) <= minDistanceFromTarget)
+            {
+                Debug.Log($"Unit {unit.pos} already close enough to target {nodePos}");
+                return;
+            }
+
+            List<Vector2Int> fullPath = masterGrid.BidirectionalSearch(
+                unit.pos,
+                nodePos,
+                unit,
+                movementLeft + minDistanceFromTarget // soft extension
+            );
+
+            if (fullPath == null || fullPath.Count == 0)
+            {
+                Debug.Log($"Unit {unit.pos} couldn't find path toward {nodePos}");
+                return;
+            }
+
+            Vector2Int furthestStep = unit.pos;
+            int stepsTaken = 0;
+
+            for (int i = 0; i < fullPath.Count && stepsTaken < movementLeft; i++)
+            {
+                Vector2Int step = fullPath[i];
+                int distToTarget = Manhattan(step, nodePos);
+
+                stepsTaken++;
+
+                if (distToTarget <= minDistanceFromTarget)
+                {
+                    // Try rerouting, but preserve movementLeft
+                    GiveCombatUnitNextNodeAssignment(unit);
+                    nodePos = unit.CPU_TargetNode.pos;
+
+                    List<Vector2Int> reroutePath = masterGrid.BidirectionalSearch(
+                        step,
+                        nodePos,
+                        unit,
+                        movementLeft - stepsTaken
+                    );
+
+                    if (reroutePath != null && reroutePath.Count > 0)
+                    {
+                        furthestStep = step;
+                        for (int j = 0; j < reroutePath.Count && stepsTaken < movementLeft; j++)
+                        {
+                            furthestStep = reroutePath[j];
+                            stepsTaken++;
+                        }
+                    }
+
+                    break; // whether reroute found path or not, don't move more than allowed
+                }
+
+                furthestStep = step;
+            }
+
+            if (furthestStep != unit.pos)
+            {
+                masterGrid.selectedUnit = unit;
+                masterGrid.moveSelectedUnit(furthestStep);
+            }
+            else
+            {
+                Debug.Log($"Unit {unit.pos} had no legal movement this turn");
+            }
+        }
+
+
+        /*else // if non-resource unit (combat unit)
+        {
+            int minDistanceFromTarget = 3;
 
             // If we don’t have a target, or we are standing on it, ask for a new one
             if (unit.pos == nodePos || unit.CPU_TargetNode == null)
@@ -924,7 +999,10 @@ public class CPUManager : MonoBehaviour
             );
 
             if (fullPath.Count == 0)
+            {
+                Debug.Log($"Unit {unit.pos} could not find a path to min distance from target");
                 return;
+            }
 
             bool passedThroughAcceptableRange = false;
             Vector2Int rerouteStartTile = unit.pos;
@@ -968,7 +1046,7 @@ public class CPUManager : MonoBehaviour
                 masterGrid.selectedUnit = unit;
                 masterGrid.moveSelectedUnit(furthestTile);
             }
-        }
+        }*/
 
 
     }
@@ -1115,7 +1193,7 @@ public class CPUManager : MonoBehaviour
 }
 
 
-    private void OnDrawGizmos()
+/*    private void OnDrawGizmos()
     {
         Gizmos.color = Color.cyan;
 
@@ -1131,7 +1209,7 @@ public class CPUManager : MonoBehaviour
 
             Gizmos.DrawLine(fromPos, toPos);
         }
-    }
+    }*/
 
 
     public void AssignPriorityHeadingsToHQ()
@@ -1157,12 +1235,15 @@ public class CPUManager : MonoBehaviour
         // For each player, crawl from their HQ
         for (int player = 1; player <= numPlayers; player++)
         {
+            //Vector2Int hqPos = commandStructures[player].pos;
             Vector2Int enemyHqPos = defaultTargets[player].pos;
-            NetworkNode hq = priorityNetworkNodes.FirstOrDefault(node => node.pos == enemyHqPos);
+            priorityNodeVectorMap.TryGetValue(enemyHqPos, out NetworkNode hq);
             Queue<NetworkNode> queue = new Queue<NetworkNode>();
+            List<NetworkNode> visitedNodes = new List<NetworkNode>();
             hq.priorityCostToTarget[player] = 0;
             hq.priorityNextNodeToTarget[player] = hq;
             queue.Enqueue(hq);
+            visitedNodes.Add(hq);
 
             if (priorityNetworkNodes.Contains(hq))
             {
@@ -1177,46 +1258,49 @@ public class CPUManager : MonoBehaviour
             while (queue.Count > 0)
             {
                 NetworkNode current = queue.Dequeue();
+                //NetworkNode bestNeighbour = null;
                 int currentDist = current.priorityCostToTarget[player];
 
                 foreach (NetworkEdge edge in current.localEdges)
-                //foreach (NetworkNode neighbor in current.localNodes)
+                //foreach (NetworkNode currentNeighbor in current.localNodes)
                 {
-                    NetworkNode neighbor = edge.GetOtherNode(current);
-                    //Debug.Log($"Node {current.pos} has neighbour {neighbor.pos}");
-                    //Debug.Log($"neighbor at {neighbor.pos} has id {RuntimeHelpers.GetHashCode(neighbor)}");
+                    if (!edge.isLandAccessible)
+                        continue;
+                    NetworkNode currentNeighbor = edge.GetOtherNode(current);
+                    //Debug.Log($"Node {current.pos} has neighbour {currentNeighbor.pos}");
+                    //Debug.Log($"currentNeighbor at {currentNeighbor.pos} has id {RuntimeHelpers.GetHashCode(currentNeighbor)}");
 
-                    /*if (!priorityNetworkNodes.Contains(neighbor))
+                    /*if (!priorityNetworkNodes.Contains(currentNeighbor))
                     {
-                        Debug.LogWarning($"[WARNING] Neighbor {neighbor.pos} is not part of priorityNetworkNodes!");
+                        Debug.LogWarning($"[WARNING] Neighbor {currentNeighbor.pos} is not part of priorityNetworkNodes!");
                     }
-                    if (neighbor.priorityNextNodeToTarget == null)
+                    if (currentNeighbor.priorityNextNodeToTarget == null)
                     {
-                        neighbor.priorityNextNodeToTarget = new NetworkNode[GameMaster.numPlayers + 1];
-                        Debug.Log($"Node {neighbor.pos} priorityNextNode not initialized");
+                        currentNeighbor.priorityNextNodeToTarget = new NetworkNode[GameMaster.numPlayers + 1];
+                        Debug.Log($"Node {currentNeighbor.pos} priorityNextNode not initialized");
                     }                    
-                    if(neighbor.priorityCostToTarget == null)
+                    if(currentNeighbor.priorityCostToTarget == null)
                     {
-                        neighbor.priorityCostToTarget = new int[GameMaster.numPlayers + 1];
-                        Debug.Log($"Node {neighbor.pos} priorityNextNodeCost not initialized");
+                        currentNeighbor.priorityCostToTarget = new int[GameMaster.numPlayers + 1];
+                        Debug.Log($"Node {currentNeighbor.pos} priorityNextNodeCost not initialized");
 
 
                     }*/
-                    int newDist = Manhattan(hq.pos, neighbor.pos);
+                    int newDist = Manhattan(hq.pos, currentNeighbor.pos);
 
-                    //Debug.Log($"Node {current.pos} has local neighbour {neighbor.pos} with distance {newDist} vs {neighbor.priorityCostToTarget[player]}");
+                    //Debug.Log($"Node {current.pos} has local neighbour {currentNeighbor.pos} with distance {newDist} vs {currentNeighbor.priorityCostToTarget[player]}");
 
-                    if (neighbor.priorityCostToTarget[player] == 0 && neighbor != hq)
+                    if (currentNeighbor.priorityCostToTarget[player] == 0 && currentNeighbor != hq)
                     {
-                        Debug.LogWarning($"[COST WARNING] Node at {neighbor.pos} has cost 0 but isn't HQ! Investigate who changed this.");
+                        Debug.LogWarning($"[COST WARNING] Node at {currentNeighbor.pos} has cost 0 but isn't HQ! Investigate who changed this.");
                     }
 
-                    if (newDist < neighbor.priorityCostToTarget[player])
+
+                    if (newDist < currentNeighbor.priorityCostToTarget[player])
                     {
-                        neighbor.priorityCostToTarget[player] = newDist;
-                        neighbor.priorityNextNodeToTarget[player] = current; // "To get to HQ, go through current"
-                        //Debug.Log($"Updating {current.pos} with neighbour {neighbor.pos} with cost {neighbor.priorityCostToTarget[player]} and target {neighbor.priorityNextNodeToTarget[player]}");
-                        queue.Enqueue(neighbor);
+                        currentNeighbor.priorityCostToTarget[player] = newDist;
+                        currentNeighbor.priorityNextNodeToTarget[player] = current;
+                        queue.Enqueue(currentNeighbor);
                     }
                 }
             }
@@ -1250,10 +1334,10 @@ public class CPUManager : MonoBehaviour
     }
 
 
-    public void CorrectManhattanDistances()
+    public void CorrectManhattanDistances(List<NetworkEdge> edges)
     {
 
-        foreach (NetworkEdge edge in networkEdges)
+        foreach (NetworkEdge edge in edges)
         {
             //bool curiousCheck = false;
             //curiousCheck = node.Equals(new NetworkEdge(new Vector2Int(8,2), new Vector2Int(10, 2)));
@@ -1261,7 +1345,7 @@ public class CPUManager : MonoBehaviour
 
             List<Vector2Int> dirs = new();
             //a little hacky using speficially infantry for this but that will be the source of truth for now.
-            dirs = masterGrid.BidirectionalSearch(edge.vectorA, edge.vectorB, PrefabManager.getBaseUnitFromName("Infantry", 0), edge.distance + 1);
+            dirs = masterGrid.BidirectionalSearch(edge.vectorA, edge.vectorB, PrefabManager.getBaseUnitFromName("Infantry", 0), (int)(edge.distance *0.75 + 1));
             if (dirs.Count == 0) {
                 edge.isLandAccessible = false;
                 Debug.Log($"GraphEdge {edge.vectorA}{edge.vectorB} is not land accessible");
@@ -1291,6 +1375,7 @@ public class CPUManager : MonoBehaviour
             }
 
         }
+        
         Debug.Log("Done checking land accessibility");
     }
 
