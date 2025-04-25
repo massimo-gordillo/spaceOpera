@@ -315,13 +315,17 @@ public class CPUManager : MonoBehaviour
 
     public void CollectPotentialGameActions(BaseUnit unit)
     {
+/*        bool isCurious = false;
+        if (!unit.isResourceUnit)
+            isCurious = true;*/
+
         Queue<(Vector2Int cell, int range)> cellsToCheck = new Queue<(Vector2Int, int)>();
         bool[,] checkedCells = new bool[masterGrid.gridX + 2, masterGrid.gridY + 2];
         checkedCells[unit.pos.x + 1, unit.pos.y + 1] = true;
         cellsToCheck.Enqueue((new Vector2Int(unit.pos.x + 1, unit.pos.y + 1), unit.movementRange + 1));//assuming unit only has 1 attack range for the first vectorA* search.
         List<Queue<Vector2Int>> squareQueuesList = null;
         if (unit.attackRange >= 1)
-            squareQueuesList = masterGrid.AStarSearchRecursive(unit, unit.movementRange, 1, cellsToCheck, checkedCells, new List<Queue<Vector2Int>> { new Queue<Vector2Int>(), new Queue<Vector2Int>(), new Queue<Vector2Int>() });
+            squareQueuesList = masterGrid.FloodFillSearch(unit, unit.movementRange, 1, cellsToCheck, checkedCells, new List<Queue<Vector2Int>> { new Queue<Vector2Int>(), new Queue<Vector2Int>(), new Queue<Vector2Int>() });
         //masterGrid.ManualTestAndPrintLogQueueSizes(squareQueuesList);
         //Debug.LogError($"unit {unit.pos} has printed it's queue sizes ^");
         Queue<Vector2Int> movementQueue = squareQueuesList[0];
@@ -331,10 +335,43 @@ public class CPUManager : MonoBehaviour
         //clear list from last search
         unit.CPU_AttackableUnitList = new List<BaseUnit>();
         unit.CPU_AttackableResourceUnitList = new List<BaseUnit>();
+/*        if (isCurious)
+            foreach (Vector2Int m in movementQueue)
+                //attackQueue.Enqueue(m);
+                Debug.Log($"unit {unit.pos} has movement location {m}");*/
         foreach(Vector2Int attackSquare in attackQueue)
         {
+            /*if(isCurious)
+                Debug.Log($"unit {unit.pos} has attack location {attackSquare}");
+            */
             BaseUnit attackable = masterGrid.whatUnitIsInThisLocation(attackSquare);
-            if(attackable != null)
+           /* if (isCurious && attackSquare == new Vector2Int(12, 8))
+                Debug.Log($"BOOL: unit {unit.pos}, has found an attackable? {attackable} owned by player {attackable.playerControl}, can they attack it? {masterGrid.canUnitAttack(unit, attackable)}");
+*/
+            if (attackable != null)
+            {
+                /*if(isCurious)
+                    Debug.Log($"unit found at location {attackSquare} by {unit.pos}, it is an {attackable.unitName} owned by player {attackable.playerControl}, can they attack it? {masterGrid.canUnitAttack(unit, attackable)}");
+                */
+                if (masterGrid.canUnitAttack(unit, attackable))
+                {
+                    unit.CPU_AttackableUnitList.Add(attackable);
+                 /*   if (isCurious)
+                        Debug.Log($"counting: Unit {unit.pos} has an attack list of length {unit.CPU_AttackableUnitList.Count}");
+*/
+                    if (attackable.isResourceUnit)
+                    {
+                        unit.CPU_AttackableResourceUnitList.Add(attackable);
+                    }
+                }
+            }
+        }
+/*
+        //debug for attack list gen.
+        foreach (Vector2Int attackSquare in movementQueue)
+        {
+            BaseUnit attackable = masterGrid.whatUnitIsInThisLocation(attackSquare);
+            if (attackable != null)
             {
                 if (masterGrid.canUnitAttack(unit, attackable))
                 {
@@ -345,12 +382,18 @@ public class CPUManager : MonoBehaviour
                     }
                 }
             }
-
-        }
-/*        foreach (BaseUnit attack in attackableUnitList)
-        {
-            Debug.Log($"Unit {unit.pos} can attack {attack.pos}");
         }*/
+
+/*        if (!unit.isResourceUnit && isCurious)
+        {
+            Debug.Log($"Unit {unit.pos} has an attack queue of length {attackQueue.Count}");
+            Debug.Log($"Unit {unit.pos} has an attack list of length {unit.CPU_AttackableUnitList.Count}");
+        }*/
+
+        /*        foreach (BaseUnit attack in attackableUnitList)
+                {
+                    Debug.Log($"Unit {unit.pos} can attack {attack.pos}");
+                }*/
 
         //clear lists from last search
         unit.CPU_StructureList = new List<BaseStructure>();
@@ -368,10 +411,7 @@ public class CPUManager : MonoBehaviour
                 unit.CPU_CapturingUnitList.Add(unitAtLoc);
         }
 
-        if (!unit.isResourceUnit)
-        {
-            Debug.Log($"Unit {unit.pos} has an attack list of length {unit.CPU_AttackableUnitList.Count}");
-        }
+
         
     }
 
@@ -397,8 +437,9 @@ public class CPUManager : MonoBehaviour
             }
             foreach (BaseUnit attackableUnit in unit.CPU_AttackableUnitList)
             {
-                
+                //Debug.Log($"Unit {unit.pos} is checking if it should attack {attackableUnit.pos}");
                 double damageDelta = GetDamageCostDelta(unit, attackableUnit);
+                //Debug.Log($"Unit {unit.pos} attacking {attackableUnit.pos} has damage delta {damageDelta}");
                 if (damageDelta > mostDamageDelta)
                 {
                     candidate = attackableUnit;
@@ -414,6 +455,10 @@ public class CPUManager : MonoBehaviour
                     List<Vector2Int> path = masterGrid.BidirectionalSearch(unit.pos, candidate.pos, unit, ((unit.movementRange + unit.movementRange % 2) / 2 + 1));
                     masterGrid.selectedUnit = unit;
                     masterGrid.moveSelectedUnit(GetAdjacentPosFromBidirectionalSearch(path, candidate.pos));
+                    masterGrid.unitCombat(unit, candidate);
+                }else if(diff == 1)
+                {
+                    masterGrid.selectedUnit = unit;
                     masterGrid.unitCombat(unit, candidate);
                 }
             }
@@ -773,7 +818,10 @@ public class CPUManager : MonoBehaviour
             NetworkNode targetNode = unit.CPU_TargetNode;
             if (targetNode == null)
             {
-                GiveResourceUnitNodeAssignment(unit);
+                if(unit.isResourceUnit)
+                    GiveResourceUnitNodeAssignment(unit);
+                else
+                    GiveCombatUnitNextNodeAssignment(unit);
                 targetNode = unit.CPU_TargetNode;
                 if(targetNode == null)
                 {
@@ -856,49 +904,72 @@ public class CPUManager : MonoBehaviour
             }
 
         }
-        else //if non-resource unit.
+        else // if non-resource unit (combat unit)
         {
             int minDistanceFromTarget = 3;
+
+            // If we don’t have a target, or we are standing on it, ask for a new one
             if (unit.pos == nodePos || unit.CPU_TargetNode == null)
             {
-                //get a new target node
-                GiveCombatUnitNodeAssignment(unit);
-            }
-            // Full path to target
-            List<Vector2Int> fullPath = masterGrid.BidirectionalSearch(unit.pos, nodePos, unit, unit.movementRange/2 + minDistanceFromTarget);
-            if (fullPath.Count == 0)
-            {
-                return;
+                GiveCombatUnitNextNodeAssignment(unit);
+                nodePos = unit.CPU_TargetNode.pos; // Update nodePos in case it changed
             }
 
+            // Calculate a path toward the current target
+            List<Vector2Int> fullPath = masterGrid.BidirectionalSearch(
+                unit.pos,
+                nodePos,
+                unit,
+                unit.movementRange / 2 + minDistanceFromTarget
+            );
+
+            if (fullPath.Count == 0)
+                return;
+
             bool passedThroughAcceptableRange = false;
+            Vector2Int rerouteStartTile = unit.pos;
             Vector2Int furthestTile = unit.pos;
-            int totalSteps = 0;
 
             foreach (Vector2Int step in fullPath)
             {
-                totalSteps++;
-                int manhattanToTarget = Manhattan(step, nodePos);//Mathf.Abs(step.x - nodePos.x) + Mathf.Abs(step.y - nodePos.y);
-                int manhattanFromUnit = Manhattan(step, unit.pos);//Mathf.Abs(step.x - unit.pos.x) + Mathf.Abs(step.y - unit.pos.y);
+                int distToTarget = Manhattan(step, nodePos);
+                int distFromStart = Manhattan(step, unit.pos);
 
-                if (manhattanToTarget <= minDistanceFromTarget)
+                if (distToTarget <= minDistanceFromTarget && !passedThroughAcceptableRange)
+                {
                     passedThroughAcceptableRange = true;
 
-                // Only consider tiles we can reach this turn
-                if (manhattanFromUnit <= unit.movementRange)
+                    // Reroute from here
+                    GiveCombatUnitNextNodeAssignment(unit);
+                    nodePos = unit.CPU_TargetNode.pos;
+
+                    // Recalculate the path starting from this step
+                    fullPath = masterGrid.BidirectionalSearch(step, nodePos, unit, unit.movementRange);
+                    // If rerouting fails, just keep going toward the current one
+                    if (fullPath.Count == 0)
+                        break;
+
+                    // Reset loop from reroute point
+                    rerouteStartTile = step;
+                    furthestTile = step;
+                    distFromStart = 0; // We're starting fresh
+                }
+
+                if (distFromStart <= unit.movementRange)
                     furthestTile = step;
 
-                // Stop checking if we've exhausted movement
-                if (manhattanFromUnit >= unit.movementRange)
+                if (distFromStart >= unit.movementRange)
                     break;
             }
 
-            if (passedThroughAcceptableRange && furthestTile != unit.pos)
+            // Move the unit if they actually made progress
+            if (furthestTile != unit.pos)
             {
                 masterGrid.selectedUnit = unit;
                 masterGrid.moveSelectedUnit(furthestTile);
             }
         }
+
 
     }
 
@@ -991,7 +1062,7 @@ public class CPUManager : MonoBehaviour
                         gameMaster.ProduceUnit(candidateAirUnit, player, false);
                         //get the node it's created at, then ask for a new heading.
                         priorityNodeVectorMap.TryGetValue(airport.pos, out candidateAirUnit.CPU_TargetNode);
-                        GiveCombatUnitNodeAssignment(candidateAirUnit);
+                        GiveCombatUnitNextNodeAssignment(candidateAirUnit);
                         //CPU_MoveUnitTowardsTargetNode(candidateAirUnit);
                         cashRemain -= candidateAirUnit.price;
                     }
@@ -1022,7 +1093,7 @@ public class CPUManager : MonoBehaviour
                         gameMaster.selectedStructure = factories[i];
                         gameMaster.ProduceUnit(candidateFactoryUnit, player, false);
                         priorityNodeVectorMap.TryGetValue(factories[i].pos, out candidateFactoryUnit.CPU_TargetNode);
-                        GiveCombatUnitNodeAssignment(candidateFactoryUnit);
+                        GiveCombatUnitNextNodeAssignment(candidateFactoryUnit);
                         cashRemain -= (candidateFactoryUnit.price - 100);
                     }
                 }
@@ -1086,8 +1157,8 @@ public class CPUManager : MonoBehaviour
         // For each player, crawl from their HQ
         for (int player = 1; player <= numPlayers; player++)
         {
-            Vector2Int hqPos = commandStructures[player].pos;
-            NetworkNode hq = priorityNetworkNodes.FirstOrDefault(node => node.pos == hqPos);
+            Vector2Int enemyHqPos = defaultTargets[player].pos;
+            NetworkNode hq = priorityNetworkNodes.FirstOrDefault(node => node.pos == enemyHqPos);
             Queue<NetworkNode> queue = new Queue<NetworkNode>();
             hq.priorityCostToTarget[player] = 0;
             hq.priorityNextNodeToTarget[player] = hq;
@@ -1148,6 +1219,14 @@ public class CPUManager : MonoBehaviour
                         queue.Enqueue(neighbor);
                     }
                 }
+            }
+        }
+
+        for (int p = 1;  p <= GameMaster.numPlayers; p++){
+
+            foreach (NetworkNode node in priorityNetworkNodes)
+            {
+                Debug.Log($"Node {node.pos} is pointing at {node.priorityNextNodeToTarget[p].pos} with cost {node.priorityCostToTarget[p]} for player {p}");
             }
         }
     }
@@ -1233,7 +1312,7 @@ public class CPUManager : MonoBehaviour
         NetworkNode currentNode = unit.CPU_TargetNode;
         NetworkNode targetNode = null;
         if (currentNode == null) {
-            currentNode = GetClosestNodeAgnostic(unit.pos);
+            currentNode = GetClosestNodeAgnostic(unit.pos, false);
             if (currentNode.IsClaimableBy(unit.playerControl))
             {
                 targetNode = currentNode;
@@ -1280,40 +1359,50 @@ public class CPUManager : MonoBehaviour
 
     }
 
-    public void GiveCombatUnitNodeAssignment(BaseUnit unit)
+
+
+    public void GiveCombatUnitNextNodeAssignment(BaseUnit unit)
     {
-        if(unit.CPU_TargetNode == null)
+        if (unit.CPU_TargetNode == null)
         {
-            Debug.LogWarning($"Combat unit {unit.pos} does not have a target node assignment");
-            return;        
+            //assume unit was created on a priority structure, maybe this is bad form for virix implementation.
+            priorityNodeVectorMap.TryGetValue(unit.pos, out unit.CPU_TargetNode);
+            if (unit.CPU_TargetNode == null)
+                unit.CPU_TargetNode = GetClosestNodeAgnostic(unit.pos, true);
+            /*            Debug.LogWarning($"Combat unit {unit.pos} does not have a target node assignment");
+                        return;   */
         }
 
         NetworkNode currentNode = unit.CPU_TargetNode;
+
         //MG 25-04-2: realizing now this implementation doesn't properly handle ground units moving through unpassable terrain, I think.
         NetworkNode nextTargetNode = currentNode.priorityNextNodeToTarget[unit.playerControl];
         unit.CPU_TargetNode = nextTargetNode;
+        Debug.Log($"Setting {unit.pos}'s target node to {unit.CPU_TargetNode.pos}");
     }
 
-    public static NetworkNode GetUnitAssignment(BaseUnit unit)
+/*    public static NetworkNode GetUnitAssignment(BaseUnit unit)
     {
 
         NetworkNode currentNode = resourceNetworkNodes.Find(n => n.pos == unit.pos);
 
         if (currentNode == null)
         {
-            currentNode = GetClosestNodeAgnostic(unit.pos);
+            currentNode = GetClosestNodeAgnostic(unit.pos, !unit.isResourceUnit);
         }
 
         NetworkNode targetNode = currentNode.closestUnclaimed[unit.playerControl];
         targetNode.ClaimByUnit(unit);
         return targetNode;
-    }
-    public static  NetworkNode GetClosestNodeAgnostic(Vector2Int targetPos)
+    }*/
+    public static  NetworkNode GetClosestNodeAgnostic(Vector2Int targetPos, bool isPriority)
     {
         NetworkNode closestNode = null;
         int closestDistance = int.MaxValue;
+        
+        List<NetworkNode> nodes = isPriority ? priorityNetworkNodes : resourceNetworkNodes;
 
-        foreach (var node in resourceNetworkNodes)
+        foreach (var node in nodes)
         {
             int distance = Manhattan(node.pos, targetPos);
 
