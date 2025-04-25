@@ -704,7 +704,13 @@ public class MasterGrid : MonoBehaviour
     }
     public IEnumerator AnimateMovementVisual(BaseUnit unit, List<Vector2Int> path, float speed)
     {
-        cameraManager.SetFollowTarget(unit.transform);
+        //have the camera follow if it's a cpu player
+        if (GameMaster.CPU_PlayersList[getPlayerTurn()])
+            cameraManager.SetFollowTarget(unit.transform);
+        yield return new WaitForSeconds(0.2f);
+        Vector2Int finalPos = path[path.Count - 1];
+        if (!GameMaster.CPU_PlayersList[getPlayerTurn()])
+            cameraManager.SetPosition(finalPos);
         foreach (var position in path)
         {
             Vector3 targetPosition = new Vector3(position.x, position.y, unit.transform.position.z);
@@ -716,6 +722,8 @@ public class MasterGrid : MonoBehaviour
                     yield break;
             }
         }
+        //if it's not a CPU, slide to target square
+
         cameraManager.ClearFollowTarget();
 
         //Debug.Log("Movement animation complete.");

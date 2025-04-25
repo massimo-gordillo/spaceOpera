@@ -18,6 +18,8 @@ public class GameMaster : MonoBehaviour
     //private PrefabManager prefabManager = new PrefabManager();
     public SupabaseManager supabaseManager;
     public CPUManager CPUManager;
+    public CameraManager cameraManager;
+
     public Guid match_id;
 
     public Canvas canvas;
@@ -193,7 +195,7 @@ public class GameMaster : MonoBehaviour
         productionPanel.init();
 
         //animation
-        isAnimating = false;
+        isAnimating = true;
         announcementCard.SetActive(true);
         announcementCardRT = announcementCard.GetComponent<RectTransform>();
 
@@ -212,6 +214,7 @@ public class GameMaster : MonoBehaviour
         //WaitForSeconds(0.5);
         if(isAnimating)
             AnimateStartTurnCard(1);
+        cameraManager.SetPosition(MasterGrid.commandStructures[1].pos);
 
         startupInstantiateUnits();
 
@@ -459,6 +462,8 @@ public class GameMaster : MonoBehaviour
 
         if (isAnimating)
             AnimateStartTurnCard(playerTurn);
+        cameraManager.SnapCameraToUnitCluster(playerTurn);
+
 
         setPlayerTurnText(playerTurn);
         setPlayerResources(playerTurn);
@@ -487,6 +492,7 @@ public class GameMaster : MonoBehaviour
 
     public void RunCPUForPlayer(int playerTurn)
     {
+        endTurnButton.interactable = false;
         //CPUManager.GetUnitAssignment(playerTurn);
         StartCoroutine(RunCPUForPlayerDelay(playerTurn));
         //CPUManager.CreateUnits(playerTurn, playerProgeny[(byte)playerTurn]);
@@ -494,8 +500,14 @@ public class GameMaster : MonoBehaviour
 
     public IEnumerator RunCPUForPlayerDelay(int playerTurn)
     {
+        if (isAnimating)
+        {
+            yield return new WaitForSeconds(1.0f);
+        }
         yield return StartCoroutine(CPUManager.CommandUnits(playerTurn));
-        CPUManager.CreateUnits(playerTurn, playerProgeny[(byte)playerTurn]);
+        yield return StartCoroutine(CPUManager.CreateUnits(playerTurn, playerProgeny[(byte)playerTurn]));
+        endTurnButton.interactable = true;
+        endTurnButtonPressed();
     }
 
 
@@ -749,9 +761,33 @@ public class GameMaster : MonoBehaviour
             unit.playerControl = getPlayerTurn();
         else
             unit.playerControl = (int)player;
-        BaseUnit tempUnit = Instantiate(unit, (Vector2)pos, Quaternion.identity, unitContainer);
-        return tempUnit;
+        unit.spriteContainer.transform.localScale = new Vector2(0.01f, 0.01f);
+        unit = Instantiate(unit, (Vector2)pos, Quaternion.identity, unitContainer);
+        StartCoroutine(AnimateCreateUnit(unit));
+        return unit;
     }
+
+    public IEnumerator AnimateCreateUnit(BaseUnit unit)
+    {
+        float duration = 0.1f;
+        float elapsed = 0f;
+        Transform t = unit.spriteContainer.transform;
+        Vector3 startScale = new Vector3(0.01f, 0.01f, 1f);
+        Vector3 endScale = Vector3.one;
+
+        t.localScale = startScale;
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float tLerp = Mathf.SmoothStep(0f, 1f, elapsed / duration);
+            t.localScale = Vector3.Lerp(startScale, endScale, tLerp);
+            yield return null;
+        }
+
+        t.localScale = endScale;
+    }
+
 
 
     /*    public void ConvertFileToGameState()

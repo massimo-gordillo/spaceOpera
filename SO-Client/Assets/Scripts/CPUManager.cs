@@ -31,12 +31,13 @@ public class CPUManager : MonoBehaviour
     public List<NetworkEdge> priorityNetworkEdgesGround = new();
     public GameMaster gameMaster;
     public MasterGrid masterGrid;
+    public CameraManager cameraManager;
 
     public bool[] playersAsCPU = new bool[GameMaster.numPlayers+1];
     public List<BaseUnit>[] CPU_Units = new List<BaseUnit>[GameMaster.numPlayers+1];
 
     public GameObject debugLinePrefab;
-    public float CPU_AnimationWaitTime = 10.0f;
+    private float CPU_AnimationWaitTime = 0.4f;
 
 
 
@@ -608,6 +609,7 @@ public class CPUManager : MonoBehaviour
             {
                 Vector2Int initSearchVector = origin + dir * dist;
 
+
                 //if the center of the search section is outside of the map then we can ignore the rest of that search. Can't do this for checkPos because you can breadth outside.
                 if (initSearchVector.x < 0 || initSearchVector.y < 0 || initSearchVector.x >= gameMaster.gridX || initSearchVector.y >= gameMaster.gridY)
                     continue;
@@ -816,9 +818,9 @@ public class CPUManager : MonoBehaviour
         
         foreach (BaseUnit unit in unitsToCommand)
         {
-            yield return new WaitForSeconds(CPU_AnimationWaitTime);
             if (GameMaster.isGameComplete)
                 break;
+            yield return new WaitForSeconds(CPU_AnimationWaitTime);
             CollectPotentialGameActions(unit);
             NetworkNode targetNode = unit.CPU_TargetNode;
             if (targetNode == null)
@@ -1021,7 +1023,7 @@ public class CPUManager : MonoBehaviour
         }
     }
 
-    public void CreateUnits(int player, int progeny)
+    public IEnumerator CreateUnits(int player, int progeny)
     {
         //simple make base unit check
         List<BaseStructure> structures = masterGrid.GetStructures(player);
@@ -1042,7 +1044,7 @@ public class CPUManager : MonoBehaviour
                 if (structure.structureType == 2)
                     airports.Add(structure);
             }
-            StartCoroutine(GenerateSpendErtrian());
+            yield return GenerateSpendErtrian();
 /*            foreach (BaseStructure structure in prods)
             {
                 if (structure.playerControl == player && structure.structureType == 1)
@@ -1052,6 +1054,7 @@ public class CPUManager : MonoBehaviour
                         gameMaster.ProduceResourceUnit(structure, player);
                 }
             }*/
+            //yield return null;
         }
 
         IEnumerator GenerateSpendErtrian()
@@ -1083,20 +1086,22 @@ public class CPUManager : MonoBehaviour
                     }
                     if (candidateAirUnit != null)
                     {
+                        /*       cameraManager.SetPosition((Vector2)airport.pos);
                         gameMaster.selectedStructure = airport;
                         gameMaster.ProduceUnit(candidateAirUnit, player, false);
                         //get the node it's created at, then ask for a new heading.
                         priorityNodeVectorMap.TryGetValue(airport.pos, out candidateAirUnit.CPU_TargetNode);
                         GiveCombatUnitNextNodeAssignment(candidateAirUnit);
-                        //CPU_MoveUnitTowardsTargetNode(candidateAirUnit);
+                        //CPU_MoveUnitTowardsTargetNode(candidateAirUnit);*/
+                        yield return createUnitAtStructure(candidateAirUnit, airport);
                         cashRemain -= candidateAirUnit.price;
-                        yield return new WaitForSeconds(CPU_AnimationWaitTime);
                     }
                 }
             if (factories.Count > 0)
             {
                 //gameMaster.selectedStructure = factories[0];
                 //BaseUnit progenyResourceUnit = gameMaster.ProduceResourceUnit(factories[0], player);
+                cameraManager.SetPosition((Vector2)factories[0].pos);
                 yield return new WaitForSeconds(CPU_AnimationWaitTime);
                 gameMaster.ProduceResourceUnit(factories[0], player);
                 yield return new WaitForSeconds(CPU_AnimationWaitTime);
@@ -1117,13 +1122,9 @@ public class CPUManager : MonoBehaviour
                     }
                     if (candidateFactoryUnit != null)
                     {
-                        //Debug.Log($"Unit {candidateFactoryUnit.unitName} has price {candidateFactoryUnit.price} compared to cash {cashRemain}");
-                        gameMaster.selectedStructure = factories[i];
-                        gameMaster.ProduceUnit(candidateFactoryUnit, player, false);
-                        priorityNodeVectorMap.TryGetValue(factories[i].pos, out candidateFactoryUnit.CPU_TargetNode);
-                        GiveCombatUnitNextNodeAssignment(candidateFactoryUnit);
+                        yield return createUnitAtStructure(candidateFactoryUnit, factories[i]);
                         cashRemain -= (candidateFactoryUnit.price - 100);
-                        yield return new WaitForSeconds(CPU_AnimationWaitTime);
+
                     }
                 }
                 /*            if(factories.Count == 1)
@@ -1142,6 +1143,19 @@ public class CPUManager : MonoBehaviour
 
 
 }
+
+    public IEnumerator createUnitAtStructure(BaseUnit unit, BaseStructure prod)
+    {
+        cameraManager.SetPosition((Vector2)prod.pos);
+        yield return new WaitForSeconds(CPU_AnimationWaitTime);
+        //Debug.Log($"Unit {candidateFactoryUnit.unitName} has price {candidateFactoryUnit.price} compared to cash {cashRemain}");
+        
+        gameMaster.selectedStructure = prod;
+        gameMaster.ProduceUnit(unit, prod.playerControl, false);
+        priorityNodeVectorMap.TryGetValue(prod.pos, out unit.CPU_TargetNode);
+        GiveCombatUnitNextNodeAssignment(unit);
+        yield return new WaitForSeconds(CPU_AnimationWaitTime);
+    }
 
 
 /*    private void OnDrawGizmos()

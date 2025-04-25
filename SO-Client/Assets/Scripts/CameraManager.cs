@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
@@ -8,17 +9,22 @@ public class CameraManager : MonoBehaviour
     private Vector3 dragOrigin;
     private bool isDragging = false;
     private bool isMouseDownOnClickableObject = false;
-    private float dragThreshold = 15f;
+    private float dragThreshold = 10f;
 
     public Vector2 gridMin;
     public Vector2 gridMax;
-    public float boundaryOffset = 10f;
-    public float snapBackSpeed = 5f;
+
+    //set in inspector
+    public float boundaryOffset; 
+    public float snapBackSpeed;
+    public float softBoundaryPadding;
+    public float snapBackRelaxFactor; 
+
     public bool isMenuDisplayed = false;
     public float menuWidth;
     private bool isSnappingBack = false;
     private Vector3 snapBackTarget;
-    private Camera cam;
+    private static Camera cam;
     public GameMaster gameMaster;
 
     private bool wasTouchingLastFrame = false;
@@ -141,6 +147,29 @@ public class CameraManager : MonoBehaviour
         }
     }
 
+    public void SetPosition(Vector2 targetPos, float duration = 0.3f)
+    {
+        StartCoroutine(SmoothMoveTo(targetPos, duration));
+    }
+
+    private IEnumerator SmoothMoveTo(Vector2 targetPos, float duration)
+    {
+        Vector3 startPos = cam.transform.position;
+        Vector3 endPos = new Vector3(targetPos.x, targetPos.y, startPos.z);
+        float elapsed = 0f;
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float t = Mathf.SmoothStep(0f, 1f, elapsed / duration);
+            cam.transform.position = Vector3.Lerp(startPos, endPos, t);
+            yield return null;
+        }
+
+        cam.transform.position = endPos;
+    }
+
+
     private void ApplyCameraBounds()
     {
         Vector3 clampedPosition = cam.transform.position;
@@ -149,11 +178,33 @@ public class CameraManager : MonoBehaviour
         isMenuDisplayed = gameMaster.choicePanel.gameObject.activeSelf;
         float rightBoundaryOffset = isMenuDisplayed ? boundaryOffset + menuWidth : boundaryOffset;
 
-        clampedPosition.x = Mathf.Clamp(clampedPosition.x, gridMin.x + camWidth - boundaryOffset, gridMax.x - camWidth + rightBoundaryOffset);
-        clampedPosition.y = Mathf.Clamp(clampedPosition.y, gridMin.y + camHeight - boundaryOffset, gridMax.y - camHeight + boundaryOffset);
+        clampedPosition.x = Mathf.Clamp(
+            clampedPosition.x,
+            gridMin.x + camWidth - boundaryOffset - softBoundaryPadding,
+            gridMax.x - camWidth + rightBoundaryOffset + softBoundaryPadding
+        );
+
+        clampedPosition.y = Mathf.Clamp(
+            clampedPosition.y,
+            gridMin.y + camHeight - boundaryOffset - softBoundaryPadding,
+            gridMax.y - camHeight + boundaryOffset + softBoundaryPadding
+        );
+
         cam.transform.position = clampedPosition;
     }
 
+    /*    private void StartSnapBack()
+        {
+            snapBackTarget = cam.transform.position;
+            float camHeight = cam.orthographicSize;
+            float camWidth = camHeight * cam.aspect;
+            isMenuDisplayed = gameMaster.choicePanel.gameObject.activeSelf;
+            float rightBoundaryOffset = isMenuDisplayed ? menuWidth : 0f;
+
+            snapBackTarget.x = Mathf.Clamp(snapBackTarget.x, gridMin.x + camWidth, gridMax.x - camWidth + rightBoundaryOffset);
+            snapBackTarget.y = Mathf.Clamp(snapBackTarget.y, gridMin.y + camHeight, gridMax.y - camHeight);
+            isSnappingBack = true;
+        }*/
     private void StartSnapBack()
     {
         snapBackTarget = cam.transform.position;
@@ -162,10 +213,20 @@ public class CameraManager : MonoBehaviour
         isMenuDisplayed = gameMaster.choicePanel.gameObject.activeSelf;
         float rightBoundaryOffset = isMenuDisplayed ? menuWidth : 0f;
 
-        snapBackTarget.x = Mathf.Clamp(snapBackTarget.x, gridMin.x + camWidth, gridMax.x - camWidth + rightBoundaryOffset);
-        snapBackTarget.y = Mathf.Clamp(snapBackTarget.y, gridMin.y + camHeight, gridMax.y - camHeight);
+
+        snapBackTarget.x = Mathf.Clamp(
+            snapBackTarget.x,
+            gridMin.x + camWidth - snapBackRelaxFactor,
+            gridMax.x - camWidth + rightBoundaryOffset + snapBackRelaxFactor);
+
+        snapBackTarget.y = Mathf.Clamp(
+            snapBackTarget.y,
+            gridMin.y + camHeight - snapBackRelaxFactor,
+            gridMax.y - camHeight + snapBackRelaxFactor);
+
         isSnappingBack = true;
     }
+
 
     private bool IsPointerOverClickableObject(Vector2 position)
     {
@@ -206,6 +267,40 @@ public class CameraManager : MonoBehaviour
         EventSystem.current.RaycastAll(eventData, results);
         return results.Count > 0;
     }
+
+    public void SnapCameraToUnitCluster(int playerTurn)
+    {
+        List<BaseUnit> units = MasterGrid.playerUnits[playerTurn];
+        if (units == null || units.Count == 0) return;
+
+        const float clusterRadius = 5f; // How far to search for nearby units
+        Vector2 bestCenter = Vector2.zero;
+        int maxCount = 0;
+
+        foreach (BaseUnit unit in units)
+        {
+            if (unit == null) continue;
+
+            Vector2 center = unit.transform.position;
+            int count = 0;
+
+            foreach (BaseUnit other in units)
+            {
+                if (other == null) continue;
+                if (Vector2.Distance(center, other.transform.position) <= clusterRadius)
+                    count++;
+            }
+
+            if (count > maxCount)
+            {
+                maxCount = count;
+                bestCenter = center;
+            }
+        }
+
+        SetPosition(bestCenter);
+    }
+
 
 
 

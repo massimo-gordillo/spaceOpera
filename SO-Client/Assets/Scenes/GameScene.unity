@@ -1491,9 +1491,9 @@ MonoBehaviour:
   structureListArray: []
   gameMaster: {fileID: 1024135144}
   masterGrid: {fileID: 450342577}
+  cameraManager: {fileID: 519420030}
   playersAsCPU: 
   debugLinePrefab: {fileID: 399456013}
-  CPU_AnimationWaitTime: 0.1
 --- !u!1001 &210657160
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5021,8 +5021,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gridMin: {x: 0, y: 0}
   gridMax: {x: 0, y: 0}
-  boundaryOffset: 5
+  boundaryOffset: 30
   snapBackSpeed: 5
+  softBoundaryPadding: 1
+  snapBackRelaxFactor: 9
   isMenuDisplayed: 0
   menuWidth: 5
   gameMaster: {fileID: 1024135144}
@@ -8834,6 +8836,7 @@ MonoBehaviour:
   tilemapManager: {fileID: 1002579701}
   supabaseManager: {fileID: 1718293608}
   CPUManager: {fileID: 205759595}
+  cameraManager: {fileID: 519420030}
   canvas: {fileID: 471929090}
   selectedStructure: {fileID: 0}
   choicePanel: {fileID: 1454215227}
