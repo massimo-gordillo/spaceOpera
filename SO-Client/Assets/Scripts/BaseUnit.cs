@@ -282,11 +282,6 @@ public class BaseUnit : MonoBehaviour
         }
     }
 
-    public bool getNonExhausted()
-    {
-        return nonExhausted;
-    }
-
     public void setNonExhausted(bool b)
     {
         //Debug.Log($"{this.unitName} is being set to non-exhausted {b}");

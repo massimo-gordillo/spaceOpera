@@ -147,8 +147,9 @@ public class CameraManager : MonoBehaviour
         }
     }
 
-    public void SetPosition(Vector2 targetPos, float duration = 0.3f)
+    public void SetPosition(Vector2 targetPos)
     {
+        float duration = 0.3f;
         StartCoroutine(SmoothMoveTo(targetPos, duration));
     }
 

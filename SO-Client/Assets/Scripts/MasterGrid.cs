@@ -194,7 +194,7 @@ public class MasterGrid : MonoBehaviour
             }
 
             //if there is no selected unit and the clicked unit isn't exhausted & player controls that unit.
-            else if (getSelectedUnit() == null && unit.getNonExhausted() && unit.playerControl == gameMaster.getPlayerTurn()) //what if you don't control this unit?
+            else if (getSelectedUnit() == null && unit.nonExhausted && unit.playerControl == gameMaster.getPlayerTurn()) //what if you don't control this unit?
             {
                 clearMovement();
                 setSelectedUnit(unit);
@@ -652,7 +652,7 @@ public class MasterGrid : MonoBehaviour
                     if (structure != null)
                         squareQueuesList[2].Enqueue(new Vector2Int(xCheck, yCheck)); // Structure square
                 }
-                else if (IsCellInBounds(xCheck, yCheck))
+                else if (IsInBoundsExtended(xCheck, yCheck))
                 {
                     BaseUnit unitAtLocation = whatUnitIsInThisLocation(new Vector2Int(xCheck - 1, yCheck - 1));
 
@@ -942,7 +942,7 @@ public class MasterGrid : MonoBehaviour
 
 
     // Helper function to check if a cell is in bounds
-    private bool IsCellInBounds(int x, int y)
+    private bool IsInBoundsExtended(int x, int y)
     {
         return (x - 1) < gridX && (x - 1) >= 0 && (y - 1) < gridY && (y - 1) >= 0;
     }
@@ -1195,8 +1195,7 @@ public class MasterGrid : MonoBehaviour
 
     public BaseUnit whatUnitIsInThisLocation(Vector2Int pos)
     {
-
-        if (pos.x >= 0 && pos.y >= 0 && pos.x < gridX && pos.y < gridY)
+        if (IsInBounds(pos))
             if (unitGrid[pos.x, pos.y] is BaseUnit)
             {
                 //Debug.Log($"Checking for unit at location {x},{y}");
@@ -1211,12 +1210,11 @@ public class MasterGrid : MonoBehaviour
             print("Out of Bounds in whatUnit");
             return null;
         }
-
     }
 
     public BaseStructure whatStructureIsInThisLocation(Vector2Int pos)
     {
-        if (pos.x >= 0 && pos.y >= 0 && pos.x < gridX && pos.y < gridY)
+        if (IsInBounds(pos))
             if (structureGrid[pos.x, pos.y] is BaseStructure)
                 return structureGrid[pos.x, pos.y];
             else
@@ -1228,7 +1226,13 @@ public class MasterGrid : MonoBehaviour
 
     public byte whatTileIsInThisLocation(Vector2Int pos)
     {
-        return terrainGrid[pos.x, pos.y];
+        if (IsInBounds(pos))
+            return terrainGrid[pos.x, pos.y];
+        else
+        {
+            Debug.LogWarning("Out of bounds in WhatTile");
+            return 0;
+        }
     }
 
     public double getTileDefenceValueMultiplier(Vector2Int pos)
@@ -1307,10 +1311,8 @@ public class MasterGrid : MonoBehaviour
     //eventually this can decrement the number of additional movements (due to terrain) the unit has but that's for later.
     public int legalMove(Vector2Int pos, BaseUnit mTarget)
     {
-        int x = pos.x;
-        int y = pos.y;
 
-        if (x < 0 || y < 0 || x >= gridX || y >= gridY)
+        if (!IsInBounds(pos))
             return 0;
         else if (!canUnitMoveToByteValue(mTarget, whatTileIsInThisLocation(pos)))
             return 0;
@@ -1897,6 +1899,11 @@ public class MasterGrid : MonoBehaviour
             Debug.LogError("Get Enemy Command but more than 2 players");
             return commandStructures[p].pos;
         }
+    }
+
+    public bool IsInBounds(Vector2Int pos)
+    {
+        return (pos.x >= 0 && pos.y >= 0 && pos.x < gridX && pos.y < gridY);
     }
 
     private IEnumerator waitGenerateSaveArrayToCSV()

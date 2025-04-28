@@ -49,7 +49,7 @@ public class GameMaster : MonoBehaviour
     public Button endTurnButton;
     public TMP_Text bottomButtonText;
 
-    public bool isAnimating;
+    public static bool isAnimating;
     public GameObject announcementCard;
     public TMP_Text announcementCardText;
     public GameObject promptCard;
@@ -59,6 +59,9 @@ public class GameMaster : MonoBehaviour
     public TMP_Text promptCardButtonRightText;
     public Button concedeMenuButton;
     public Button backToMenuButton;
+    public GameObject endTurnConfirmCard;
+    public Button endTurnConfirmCardBackButton;
+    public TMP_Text endTurnConfirmCardText;
     //public float animationDuration = 0.5f;
     public float holdDuration;
     public float swoopDuration;
@@ -83,7 +86,8 @@ public class GameMaster : MonoBehaviour
 
     public static bool CPU_isOn = true;
     public static bool[] CPU_PlayersList;
-    public static List<(BaseUnit, int)>[] unitCosts; 
+    public static List<(BaseUnit, int)>[] unitCosts;
+    public int virixCheapestUnit;
 
     /*    public static GameMaster Instance
         {
@@ -175,6 +179,8 @@ public class GameMaster : MonoBehaviour
         playerResources[0] = 0;
         for (int i = 1; i <= numPlayers; i++)
             setPlayerResources(i);
+
+        SetVirixCheapestUnit();
         //startupInstantiateUnits();
         //productionPanel.Start();
 
@@ -424,7 +430,12 @@ public class GameMaster : MonoBehaviour
     public void endTurnButtonPressed()
     {
         hideChoicePanel();
+        endTurnButton.interactable = false;
+        CheckNoAvailableActions(playerTurn);
+    }
 
+    public void initiateEndTurn()
+    {
         var (gameActions, preTurnHash, postTurnHash) = masterGrid.endTurn(playerTurn);
         SubmitTurnToServer(gameActions, preTurnHash, postTurnHash);
         masterGrid.refreshUnits(playerTurn);
@@ -442,6 +453,73 @@ public class GameMaster : MonoBehaviour
         }
         StartTurn();
     }
+
+    public void CheckNoAvailableActions(int player)
+    {
+        BaseUnit unitFocus = null;
+        int unitCount = 0;
+        foreach (BaseUnit unit in MasterGrid.playerUnits[player])
+        {
+            if (unit.nonExhausted)
+            {
+                unitCount++;
+                if (unitFocus == null)
+                {
+                    unitFocus = unit;
+                }
+            }
+        }
+        BaseStructure prodFocus = null;
+
+        int prodCount = 0;
+        foreach(BaseStructure prod in masterGrid.GetProductionStructures(player))
+        {
+            if (!prod.IsCoveredByUnit()) //assuming this is sufficient to confirm nothing's been created on it.
+            {  
+                prodCount++;
+                if (prodFocus == null)
+                {
+                    prodFocus = prod;
+                }
+            }
+        }
+        if (prodCount + unitCount > 0)
+        {
+            endTurnConfirmCard.SetActive(true);
+            String message = "";
+            if (unitCount > 0)
+            {
+                if(unitCount == 1)
+                    message += $"You have {unitCount} unit which you can still move!\n";
+                else
+                    message += $"You have {unitCount} units which you can still move!\n";
+            }
+            if (prodCount > 0 && playerResources[player] >= 100 && getPlayerProgeny((byte)player) != 1)
+            {
+                if(prodCount == 1)
+                    message += $"You have {prodCount} production location which hasn't produced!\n";
+                else
+                    message += $"You have {prodCount} production locations which haven't produced!\n";
+            }
+            if (getPlayerProgeny((byte)player) == 1 && playerResources[player] >= virixCheapestUnit)
+            {
+                message += $"You have {playerResources[player]} unspent bismuth!\n";
+            }
+            //message += "Are you sure you want to end your turn?";
+            endTurnConfirmCardText.text = message;
+
+            if (unitFocus != null)
+                endTurnConfirmCardBackButton.onClick.AddListener(delegate { cameraManager.SetPosition(unitFocus.pos); });
+            else
+                endTurnConfirmCardBackButton.onClick.AddListener(delegate { cameraManager.SetPosition(prodFocus.pos); });
+
+        }
+        else
+            initiateEndTurn();
+        
+    }
+
+    
 
     public void StartTurn()
     {
@@ -506,6 +584,7 @@ public class GameMaster : MonoBehaviour
         }
         yield return StartCoroutine(CPUManager.CommandUnits(playerTurn));
         yield return StartCoroutine(CPUManager.CreateUnits(playerTurn, playerProgeny[(byte)playerTurn]));
+        yield return new WaitForSeconds(0.5f);
         endTurnButton.interactable = true;
         endTurnButtonPressed();
     }
@@ -763,7 +842,8 @@ public class GameMaster : MonoBehaviour
             unit.playerControl = (int)player;
         unit.spriteContainer.transform.localScale = new Vector2(0.01f, 0.01f);
         unit = Instantiate(unit, (Vector2)pos, Quaternion.identity, unitContainer);
-        StartCoroutine(AnimateCreateUnit(unit));
+        if(isAnimating)
+            StartCoroutine(AnimateCreateUnit(unit));
         return unit;
     }
 
@@ -900,5 +980,19 @@ public class GameMaster : MonoBehaviour
     public int GetPlayerResources(int p)
     {
         return playerResources[p];
+    }
+
+    public void SetVirixCheapestUnit() //virix implementation
+    {
+        List<(BaseUnit, int)> virixCosts = unitCosts[1];
+        int lowest = int.MaxValue;
+        foreach((BaseUnit, int) pair in virixCosts)
+        {
+            if(pair.Item2 < lowest && pair.Item1.unitName != "Spore")
+            {
+                lowest = pair.Item2;
+            }
+        }
+        virixCheapestUnit = lowest;
     }
 }

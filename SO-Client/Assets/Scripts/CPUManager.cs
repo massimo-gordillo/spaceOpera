@@ -1101,15 +1101,21 @@ public class CPUManager : MonoBehaviour
             {
                 //gameMaster.selectedStructure = factories[0];
                 //BaseUnit progenyResourceUnit = gameMaster.ProduceResourceUnit(factories[0], player);
-                cameraManager.SetPosition((Vector2)factories[0].pos);
-                yield return new WaitForSeconds(CPU_AnimationWaitTime);
+                if (GameMaster.isAnimating)
+                {
+                    cameraManager.SetPosition((Vector2)factories[0].pos);
+                    yield return new WaitForSeconds(CPU_AnimationWaitTime);
+                }
                 gameMaster.ProduceResourceUnit(factories[0], player);
-                yield return new WaitForSeconds(CPU_AnimationWaitTime);
+                
+                if (GameMaster.isAnimating)
+                    yield return new WaitForSeconds(CPU_AnimationWaitTime);
 
                 //CPU_MoveUnitTowardsTargetNode(progenyResourceUnit);
                 for (int i = 1; i < factories.Count; i++)
                 {
-                    BaseUnit candidateFactoryUnit = null;
+                    gameMaster.ProduceResourceUnit(factories[i], player);
+                    /*BaseUnit candidateFactoryUnit = null;
                     int highestPrice = 0;
                     foreach ((BaseUnit unit, int price) in factoryProdList)
                     {
@@ -1125,16 +1131,8 @@ public class CPUManager : MonoBehaviour
                         yield return createUnitAtStructure(candidateFactoryUnit, factories[i]);
                         cashRemain -= (candidateFactoryUnit.price - 100);
 
-                    }
+                    }*/
                 }
-                /*            if(factories.Count == 1)
-                            {
-                                //produceBaseUnit
-                                //cashRemain = cashRemain;
-                            }else
-                            {
-
-                            }*/
 
             }
 
