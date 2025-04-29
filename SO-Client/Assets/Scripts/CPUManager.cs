@@ -1028,7 +1028,7 @@ public class CPUManager : MonoBehaviour
         }
     }
 
-    public IEnumerator CreateUnits(int player, int progeny)
+    public IEnumerator ProduceUnits(int player, int progeny)
     {
         //simple make base unit check
         List<BaseStructure> structures = masterGrid.GetStructures(player);
@@ -1083,7 +1083,7 @@ public class CPUManager : MonoBehaviour
                     int highestPrice = 0;
                     foreach ((BaseUnit unit, int price) in airportProdList)
                     {
-                        if (price < cashRemain && price > highestPrice)
+                        if (price <= cashRemain && price > highestPrice)
                         {
                             highestPrice = price;
                             candidateAirUnit = unit;
@@ -1091,26 +1091,27 @@ public class CPUManager : MonoBehaviour
                     }
                     if (candidateAirUnit != null)
                     {
-                        /*       cameraManager.SetPosition((Vector2)airport.pos);
+                        cameraManager.SetPosition((Vector2)airport.pos);
                         gameMaster.selectedStructure = airport;
                         gameMaster.ProduceUnit(candidateAirUnit, player, false);
                         //get the node it's created at, then ask for a new heading.
                         priorityNodeVectorMap.TryGetValue(airport.pos, out candidateAirUnit.CPU_TargetNode);
                         GiveCombatUnitNextNodeAssignment(candidateAirUnit);
-                        //CPU_MoveUnitTowardsTargetNode(candidateAirUnit);*/
+                        //CPU_MoveUnitTowardsTargetNode(candidateAirUnit);
                         yield return createUnitAtStructure(candidateAirUnit, airport);
                         cashRemain -= candidateAirUnit.price;
                     }
                 }
             if (factories.Count > 0)
             {
-                //gameMaster.selectedStructure = factories[0];
+                
                 //BaseUnit progenyResourceUnit = gameMaster.ProduceResourceUnit(factories[0], player);
                 if (GameMaster.isAnimating)
                 {
                     cameraManager.SetPosition((Vector2)factories[0].pos);
                     yield return new WaitForSeconds(CPU_AnimationWaitTime);
                 }
+                //gameMaster.selectedStructure = factories[0];
                 gameMaster.ProduceResourceUnit(factories[0], player);
                 
                 if (GameMaster.isAnimating)
@@ -1119,12 +1120,12 @@ public class CPUManager : MonoBehaviour
                 //CPU_MoveUnitTowardsTargetNode(progenyResourceUnit);
                 for (int i = 1; i < factories.Count; i++)
                 {
-                    gameMaster.ProduceResourceUnit(factories[i], player);
-                    /*BaseUnit candidateFactoryUnit = null;
+                    //gameMaster.ProduceResourceUnit(factories[i], player);
+                    BaseUnit candidateFactoryUnit = null;
                     int highestPrice = 0;
                     foreach ((BaseUnit unit, int price) in factoryProdList)
                     {
-                        if ((price - 100) < cashRemain && price > highestPrice)
+                        if ((price - 100) <= cashRemain && price > highestPrice)
                         {
                             highestPrice = price;
                             candidateFactoryUnit = unit;
@@ -1136,7 +1137,7 @@ public class CPUManager : MonoBehaviour
                         yield return createUnitAtStructure(candidateFactoryUnit, factories[i]);
                         cashRemain -= (candidateFactoryUnit.price - 100);
 
-                    }*/
+                    }
                 }
 
             }

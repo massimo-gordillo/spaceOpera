@@ -390,7 +390,13 @@ public class GameMaster : MonoBehaviour
 
     public void ProduceUnit(BaseUnit unit, int playerControl, bool isNonExhausted)
     {
-        if(masterGrid.whatUnitIsInThisLocation(selectedStructure.pos) != null)
+        if(playerResources[playerTurn] < unit.price)
+        {
+            Debug.LogWarning($"Trying to produce a {unit.unitName} at {selectedStructure.pos} but not enough funds");
+            return;
+        }
+
+        if (masterGrid.whatUnitIsInThisLocation(selectedStructure.pos) != null)
         {
             Debug.LogWarning($"Trying to produce a unit at {selectedStructure.pos} but it is covered by a unit");
             selectedStructure = null;
@@ -574,7 +580,7 @@ public class GameMaster : MonoBehaviour
         endTurnButton.interactable = false;
         //CPUManager.GetUnitAssignment(playerTurn);
         StartCoroutine(RunCPUForPlayerDelay(playerTurn));
-        //CPUManager.CreateUnits(playerTurn, playerProgeny[(byte)playerTurn]);
+        //CPUManager.ProduceUnits(playerTurn, playerProgeny[(byte)playerTurn]);
     }
 
     public IEnumerator RunCPUForPlayerDelay(int playerTurn)
@@ -584,7 +590,7 @@ public class GameMaster : MonoBehaviour
             yield return new WaitForSeconds(1.0f);
         }
         yield return StartCoroutine(CPUManager.CommandUnits(playerTurn));
-        yield return StartCoroutine(CPUManager.CreateUnits(playerTurn, playerProgeny[(byte)playerTurn]));
+        yield return StartCoroutine(CPUManager.ProduceUnits(playerTurn, playerProgeny[(byte)playerTurn]));
         yield return new WaitForSeconds(0.5f);
         CPUManager.LogicCheckUnits(playerTurn);
         endTurnButton.interactable = true;
