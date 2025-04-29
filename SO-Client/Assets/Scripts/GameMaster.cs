@@ -187,7 +187,7 @@ public class GameMaster : MonoBehaviour
         //unitCosts = new List<(BaseUnit, int)>[numPlayers];
         if (CPU_isOn)
         {
-            CPU_PlayersList[1] = true;
+            //CPU_PlayersList[1] = true;
             CPU_PlayersList[2] = true;
         }
 

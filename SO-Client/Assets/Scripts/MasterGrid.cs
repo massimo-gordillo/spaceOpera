@@ -687,7 +687,7 @@ public class MasterGrid : MonoBehaviour
     {
         
         //Debug.Log($"Animating movement from {start} to {end}");
-        List<Vector2Int> path = BidirectionalSearch(start, end, unit, unit.movementRange+1);
+        List<Vector2Int> path = BidirectionalSearch(start, end, unit, unit.movementRange);
         //List<Vector2Int> path = BidirectionalSearch(start, end, unit);
 
         //movement animation speed
@@ -836,8 +836,13 @@ public class MasterGrid : MonoBehaviour
     Vector2Int start,
     Vector2Int end,
     BaseUnit unit,
-    int depthLimitPerSide)
+    int totalDistance)
     {
+        if(totalDistance <= 0)
+        {
+            Debug.LogError($"Bidirectional Search asked to find path for {totalDistance}");
+        }
+        int depthLimitPerSide = totalDistance % 2 == 0 ? totalDistance / 2 : (totalDistance + 1 / 2);
         if (start == end) return new List<Vector2Int> { start };
 
         Queue<Vector2Int> queueStart = new Queue<Vector2Int>();

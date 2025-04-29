@@ -128,7 +128,7 @@ public class CPUManager : MonoBehaviour
         }*/
 
         InitClosestNeighbour();
-        //StartCoroutine(DrawStructureDebugLines());
+        StartCoroutine(DrawStructureDebugLines());
     }
 
     public void Start()
@@ -441,7 +441,7 @@ public class CPUManager : MonoBehaviour
                 int diff = Manhattan(unit.pos, candidate.pos); //Math.Abs(diffV.x) + Math.Abs(diffV.y);
                 if (diff > 1 && diff <= unit.movementRange+unit.attackRange)
                 {
-                    List<Vector2Int> path = masterGrid.BidirectionalSearch(unit.pos, candidate.pos, unit, ((unit.movementRange + unit.movementRange % 2) / 2 + 1));
+                    List<Vector2Int> path = masterGrid.BidirectionalSearch(unit.pos, candidate.pos, unit, unit.movementRange);
                     masterGrid.selectedUnit = unit;
                     masterGrid.moveSelectedUnit(GetAdjacentPosFromBidirectionalSearch(path, candidate.pos)); //assumes attack range of 1 for now.
                     if (Manhattan(unit.pos, candidate.pos) == 1)//for some reason this wasn't always true.
@@ -775,7 +775,7 @@ public class CPUManager : MonoBehaviour
             //Vector3 start = new Vector3(structure.xPos, structure.yPos, 0);
             Vector2Int startV2 = node.pos;
             Vector3 start = new Vector3(startV2.x, startV2.y, 0);
-            Vector2Int targetV2 = node.priorityNextNodeToTarget[1].pos;
+            Vector2Int targetV2 = node.priorityNextNodeToTarget[2].pos;
 
             Vector3 target = new Vector3(targetV2.x, targetV2.y, 0);
 
@@ -887,7 +887,7 @@ public class CPUManager : MonoBehaviour
         {
             if (delta > 0)
             {
-                List<Vector2Int> availPath = masterGrid.BidirectionalSearch(unit.pos, nodePos, unit, delta * 2);
+                List<Vector2Int> availPath = masterGrid.BidirectionalSearch(unit.pos, nodePos, unit, delta * 4);
                 /*                    if (unit.pos == new Vector2Int(1, 1))
                                     {
                                         Debug.Log($"Checking avail path for {unit.pos} has count {availPath.Count}");
@@ -919,6 +919,7 @@ public class CPUManager : MonoBehaviour
         {
             int minDistanceFromTarget = 3;
             int movementLeft = unit.movementRange;
+            bool isStepwiseMovement = true;
 
             // If no target or we're on the target, get a new one
             if (unit.pos == nodePos || unit.CPU_TargetNode == null)
@@ -932,8 +933,8 @@ public class CPUManager : MonoBehaviour
                 Debug.Log($"Unit {unit.pos} already close enough to target {nodePos}");
                 return;
             }
-
-            List<Vector2Int> fullPath = masterGrid.BidirectionalSearch(
+            List<Vector2Int> fullPath = null;
+            fullPath = masterGrid.BidirectionalSearch(
                 unit.pos,
                 nodePos,
                 unit,
@@ -942,47 +943,55 @@ public class CPUManager : MonoBehaviour
 
             if (fullPath == null || fullPath.Count == 0)
             {
-                Debug.Log($"Unit {unit.pos} couldn't find path toward {nodePos}");
-                return;
+                Debug.Log($"Unit {unit.pos} couldn't find path which passes through {nodePos} distance, giving it general path");
+                fullPath = masterGrid.BidirectionalSearch(
+                    unit.pos,
+                    nodePos,
+                    unit,
+                    Manhattan(unit.pos, nodePos)
+                );
+                isStepwiseMovement = false;
             }
-
             Vector2Int furthestStep = unit.pos;
-            int stepsTaken = 0;
-
-            for (int i = 0; i < fullPath.Count && stepsTaken < movementLeft; i++)
+            if (isStepwiseMovement)
             {
-                Vector2Int step = fullPath[i];
-                int distToTarget = Manhattan(step, nodePos);
+                int stepsTaken = 0;
 
-                stepsTaken++;
-
-                if (distToTarget <= minDistanceFromTarget)
+                for (int i = 0; i < fullPath.Count && stepsTaken < movementLeft; i++)
                 {
-                    // Try rerouting, but preserve movementLeft
-                    GiveCombatUnitNextNodeAssignment(unit);
-                    nodePos = unit.CPU_TargetNode.pos;
+                    Vector2Int step = fullPath[i];
+                    int distToTarget = Manhattan(step, nodePos);
 
-                    List<Vector2Int> reroutePath = masterGrid.BidirectionalSearch(
-                        step,
-                        nodePos,
-                        unit,
-                        movementLeft - stepsTaken
-                    );
+                    stepsTaken++;
 
-                    if (reroutePath != null && reroutePath.Count > 0)
+                    if (distToTarget <= minDistanceFromTarget)
                     {
-                        furthestStep = step;
-                        for (int j = 0; j < reroutePath.Count && stepsTaken < movementLeft; j++)
+                        // Try rerouting, but preserve movementLeft
+                        GiveCombatUnitNextNodeAssignment(unit);
+                        nodePos = unit.CPU_TargetNode.pos;
+
+                        List<Vector2Int> reroutePath = masterGrid.BidirectionalSearch(
+                            step,
+                            nodePos,
+                            unit,
+                            movementLeft - stepsTaken
+                        );
+
+                        if (reroutePath != null && reroutePath.Count > 0)
                         {
-                            furthestStep = reroutePath[j];
-                            stepsTaken++;
+                            furthestStep = step;
+                            for (int j = 0; j < reroutePath.Count && stepsTaken < movementLeft; j++)
+                            {
+                                furthestStep = reroutePath[j];
+                                stepsTaken++;
+                            }
                         }
+
+                        break; // whether reroute found path or not, don't move more than allowed
                     }
 
-                    break; // whether reroute found path or not, don't move more than allowed
+                    furthestStep = step;
                 }
-
-                furthestStep = step;
             }
             //don't land on the enemy HQ.
             if (furthestStep != unit.pos && furthestStep != defaultTargets[unit.playerControl].pos)
@@ -1105,20 +1114,19 @@ public class CPUManager : MonoBehaviour
             if (factories.Count > 0)
             {
                 
-                //BaseUnit progenyResourceUnit = gameMaster.ProduceResourceUnit(factories[0], player);
                 if (GameMaster.isAnimating)
                 {
                     cameraManager.SetPosition((Vector2)factories[0].pos);
                     yield return new WaitForSeconds(CPU_AnimationWaitTime);
                 }
-                //gameMaster.selectedStructure = factories[0];
-                gameMaster.ProduceResourceUnit(factories[0], player);
+                //gameMaster.ProduceResourceUnit(factories[0], player);
                 
                 if (GameMaster.isAnimating)
                     yield return new WaitForSeconds(CPU_AnimationWaitTime);
 
                 //CPU_MoveUnitTowardsTargetNode(progenyResourceUnit);
-                for (int i = 1; i < factories.Count; i++)
+                //for (int i = 1; i < factories.Count; i++)
+                for (int i = 0; i < factories.Count; i++)
                 {
                     //gameMaster.ProduceResourceUnit(factories[i], player);
                     BaseUnit candidateFactoryUnit = null;
@@ -1314,7 +1322,7 @@ public class CPUManager : MonoBehaviour
 
             List<Vector2Int> dirs = new();
             //a little hacky using speficially infantry for this but that will be the source of truth for now.
-            dirs = masterGrid.BidirectionalSearch(edge.vectorA, edge.vectorB, PrefabManager.getBaseUnitFromName("Infantry", 0), (int)(edge.distance *0.75 + 1));
+            dirs = masterGrid.BidirectionalSearch(edge.vectorA, edge.vectorB, PrefabManager.getBaseUnitFromName("Infantry", 0), (int)(edge.distance*1.5));
             if (dirs.Count == 0) {
                 edge.isLandAccessible = false;
                 Debug.Log($"GraphEdge {edge.vectorA}{edge.vectorB} is not land accessible");
@@ -1353,7 +1361,7 @@ public class CPUManager : MonoBehaviour
         foreach(NetworkEdge edge in priorityNetworkEdgesAir)
         {
             List<Vector2Int> dirs = new();
-            dirs = masterGrid.BidirectionalSearch(edge.vectorA, edge.vectorB, PrefabManager.getBaseUnitFromName("LightTank", 0), (int)(edge.distance *0.75));
+            dirs = masterGrid.BidirectionalSearch(edge.vectorA, edge.vectorB, PrefabManager.getBaseUnitFromName("LightTank", 0), (int)(edge.distance*1.5));
             if (dirs.Count == 0)
                 Debug.Log($"Priority GraphEdge {edge.vectorA}{edge.vectorB} is not vehicle accessible");
             else
