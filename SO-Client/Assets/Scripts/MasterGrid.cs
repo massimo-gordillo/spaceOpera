@@ -710,7 +710,7 @@ public class MasterGrid : MonoBehaviour
         yield return new WaitForSeconds(0.2f);
         Vector2Int finalPos = path[path.Count - 1];
         if (!GameMaster.CPU_PlayersList[getPlayerTurn()])
-            cameraManager.SetPosition(finalPos);
+            cameraManager.SetPosition((finalPos+unit.pos)/2);
         foreach (var position in path)
         {
             Vector3 targetPosition = new Vector3(position.x, position.y, unit.transform.position.z);
@@ -1441,6 +1441,8 @@ public class MasterGrid : MonoBehaviour
             clearMovement();
 
         }
+        else
+            Debug.LogWarning($"Unit {selectedUnit.pos} trying to move to {pos} but can't because there's a unit there");
     }
 
 
@@ -1466,6 +1468,12 @@ public class MasterGrid : MonoBehaviour
         removeUnitInGrid(deadUnit.pos);
         //if not null call the function
         whatStructureIsInThisLocation(deadUnit.pos)?.resetCaptureHealth();
+        if (playerUnits[deadUnit.playerControl].Contains(deadUnit))
+        {
+            playerUnits[deadUnit.playerControl].Remove(deadUnit);
+        }
+        else
+            Debug.LogWarning($"Asking to delete unit {deadUnit.pos} from a list it's not in");
         Destroy(deadUnit.gameObject);
         //Destroy(deadUnit.GetComponent<UnitSprite>());
     }

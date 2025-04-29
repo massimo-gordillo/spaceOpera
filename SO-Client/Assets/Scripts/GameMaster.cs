@@ -187,7 +187,7 @@ public class GameMaster : MonoBehaviour
         //unitCosts = new List<(BaseUnit, int)>[numPlayers];
         if (CPU_isOn)
         {
-            //CPU_PlayersList[1] = true;
+            CPU_PlayersList[1] = true;
             CPU_PlayersList[2] = true;
         }
 
@@ -510,9 +510,10 @@ public class GameMaster : MonoBehaviour
 
             if (unitFocus != null)
                 endTurnConfirmCardBackButton.onClick.AddListener(delegate { cameraManager.SetPosition(unitFocus.pos); });
-            else
+            else if (prodFocus != null)
                 endTurnConfirmCardBackButton.onClick.AddListener(delegate { cameraManager.SetPosition(prodFocus.pos); });
-
+            else
+                Debug.LogWarning("Confirmation card triggered but niether unit nor prod found.");
         }
         else
             initiateEndTurn();
@@ -585,6 +586,7 @@ public class GameMaster : MonoBehaviour
         yield return StartCoroutine(CPUManager.CommandUnits(playerTurn));
         yield return StartCoroutine(CPUManager.CreateUnits(playerTurn, playerProgeny[(byte)playerTurn]));
         yield return new WaitForSeconds(0.5f);
+        CPUManager.LogicCheckUnits(playerTurn);
         endTurnButton.interactable = true;
         endTurnButtonPressed();
     }

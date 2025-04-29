@@ -37,7 +37,7 @@ public class CPUManager : MonoBehaviour
     public List<BaseUnit>[] CPU_Units = new List<BaseUnit>[GameMaster.numPlayers+1];
 
     public GameObject debugLinePrefab;
-    private float CPU_AnimationWaitTime = 0.4f;
+    private float CPU_AnimationWaitTime = 0.3f;
 
 
 
@@ -439,12 +439,15 @@ public class CPUManager : MonoBehaviour
             {
                 //Vector2Int diffV = unit.pos - candidate.pos;
                 int diff = Manhattan(unit.pos, candidate.pos); //Math.Abs(diffV.x) + Math.Abs(diffV.y);
-                if (diff > 1 && diff <= unit.movementRange)
+                if (diff > 1 && diff <= unit.movementRange+unit.attackRange)
                 {
                     List<Vector2Int> path = masterGrid.BidirectionalSearch(unit.pos, candidate.pos, unit, ((unit.movementRange + unit.movementRange % 2) / 2 + 1));
                     masterGrid.selectedUnit = unit;
-                    masterGrid.moveSelectedUnit(GetAdjacentPosFromBidirectionalSearch(path, candidate.pos));
-                    masterGrid.unitCombat(unit, candidate);
+                    masterGrid.moveSelectedUnit(GetAdjacentPosFromBidirectionalSearch(path, candidate.pos)); //assumes attack range of 1 for now.
+                    if (Manhattan(unit.pos, candidate.pos) == 1)//for some reason this wasn't always true.
+                        masterGrid.unitCombat(unit, candidate);
+                    else
+                        Debug.LogWarning($"Unit {unit.pos} trying to attack {candidate.pos} but they are not adjacent");
                     unit.setNonExhausted(false);
                 }
                 else if (diff == 1)
@@ -453,7 +456,7 @@ public class CPUManager : MonoBehaviour
                     masterGrid.unitCombat(unit, candidate);
                     unit.setNonExhausted(false);
                 }
-                //failcase if the unit attacks while landing on the enemy HQ, remove softlocks.
+                //failcase if the unit attacks while landing on the enemy HQ, remove CPU softlocking themselves.
                 if (unit.pos == defaultTargets[unit.playerControl].pos && unit.CPU_TargetNode == defaultTargets[unit.playerControl])
                 {
                     masterGrid.deleteUnit(unit);
@@ -844,7 +847,7 @@ public class CPUManager : MonoBehaviour
                 else
                 {
                     CPU_MoveUnitTowardsTargetNode(unit);
-                    CPU_GameActionCapture(unit);
+                    StartCoroutine(CPU_GameActionCapture(unit));
                 }
             }
             else
@@ -1000,7 +1003,7 @@ public class CPUManager : MonoBehaviour
 
     }
 
-    public void CPU_GameActionCapture(BaseUnit unit)
+    public IEnumerator CPU_GameActionCapture(BaseUnit unit)
     {
         NetworkNode targetNode = unit.CPU_TargetNode;
         Vector2Int nodePos = targetNode.pos;
@@ -1010,6 +1013,8 @@ public class CPUManager : MonoBehaviour
             if (targetNode.playerControl != unit.playerControl)
             {
                 int oldPlayer = targetNode.playerControl;
+                cameraManager.SetPosition(targetNode.pos);
+                yield return new WaitForSeconds(CPU_AnimationWaitTime);
                 masterGrid.selectedUnit = unit;
                 masterGrid.captureStructure(targetNode.structure);
                 unit.CPU_IsCapturing = true;
@@ -1469,6 +1474,18 @@ public class CPUManager : MonoBehaviour
             Debug.LogError($"unable to find a node close to {targetPos}");
 
         return closestNode;
+    }
+
+    public void LogicCheckUnits(int player)
+    {
+        foreach(BaseUnit unit in MasterGrid.playerUnits[player])
+        {
+            if (unit.nonExhausted)
+            {
+                Debug.LogWarning($"Unit {unit.pos} is nonExhausted. It has target node {unit.CPU_TargetNode.pos} and attackable list count {unit.CPU_AttackableUnitList.Count}, but it didn't do anything. Why?");
+                CPU_MoveUnitTowardsTargetNode(unit);
+            }
+        }
     }
 
     public void WriteArrayToCSV(string fileName)
