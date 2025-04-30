@@ -711,6 +711,7 @@ public class MasterGrid : MonoBehaviour
         Vector2Int finalPos = path[path.Count - 1];
         if (!GameMaster.CPU_PlayersList[getPlayerTurn()])
             cameraManager.SetPosition((finalPos+unit.pos)/2);
+        //Debug.Log($"Unit {unit.pos} has a path of length {path.Count}");
         foreach (var position in path)
         {
             Vector3 targetPosition = new Vector3(position.x, position.y, unit.transform.position.z);

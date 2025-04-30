@@ -441,7 +441,7 @@ public class CPUManager : MonoBehaviour
                 int diff = Manhattan(unit.pos, candidate.pos); //Math.Abs(diffV.x) + Math.Abs(diffV.y);
                 if (diff > 1 && diff <= unit.movementRange+unit.attackRange)
                 {
-                    List<Vector2Int> path = masterGrid.BidirectionalSearch(unit.pos, candidate.pos, unit, unit.movementRange);
+                    List<Vector2Int> path = masterGrid.BidirectionalSearch(unit.pos, candidate.pos, unit, unit.movementRange+unit.attackRange);
                     masterGrid.selectedUnit = unit;
                     masterGrid.moveSelectedUnit(GetAdjacentPosFromBidirectionalSearch(path, candidate.pos)); //assumes attack range of 1 for now.
                     if (Manhattan(unit.pos, candidate.pos) == 1)//for some reason this wasn't always true.
@@ -921,96 +921,212 @@ public class CPUManager : MonoBehaviour
             int movementLeft = unit.movementRange;
             bool isStepwiseMovement = true;
 
+            Debug.Log($"Target for {unit.pos} target node is {unit.CPU_TargetNode.pos}");
+
+
             // If no target or we're on the target, get a new one
             if (unit.pos == nodePos || unit.CPU_TargetNode == null)
             {
                 GiveCombatUnitNextNodeAssignment(unit);
                 nodePos = unit.CPU_TargetNode.pos;
+                Debug.Log($"New target for {unit.pos} target node is {unit.CPU_TargetNode.pos}");
+
             }
 
-            if (Manhattan(unit.pos, nodePos) <= minDistanceFromTarget)
-            {
-                Debug.Log($"Unit {unit.pos} already close enough to target {nodePos}");
-                return;
-            }
-            List<Vector2Int> fullPath = null;
-            fullPath = masterGrid.BidirectionalSearch(
+
+
+            List<Vector2Int> foundPath = new();
+            List<Vector2Int> finalPath = new();
+/*            foundPath = masterGrid.BidirectionalSearch(
                 unit.pos,
                 nodePos,
                 unit,
                 movementLeft + minDistanceFromTarget // soft extension
-            );
+            );*/
 
-            if (fullPath == null || fullPath.Count == 0)
+            bool isInDistance = true;
+            //while you still have movement available
+            while (movementLeft > 0)
             {
-                Debug.Log($"Unit {unit.pos} couldn't find path which passes through {nodePos} distance, giving it general path");
-                fullPath = masterGrid.BidirectionalSearch(
+                //search for a path to a cell within min distance from target
+                Debug.Log($"Unit {unit.pos} has movement available {movementLeft}, searching");
+                foundPath = masterGrid.BidirectionalSearch(
                     unit.pos,
                     nodePos,
                     unit,
-                    Manhattan(unit.pos, nodePos)
-                );
-                isStepwiseMovement = false;
-            }
-            Vector2Int furthestStep = unit.pos;
-            if (isStepwiseMovement)
-            {
-                int stepsTaken = 0;
-
-                for (int i = 0; i < fullPath.Count && stepsTaken < movementLeft; i++)
+                    movementLeft + minDistanceFromTarget // soft extension
+                    );
+                //if you're unable to find a cell within the distance, just go as far as you can towards the target node
+                if(foundPath == null || foundPath.Count == 0)
                 {
-                    Vector2Int step = fullPath[i];
-                    int distToTarget = Manhattan(step, nodePos);
+                    Debug.Log($"Unit {unit.pos} wants to travel max distance to  {nodePos}");
 
-                    stepsTaken++;
-
-                    if (distToTarget <= minDistanceFromTarget)
+                    foundPath = masterGrid.BidirectionalSearch(
+                    unit.pos,
+                    nodePos,
+                    unit,
+                    (int)(Manhattan(unit.pos, nodePos) * 4)
+                    );
+                    movementLeft = 0;
+                    isInDistance = false;
+                    finalPath = foundPath;
+                }
+                if(foundPath == null || foundPath.Count == 0) {
+                    Debug.LogError($"Unable to find a path from {unit.pos} to {nodePos}, has a search value of {Manhattan(unit.pos, nodePos)}");
+                    break; 
+                
+                }
+                /*//if you have movement remaining and you're not in the appropriate distance to the target
+                for (int i = 0; i < movementLeft && !isInDistance; i++)
+                {
+                    Debug.Log($"first path found, current path is {foundPath[i]}, target node is {unit.CPU_TargetNode.pos}");
+                    //if you find yourself within manhattan distance MIN from target 
+                    if (Manhattan(foundPath[i], targetNode.pos) <= minDistanceFromTarget)
                     {
-                        // Try rerouting, but preserve movementLeft
-                        GiveCombatUnitNextNodeAssignment(unit);
-                        nodePos = unit.CPU_TargetNode.pos;
-
-                        List<Vector2Int> reroutePath = masterGrid.BidirectionalSearch(
-                            step,
+                        //check that you can actually reach the target in 3 moves (not blocked by units/terrain)
+                        List<Vector2Int> shortPath = masterGrid.BidirectionalSearch(
+                            foundPath[i],
                             nodePos,
                             unit,
-                            movementLeft - stepsTaken
+                            minDistanceFromTarget
+                        );
+                        //if you find a path AND (your path isn't 0 or at target), give unit new target assignment and determine new path to continue.
+                        if (shortPath != null && (shortPath.Count !=0 || unit.pos == nodePos)) {
+                            isInDistance = true;
+                            GiveCombatUnitNextNodeAssignment(unit);
+                            nodePos = unit.CPU_TargetNode.pos;
+                            foundPath = masterGrid.BidirectionalSearch(
+                                foundPath[i],
+                                nodePos,
+                                unit,
+                                movementLeft + minDistanceFromTarget
+                            );
+                        }
+                    }
+                    finalPath.Add(foundPath[i]);
+                    movementLeft--;
+                }*/
+
+                for (int i = 0; i < movementLeft && i < foundPath.Count && isInDistance; i++)
+                {
+                    Debug.Log($"first path found, current path is {foundPath[i]}, target node is {unit.CPU_TargetNode.pos}");
+
+                    // Check Manhattan distance to target
+                    if (Manhattan(foundPath[i], targetNode.pos) <= minDistanceFromTarget)
+                    {
+                        // Verify we can reach the target from here
+                        List<Vector2Int> shortPath = masterGrid.BidirectionalSearch(
+                            foundPath[i],
+                            nodePos,
+                            unit,
+                            minDistanceFromTarget
                         );
 
-                        if (reroutePath != null && reroutePath.Count > 0)
+                        if (shortPath != null && (shortPath.Count != 0 || unit.pos == nodePos))
                         {
-                            furthestStep = step;
-                            for (int j = 0; j < reroutePath.Count && stepsTaken < movementLeft; j++)
-                            {
-                                furthestStep = reroutePath[j];
-                                stepsTaken++;
-                            }
-                        }
+                            isInDistance = true;
 
-                        break; // whether reroute found path or not, don't move more than allowed
+                            // Reassign target and get updated path
+                            GiveCombatUnitNextNodeAssignment(unit);
+                            nodePos = unit.CPU_TargetNode.pos;
+
+                            foundPath = masterGrid.BidirectionalSearch(
+                                foundPath[i],
+                                nodePos,
+                                unit,
+                                movementLeft + minDistanceFromTarget
+                            );
+
+                            // Reset i to -1 so it becomes 0 next loop (freshly iterate new path)
+                            i = -1;
+
+                            continue; // Skip adding this path to finalPath, since it's now outdated
+                        }
                     }
 
-                    furthestStep = step;
+                    finalPath.Add(foundPath[i]);
+                    movementLeft--;
                 }
-            }
-            //don't land on the enemy HQ.
-            if (furthestStep != unit.pos && furthestStep != defaultTargets[unit.playerControl].pos)
-            {
-                if(Manhattan(furthestStep, unit.pos) != unit.movementRange )
+/*                if (!isInDistance)
                 {
-                    Debug.Log($"Unit {unit.pos} did not move full range, stopped at {furthestStep}");
-                }
-                masterGrid.selectedUnit = unit;                
-                masterGrid.moveSelectedUnit(furthestStep);
-                
+                    movementLeft = 0;
+                    List<Vector2Int> pathCopy = new(foundPath); // Make a shallow copy
+                    foreach (Vector2Int v in pathCopy)
+                    {
+                        finalPath.Add(v);
+                    }
+                }*/
+
+
             }
-            else
-            {
-                Debug.Log($"Unit {unit.pos} had no legal movement this turn");
-            }
+            Vector2Int target = masterGrid.GetFurthestTileByMovement(finalPath, unit.movementRange);
+            //target = GetAdjacentPosFromBidirectionalSearch(finalPath, target);
+            Debug.Log($"Unit found final target square {target}");
+            masterGrid.selectedUnit = unit;
+            masterGrid.moveSelectedUnit(target);
+
+
         }
 
     }
+
+    public Vector2Int FindBestReachableSquare(Vector2Int targetPos, Vector2Int unitPos, BaseUnit unit, HashSet<Vector2Int> reachableSquares)
+    {
+        HashSet<Vector2Int> visited = new HashSet<Vector2Int>();
+        SortedSet<(float score, int steps, Vector2Int pos)> queue = new SortedSet<(float, int, Vector2Int)>(
+            Comparer<(float, int, Vector2Int)>.Create((a, b) =>
+            {
+                int cmp = a.Item1.CompareTo(b.Item1);
+                if (cmp == 0) cmp = a.Item2.CompareTo(b.Item2);
+                if (cmp == 0) cmp = a.Item3.x.CompareTo(b.Item3.x);
+                if (cmp == 0) cmp = a.Item3.y.CompareTo(b.Item3.y);
+                return cmp;
+            })
+        );
+
+        queue.Add((0f, 0, targetPos));
+        visited.Add(targetPos);
+
+        Vector2Int[] directions = new Vector2Int[]
+        {
+        new Vector2Int(0, 1),
+        new Vector2Int(1, 0),
+        new Vector2Int(0, -1),
+        new Vector2Int(-1, 0)
+        };
+
+        while (queue.Count > 0)
+        {
+            var (score, steps, current) = queue.Min;
+            queue.Remove(queue.Min);
+
+            if (reachableSquares.Contains(current))
+            {
+                return current;
+            }
+
+            foreach (var dir in directions)
+            {
+                Vector2Int neighbor = current + dir;
+                if (visited.Contains(neighbor)) continue;
+
+                int legality = masterGrid.legalMove(neighbor, unit);
+                if (legality != 1) continue;
+
+                visited.Add(neighbor);
+
+                // Cost: steps so far + heuristic (distance to unitPos)
+                float heuristic = Vector2Int.Distance(neighbor, unitPos);
+                float totalScore = steps + 1 + heuristic;
+
+                queue.Add((totalScore, steps + 1, neighbor));
+            }
+        }
+
+        Debug.LogWarning("No reachable square found from target node.");
+        return unitPos; // fallback
+    }
+
 
     public IEnumerator CPU_GameActionCapture(BaseUnit unit)
     {
@@ -1492,7 +1608,7 @@ public class CPUManager : MonoBehaviour
             if (unit.nonExhausted)
             {
                 Debug.LogWarning($"Unit {unit.pos} is nonExhausted. It has target node {unit.CPU_TargetNode.pos} and attackable list count {unit.CPU_AttackableUnitList.Count}, but it didn't do anything. Why?");
-                CPU_MoveUnitTowardsTargetNode(unit);
+                //CPU_MoveUnitTowardsTargetNode(unit);
             }
         }
     }

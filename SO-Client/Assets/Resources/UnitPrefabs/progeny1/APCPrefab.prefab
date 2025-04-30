@@ -274,11 +274,10 @@ MonoBehaviour:
   attackRange: 0
   price: 500
   movementRange: 7
-  playerControl: 0
+  playerControl: 1
   team: 0
   orientation: 3
-  xPos: 0
-  yPos: 0
+  pos: {x: 0, y: 0}
   movementNonExhausted: 0
   nonExhausted: 0
   undoingMovement: 0
@@ -306,6 +305,12 @@ MonoBehaviour:
   defenceValueTextContainer: {fileID: 5111704317312233887}
   damageRangeTextContainer: {fileID: 1642147881846937329}
   combatTooltip: {fileID: 3007232869021273279}
+  CPU_IsCapturing: 0
+  CPU_StructureList: []
+  CPU_CapturableStructureList: []
+  CPU_CapturingUnitList: []
+  CPU_AttackableUnitList: []
+  CPU_AttackableResourceUnitList: []
 --- !u!1 &2674036846729813689
 GameObject:
   m_ObjectHideFlags: 0
@@ -333,7 +338,7 @@ Transform:
   m_GameObject: {fileID: 2674036846729813689}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.01, y: 0.01, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 8326007149815282679}

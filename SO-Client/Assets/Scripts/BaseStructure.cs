@@ -242,7 +242,7 @@ public class BaseStructure : MonoBehaviour
 
     public bool IsCoveredByUnit()
     {
-        Debug.Log($"Structure {pos} is covered by unit? {masterGrid.whatUnitIsInThisLocation(pos) != null}");
+        //Debug.Log($"Structure {pos} is covered by unit? {masterGrid.whatUnitIsInThisLocation(pos) != null}");
         return (masterGrid.whatUnitIsInThisLocation(pos) != null);
     }
 }

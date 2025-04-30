@@ -87,6 +87,7 @@ public class GameMaster : MonoBehaviour
     public static bool CPU_isOn = true;
     public static bool[] CPU_PlayersList;
     public static List<(BaseUnit, int)>[] unitCosts;
+    public static List<(BaseUnit, int)>[] CPU_unitMatchupWeights;
     public int virixCheapestUnit;
 
     /*    public static GameMaster Instance
@@ -142,10 +143,15 @@ public class GameMaster : MonoBehaviour
         {
             unitCosts[i] = new List<(BaseUnit, int)>();
         }
-/*        foreach(List<(BaseUnit, int)> pair in unitCosts)
+        CPU_unitMatchupWeights = new List<(BaseUnit, int)>[3];
+        for (int i = 0; i < 3; i++)
         {
-            pair = new List<(BaseUnit, int)>();
-        }*/
+            CPU_unitMatchupWeights[i] = new List<(BaseUnit, int)>();
+        }
+        /*        foreach(List<(BaseUnit, int)> pair in unitCosts)
+                {
+                    pair = new List<(BaseUnit, int)>();
+                }*/
         //initializes all unit values, modifies their prefab and sprites.
         //initializes all Tilebases for tilemap
         //only does anything if it hasn't already been initialized.
@@ -187,7 +193,7 @@ public class GameMaster : MonoBehaviour
         //unitCosts = new List<(BaseUnit, int)>[numPlayers];
         if (CPU_isOn)
         {
-            //CPU_PlayersList[1] = true;
+            CPU_PlayersList[1] = true;
             CPU_PlayersList[2] = true;
         }
 
@@ -466,7 +472,7 @@ public class GameMaster : MonoBehaviour
         int unitCount = 0;
         foreach (BaseUnit unit in MasterGrid.playerUnits[player])
         {
-            if (unit.nonExhausted)
+            if (unit.movementNonExhausted)
             {
                 unitCount++;
                 if (unitFocus == null)
@@ -586,12 +592,11 @@ public class GameMaster : MonoBehaviour
     public IEnumerator RunCPUForPlayerDelay(int playerTurn)
     {
         if (isAnimating)
-        {
             yield return new WaitForSeconds(1.0f);
-        }
         yield return StartCoroutine(CPUManager.CommandUnits(playerTurn));
         yield return StartCoroutine(CPUManager.ProduceUnits(playerTurn, playerProgeny[(byte)playerTurn]));
-        yield return new WaitForSeconds(0.5f);
+        if (isAnimating)
+            yield return new WaitForSeconds(0.5f);
         CPUManager.LogicCheckUnits(playerTurn);
         endTurnButton.interactable = true;
         endTurnButtonPressed();
@@ -906,7 +911,7 @@ public class GameMaster : MonoBehaviour
 
     public void AnimateStartTurnCard(int player)
     {
-        endTurnButton.GetComponent<Button>().interactable = false;
+        
         Vector2 endPos = (player % 2 == 0) ? offScreenRight : offScreenLeft;
         Vector2 startPos = (player % 2 == 0) ? offScreenLeft : offScreenRight;
 
@@ -918,9 +923,12 @@ public class GameMaster : MonoBehaviour
 
     private IEnumerator SwoopInAndOutTurnCard(Vector2 startPos, Vector2 centerPos, Vector2 endPos)
     {
+        endTurnButton.GetComponent<Button>().interactable = false; 
         yield return SwoopTurnCard(startPos, centerPos, swoopDuration*1.5f, easeOutCubic);
         yield return new WaitForSeconds(holdDuration);
         yield return SwoopTurnCard(centerPos, endPos, swoopDuration, easeInCubic);
+        //I don't like this being here but I need to wait.
+        //endTurnButton.GetComponent<Button>().interactable = !CPU_PlayersList[playerTurn];
         endTurnButton.GetComponent<Button>().interactable = true;
     }
 
