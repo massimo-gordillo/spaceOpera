@@ -1502,12 +1502,12 @@ MonoBehaviour:
   baseUnitVariantIdentifier: 0
   progeny: 1
   unitTerrainType: 1
-  gamePieceId: 13
+  gamePieceId: 50
   isNotPrototype: 1
   healthType: 0
   damageType: 0
   weaponType: 0
-  attributesHash: -5761294625780269056
+  attributesHash: 8079442681937264640
   isResourceUnit: 1
   isInfantry: 1
   healthMax: 50
@@ -1519,8 +1519,7 @@ MonoBehaviour:
   playerControl: 0
   team: 0
   orientation: 3
-  xPos: 0
-  yPos: 0
+  pos: {x: 0, y: 0}
   movementNonExhausted: 0
   nonExhausted: 0
   undoingMovement: 0
@@ -1548,6 +1547,12 @@ MonoBehaviour:
   defenceValueTextContainer: {fileID: 297900537950936986}
   damageRangeTextContainer: {fileID: 469454120118911794}
   combatTooltip: {fileID: 2041258608177600918}
+  CPU_IsCapturing: 0
+  CPU_StructureList: []
+  CPU_CapturableStructureList: []
+  CPU_CapturingUnitList: []
+  CPU_AttackableUnitList: []
+  CPU_AttackableResourceUnitList: []
 --- !u!1 &6228835300446297275
 GameObject:
   m_ObjectHideFlags: 0

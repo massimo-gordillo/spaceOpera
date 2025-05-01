@@ -270,7 +270,7 @@ Transform:
   m_GameObject: {fileID: 1143842104089529702}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.01, y: 0.01, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6737473722269226990}
@@ -1663,7 +1663,7 @@ MonoBehaviour:
   healthType: 1
   damageType: 1
   weaponType: 1
-  attributesHash: 3885515762885984256
+  attributesHash: -1498643144751710208
   isResourceUnit: 0
   isInfantry: 0
   healthMax: 300
@@ -1672,11 +1672,10 @@ MonoBehaviour:
   attackRange: 3
   price: 600
   movementRange: 4
-  playerControl: 0
+  playerControl: 2
   team: 0
   orientation: 3
-  xPos: 0
-  yPos: 0
+  pos: {x: 0, y: 0}
   movementNonExhausted: 0
   nonExhausted: 0
   undoingMovement: 0
@@ -1704,6 +1703,12 @@ MonoBehaviour:
   defenceValueTextContainer: {fileID: 3140721843402378909}
   damageRangeTextContainer: {fileID: 4041308757638743399}
   combatTooltip: {fileID: 7621041416970937430}
+  CPU_IsCapturing: 0
+  CPU_StructureList: []
+  CPU_CapturableStructureList: []
+  CPU_CapturingUnitList: []
+  CPU_AttackableUnitList: []
+  CPU_AttackableResourceUnitList: []
 --- !u!1 &7123453975287452329
 GameObject:
   m_ObjectHideFlags: 0

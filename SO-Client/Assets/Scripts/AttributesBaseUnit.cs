@@ -2,9 +2,9 @@ using UnityEngine;
 
 public enum Progeny
 {
-    Ertrian,
-    Virix,
-    Sentus
+    Ertrian = 0,
+    Virix = 1,
+    Sentus = 2
 }
 
 public enum UnitTerrainType
@@ -39,7 +39,7 @@ public enum DamageType
 public class AttributesBaseUnit
 {
     public string unitName { get; set; }
-    public byte gamePieceId { get; set; }
+    public int gamePieceId { get; set; }
     //public byte baseUnitVariantIdentifier { get; set; }
     public bool isNotPrototype { get; set; }
     public Progeny progeny { get; set; } //Ertiran, Virix, Sentus

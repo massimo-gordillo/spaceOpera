@@ -437,7 +437,7 @@ MonoBehaviour:
   healthType: 0
   damageType: 0
   weaponType: 0
-  attributesHash: 8389234178515795968
+  attributesHash: 2519504858990510080
   isResourceUnit: 0
   isInfantry: 0
   healthMax: 350
@@ -449,8 +449,7 @@ MonoBehaviour:
   playerControl: 0
   team: 0
   orientation: 3
-  xPos: 0
-  yPos: 0
+  pos: {x: 0, y: 0}
   movementNonExhausted: 0
   nonExhausted: 0
   undoingMovement: 0
@@ -478,6 +477,12 @@ MonoBehaviour:
   defenceValueTextContainer: {fileID: 2756986084564594787}
   damageRangeTextContainer: {fileID: 3498258081429690551}
   combatTooltip: {fileID: 2629987206059995397}
+  CPU_IsCapturing: 0
+  CPU_StructureList: []
+  CPU_CapturableStructureList: []
+  CPU_CapturingUnitList: []
+  CPU_AttackableUnitList: []
+  CPU_AttackableResourceUnitList: []
 --- !u!1 &2013778395790457772
 GameObject:
   m_ObjectHideFlags: 0

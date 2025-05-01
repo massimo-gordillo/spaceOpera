@@ -648,7 +648,7 @@ MonoBehaviour:
   healthType: 0
   damageType: 0
   weaponType: 1
-  attributesHash: 5825589989848645632
+  attributesHash: -6431823804950904832
   isResourceUnit: 1
   isInfantry: 1
   healthMax: 100

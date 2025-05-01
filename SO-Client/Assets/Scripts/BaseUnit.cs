@@ -16,7 +16,7 @@ public class BaseUnit : MonoBehaviour
     //enums as defined in AttributesBaseUnit
     public Progeny progeny; 
     public UnitTerrainType unitTerrainType;
-    public byte gamePieceId;
+    public int gamePieceId;
     public bool isNotPrototype;
     public HealthType healthType;
     public DamageType damageType;

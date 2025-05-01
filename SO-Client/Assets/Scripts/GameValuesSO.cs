@@ -47,7 +47,7 @@ public class GameValuesSO : ScriptableObject
             StartCoroutine(LoadCSVCoroutine(fileName, callback));
         }*/
 
-    public List<string> LoadCSVFromJSON(string fileName)
+    public static List<string> LoadCSVFromJSON(string fileName)
     {
         string filePath = Path.Combine(Application.streamingAssetsPath, fileName);
         string csvText = null;
@@ -219,10 +219,10 @@ public class GameValuesSO : ScriptableObject
 
 
             unitAttributes.prefabPath = generatePrefabLocationString(unitAttributes.unitName, unitAttributes.progeny);
-            unitAttributes.gamePieceId = (byte)(i - 1);
+            //unitAttributes.gamePieceId = (byte)(i - 1);
             unitAttributes.attributesHash = ComputeUnitHash(unitAttributes);
             //add unit attributes to list of attributesBaseUnit.
-            attributesBaseUnits.Add(unitAttributes.gamePieceId, unitAttributes);
+            attributesBaseUnits.Add((byte)unitAttributes.gamePieceId, unitAttributes);
 
             prefabManager.managePrefabOnStartUp(unitAttributes);
 /*            if (Resources.Load(unitAttributes.prefabPath) == null)// || Resources.Load(unitAttributes.prefabPath) != )

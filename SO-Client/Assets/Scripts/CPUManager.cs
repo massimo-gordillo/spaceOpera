@@ -36,6 +36,10 @@ public class CPUManager : MonoBehaviour
     public bool[] playersAsCPU = new bool[GameMaster.numPlayers+1];
     public List<BaseUnit>[] CPU_Units = new List<BaseUnit>[GameMaster.numPlayers+1];
 
+    List<(BaseUnit unit, int cost, int weight)>[,] matchupWeights;
+    List<(BaseUnit, int, int weight)> ertrianFactoryProdList;
+    List<(BaseUnit, int, int weight)> ertrianAirportProdList;
+
     public GameObject debugLinePrefab;
     private float CPU_AnimationWaitTime = 0.3f;
 
@@ -128,12 +132,13 @@ public class CPUManager : MonoBehaviour
         }*/
 
         InitClosestNeighbour();
-        StartCoroutine(DrawStructureDebugLines());
+        //StartCoroutine(DrawStructureDebugLines());
     }
 
     public void Start()
     {
         SetDefaultTargets();
+        ImportMatchupWeights();
     }
 
     public void DebugNodes()
@@ -1165,8 +1170,8 @@ public class CPUManager : MonoBehaviour
         List<(BaseUnit, int)> airportProdList = new();
         if (progeny == 0)
         {
-/*            int factoryCount = 0;
-            int airportCount = 0;*/
+            /*            int factoryCount = 0;
+                        int airportCount = 0;*/
             foreach (BaseStructure structure in prods)
             {
                 if (structure.structureType == 1)
@@ -1174,16 +1179,16 @@ public class CPUManager : MonoBehaviour
                 if (structure.structureType == 2)
                     airports.Add(structure);
             }
-            yield return GenerateSpendErtrian();
-/*            foreach (BaseStructure structure in prods)
-            {
-                if (structure.playerControl == player && structure.structureType == 1)
-                {
-                    //Debug.Log($"Creating base unit for {player} at {structure.pos}, they have progeny {gameMaster.getPlayerProgeny((byte)player)}");
-                    if (gameMaster.getPlayerProgeny((byte)player) != 1)
-                        gameMaster.ProduceResourceUnit(structure, player);
-                }
-            }*/
+            yield return GenerateSpendErtrianV2();
+            /*            foreach (BaseStructure structure in prods)
+                        {
+                            if (structure.playerControl == player && structure.structureType == 1)
+                            {
+                                //Debug.Log($"Creating base unit for {player} at {structure.pos}, they have progeny {gameMaster.getPlayerProgeny((byte)player)}");
+                                if (gameMaster.getPlayerProgeny((byte)player) != 1)
+                                    gameMaster.ProduceResourceUnit(structure, player);
+                            }
+                        }*/
             //yield return null;
         }
 
@@ -1229,14 +1234,14 @@ public class CPUManager : MonoBehaviour
                 }
             if (factories.Count > 0)
             {
-                
+
                 if (GameMaster.isAnimating)
                 {
                     cameraManager.SetPosition((Vector2)factories[0].pos);
                     yield return new WaitForSeconds(CPU_AnimationWaitTime);
                 }
                 //gameMaster.ProduceResourceUnit(factories[0], player);
-                
+
                 if (GameMaster.isAnimating)
                     yield return new WaitForSeconds(CPU_AnimationWaitTime);
 
@@ -1268,9 +1273,199 @@ public class CPUManager : MonoBehaviour
 
         }
 
+        /*IEnumerator GenerateSpendErtrianV2()
+        {
+            int totalCash = cash;
+
+            // All structure slots available
+            int maxFactoryCount = factories.Count;
+            int maxAirportCount = airports.Count;
+
+            List<(BaseUnit unit, BaseStructure structure)> bestBuildPlan = null;
+            int bestScore = int.MinValue;
+
+            float alpha = 10f; // weight importance of cash usage in score (tweak for balance)
+
+            // Brute-force all combinations within limits
+            foreach (var factoryCombo in GetUnitCombinations(ertrianFactoryProdList, maxFactoryCount, totalCash))
+            {
+                foreach (var airportCombo in GetUnitCombinations(ertrianAirportProdList, maxAirportCount, totalCash))
+                {
+                    var combined = factoryCombo.Concat(airportCombo).ToList();
+                    int totalCost = combined.Sum(x => x.cost);
+                    if (totalCost > totalCash)
+                        continue;
+
+                    int totalWeight = combined.Sum(x => x.weight);
+                    float score = totalWeight + alpha * ((float)totalCost / totalCash);
+                    if (score > bestScore)
+                    {
+                        bestScore = (int)score;
+                        bestBuildPlan = combined
+                            .Select(x => (x.unit, x.unit.unitTerrainType == UnitTerrainType.Land
+                                ? factories[factoryCombo.IndexOf(x)]
+                                : airports[airportCombo.IndexOf(x)]
+                            )).ToList();
+                    }
+                }
+            }
+
+            // Actually produce the selected units
+            if (bestBuildPlan != null)
+            {
+                foreach ((BaseUnit unit, BaseStructure structure) in bestBuildPlan)
+                {
+                    cameraManager.SetPosition((Vector2)structure.pos);
+                    gameMaster.selectedStructure = structure;
+                    gameMaster.ProduceUnit(unit, structure.playerControl, false);
+                    priorityNodeVectorMap.TryGetValue(structure.pos, out unit.CPU_TargetNode);
+                    GiveCombatUnitNextNodeAssignment(unit);
+                    yield return createUnitAtStructure(unit, structure);
+                }
+            }
+        }
+
+        IEnumerable<List<(BaseUnit unit, int cost, int weight)>> GetUnitCombinations(
+    List<(BaseUnit unit, int cost, int weight)> units, int maxCount, int maxTotalCost)
+        {
+            int n = units.Count;
+            for (int mask = 0; mask < (1 << n); mask++)
+            {
+                var combo = new List<(BaseUnit, int, int)>();
+                int totalCost = 0;
+
+                for (int i = 0; i < n; i++)
+                {
+                    if ((mask & (1 << i)) != 0)
+                    {
+                        var entry = units[i];
+                        combo.Add(entry);
+                        totalCost += entry.cost;
+                    }
+                }
+
+                if (combo.Count <= maxCount && totalCost <= maxTotalCost)
+                    yield return combo;
+            }
+        }
 
 
-}
+
+
+    }*/
+
+        IEnumerator GenerateSpendErtrianV2()
+        {
+            int totalCash = cash;
+
+            int maxFactoryCount = factories.Count;
+            int maxAirportCount = airports.Count;
+
+            List<(BaseUnit unit, BaseStructure structure)> bestBuildPlan = null;
+            int bestScore = int.MinValue;
+
+            float alpha = 10f;
+
+            // Determine opponent progeny
+            int opponentProgeny = 0;
+            for (int i = 0; i < GameMaster.numPlayers; i++)
+            {
+                byte progeny = gameMaster.getPlayerProgeny((byte)i);
+                if (progeny != 0) // Player 0 is always Ertrian
+                {
+                    opponentProgeny = progeny;
+                    break;
+                }
+            }
+            Debug.Log($"[AI] Opponent progeny determined as: {opponentProgeny}");
+
+            // Grab list of units Ertrian (0) vs opponent
+            var ertrianMatchupList = matchupWeights[0, opponentProgeny];
+
+            var factoryList = ertrianMatchupList.Where(x => x.unit.unitTerrainType == UnitTerrainType.Land).ToList();
+            var airportList = ertrianMatchupList.Where(x => x.unit.unitTerrainType == UnitTerrainType.Air).ToList();
+
+            Debug.Log($"[AI] Factory buildable units: {factoryList.Count}, Airport buildable units: {airportList.Count}");
+
+            int testedComboCount = 0;
+
+            foreach (var factoryCombo in GetUnitCombinations(factoryList, maxFactoryCount, totalCash))
+            {
+                foreach (var airportCombo in GetUnitCombinations(airportList, maxAirportCount, totalCash))
+                {
+                    var combined = factoryCombo.Concat(airportCombo).ToList();
+                    int totalCost = combined.Sum(x => x.cost);
+                    if (totalCost > totalCash)
+                        continue;
+
+                    int totalWeight = combined.Sum(x => x.weight);
+                    float score = totalWeight + alpha * ((float)totalCost / totalCash);
+                    testedComboCount++;
+
+                    Debug.Log($"[AI] Combo #{testedComboCount}: Cost={totalCost}, Weight={totalWeight}, Score={score}");
+
+                    if (score > bestScore)
+                    {
+                        bestScore = (int)score;
+                        bestBuildPlan = combined
+                            .Select(x => (x.unit,
+                                x.unit.unitTerrainType == UnitTerrainType.Land
+                                    ? factories[factoryCombo.IndexOf(x)]
+                                    : airports[airportCombo.IndexOf(x)]
+                            )).ToList();
+
+                        Debug.Log($"[AI] New best score: {bestScore}. Units: {string.Join(", ", combined.Select(u => u.unit.unitName))}");
+                    }
+                }
+            }
+
+            if (bestBuildPlan != null)
+            {
+                Debug.Log($"[AI] Final build plan selected with score {bestScore}:");
+                foreach ((BaseUnit unit, BaseStructure structure) in bestBuildPlan)
+                {
+                    Debug.Log($"[AI] Producing {unit.unitName} at {structure.structureType} located at {structure.pos}");
+                    cameraManager.SetPosition((Vector2)structure.pos);
+                    gameMaster.selectedStructure = structure;
+                    gameMaster.ProduceUnit(unit, structure.playerControl, false);
+                    priorityNodeVectorMap.TryGetValue(structure.pos, out unit.CPU_TargetNode);
+                    GiveCombatUnitNextNodeAssignment(unit);
+                    yield return createUnitAtStructure(unit, structure);
+                }
+            }
+            else
+            {
+                Debug.LogWarning("[AI] No valid build plan found within cash and structure constraints.");
+            }
+        }
+    }
+
+
+        IEnumerable<List<(BaseUnit unit, int cost, int weight)>> GetUnitCombinations(
+    List<(BaseUnit unit, int cost, int weight)> units, int maxCount, int maxTotalCost)
+    {
+        int n = units.Count;
+        for (int mask = 0; mask < (1 << n); mask++)
+        {
+            var combo = new List<(BaseUnit, int, int)>();
+            int totalCost = 0;
+
+            for (int i = 0; i < n; i++)
+            {
+                if ((mask & (1 << i)) != 0)
+                {
+                    var entry = units[i];
+                    combo.Add(entry);
+                    totalCost += entry.cost;
+                }
+            }
+
+            if (combo.Count <= maxCount && totalCost <= maxTotalCost)
+                yield return combo;
+        }
+    }
+
+
 
     public IEnumerator createUnitAtStructure(BaseUnit unit, BaseStructure prod)
     {
@@ -1612,6 +1807,153 @@ public class CPUManager : MonoBehaviour
             }
         }
     }
+
+    /*  Reference a json of the production weights for each unit against a certain matchup.
+        In theory I could include this in Prefab importing but unnecessarily fancy for now.
+        In future I could extend this to multiplayer by doing a multiplier of the weights against the ratio of opps matchups
+    */
+    public void ImportMatchupWeights()
+    {
+        // Initialize 2D array: matchupWeights[myProgeny, opponentProgeny]
+        matchupWeights = new List<(BaseUnit unit, int cost, int weight)>[3, 3];
+        for (int i = 0; i < 3; i++)
+        {
+            for (int j = 0; j < 3; j++)
+            {
+                matchupWeights[i, j] = new List<(BaseUnit, int, int)>();
+            }
+        }
+
+        List<string> lines = GameValuesSO.LoadCSVFromJSON("MatchupWeights.json");
+        if (lines == null || lines.Count < 2)
+        {
+            Debug.LogError("CSV file not loaded or empty.");
+            return;
+        }
+
+        // Flatten unitCosts into a dictionary for lookup by gamePieceId
+        var allCosts = GameMaster.unitCosts
+            .SelectMany(list => list)
+            .ToDictionary(tuple => tuple.Item1.gamePieceId, tuple => (tuple.Item1, tuple.Item2));
+
+        // Parse CSV lines
+        for (int i = 1; i < lines.Count; i++) // skip header
+        {
+            string line = lines[i];
+            if (string.IsNullOrWhiteSpace(line))
+                continue;
+
+            var cols = line.Split(',');
+            if (cols.Length < 6)
+            {
+                Debug.LogWarning($"Line {i + 1} malformed: {line}");
+                continue;
+            }
+
+            if (!int.TryParse(cols[0].Trim(), out int gamePieceId))
+            {
+                Debug.LogWarning($"Invalid gamePieceId on line {i + 1}: {cols[0]}");
+                continue;
+            }
+
+            string progenyStr = cols[2].Trim();
+            if (!Enum.TryParse(progenyStr, out Progeny progenyEnum))
+            {
+                Debug.LogWarning($"Invalid progeny value on line {i + 1}: {progenyStr}");
+                continue;
+            }
+
+            int myProgeny = (int)progenyEnum;
+
+            if (!allCosts.TryGetValue((byte)gamePieceId, out var unitInfo))
+            {
+                Debug.LogWarning($"Unit with gamePieceID '{gamePieceId}' not found in unitCosts.");
+                continue;
+            }
+
+            var unit = unitInfo.Item1;
+            var cost = unitInfo.Item2;
+
+            // Add weights for this unit against each opponent progeny
+            for (int enemyProgeny = 0; enemyProgeny < 3; enemyProgeny++)
+            {
+                if (!int.TryParse(cols[3 + enemyProgeny], out int weight))
+                {
+                    Debug.LogWarning($"Weight parse error on line {i + 1} for enemy progeny {enemyProgeny}");
+                    continue;
+                }
+
+                matchupWeights[(int)progenyEnum, enemyProgeny].Add((unit, cost, weight));
+            }
+        }
+
+        Debug.Log("Completed importing matchup weights");
+        //ExportMatchupWeightsToCSV(matchupWeights, "assets/matchupWeightsCheck.csv");
+
+        // Example: Build Ertrian production lists based on current enemy
+        ertrianFactoryProdList = new List<(BaseUnit, int, int)>();
+        ertrianAirportProdList = new List<(BaseUnit, int, int)>();
+
+        int progenyOpp = 0;
+        for (byte i = 0; i < GameMaster.numPlayers; i++)
+        {
+            byte tempProgeny = gameMaster.getPlayerProgeny(i);
+            if (tempProgeny != 0) // Assuming Ertrian is progeny 0
+                progenyOpp = tempProgeny;
+        }
+
+        foreach (var (unit, cost, weight) in matchupWeights[0, progenyOpp])
+        {
+            if (unit.unitTerrainType == UnitTerrainType.Land)
+                ertrianFactoryProdList.Add((unit, cost, weight));
+            if (unit.unitTerrainType == UnitTerrainType.Air)
+                ertrianAirportProdList.Add((unit, cost, weight));
+        }
+    }
+
+    public void ExportMatchupWeightsToCSV(List<(BaseUnit, int, int)>[,] matchupWeights, string filepath)
+    {
+        List<string> lines = new List<string>();
+
+        // Header
+        lines.Add("Progeny,GamePieceID,UnitName,WeightVsErtrian,WeightVsVirix,WeightVsSentus");
+
+        // Dictionary to temporarily hold flattened rows: Key = gamePieceID, Value = [progeny, name, [weight0, weight1, weight2]]
+        Dictionary<int, (int progeny, string name, int[] weights)> weightMap = new Dictionary<int, (int, string, int[])>();
+
+        for (int progeny = 0; progeny < 3; progeny++)
+        {
+            for (int opponent = 0; opponent < 3; opponent++)
+            {
+                foreach (var (unit, cost, weight) in matchupWeights[progeny, opponent])
+                {
+                    int id = unit.gamePieceId;
+                    if (!weightMap.ContainsKey(id))
+                    {
+                        weightMap[id] = (progeny, unit.unitName, new int[3]);
+                    }
+
+                    weightMap[id].weights[opponent] = weight;
+                }
+            }
+        }
+
+        // Compose lines from map
+        foreach (var kvp in weightMap)
+        {
+            int id = kvp.Key;
+            int progeny = kvp.Value.progeny;
+            string name = kvp.Value.name;
+            int[] weights = kvp.Value.weights;
+
+            lines.Add($"{progeny},{id},{name},{weights[0]},{weights[1]},{weights[2]}");
+        }
+
+        System.IO.File.WriteAllLines(filepath, lines);
+        Debug.Log($"Exported matchup weights to: {filepath}");
+    }
+
+
 
     public void WriteArrayToCSV(string fileName)
     {

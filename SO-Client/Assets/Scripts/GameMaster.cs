@@ -33,7 +33,7 @@ public class GameMaster : MonoBehaviour
     private bool[] playersNotLost;
     public static bool isGameComplete = false;
     /*public byte[] playerProgeny;*/
-    Dictionary<byte, byte> playerProgeny = new Dictionary<byte, byte>();
+    public static Dictionary<byte, byte> playerProgeny = new Dictionary<byte, byte>();
     public TMP_Text playerTurnText;
     public TMP_Text playerResourceText;
     private int[] playerResources;
@@ -87,7 +87,7 @@ public class GameMaster : MonoBehaviour
     public static bool CPU_isOn = true;
     public static bool[] CPU_PlayersList;
     public static List<(BaseUnit, int)>[] unitCosts;
-    public static List<(BaseUnit, int)>[] CPU_unitMatchupWeights;
+    //public static List<(BaseUnit, int)>[] CPU_unitMatchupWeights;
     public int virixCheapestUnit;
 
     /*    public static GameMaster Instance
@@ -143,11 +143,11 @@ public class GameMaster : MonoBehaviour
         {
             unitCosts[i] = new List<(BaseUnit, int)>();
         }
-        CPU_unitMatchupWeights = new List<(BaseUnit, int)>[3];
+/*        CPU_unitMatchupWeights = new List<(BaseUnit, int)>[3];
         for (int i = 0; i < 3; i++)
         {
             CPU_unitMatchupWeights[i] = new List<(BaseUnit, int)>();
-        }
+        }*/
         /*        foreach(List<(BaseUnit, int)> pair in unitCosts)
                 {
                     pair = new List<(BaseUnit, int)>();
@@ -735,7 +735,7 @@ public class GameMaster : MonoBehaviour
                     (
                         (byte)x,
                         (byte)y,
-                        unit.gamePieceId,
+                        (byte)unit.gamePieceId,
                         (byte)unit.playerControl,
                         (byte)((double)unit.healthCurrent / (double)unit.healthMax * 100)
                     );
