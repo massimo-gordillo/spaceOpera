@@ -1179,7 +1179,7 @@ public class CPUManager : MonoBehaviour
                 if (structure.structureType == 2)
                     airports.Add(structure);
             }
-            yield return GenerateSpendErtrianV2();
+            yield return GenerateSpendErtrianHeuristicV2();
             /*            foreach (BaseStructure structure in prods)
                         {
                             if (structure.playerControl == player && structure.structureType == 1)
@@ -1353,117 +1353,270 @@ public class CPUManager : MonoBehaviour
 
 
     }*/
-
-        IEnumerator GenerateSpendErtrianV2()
+        IEnumerator GenerateSpendErtrianHeuristicV2()
         {
             int totalCash = cash;
+            Debug.Log($"[GenerateSpendErtrianHeuristicV2] Starting with {totalCash} cash.");
 
+            // All structure slots available
             int maxFactoryCount = factories.Count;
             int maxAirportCount = airports.Count;
+            Debug.Log($"[GenerateSpendErtrianHeuristicV2] Max factories: {maxFactoryCount}, Max airports: {maxAirportCount}");
 
-            List<(BaseUnit unit, BaseStructure structure)> bestBuildPlan = null;
+            List<(BaseUnit unit, BaseStructure structure)> bestBuildPlan = new List<(BaseUnit, BaseStructure)>();
             int bestScore = int.MinValue;
 
-            float alpha = 10f;
+            float alpha = 10f; // Weight importance of cash usage in score (tweak for balance)
+            Debug.Log($"[GenerateSpendErtrianHeuristicV2] Alpha for cash usage: {alpha}");
 
             // Determine opponent progeny
-            int opponentProgeny = 0;
+            int opponentProgeny = 0; // Default fallback
             for (int i = 0; i < GameMaster.numPlayers; i++)
             {
                 byte progeny = gameMaster.getPlayerProgeny((byte)i);
-                if (progeny != 0) // Player 0 is always Ertrian
+                if (progeny != 0) // Assuming player 0 is always Ertrian
                 {
                     opponentProgeny = progeny;
                     break;
                 }
             }
-            Debug.Log($"[AI] Opponent progeny determined as: {opponentProgeny}");
+            Debug.Log($"[GenerateSpendErtrianHeuristicV2] Opponent Progeny: {opponentProgeny}");
 
-            // Grab list of units Ertrian (0) vs opponent
-            var ertrianMatchupList = matchupWeights[0, opponentProgeny];
+            // Grab the unit list for Ertrian (X=0) vs the opponent progeny (Y)
+            List<(BaseUnit unit, int cost, int weight)> ertrianMatchupList = matchupWeights[0, opponentProgeny];
+            Debug.Log($"[GenerateSpendErtrianHeuristicV2] Found {ertrianMatchupList.Count} units in matchup list.");
 
+            // Filter into terrain-specific build lists
             var factoryList = ertrianMatchupList.Where(x => x.unit.unitTerrainType == UnitTerrainType.Land).ToList();
             var airportList = ertrianMatchupList.Where(x => x.unit.unitTerrainType == UnitTerrainType.Air).ToList();
+            Debug.Log($"[GenerateSpendErtrianHeuristicV2] Factory list size: {factoryList.Count}, Airport list size: {airportList.Count}");
 
-            Debug.Log($"[AI] Factory buildable units: {factoryList.Count}, Airport buildable units: {airportList.Count}");
+            // Sort units by weight (highest first) for more effective units
+            var sortedFactoryList = factoryList.OrderByDescending(x => x.weight).ToList();
+            var sortedAirportList = airportList.OrderByDescending(x => x.weight).ToList();
+            Debug.Log("[GenerateSpendErtrianHeuristicV2] Sorted factory and airport lists by weight.");
 
-            int testedComboCount = 0;
+            int remainingCash = totalCash;
 
-            foreach (var factoryCombo in GetUnitCombinations(factoryList, maxFactoryCount, totalCash))
+            // Greedily select units for factories (land units)
+            Debug.Log("[GenerateSpendErtrianHeuristicV2] Starting to select units for factories...");
+            foreach (var unit in sortedFactoryList)
             {
-                foreach (var airportCombo in GetUnitCombinations(airportList, maxAirportCount, totalCash))
+                if (remainingCash >= unit.cost && bestBuildPlan.Count < maxFactoryCount)
                 {
-                    var combined = factoryCombo.Concat(airportCombo).ToList();
-                    int totalCost = combined.Sum(x => x.cost);
-                    if (totalCost > totalCash)
-                        continue;
-
-                    int totalWeight = combined.Sum(x => x.weight);
-                    float score = totalWeight + alpha * ((float)totalCost / totalCash);
-                    testedComboCount++;
-
-                    Debug.Log($"[AI] Combo #{testedComboCount}: Cost={totalCost}, Weight={totalWeight}, Score={score}");
-
-                    if (score > bestScore)
+                    int maxUnits = Math.Min(remainingCash / unit.cost, maxFactoryCount);
+                    Debug.Log($"[GenerateSpendErtrianHeuristicV2] Can afford {maxUnits} of unit {unit.unit.unitName} (Cost: {unit.cost}) with remaining cash: {remainingCash}");
+                    for (int i = 0; i < maxUnits; i++)
                     {
-                        bestScore = (int)score;
-                        bestBuildPlan = combined
-                            .Select(x => (x.unit,
-                                x.unit.unitTerrainType == UnitTerrainType.Land
-                                    ? factories[factoryCombo.IndexOf(x)]
-                                    : airports[airportCombo.IndexOf(x)]
-                            )).ToList();
-
-                        Debug.Log($"[AI] New best score: {bestScore}. Units: {string.Join(", ", combined.Select(u => u.unit.unitName))}");
+                        bestBuildPlan.Add((unit.unit, factories[i % maxFactoryCount])); // Cycle through factories if needed
+                        remainingCash -= unit.cost;
                     }
                 }
             }
 
-            if (bestBuildPlan != null)
+            // Greedily select units for airports (air units)
+            Debug.Log("[GenerateSpendErtrianHeuristicV2] Starting to select units for airports...");
+            foreach (var unit in sortedAirportList)
             {
-                Debug.Log($"[AI] Final build plan selected with score {bestScore}:");
+                if (remainingCash >= unit.cost && bestBuildPlan.Count < maxAirportCount)
+                {
+                    int maxUnits = Math.Min(remainingCash / unit.cost, maxAirportCount);
+                    Debug.Log($"[GenerateSpendErtrianHeuristicV2] Can afford {maxUnits} of unit {unit.unit.unitName} (Cost: {unit.cost}) with remaining cash: {remainingCash}");
+                    for (int i = 0; i < maxUnits; i++)
+                    {
+                        bestBuildPlan.Add((unit.unit, airports[i % maxAirportCount])); // Cycle through airports if needed
+                        remainingCash -= unit.cost;
+                    }
+                }
+            }
+
+            // After greedy selection, calculate the score based on weight and remaining resources
+            int totalWeight = bestBuildPlan.Sum(x => ertrianMatchupList.First(t => t.unit == x.unit).weight); // Corrected to fetch the weight from the list
+            float score = totalWeight + alpha * ((float)remainingCash / totalCash);
+
+            // Log the final score for debugging
+            Debug.Log($"[GenerateSpendErtrianHeuristicV2] Final Score: {score}, Remaining Cash: {remainingCash}");
+
+            // Produce the selected units
+            if (bestBuildPlan.Count > 0)
+            {
+                Debug.LogWarning($"[GenerateSpendErtrianHeuristicV2] Producing {bestBuildPlan.Count} units.");
                 foreach ((BaseUnit unit, BaseStructure structure) in bestBuildPlan)
                 {
-                    Debug.Log($"[AI] Producing {unit.unitName} at {structure.structureType} located at {structure.pos}");
-                    cameraManager.SetPosition((Vector2)structure.pos);
+/*                    cameraManager.SetPosition((Vector2)structure.pos);
                     gameMaster.selectedStructure = structure;
                     gameMaster.ProduceUnit(unit, structure.playerControl, false);
                     priorityNodeVectorMap.TryGetValue(structure.pos, out unit.CPU_TargetNode);
-                    GiveCombatUnitNextNodeAssignment(unit);
+                    GiveCombatUnitNextNodeAssignment(unit);*/
                     yield return createUnitAtStructure(unit, structure);
                 }
             }
             else
             {
-                Debug.LogWarning("[AI] No valid build plan found within cash and structure constraints.");
+                Debug.Log("[GenerateSpendErtrianHeuristicV2] No units were selected for production.");
             }
         }
+
     }
 
 
-        IEnumerable<List<(BaseUnit unit, int cost, int weight)>> GetUnitCombinations(
-    List<(BaseUnit unit, int cost, int weight)> units, int maxCount, int maxTotalCost)
+    /*IEnumerator GenerateSpendErtrianV2()
     {
-        int n = units.Count;
-        for (int mask = 0; mask < (1 << n); mask++)
-        {
-            var combo = new List<(BaseUnit, int, int)>();
-            int totalCost = 0;
+        int totalCash = cash;
 
-            for (int i = 0; i < n; i++)
+        int maxFactoryCount = factories.Count;
+        int maxAirportCount = airports.Count;
+
+        List<(BaseUnit unit, BaseStructure structure)> bestBuildPlan = null;
+        int bestScore = int.MinValue;
+
+        float alpha = 10f;
+
+        // Determine opponent progeny
+        int opponentProgeny = 0;
+        for (int i = 0; i < GameMaster.numPlayers; i++)
+        {
+            byte progeny = gameMaster.getPlayerProgeny((byte)i);
+            if (progeny != 0) // Player 0 is always Ertrian
             {
-                if ((mask & (1 << i)) != 0)
+                opponentProgeny = progeny;
+                break;
+            }
+        }
+        Debug.Log($"[AI] Opponent progeny determined as: {opponentProgeny}");
+
+        // Grab list of units Ertrian (0) vs opponent
+        var ertrianMatchupList = matchupWeights[0, opponentProgeny];
+
+        var factoryList = ertrianMatchupList.Where(x => x.unit.unitTerrainType == UnitTerrainType.Land).ToList();
+        var airportList = ertrianMatchupList.Where(x => x.unit.unitTerrainType == UnitTerrainType.Air).ToList();
+
+        Debug.Log($"[AI] Factory buildable units: {factoryList.Count}, Airport buildable units: {airportList.Count}");
+
+        int testedComboCount = 0;
+
+        foreach (var factoryCombo in GetUnitCombinations(factoryList, maxFactoryCount, totalCash))
+        {
+            foreach (var airportCombo in GetUnitCombinations(airportList, maxAirportCount, totalCash))
+            {
+                var combined = factoryCombo.Concat(airportCombo).ToList();
+                int totalCost = combined.Sum(x => x.cost);
+                if (totalCost > totalCash)
+                    continue;
+
+                int totalWeight = combined.Sum(x => x.weight);
+                float score = totalWeight + alpha * ((float)totalCost / totalCash);
+                testedComboCount++;
+
+                Debug.Log($"[AI] Combo #{testedComboCount}: Cost={totalCost}, Weight={totalWeight}, Score={score}");
+
+                if (score > bestScore)
                 {
-                    var entry = units[i];
-                    combo.Add(entry);
-                    totalCost += entry.cost;
+                    bestScore = (int)score;
+                    bestBuildPlan = combined
+                        .Select(x => (x.unit,
+                            x.unit.unitTerrainType == UnitTerrainType.Land
+                                ? factories[factoryCombo.IndexOf(x)]
+                                : airports[airportCombo.IndexOf(x)]
+                        )).ToList();
+
+                    Debug.Log($"[AI] New best score: {bestScore}. Units: {string.Join(", ", combined.Select(u => u.unit.unitName))}");
                 }
             }
+        }
 
-            if (combo.Count <= maxCount && totalCost <= maxTotalCost)
-                yield return combo;
+        if (bestBuildPlan != null)
+        {
+            Debug.Log($"[AI] Final build plan selected with score {bestScore}:");
+            foreach ((BaseUnit unit, BaseStructure structure) in bestBuildPlan)
+            {
+                Debug.Log($"[AI] Producing {unit.unitName} at {structure.structureType} located at {structure.pos}");
+                cameraManager.SetPosition((Vector2)structure.pos);
+                gameMaster.selectedStructure = structure;
+                gameMaster.ProduceUnit(unit, structure.playerControl, false);
+                priorityNodeVectorMap.TryGetValue(structure.pos, out unit.CPU_TargetNode);
+                GiveCombatUnitNextNodeAssignment(unit);
+                yield return createUnitAtStructure(unit, structure);
+            }
+        }
+        else
+        {
+            Debug.LogWarning("[AI] No valid build plan found within cash and structure constraints.");
         }
     }
+}
+
+
+IEnumerable<List<(BaseUnit unit, int cost, int weight)>> GetUnitCombinations(
+List<(BaseUnit unit, int cost, int weight)> units,
+int maxCount,
+int maxTotalCost)
+{
+    List<List<(BaseUnit unit, int cost, int weight)>> results = new();
+    List<(BaseUnit unit, int cost, int weight)> currentCombo = new();
+
+    // Filter out units that are too expensive to ever purchase
+    var filteredUnits = units.Where(x => x.cost <= maxTotalCost).ToList();
+    Debug.Log($"[GetUnitCombinations] Starting recursion with {filteredUnits.Count} units (filtered from {units.Count})");
+
+    void Recurse(int index, int remainingCount, int remainingCash)
+    {
+        Debug.Log($"[Recurse] Index: {index}, RemainingCount: {remainingCount}, RemainingCash: {remainingCash}, CurrentComboCount: {currentCombo.Count}");
+
+        // If we've exhausted all unit types or reached the max count, add the valid combo
+        if (index >= filteredUnits.Count || remainingCount == 0)
+        {
+            if (currentCombo.Count > 0)
+            {
+                Debug.Log($"[Recurse] --> Adding valid combo of {currentCombo.Count} units, total cost: {currentCombo.Sum(x => x.cost)}");
+                results.Add(new List<(BaseUnit, int, int)>(currentCombo));
+            }
+            return;
+        }
+
+        var (unit, cost, weight) = filteredUnits[index];
+        int maxCopies = Math.Min(remainingCount, cost > 0 ? remainingCash / cost : 0);
+
+        // If there are no valid units to consider, skip to the next one
+        if (maxCopies == 0)
+        {
+            Debug.Log($"[Recurse] Skipping {unit.unitName} as it's too expensive for remaining resources.");
+            Recurse(index + 1, remainingCount, remainingCash);
+            return;
+        }
+
+        for (int count = 0; count <= maxCopies; count++)
+        {
+            // Add the unit to the current combo
+            for (int i = 0; i < count; i++)
+                currentCombo.Add((unit, cost, weight));
+
+            Debug.Log($"[Recurse] Trying {count}x {unit.unitName} (cost: {cost}, weight: {weight})");
+
+            // Recurse into the next unit type with updated remaining count and cash
+            Recurse(index + 1, remainingCount - count, remainingCash - count * cost);
+
+            // Remove the added units to backtrack and try a different combination
+            for (int i = 0; i < count; i++)
+                currentCombo.RemoveAt(currentCombo.Count - 1);
+        }
+    }
+
+    // Start recursion with the initial values
+    Recurse(0, maxCount, maxTotalCost);
+
+    // Final debug message with total combinations found
+    Debug.Log($"[GetUnitCombinations] Generated {results.Count} total combinations");
+
+    return results;
+}*/
+
+
+
+
+
+
+
 
 
 
@@ -1636,7 +1789,7 @@ public class CPUManager : MonoBehaviour
             dirs = masterGrid.BidirectionalSearch(edge.vectorA, edge.vectorB, PrefabManager.getBaseUnitFromName("Infantry", 0), (int)(edge.distance*1.5));
             if (dirs.Count == 0) {
                 edge.isLandAccessible = false;
-                Debug.Log($"GraphEdge {edge.vectorA}{edge.vectorB} is not land accessible");
+                //Debug.Log($"GraphEdge {edge.vectorA}{edge.vectorB} is not land accessible");
             }
             int total = 0;
             Vector2Int start = edge.vectorA;
@@ -1673,9 +1826,11 @@ public class CPUManager : MonoBehaviour
         {
             List<Vector2Int> dirs = new();
             dirs = masterGrid.BidirectionalSearch(edge.vectorA, edge.vectorB, PrefabManager.getBaseUnitFromName("LightTank", 0), (int)(edge.distance*1.5));
-            if (dirs.Count == 0)
-                Debug.Log($"Priority GraphEdge {edge.vectorA}{edge.vectorB} is not vehicle accessible");
-            else
+            /*            if (dirs.Count == 0)
+                            Debug.Log($"Priority GraphEdge {edge.vectorA}{edge.vectorB} is not vehicle accessible");
+                        else
+                            priorityNetworkEdgesGround.Add(edge);*/
+            if (dirs.Count != 0)
                 priorityNetworkEdgesGround.Add(edge);
         }
     }
