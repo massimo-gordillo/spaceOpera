@@ -1400,35 +1400,48 @@ public class CPUManager : MonoBehaviour
 
             // Greedily select units for factories (land units)
             Debug.Log("[GenerateSpendErtrianHeuristicV2] Starting to select units for factories...");
+            int factoryUnitsCreated = 0;
+
             foreach (var unit in sortedFactoryList)
             {
-                if (remainingCash >= unit.cost && bestBuildPlan.Count < maxFactoryCount)
+                if (remainingCash >= unit.cost && factoryUnitsCreated < maxFactoryCount)
                 {
-                    int maxUnits = Math.Min(remainingCash / unit.cost, maxFactoryCount);
+                    int availableSlots = maxFactoryCount - factoryUnitsCreated;
+                    int maxUnits = Math.Min(remainingCash / unit.cost, availableSlots);
+
                     Debug.Log($"[GenerateSpendErtrianHeuristicV2] Can afford {maxUnits} of unit {unit.unit.unitName} (Cost: {unit.cost}) with remaining cash: {remainingCash}");
+
                     for (int i = 0; i < maxUnits; i++)
                     {
-                        bestBuildPlan.Add((unit.unit, factories[i % maxFactoryCount])); // Cycle through factories if needed
+                        bestBuildPlan.Add((unit.unit, factories[factoryUnitsCreated % maxFactoryCount]));
                         remainingCash -= unit.cost;
+                        factoryUnitsCreated++;
                     }
                 }
             }
 
-            // Greedily select units for airports (air units)
+
             Debug.Log("[GenerateSpendErtrianHeuristicV2] Starting to select units for airports...");
+            int airportUnitsCreated = 0;
+
             foreach (var unit in sortedAirportList)
             {
-                if (remainingCash >= unit.cost && bestBuildPlan.Count < maxAirportCount)
+                if (remainingCash >= unit.cost && airportUnitsCreated < maxAirportCount)
                 {
-                    int maxUnits = Math.Min(remainingCash / unit.cost, maxAirportCount);
+                    int availableSlots = maxAirportCount - airportUnitsCreated;
+                    int maxUnits = Math.Min(remainingCash / unit.cost, availableSlots);
+
                     Debug.Log($"[GenerateSpendErtrianHeuristicV2] Can afford {maxUnits} of unit {unit.unit.unitName} (Cost: {unit.cost}) with remaining cash: {remainingCash}");
+
                     for (int i = 0; i < maxUnits; i++)
                     {
-                        bestBuildPlan.Add((unit.unit, airports[i % maxAirportCount])); // Cycle through airports if needed
+                        bestBuildPlan.Add((unit.unit, airports[airportUnitsCreated % maxAirportCount]));
                         remainingCash -= unit.cost;
+                        airportUnitsCreated++;
                     }
                 }
             }
+
 
             // After greedy selection, calculate the score based on weight and remaining resources
             int totalWeight = bestBuildPlan.Sum(x => ertrianMatchupList.First(t => t.unit == x.unit).weight); // Corrected to fetch the weight from the list
