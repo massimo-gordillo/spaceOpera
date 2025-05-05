@@ -46,7 +46,7 @@ public class BaseStructure : MonoBehaviour
 
 
     // Start is called before the first frame update
-    void Start()
+    protected virtual void Start()
     {
         gamePieceId = 200 + structureType; //structure ids start at 200.
         pos = new Vector2Int((int)transform.position.x, (int)transform.position.y);
@@ -75,10 +75,10 @@ public class BaseStructure : MonoBehaviour
         {
             setCaptureHealth(maxCaptureHealth);
         }*/
-        if (structureType == 5)
+/*        if (structureType == 5)
         {
             MasterGrid.commandStructures[playerControl] = this;
-        }
+        }*/
 
     }
 
@@ -127,7 +127,8 @@ public class BaseStructure : MonoBehaviour
                 }
                 else
                 {
-                    neutralSpriteContainer.SetColor(playerControl, true, true);
+                    if(neutralSpriteContainer!=null)
+                        neutralSpriteContainer.SetColor(playerControl, true, true);
                 }
                 //progeny0SpriteRenderer.gameObject.SetActive(true);
             }
@@ -200,17 +201,22 @@ public class BaseStructure : MonoBehaviour
 
     public void turnOffCaptureSprites()
     {
-        neutralSpriteContainer.ToggleSprites(true);
+        if(neutralSpriteContainer != null)
+            neutralSpriteContainer.ToggleSprites(true);
         //progeny0SpriteRenderer.gameObject.SetActive(false);
         //progeny1SpriteRenderer.gameObject.SetActive(false);
-        progeny1CaptureSpriteContainer.gameObject.SetActive(false);
+        if(progeny1CaptureSpriteContainer!=null)
+            progeny1CaptureSpriteContainer.gameObject.SetActive(false);
         //progeny2SpriteRenderer.gameObject.SetActive(false);
         /*        progeny0ResourceCaptureSpriteFillSR.gameObject.SetActive(false);
                 progeny0ResourceCaptureSpriteTrimSR.gameObject.SetActive(false);
                 progeny0ResourceCaptureSpriteLightsSR.gameObject.SetActive(false);*/
-        progeny0CaptureSpriteContainer.gameObject.SetActive(false);
-        progeny2ResourceCaptureSpriteContainer.gameObject.SetActive(false);
-        progeny2ProductionCaptureSpriteContainer.gameObject.SetActive(false);
+        if(progeny0CaptureSpriteContainer!=null)
+            progeny0CaptureSpriteContainer.gameObject.SetActive(false);
+        if(progeny2ResourceCaptureSpriteContainer!=null)
+            progeny2ResourceCaptureSpriteContainer.gameObject.SetActive(false);
+        if(progeny2ProductionCaptureSpriteContainer!=null)
+            progeny2ProductionCaptureSpriteContainer.gameObject.SetActive(false);
     }
 
     public void staticSpriteHasBeenClicked()

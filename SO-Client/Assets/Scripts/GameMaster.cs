@@ -6,6 +6,7 @@ using UnityEngine.UI;
 using TMPro;
 using System.IO;
 using UnityEngine.SceneManagement;
+using JetBrains.Annotations;
 //using System.Diagnostics;
 //using MessagePack;
 
@@ -193,8 +194,8 @@ public class GameMaster : MonoBehaviour
         //unitCosts = new List<(BaseUnit, int)>[numPlayers];
         if (CPU_isOn)
         {
-            CPU_PlayersList[1] = true;
-            CPU_PlayersList[2] = true;
+            CPU_PlayersList[1] = false;
+            CPU_PlayersList[2] = false;
         }
 
 

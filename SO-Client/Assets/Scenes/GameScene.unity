@@ -6330,6 +6330,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: commandStructure
       objectReference: {fileID: 0}
+    - target: {fileID: 5031494679086057586, guid: 71e7db29bb8159048a60acdf62cc9b4f, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8663485981121422305, guid: 71e7db29bb8159048a60acdf62cc9b4f, type: 3}
       propertyPath: playerControl
       value: 1
@@ -7624,6 +7628,18 @@ PrefabInstance:
     - target: {fileID: 5031494679086057586, guid: 71e7db29bb8159048a60acdf62cc9b4f, type: 3}
       propertyPath: m_Name
       value: commandStructure
+      objectReference: {fileID: 0}
+    - target: {fileID: 5711971962249203475, guid: 71e7db29bb8159048a60acdf62cc9b4f, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6992075914564551546, guid: 71e7db29bb8159048a60acdf62cc9b4f, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7951982675483676297, guid: 71e7db29bb8159048a60acdf62cc9b4f, type: 3}
+      propertyPath: playerControl
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8663485981121422305, guid: 71e7db29bb8159048a60acdf62cc9b4f, type: 3}
       propertyPath: playerControl
@@ -10825,6 +10841,22 @@ PrefabInstance:
     - target: {fileID: 5031494679086057586, guid: 71e7db29bb8159048a60acdf62cc9b4f, type: 3}
       propertyPath: m_Name
       value: commandStructure (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 5031494679086057586, guid: 71e7db29bb8159048a60acdf62cc9b4f, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5711971962249203475, guid: 71e7db29bb8159048a60acdf62cc9b4f, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6992075914564551546, guid: 71e7db29bb8159048a60acdf62cc9b4f, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7951982675483676297, guid: 71e7db29bb8159048a60acdf62cc9b4f, type: 3}
+      propertyPath: playerControl
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 8663485981121422305, guid: 71e7db29bb8159048a60acdf62cc9b4f, type: 3}
       propertyPath: playerControl

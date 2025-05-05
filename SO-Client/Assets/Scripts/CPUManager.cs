@@ -81,6 +81,9 @@ public class CPUManager : MonoBehaviour
         {
             NetworkNode node = new NetworkNode(structure);
             resourceNetworkNodes.Add(node);
+            if (structure.structureType == 5)
+                Debug.Log($"Adding command structure {structure.pos} to the nodeVectorMap it has {structure.transform.position.x} x pos in world");
+
             nodeVectorMap.Add(node.pos, node);
             if(structure.structureType != 0)
             {
@@ -96,10 +99,10 @@ public class CPUManager : MonoBehaviour
         //SortByDistanceFromOrigin(structureListArray);
         //Vector2[] structLocs = 
 
-        //generatePairwiseEuclideanDistanceArray(structLocs);
-        //WriteArrayToCSV("EuclideanDistanceArray.csv");
-        //GenerateNaiveStructureNetwork();
-        //ExportVerticiesToCSV();
+                //generatePairwiseEuclideanDistanceArray(structLocs);
+                //WriteArrayToCSV("EuclideanDistanceArray.csv");
+                //GenerateNaiveStructureNetwork();
+                //ExportVerticiesToCSV();
 
         foreach (NetworkNode n in resourceNetworkNodes)
         {
@@ -977,7 +980,7 @@ public class CPUManager : MonoBehaviour
                     finalPath = foundPath;
                 }
                 if(foundPath == null || foundPath.Count == 0) {
-                    Debug.LogError($"Unable to find a path from {unit.pos} to {nodePos}, has a search value of {Manhattan(unit.pos, nodePos)}");
+                    Debug.LogError($"Unable to find a path from {unit.pos} to {nodePos}, has a search value of {Manhattan(unit.pos, nodePos)*4}");
                     break; 
                 
                 }
@@ -1116,7 +1119,7 @@ public class CPUManager : MonoBehaviour
                 if (visited.Contains(neighbor)) continue;
 
                 int legality = masterGrid.legalMove(neighbor, unit);
-                if (legality != 1) continue;
+                if (legality < 1) continue;
 
                 visited.Add(neighbor);
 

@@ -55,7 +55,7 @@ public class MasterGrid : MonoBehaviour
 
     public List<BaseStructure> structuresList;
     public List<BaseStructure> prodStructuresList;
-    public static BaseStructure[] commandStructures;
+    public static CommandStructure[] commandStructures;
 
     // Called by GameMaster
     public void startup(int x, int y, byte[] tilemapByteArray,
@@ -88,7 +88,7 @@ public class MasterGrid : MonoBehaviour
         //Dictionary<(byte, byte), GamePieceInfo> gameStateDict = ConvertGameStateToList();
         //printUnitGrid();
 
-        commandStructures = new BaseStructure[GameMaster.numPlayers+1];
+        commandStructures = new CommandStructure[GameMaster.numPlayers+1];
         structuresList = GetStructures(null);
         prodStructuresList = GetProductionStructures(null);
         commandStructures[0] = null;
@@ -909,6 +909,7 @@ public class MasterGrid : MonoBehaviour
             if (depths.ContainsKey(neighbor) || legalMove(neighbor, unit) <= 0)
                 continue;
 
+
             depths[neighbor] = currentDepth + 1;
             parents[neighbor] = current;
             queue.Enqueue(neighbor);
@@ -1326,9 +1327,9 @@ public class MasterGrid : MonoBehaviour
             return 1;
         else if (whatUnitIsInThisLocation(pos) == mTarget)
             return -1;
-        else if (drawMovementUnit != null && drawing) //if we're drawing movement squares
+        else if (true)//(!isFinal || (drawMovementUnit != null && drawing)) //if we're drawing movement squares
         {
-            if (whatUnitIsInThisLocation(pos).playerControl == drawMovementUnit.playerControl)
+            if (whatUnitIsInThisLocation(pos).playerControl == mTarget.playerControl)//== drawMovementUnit.playerControl)
                 return 2;
             else
                 return 0; //true as long as future conditions also return 0. Might become a headache if that's not the case.
