@@ -53,10 +53,10 @@ public class StaticSprite : ClickableObject
             Debug.Log("No parent of StaticSprite " + this.GetInstanceID()+" found");
     }
 
-    public void destroyMe()
+/*    public void destroyMe()
     {
         Destroy(this);
-    }
+    }*/
 
     public void ToggleSprites(bool b)
     {

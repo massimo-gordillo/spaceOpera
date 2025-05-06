@@ -15,12 +15,12 @@ public class PrefabManager
     public void managePrefabOnStartUp(AttributesBaseUnit unitAttributes)
     {
         //manual check if I want to mass update all prefabs if I've done work on the BaseUnitBasePrefab.
-        bool updateSpritesFlag = false;
+        bool updateAllPrefabsFlag = false;
 
         string prefabPath = unitAttributes.prefabPath;
         BaseUnit prefab = getBaseUnitFromPath(prefabPath);
 
-        if (prefab == null || prefab.attributesHash != unitAttributes.attributesHash || updateSpritesFlag)
+        if (prefab == null || prefab.attributesHash != unitAttributes.attributesHash || updateAllPrefabsFlag)
         {
             if (prefab.attributesHash != unitAttributes.attributesHash && prefab != null)
             {

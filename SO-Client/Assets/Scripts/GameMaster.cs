@@ -63,7 +63,7 @@ public class GameMaster : MonoBehaviour
     public GameObject endTurnConfirmCard;
     public Button endTurnConfirmCardBackButton;
     public TMP_Text endTurnConfirmCardText;
-    //public float animationDuration = 0.5f;
+    public static float animationDuration = 0.6f;
     public float holdDuration;
     public float swoopDuration;
 
@@ -128,8 +128,8 @@ public class GameMaster : MonoBehaviour
         }
         else {
             Debug.LogWarning("Progeny set to -1 selected, defaulting to hard values");
-            playerProgeny.Add(1, 1);
-            playerProgeny.Add(2, 2);
+            playerProgeny.Add(1, 0);
+            playerProgeny.Add(2, 0);
         }
 
         

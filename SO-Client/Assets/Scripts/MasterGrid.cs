@@ -9,6 +9,7 @@ using Newtonsoft.Json.Linq;
 using System.IO;
 using System.Text;
 using Unity.Mathematics;
+using System.Security.Cryptography;
 
 
 public class MasterGrid : MonoBehaviour
@@ -1481,8 +1482,16 @@ public class MasterGrid : MonoBehaviour
         }
         else
             Debug.LogWarning($"Asking to delete unit {deadUnit.pos} from a list it's not in");
-        Destroy(deadUnit.gameObject);
+
+        StartCoroutine(AnimateDeleteUnit(deadUnit));
         //Destroy(deadUnit.GetComponent<UnitSprite>());
+    }
+
+    public IEnumerator AnimateDeleteUnit(BaseUnit deadUnit)
+    {
+        yield return StartCoroutine(deadUnit.AnimateDestroy());
+        Debug.Log($"Destroying Unit {deadUnit.pos} now");
+        Destroy(deadUnit.gameObject);
     }
 
     /*    private IEnumerator waitedDeleteUnit(BaseUnit deadUnit)

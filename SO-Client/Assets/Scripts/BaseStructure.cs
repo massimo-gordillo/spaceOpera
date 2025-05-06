@@ -19,6 +19,7 @@ public class BaseStructure : MonoBehaviour
     //private Color baseColor;
     public StaticSprite neutralSpriteContainer;
     public SpriteRenderer neutralSpriteFill;
+    public SpriteRenderer hammerSprite;
     
 /*    public SpriteRenderer progeny0SpriteRenderer;
     public SpriteRenderer progeny1SpriteRenderer;
@@ -93,14 +94,18 @@ public class BaseStructure : MonoBehaviour
         return (unit.playerControl != playerControl && unit.isResourceUnit);  
     }
 
-    public void switchAlliance(int capturePlayerInt)
+    public IEnumerator switchAlliance(int capturePlayerInt)
     {
+        yield return StartCoroutine(AnimateCaptureHealth(captureHealth, 0));
+        yield return new WaitForSeconds(GameMaster.animationDuration / 3);
         if (structureType == 5 && playerControl != capturePlayerInt)
             gameMaster.ConcedePlayer(playerControl);
+
         playerControl = (byte)capturePlayerInt;
         resetCaptureHealth();
         setCaptureSpritesAndColor();
     }
+
 
     public void setCaptureSpritesAndColor()
     {
@@ -173,32 +178,129 @@ public class BaseStructure : MonoBehaviour
 
     public void captureByPercentage(int percentCapturing, int playerCapturing)
     {
-        
+        //int prevCaptureHealth = captureHealth;
         if (playerCapturing != playerControl)
         {
+            StartCoroutine(AnimateCapture());
             if (percentCapturing < captureHealth)
-                captureHealth -= percentCapturing;
+                SetCaptureHealth(captureHealth - percentCapturing);
             else
-                switchAlliance(playerCapturing);
-            //Debug.Log("capture health: " + captureHealth + "selectedUnithealth " + percentCapturing);
-            setCaptureHealth(captureHealth);
+                StartCoroutine(switchAlliance(playerCapturing));
+            //Debug.Log("capture newHealth: " + captureHealth + "selectedUnithealth " + percentCapturing);
         }else
             Debug.LogError("Player " + playerCapturing + " tried to capture their own structure");
     }
 
-    public void setCaptureHealth(int health)
+    public void SetCaptureHealth(int newHealth)
     {
-        if (captureHealth >= maxCaptureHealth)
+        
+        int previousCaptureHealth = captureHealth;
+        captureHealth = newHealth;
+        if (newHealth >= maxCaptureHealth)
         {
             captureHealth = maxCaptureHealth;
             healthCanvas.SetActive(false);
         }
         else
         {
-            captureHealth = health;
+            //captureHealth = newHealth;
             healthCanvas.SetActive(true);
         }
-        healthTextContainer.text = captureHealth.ToString()+"/"+maxCaptureHealth.ToString();
+        StartCoroutine(AnimateCaptureHealth(previousCaptureHealth, newHealth));
+
+        //healthTextContainer.text = captureHealth.ToString()+"/"+maxCaptureHealth.ToString();
+    }
+
+    private IEnumerator AnimateCaptureHealth(int from, int to)
+    {
+        if (to <= maxCaptureHealth)
+        {
+
+            float duration = GameMaster.animationDuration;
+            //float halfDuration = totalDuration * 0.5f;
+            int displayValue = from;
+
+            // Phase 1: If coming down from full to 0 (before rising to new value)
+            if (from > to && to < maxCaptureHealth)
+            {
+                float elapsed = 0f;
+                while (elapsed < duration)
+                {
+                    elapsed += Time.deltaTime;
+                    float t = Mathf.Clamp01(elapsed / duration);
+                    displayValue = Mathf.RoundToInt(Mathf.Lerp(from, to, t));
+                    healthTextContainer.text = displayValue + "/" + maxCaptureHealth;
+                    yield return null;
+                }
+                displayValue = to;
+            }
+            healthTextContainer.text = to + "/" + maxCaptureHealth;
+        }
+
+        // Phase 2: Rise from current (0 or previous) to `to`
+        /*{
+            float elapsed = 0f;
+            int riseFrom = displayValue;
+            float riseDuration = (from >= maxCaptureHealth && to < maxCaptureHealth) ? halfDuration : totalDuration;
+
+            while (elapsed < riseDuration)
+            {
+                elapsed += Time.deltaTime;
+                float t = Mathf.Clamp01(elapsed / riseDuration);
+                displayValue = Mathf.RoundToInt(Mathf.Lerp(riseFrom, to, t));
+                healthTextContainer.text = displayValue + "/" + maxCaptureHealth;
+                yield return null;
+            }
+        }*/
+
+        // Final set to ensure accuracy
+        
+    }
+
+
+
+    public IEnumerator AnimateCapture()
+    {
+        hammerSprite.gameObject.SetActive(true);
+
+        Transform t = hammerSprite.transform;
+        Vector3 startScale = new Vector3(0.01f, 0.01f, 1f);
+        Vector3 peakScale = new Vector3(0.9f, 0.9f, 1f);
+        float swoopDuration = GameMaster.animationDuration/6;
+        float holdDuration = GameMaster.animationDuration *2/3;
+
+        // Reset initial scale
+        t.localScale = startScale;
+
+        // Swoop in
+        float elapsed = 0f;
+        while (elapsed < swoopDuration)
+        {
+            elapsed += Time.deltaTime;
+            float tLerp = Mathf.SmoothStep(0f, 1f, elapsed / swoopDuration);
+            t.localScale = Vector3.Lerp(startScale, peakScale, tLerp);
+            yield return null;
+        }
+
+        // Ensure it's fully scaled
+        t.localScale = peakScale;
+
+        // Hold at full size
+        yield return new WaitForSeconds(holdDuration);
+
+        // Swoop out
+        elapsed = 0f;
+        while (elapsed < swoopDuration)
+        {
+            elapsed += Time.deltaTime;
+            float tLerp = Mathf.SmoothStep(0f, 1f, elapsed / swoopDuration);
+            t.localScale = Vector3.Lerp(peakScale, startScale, tLerp);
+            yield return null;
+        }
+
+        // Ensure fully shrunk and deactivate
+        t.localScale = startScale;
+        hammerSprite.gameObject.SetActive(false);
     }
 
     public void turnOffCaptureSprites()
@@ -239,8 +341,34 @@ public class BaseStructure : MonoBehaviour
 
     public void resetCaptureHealth()
     {
+        //StartCoroutine(AnimateResetCaptureHealth());
         healthCanvas.SetActive(false);
-        setCaptureHealth(maxCaptureHealth);
+        SetCaptureHealth(maxCaptureHealth);
+    }
+
+    public IEnumerator AnimateResetCaptureHealth()
+    {
+        float duration = 0.1f;
+        //float halfDuration = totalDuration * 0.5f;
+        int from = captureHealth;
+        int to = maxCaptureHealth;
+        int displayValue = from;
+
+        // Phase 1: If coming down from full to 0 (before rising to new value)
+        if (from > to && to < maxCaptureHealth)
+        {
+            float elapsed = 0f;
+            while (elapsed < duration)
+            {
+                elapsed += Time.deltaTime;
+                float t = Mathf.Clamp01(elapsed / duration);
+                displayValue = Mathf.RoundToInt(Mathf.Lerp(from, to, t));
+                healthTextContainer.text = displayValue + "/" + maxCaptureHealth;
+                yield return null;
+            }
+            displayValue = to;
+        }
+        healthTextContainer.text = to + "/" + maxCaptureHealth;
     }
 
     public bool IsProduction()

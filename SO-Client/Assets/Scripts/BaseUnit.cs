@@ -56,7 +56,8 @@ public class BaseUnit : MonoBehaviour
     public GameObject cornerSpriteTR;
     public GameObject cornerSpriteBL;
     public GameObject cornerSpriteBR;
-
+    public SpriteRenderer swordsSprite;
+    public Animator explosionAnimator;
 
     public MasterGrid masterGrid;
     public string prefabPath;
@@ -266,6 +267,7 @@ public class BaseUnit : MonoBehaviour
 
     public void takeDamage(double damage)
     {
+        StartCoroutine(AnimateTakeDamage());
         if (damage <= 0)
             setHealth(healthCurrent);
         else if (healthCurrent <= damage){
@@ -281,6 +283,50 @@ public class BaseUnit : MonoBehaviour
             setHealth(healthCurrent - damage);
         }
     }
+
+    public IEnumerator AnimateTakeDamage()
+    {
+        swordsSprite.gameObject.SetActive(true);
+
+        float scaleUpDuration = GameMaster.animationDuration/6;
+        float holdDuration = GameMaster.animationDuration* 3  / 4;
+        float scaleDownDuration = GameMaster.animationDuration / 12; ;
+
+        Transform t = swordsSprite.transform;
+        Vector3 startScale = new Vector3(0.01f, 0.01f, 1f);
+        Vector3 endScale = new Vector3(0.9f, 0.9f, 1f);
+
+        // Start small
+        t.localScale = startScale;
+
+        // Scale up
+        float elapsed = 0f;
+        while (elapsed < scaleUpDuration)
+        {
+            elapsed += Time.deltaTime;
+            float tLerp = Mathf.SmoothStep(0f, 1f, elapsed / scaleUpDuration);
+            t.localScale = Vector3.Lerp(startScale, endScale, tLerp);
+            yield return null;
+        }
+        t.localScale = endScale;
+
+        // Hold at full size
+        yield return new WaitForSeconds(holdDuration);
+
+        // Scale down
+        elapsed = 0f;
+        while (elapsed < scaleDownDuration)
+        {
+            elapsed += Time.deltaTime;
+            float tLerp = Mathf.SmoothStep(0f, 1f, elapsed / scaleDownDuration);
+            t.localScale = Vector3.Lerp(endScale, startScale, tLerp);
+            yield return null;
+        }
+        t.localScale = startScale;
+
+        swordsSprite.gameObject.SetActive(false);
+    }
+
 
     public void setNonExhausted(bool b)
     {
@@ -308,6 +354,71 @@ public class BaseUnit : MonoBehaviour
     {
         masterGrid.deleteUnit(this);
     }
+
+    public IEnumerator AnimateDestroy()
+    {
+        healthTextContainer.text = "0";
+        yield return new WaitForSeconds(GameMaster.animationDuration);
+        healthTextContainer.gameObject.SetActive(false);
+        StartCoroutine(AnimateCollapseAndBlacken());
+        explosionAnimator.gameObject.SetActive(true);
+        explosionAnimator.Play("UnitExplosion");
+
+
+        // Wait until the animation finishes
+        float length = explosionAnimator.GetCurrentAnimatorStateInfo(0).length;
+        yield return new WaitForSeconds(length);
+    }
+
+    public IEnumerator AnimateCollapseAndBlacken()
+    {
+        StaticSprite sprite = spriteContainer.GetComponent<StaticSprite>();
+        float duration = 0.2f;
+        float elapsed = 0f;
+
+        Vector3 originalScale = sprite.transform.localScale;
+        Vector3 originalPosition = sprite.transform.localPosition;
+
+        float originalYScale = originalScale.y;
+
+        Color originalFillColor = sprite.fillSR.color;
+        Color originalLightsColor = sprite.lightsSR.color;
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float t = Mathf.Clamp01(elapsed / duration);
+
+            // Collapse Y scale
+            float newYScale = Mathf.Lerp(originalYScale, 0f, t);
+            sprite.transform.localScale = new Vector3(originalScale.x, newYScale, originalScale.z);
+
+            // Shift downward to collapse toward bottom
+            float yOffset = (originalYScale - newYScale) * 0.5f;
+            sprite.transform.localPosition = originalPosition - new Vector3(0f, yOffset, 0f);
+
+            // Fade to black more aggressively
+            float colorLerpFactor = t * t; // darkens faster
+            Color newFillColor = Color.Lerp(originalFillColor, Color.black, colorLerpFactor);
+            Color newLightsColor = Color.Lerp(originalLightsColor, Color.black, colorLerpFactor);
+            sprite.fillSR.color = newFillColor;
+            sprite.lightsSR.color = newLightsColor;
+
+            yield return null;
+        }
+
+        // Final state
+        sprite.transform.localScale = new Vector3(originalScale.x, 0f, originalScale.z);
+        sprite.transform.localPosition = originalPosition - new Vector3(0f, originalYScale * 0.5f, 0f);
+        sprite.fillSR.color = Color.black;
+        sprite.lightsSR.color = Color.black;
+
+        spriteContainer.gameObject.SetActive(false);
+    }
+
+
+
+
 
 
 
