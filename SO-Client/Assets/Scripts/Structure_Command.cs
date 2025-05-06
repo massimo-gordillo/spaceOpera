@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CommandStructure : BaseStructure
+public class Structure_Command : BaseStructure
 {
     public StaticSprite lowerSpriteContainer;
     public SpriteRenderer lowerSpriteSR;    
@@ -20,10 +20,6 @@ public class CommandStructure : BaseStructure
     public SpriteRenderer progeny2LowerSpriteSR;
     public StaticSprite progeny2UpperSpriteContainer;
     public SpriteRenderer progeny2UpperSpriteSR;
-
-
-
-   
 
     protected override void Start()
     {
@@ -48,28 +44,30 @@ public class CommandStructure : BaseStructure
         }
         
 
-        lowerSpriteContainer.SetColor(playerControl, true, true);
-        upperSpriteContainer.SetColor(playerControl, true, true);
+
 
         lowerSpriteContainer.gameObject.SetActive(true);
         upperSpriteContainer.gameObject.SetActive(true);
+
+        lowerSpriteContainer.SetColor(playerControl, true, true);
+        upperSpriteContainer.SetColor(playerControl, true, true);
 
     }
 
     void TurnOffCommandSprites()
     {
-        progeny0LowerSpriteContainer.enabled = false;
-        //progeny0LowerSpriteSR.enabled = false;
-        progeny0UpperSpriteContainer.enabled = false;
-        //progeny0UpperSpriteSR.enabled = false;
-        progeny1LowerSpriteContainer.enabled = false;
-        //progeny1LowerSpriteSR.enabled = false;
-        progeny1UpperSpriteContainer.enabled = false;
-        //progeny1UpperSpriteSR.enabled = false;
-        progeny2LowerSpriteContainer.enabled = false;
-        //progeny2LowerSpriteSR.enabled = false;
-        progeny2UpperSpriteContainer.enabled = false;
-        //progeny2UpperSpriteSR.enabled = false;
+        progeny0LowerSpriteContainer.gameObject.SetActive(false);
+        //progeny0LowerSpriteSR.gameObject.SetActive(false);
+        progeny0UpperSpriteContainer.gameObject.SetActive(false);
+        //progeny0UpperSpriteSR.gameObject.SetActive(false);
+        progeny1LowerSpriteContainer.gameObject.SetActive(false);
+        //progeny1LowerSpriteSR.gameObject.SetActive(false);
+        progeny1UpperSpriteContainer.gameObject.SetActive(false);
+        //progeny1UpperSpriteSR.gameObject.SetActive(false);
+        progeny2LowerSpriteContainer.gameObject.SetActive(false);
+        //progeny2LowerSpriteSR.gameObject.SetActive(false);
+        progeny2UpperSpriteContainer.gameObject.SetActive(false);
+        //progeny2UpperSpriteSR.gameObject.SetActive(false);
     }
 
 }

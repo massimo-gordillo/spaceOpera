@@ -25,21 +25,21 @@ public class BaseStructure : MonoBehaviour
     public SpriteRenderer progeny2SpriteRenderer;*/
 
     public StaticSprite progeny0CaptureSpriteContainer;
-    public SpriteRenderer progeny0ResourceCaptureSpriteFillSR;
+/*    public SpriteRenderer progeny0ResourceCaptureSpriteFillSR;
     public SpriteRenderer progeny0ResourceCaptureSpriteTrimSR;
-    public SpriteRenderer progeny0ResourceCaptureSpriteLightsSR;
+    public SpriteRenderer progeny0ResourceCaptureSpriteLightsSR;*/
     public StaticSprite progeny1CaptureSpriteContainer;
-    public SpriteRenderer progeny1CaptureSpriteFillSR;
+/*    public SpriteRenderer progeny1CaptureSpriteFillSR;
     public SpriteRenderer progeny1CaptureSpriteTrimSR;
-    public SpriteRenderer progeny1CaptureSpriteLightsSR;
+    public SpriteRenderer progeny1CaptureSpriteLightsSR;*/
     public StaticSprite progeny2ResourceCaptureSpriteContainer;
-    public SpriteRenderer progeny2ResourceCaptureSpriteFillSR;
+/*    public SpriteRenderer progeny2ResourceCaptureSpriteFillSR;
     public SpriteRenderer progeny2ResourceCaptureSpriteTrimSR;
-    public SpriteRenderer progeny2ResourceCaptureSpriteLightsSR;
+    public SpriteRenderer progeny2ResourceCaptureSpriteLightsSR;*/
     public StaticSprite progeny2ProductionCaptureSpriteContainer;
-    public SpriteRenderer progeny2ProductionCaptureSpriteFillSR;
+/*    public SpriteRenderer progeny2ProductionCaptureSpriteFillSR;
     public SpriteRenderer progeny2ProductionCaptureSpriteTrimSR;
-    public SpriteRenderer progeny2ProductionCaptureSpriteLightsSR;
+    public SpriteRenderer progeny2ProductionCaptureSpriteLightsSR;*/
 
 
 
@@ -114,52 +114,54 @@ public class BaseStructure : MonoBehaviour
                     setColor(neutralSpriteFill);*/
         if (playerControl != 0)
         {
-            if (progeny == 0)
-            {
-                if (structureType == 0)
+            if (structureType != 5) {
+                if (progeny == 0)
                 {
-                    /*                progeny0ResourceCaptureSpriteFillSR.gameObject.SetActive(true);
-                                    progeny0ResourceCaptureSpriteTrimSR.gameObject.SetActive(true);
-                                    progeny0ResourceCaptureSpriteLightsSR.gameObject.SetActive(true);*/
-                    progeny0CaptureSpriteContainer.gameObject.SetActive(true);
-                    //Debug.Log("Calling set color from baseStructure");
-                    progeny0CaptureSpriteContainer.SetColor(playerControl, true, true);
+                    if (structureType == 0)
+                    {
+                        /*                progeny0ResourceCaptureSpriteFillSR.gameObject.SetActive(true);
+                                        progeny0ResourceCaptureSpriteTrimSR.gameObject.SetActive(true);
+                                        progeny0ResourceCaptureSpriteLightsSR.gameObject.SetActive(true);*/
+                        progeny0CaptureSpriteContainer.gameObject.SetActive(true);
+                        //Debug.Log("Calling set color from baseStructure");
+                        progeny0CaptureSpriteContainer.SetColor(playerControl, true, true);
+                    }
+                    else
+                    {
+                        if (neutralSpriteContainer != null)
+                            neutralSpriteContainer.SetColor(playerControl, true, true);
+                    }
+                    //progeny0SpriteRenderer.gameObject.SetActive(true);
                 }
-                else
+                else if (progeny == 1)
                 {
-                    if(neutralSpriteContainer!=null)
-                        neutralSpriteContainer.SetColor(playerControl, true, true);
+                    progeny1CaptureSpriteContainer.gameObject.SetActive(true);
+                    progeny1CaptureSpriteContainer.SetColor(playerControl, true, true);
+                    neutralSpriteContainer.SetColor(0, true, true);
                 }
-                //progeny0SpriteRenderer.gameObject.SetActive(true);
-            }
-            else if (progeny == 1)
-            {
-                progeny1CaptureSpriteContainer.gameObject.SetActive(true);
-                progeny1CaptureSpriteContainer.SetColor(playerControl, true, true);
-                neutralSpriteContainer.SetColor(0, true, true);
-            }
-            else if (progeny == 2)
-            {
-                if (IsProduction())
+                else if (progeny == 2)
                 {
-                    progeny2ProductionCaptureSpriteContainer.gameObject.SetActive(true);
-                    progeny2ProductionCaptureSpriteContainer.SetColor(playerControl, true, true);
-                    neutralSpriteContainer.SetColor((int)playerControl, true, true);
-                    //neutralSpriteContainer.ToggleSprites(false);
-                }
-                else if(structureType == 0)
-                {
-                    progeny2ResourceCaptureSpriteContainer.gameObject.SetActive(true);
-                    progeny2ResourceCaptureSpriteContainer.SetColor(playerControl, true, true);
+                    if (IsProduction())
+                    {
+                        progeny2ProductionCaptureSpriteContainer.gameObject.SetActive(true);
+                        progeny2ProductionCaptureSpriteContainer.SetColor(playerControl, true, true);
+                        neutralSpriteContainer.SetColor((int)playerControl, true, true);
+                        //neutralSpriteContainer.ToggleSprites(false);
+                    }
+                    else if (structureType == 0)
+                    {
+                        progeny2ResourceCaptureSpriteContainer.gameObject.SetActive(true);
+                        progeny2ResourceCaptureSpriteContainer.SetColor(playerControl, true, true);
 
-                    //setColor(neutralSpriteFill);
+                        //setColor(neutralSpriteFill);
+                    }
                 }
-            }
-            /*else if (gameMaster.getPlayerProgeny(playerControl) == 2)
-                Debug.LogError("Structure: Progeny 2 not yet implemented");
-            */
-            else
-                Debug.LogError($"No progeny for byte value {progeny} found, unable to set capture sprite");
+                /*else if (gameMaster.getPlayerProgeny(playerControl) == 2)
+                    Debug.LogError("Structure: Progeny 2 not yet implemented");
+                */
+                else
+                    Debug.LogError($"No progeny for byte value {progeny} found, unable to set capture sprite");
+            }        
         }
         else
         {

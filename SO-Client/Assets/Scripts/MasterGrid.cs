@@ -55,7 +55,7 @@ public class MasterGrid : MonoBehaviour
 
     public List<BaseStructure> structuresList;
     public List<BaseStructure> prodStructuresList;
-    public static CommandStructure[] commandStructures;
+    public static Structure_Command[] commandStructures;
 
     // Called by GameMaster
     public void startup(int x, int y, byte[] tilemapByteArray,
@@ -88,7 +88,7 @@ public class MasterGrid : MonoBehaviour
         //Dictionary<(byte, byte), GamePieceInfo> gameStateDict = ConvertGameStateToList();
         //printUnitGrid();
 
-        commandStructures = new CommandStructure[GameMaster.numPlayers+1];
+        commandStructures = new Structure_Command[GameMaster.numPlayers+1];
         structuresList = GetStructures(null);
         prodStructuresList = GetProductionStructures(null);
         commandStructures[0] = null;
