@@ -271,7 +271,7 @@ public class MasterGrid : MonoBehaviour
         
         
         defender.takeDamage(finalDamage);
-        Debug.Log($"Unit attacks with preluck damage {damagePreLuck} dealing {(int)finalDamage} damage with luck factor of {finalDamage / damagePreLuck}");
+        //Debug.Log($"Unit attacks with preluck damage {damagePreLuck} dealing {(int)finalDamage} damage with luck factor of {finalDamage / damagePreLuck}");
         if (canUnitAttack(defender, attacker) && defender.canFireBack && defender.attackRange >= attacker.attackRange)
         {
             double defenderFireBackDamage = getDamageBeforeLuck(defender, attacker, true);
@@ -280,8 +280,9 @@ public class MasterGrid : MonoBehaviour
 
             attacker.takeDamage(defenderFireBackDamage);
             //Debug.Log($"Defending Unit fires back with {defenderFireBackDamage}");
-        } else
+        } /*else
             Debug.Log($"Can defending Unit fire back: {defender.canFireBack}, or is it out of range: {defender.attackRange} < {attacker.attackRange}");
+           */
     }
 
     public double getDamageBeforeLuck(BaseUnit attacker, BaseUnit defender, bool firingBack)
@@ -291,7 +292,7 @@ public class MasterGrid : MonoBehaviour
         double multiplier = getDamageMultiplier(attacker, defender);
         double defenceVal = getDefenceValueForDefender(defender);
         
-        Debug.Log($"attacker base damage: {baseDamage}, multiplier = {multiplier}, defenceVal for defender is {defenceVal}");
+        //Debug.Log($"attacker base damage: {baseDamage}, multiplier = {multiplier}, defenceVal for defender is {defenceVal}");
 
         //if they are the same type of unit, they deal a maximum of 70% after type multiplier (defence and luck calculation comes after) 
         if (attacker.gamePieceId == defender.gamePieceId)
@@ -537,7 +538,7 @@ public class MasterGrid : MonoBehaviour
             checkedCells[xpos + 1, ypos + 1] = true;
             //List<Queue<Vector2Int>> attackOutlineLocationsQueuesList = FloodFillSearch(mTarget, 0, attackRange, cellsToCheck, checkedCells, new List<Queue<Vector2Int>> { new Queue<Vector2Int>(), new Queue<Vector2Int>(), new Queue<Vector2Int>()}, true);
             List<Queue<Vector2Int>> attackOutlineLocationsQueuesList = FloodFillSearch(mTarget, 0, attackRange, cellsToCheck, checkedCells, new List<Queue<Vector2Int>> { new Queue<Vector2Int>(), new Queue<Vector2Int>(), new Queue<Vector2Int>()});
-            ManualTestAndPrintLogQueueSizes(attackOutlineLocationsQueuesList);
+            //ManualTestAndPrintLogQueueSizes(attackOutlineLocationsQueuesList);
             DrawAttackOutline(attackOutlineLocationsQueuesList, mTarget);
         }
     }
@@ -1278,7 +1279,7 @@ public class MasterGrid : MonoBehaviour
 
             tileMultiplier = getTileDefenceValueMultiplier(defender.pos);
         }
-        Debug.Log($"Defence: Tile: {tileMultiplier} defence: {defenceGridDouble}");
+        //Debug.Log($"Defence: Tile: {tileMultiplier} defence: {defenceGridDouble}");
         return 1 - tileMultiplier - defenceGridDouble;
     }
 
@@ -1491,7 +1492,7 @@ public class MasterGrid : MonoBehaviour
     public IEnumerator AnimateDeleteUnit(BaseUnit deadUnit)
     {
         yield return StartCoroutine(deadUnit.AnimateDestroy());
-        Debug.Log($"Destroying Unit {deadUnit.pos} now");
+        //Debug.Log($"Destroying Unit {deadUnit.pos} now");
         Destroy(deadUnit.gameObject);
     }
 
