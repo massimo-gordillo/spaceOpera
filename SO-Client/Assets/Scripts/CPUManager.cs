@@ -82,9 +82,9 @@ public class CPUManager : MonoBehaviour
         {
             NetworkNode node = new NetworkNode(structure);
             resourceNetworkNodes.Add(node);
-            if (structure.structureType == 5)
+            /*if (structure.structureType == 5)
                 Debug.Log($"Adding command structure {structure.pos} to the nodeVectorMap it has {structure.transform.position.x} x pos in world");
-
+*/
             nodeVectorMap.Add(node.pos, node);
             if(structure.structureType != 0)
             {
@@ -435,7 +435,7 @@ public class CPUManager : MonoBehaviour
             }
             foreach (BaseUnit attackableUnit in unit.CPU_AttackableUnitList)
             {
-                Debug.Log($"Unit {unit.pos} is checking if it should attack {attackableUnit.pos}");
+                //Debug.Log($"Unit {unit.pos} is checking if it should attack {attackableUnit.pos}");
                 double damageDelta = GetDamageCostDelta(unit, attackableUnit);
                 //Debug.Log($"Unit {unit.pos} attacking {attackableUnit.pos} has damage delta {damageDelta}");
                 if (damageDelta > mostDamageDelta)
@@ -869,12 +869,12 @@ public class CPUManager : MonoBehaviour
             {
                 if (unit.CPU_AttackableUnitList.Count > 0)
                 {
-                    Debug.Log($"Combat Unit {unit.pos} is being told to attack");
+                    //Debug.Log($"Combat Unit {unit.pos} is being told to attack");
                     yield return StartCoroutine(CPU_GameActionAttack(unit));
                 }
                 else
                 {
-                    Debug.Log($"Combat Unit {unit.pos} is being told to move");
+                    //Debug.Log($"Combat Unit {unit.pos} is being told to move");
 
                     yield return StartCoroutine(CPU_MoveUnitTowardsTargetNode(unit));
                 }
@@ -935,7 +935,7 @@ public class CPUManager : MonoBehaviour
             int movementLeft = unit.movementRange;
             bool isStepwiseMovement = true;
 
-            Debug.Log($"Target for {unit.pos} target node is {unit.CPU_TargetNode.pos}");
+            //Debug.Log($"Target for {unit.pos} target node is {unit.CPU_TargetNode.pos}");
 
 
             // If no target or we're on the target, get a new one
@@ -943,7 +943,7 @@ public class CPUManager : MonoBehaviour
             {
                 GiveCombatUnitNextNodeAssignment(unit);
                 nodePos = unit.CPU_TargetNode.pos;
-                Debug.Log($"New target for {unit.pos} target node is {unit.CPU_TargetNode.pos}");
+                //Debug.Log($"New target for {unit.pos} target node is {unit.CPU_TargetNode.pos}");
 
             }
 
@@ -963,7 +963,7 @@ public class CPUManager : MonoBehaviour
             while (movementLeft > 0)
             {
                 //search for a path to a cell within min distance from target
-                Debug.Log($"Unit {unit.pos} has movement available {movementLeft}, searching");
+                //Debug.Log($"Unit {unit.pos} has movement available {movementLeft}, searching");
                 foundPath = masterGrid.BidirectionalSearch(
                     unit.pos,
                     nodePos,
@@ -973,7 +973,7 @@ public class CPUManager : MonoBehaviour
                 //if you're unable to find a cell within the distance, just go as far as you can towards the target node
                 if(foundPath == null || foundPath.Count == 0)
                 {
-                    Debug.Log($"Unit {unit.pos} wants to travel max distance to  {nodePos}");
+                    //Debug.Log($"Unit {unit.pos} wants to travel max distance to  {nodePos}");
 
                     foundPath = masterGrid.BidirectionalSearch(
                     unit.pos,
@@ -1023,7 +1023,7 @@ public class CPUManager : MonoBehaviour
 
                 for (int i = 0; i < movementLeft && i < foundPath.Count && isInDistance; i++)
                 {
-                    Debug.Log($"first path found, current path is {foundPath[i]}, target node is {unit.CPU_TargetNode.pos}");
+                    //Debug.Log($"first path found, current path is {foundPath[i]}, target node is {unit.CPU_TargetNode.pos}");
 
                     // Check Manhattan distance to target
                     if (Manhattan(foundPath[i], targetNode.pos) <= minDistanceFromTarget)
@@ -1075,7 +1075,7 @@ public class CPUManager : MonoBehaviour
             }
             Vector2Int target = GetLegalLandSquareFromPath(finalPath, unit);
             //target = GetAdjacentPosFromBidirectionalSearch(finalPath, target);
-            Debug.Log($"Unit found final target square {target}");
+            //Debug.Log($"Unit found final target square {target}");
             masterGrid.selectedUnit = unit;
             masterGrid.moveSelectedUnit(target);
 
@@ -1394,18 +1394,18 @@ public class CPUManager : MonoBehaviour
         IEnumerator GenerateSpendErtrianHeuristicV2()
         {
             int totalCash = cash;
-            Debug.Log($"[GenerateSpendErtrianHeuristicV2] Starting with {totalCash} cash.");
+            //Debug.Log($"[GenerateSpendErtrianHeuristicV2] Starting with {totalCash} cash.");
 
             // All structure slots available
             int maxFactoryCount = factories.Count;
             int maxAirportCount = airports.Count;
-            Debug.Log($"[GenerateSpendErtrianHeuristicV2] Max factories: {maxFactoryCount}, Max airports: {maxAirportCount}");
+            //Debug.Log($"[GenerateSpendErtrianHeuristicV2] Max factories: {maxFactoryCount}, Max airports: {maxAirportCount}");
 
             List<(BaseUnit unit, BaseStructure structure)> bestBuildPlan = new List<(BaseUnit, BaseStructure)>();
             int bestScore = int.MinValue;
 
             float alpha = 10f; // Weight importance of cash usage in score (tweak for balance)
-            Debug.Log($"[GenerateSpendErtrianHeuristicV2] Alpha for cash usage: {alpha}");
+            //Debug.Log($"[GenerateSpendErtrianHeuristicV2] Alpha for cash usage: {alpha}");
 
             // Determine opponent progeny
             int opponentProgeny = 0; // Default fallback
@@ -1418,26 +1418,26 @@ public class CPUManager : MonoBehaviour
                     break;
                 }
             }
-            Debug.Log($"[GenerateSpendErtrianHeuristicV2] Opponent Progeny: {opponentProgeny}");
+            //Debug.Log($"[GenerateSpendErtrianHeuristicV2] Opponent Progeny: {opponentProgeny}");
 
             // Grab the unit list for Ertrian (X=0) vs the opponent progeny (Y)
             List<(BaseUnit unit, int cost, int weight)> ertrianMatchupList = matchupWeights[0, opponentProgeny];
-            Debug.Log($"[GenerateSpendErtrianHeuristicV2] Found {ertrianMatchupList.Count} units in matchup list.");
+            //Debug.Log($"[GenerateSpendErtrianHeuristicV2] Found {ertrianMatchupList.Count} units in matchup list.");
 
             // Filter into terrain-specific build lists
             var factoryList = ertrianMatchupList.Where(x => x.unit.unitTerrainType == UnitTerrainType.Land).ToList();
             var airportList = ertrianMatchupList.Where(x => x.unit.unitTerrainType == UnitTerrainType.Air).ToList();
-            Debug.Log($"[GenerateSpendErtrianHeuristicV2] Factory list size: {factoryList.Count}, Airport list size: {airportList.Count}");
+            //Debug.Log($"[GenerateSpendErtrianHeuristicV2] Factory list size: {factoryList.Count}, Airport list size: {airportList.Count}");
 
             // Sort units by weight (highest first) for more effective units
             var sortedFactoryList = factoryList.OrderByDescending(x => x.weight).ToList();
             var sortedAirportList = airportList.OrderByDescending(x => x.weight).ToList();
-            Debug.Log("[GenerateSpendErtrianHeuristicV2] Sorted factory and airport lists by weight.");
+            //Debug.Log("[GenerateSpendErtrianHeuristicV2] Sorted factory and airport lists by weight.");
 
             int remainingCash = totalCash;
 
             // Greedily select units for factories (land units)
-            Debug.Log("[GenerateSpendErtrianHeuristicV2] Starting to select units for factories...");
+            //Debug.Log("[GenerateSpendErtrianHeuristicV2] Starting to select units for factories...");
             int factoryUnitsCreated = 0;
 
             foreach (var unit in sortedFactoryList)
@@ -1447,7 +1447,7 @@ public class CPUManager : MonoBehaviour
                     int availableSlots = maxFactoryCount - factoryUnitsCreated;
                     int maxUnits = Math.Min(remainingCash / unit.cost, availableSlots);
 
-                    Debug.Log($"[GenerateSpendErtrianHeuristicV2] Can afford {maxUnits} of unit {unit.unit.unitName} (Cost: {unit.cost}) with remaining cash: {remainingCash}");
+                    //Debug.Log($"[GenerateSpendErtrianHeuristicV2] Can afford {maxUnits} of unit {unit.unit.unitName} (Cost: {unit.cost}) with remaining cash: {remainingCash}");
 
                     for (int i = 0; i < maxUnits; i++)
                     {
@@ -1459,7 +1459,7 @@ public class CPUManager : MonoBehaviour
             }
 
 
-            Debug.Log("[GenerateSpendErtrianHeuristicV2] Starting to select units for airports...");
+            //Debug.Log("[GenerateSpendErtrianHeuristicV2] Starting to select units for airports...");
             int airportUnitsCreated = 0;
 
             foreach (var unit in sortedAirportList)
@@ -1469,7 +1469,7 @@ public class CPUManager : MonoBehaviour
                     int availableSlots = maxAirportCount - airportUnitsCreated;
                     int maxUnits = Math.Min(remainingCash / unit.cost, availableSlots);
 
-                    Debug.Log($"[GenerateSpendErtrianHeuristicV2] Can afford {maxUnits} of unit {unit.unit.unitName} (Cost: {unit.cost}) with remaining cash: {remainingCash}");
+                    //Debug.Log($"[GenerateSpendErtrianHeuristicV2] Can afford {maxUnits} of unit {unit.unit.unitName} (Cost: {unit.cost}) with remaining cash: {remainingCash}");
 
                     for (int i = 0; i < maxUnits; i++)
                     {
@@ -1486,12 +1486,12 @@ public class CPUManager : MonoBehaviour
             float score = totalWeight + alpha * ((float)remainingCash / totalCash);
 
             // Log the final score for debugging
-            Debug.Log($"[GenerateSpendErtrianHeuristicV2] Final Score: {score}, Remaining Cash: {remainingCash}");
+            //Debug.Log($"[GenerateSpendErtrianHeuristicV2] Final Score: {score}, Remaining Cash: {remainingCash}");
 
             // Produce the selected units
             if (bestBuildPlan.Count > 0)
             {
-                Debug.LogWarning($"[GenerateSpendErtrianHeuristicV2] Producing {bestBuildPlan.Count} units.");
+                //Debug.LogWarning($"[GenerateSpendErtrianHeuristicV2] Producing {bestBuildPlan.Count} units.");
                 foreach ((BaseUnit unit, BaseStructure structure) in bestBuildPlan)
                 {
 /*                    cameraManager.SetPosition((Vector2)structure.pos);
@@ -1504,7 +1504,7 @@ public class CPUManager : MonoBehaviour
             }
             else
             {
-                Debug.Log("[GenerateSpendErtrianHeuristicV2] No units were selected for production.");
+                Debug.LogWarning("[GenerateSpendErtrianHeuristicV2] No units were selected for production.");
             }
         }
 
@@ -1737,14 +1737,14 @@ int maxTotalCost)
             queue.Enqueue(hq);
             visitedNodes.Add(hq);
 
-            if (priorityNetworkNodes.Contains(hq))
+/*            if (priorityNetworkNodes.Contains(hq))
             {
                 Debug.Log($"HQ at {hq.pos} is found in priorityNetworkNodes.");
             }
             else
             {
                 Debug.LogWarning($"HQ at {hq.pos} is NOT found in priorityNetworkNodes.");
-            }
+            }*/
 
 
             while (queue.Count > 0)
@@ -2093,7 +2093,7 @@ int maxTotalCost)
             }
         }
 
-        Debug.Log("Completed importing matchup weights");
+        //Debug.Log("Completed importing matchup weights");
         //ExportMatchupWeightsToCSV(matchupWeights, "assets/matchupWeightsCheck.csv");
 
         // Example: Build Ertrian production lists based on current enemy
@@ -2156,7 +2156,7 @@ int maxTotalCost)
         }
 
         System.IO.File.WriteAllLines(filepath, lines);
-        Debug.Log($"Exported matchup weights to: {filepath}");
+        //Debug.Log($"Exported matchup weights to: {filepath}");
     }
 
 
