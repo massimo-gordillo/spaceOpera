@@ -8,6 +8,7 @@ using System.Linq;
 
 
 using System.Runtime.CompilerServices;
+using Unity.Mathematics;
 
 
 public class CPUManager : MonoBehaviour
@@ -333,11 +334,16 @@ public class CPUManager : MonoBehaviour
         //clear list from last search
         unit.CPU_AttackableUnitList = new List<BaseUnit>();
         unit.CPU_AttackableResourceUnitList = new List<BaseUnit>();
+        Queue<Vector2Int> tempMovementQueue = squareQueuesList[0];
+        while(tempMovementQueue.Count > 0)
+        {
+            unit.CPU_MoveSquaresList.Add(tempMovementQueue.Dequeue());
+        }
 /*        if (isCurious)
             foreach (Vector2Int m in movementQueue)
                 //attackQueue.Enqueue(m);
                 Debug.Log($"unit {unit.pos} has movement location {m}");*/
-        foreach(Vector2Int attackSquare in attackQueue)
+        foreach (Vector2Int attackSquare in attackQueue)
         {
             /*if(isCurious)
                 Debug.Log($"unit {unit.pos} has attack location {attackSquare}");
@@ -437,7 +443,7 @@ public class CPUManager : MonoBehaviour
             {
                 //Debug.Log($"Unit {unit.pos} is checking if it should attack {attackableUnit.pos}");
                 double damageDelta = GetDamageCostDelta(unit, attackableUnit);
-                //Debug.Log($"Unit {unit.pos} attacking {attackableUnit.pos} has damage delta {damageDelta}");
+                Debug.Log($"Unit {unit.pos} attacking {attackableUnit.pos} has damage delta {damageDelta}");
                 if (damageDelta > mostDamageDelta)
                 {
                     candidate = attackableUnit;
@@ -494,12 +500,17 @@ public class CPUManager : MonoBehaviour
         //Also reduces the value of the attack by the fireback cost, hopefully reducing the # of suicide attacks into larger units.
         //might be nice to prioritize full destroying units over just maxing out cost, but that's good enough for now.
 
-        double attackCost = Math.Min(masterGrid.getDamageBeforeLuck(attacker, defender, false), defender.healthCurrent) * defender.price;
+        double attackCost = Math.Min(masterGrid.getDamageBeforeLuck(attacker, defender, false), defender.healthCurrent) * defender.price/defender.healthMax;
         double firebackCost = 0;
         //if unit will fire back calculate that
         if (masterGrid.getDamageBeforeLuck(attacker, defender, false) < defender.healthCurrent)
-            firebackCost = Math.Min(masterGrid.getDamageBeforeLuck(defender, attacker, true), attacker.healthCurrent) * attacker.price;
+            firebackCost = Math.Min(masterGrid.getDamageBeforeLuck(defender, attacker, true), attacker.healthCurrent) * attacker.price/attacker.healthMax;
+        if (defender.isResourceUnit)
+            firebackCost = 0;
         double delta = attackCost - firebackCost;
+        //Debug.Log($"DELTA: {attacker.pos} checking {defender.pos}, attack cost: {attackCost}, fireback cost: {firebackCost}, delta is {delta}");
+        //Debug.Log($"Attack: {masterGrid.getDamageBeforeLuck(attacker, defender, false)}, fireback {masterGrid.getDamageBeforeLuck(defender, attacker, true)}");
+
         if (delta > 0)
             return delta;
         else
@@ -911,7 +922,7 @@ public class CPUManager : MonoBehaviour
                 {
                     //Debug.Log($"Avail path has length {availPath.Count}");
                     //Vector2Int target = masterGrid.GetFurthestTileByMovement(availPath, unit.movementRange);
-                    Vector2Int target = GetLegalLandSquareFromPath(availPath, unit);
+                    Vector2Int target = GetLegalMovementSquareFromPath(availPath, unit);
 
                     //don't land on enemyHQ unless it's your capture target
                     if (Manhattan(unit.pos, target) != 0 && (target != defaultTargets[unit.playerControl].pos || unit.CPU_TargetNode == defaultTargets[unit.playerControl]))
@@ -1073,7 +1084,7 @@ public class CPUManager : MonoBehaviour
 
 
             }
-            Vector2Int target = GetLegalLandSquareFromPath(finalPath, unit);
+            Vector2Int target = GetLegalMovementSquareFromPath(finalPath, unit);
             //target = GetAdjacentPosFromBidirectionalSearch(finalPath, target);
             //Debug.Log($"Unit found final target square {target}");
             masterGrid.selectedUnit = unit;
@@ -1142,7 +1153,7 @@ public class CPUManager : MonoBehaviour
         return unitPos; // fallback
     }
 
-    public Vector2Int GetLegalLandSquareFromPath(List<Vector2Int> availPath, BaseUnit unit)
+    public Vector2Int GetLegalMovementSquareFromPath(List<Vector2Int> availPath, BaseUnit unit)
     {
         //Vector2Int target = Vector2Int.zero;
         int count = availPath.Count > unit.movementRange ? unit.movementRange + 1 : availPath.Count;
@@ -1157,11 +1168,13 @@ public class CPUManager : MonoBehaviour
                                         target = availPath[unit.movementRange];
                                     else
                                         target = availPath[availPath.Count - 1];*/
+            if (count == 1)
+            {
+                Debug.Log($"CPU Unit {unit.pos} unable to move towards target node because all units in path are allied units, taking a random square at max distance");
+                return GetRandomWalk(unit);
+            }
         }
-        if (count == 0)
-        {
-            Debug.LogWarning($"CPU Unit {unit.pos} unable to move towards target node because all units in path are allied units");
-        }
+
 
         return Vector2Int.zero;
     }
@@ -1959,10 +1972,10 @@ int maxTotalCost)
         unit.CPU_TargetNode = nextTargetNode;
         if (unit.CPU_TargetNode == null)
         {
-            Debug.Log($"{unit.pos}'s target node is null because {currentNode} doesn't have a target");
+            Debug.LogWarning($"{unit.pos}'s target node is null because {currentNode} doesn't have a target");
         }
-        else
-            Debug.Log($"Setting {unit.pos}'s target node to {unit.CPU_TargetNode.pos}");
+/*        else
+            Debug.Log($"Setting {unit.pos}'s target node to {unit.CPU_TargetNode.pos}");*/
     }
 
 /*    public static NetworkNode GetUnitAssignment(BaseUnit unit)
@@ -2008,8 +2021,10 @@ int maxTotalCost)
         {
             if (unit.nonExhausted)
             {
-                Debug.LogWarning($"Unit {unit.pos} is nonExhausted. It has target node {unit.CPU_TargetNode.pos} and attackable list count {unit.CPU_AttackableUnitList.Count}, but it didn't do anything. Why?");
-                //CPU_MoveUnitTowardsTargetNode(unit);
+                Debug.LogWarning($"Unit {unit.pos} is nonExhausted. It has target node {unit.CPU_TargetNode.pos} and attackable list count {unit.CPU_AttackableUnitList.Count}, but it didn't do anything. Moving to a random legal square.");
+                masterGrid.selectedUnit = unit;
+                masterGrid.moveSelectedUnit(GetRandomWalk(unit));
+
             }
         }
     }
@@ -2157,6 +2172,51 @@ int maxTotalCost)
 
         System.IO.File.WriteAllLines(filepath, lines);
         //Debug.Log($"Exported matchup weights to: {filepath}");
+    }
+
+    public Vector2Int GetRandomWalk(BaseUnit unit)
+    //fallback to when unit can't find a path to it's target node, has nothing to attack, can't move to a legal square in it's movement path, etc.
+    {
+        int range = unit.movementRange;
+        //bool[] minOneAtDistance = new bool[range];
+        List<List<Vector2Int>> squaresAtDistance = new();
+        bool atLeastOne = false;
+
+        for (int s =0; s<range; s++)
+        {
+            squaresAtDistance.Add(new List<Vector2Int>());
+        }
+
+        for (int i = 0; i < unit.CPU_MoveSquaresList.Count; i++)
+        {
+            int manhattan = Manhattan(unit.pos, unit.CPU_MoveSquaresList[i]);
+            if (manhattan <= range && manhattan > 0)
+                if (masterGrid.LegalMove(unit.CPU_MoveSquaresList[i], unit) == 1 && unit.CPU_MoveSquaresList[i] != defaultTargets[unit.playerControl].pos)
+                {
+                    squaresAtDistance[manhattan - 1].Add(unit.CPU_MoveSquaresList[i]);
+                    atLeastOne = true;
+                }
+        }
+
+        if (!atLeastOne)
+        {
+            
+            unit.movementNonExhausted = false;
+            return unit.pos;
+        }
+
+        for (int s = range - 1; s >= 0; s--)
+        {
+            if (squaresAtDistance[s].Count > 0)
+            {
+                int count = squaresAtDistance[s].Count;
+                int rand = UnityEngine.Random.Range(0, count);
+                return squaresAtDistance[s][rand];
+            }
+        }
+
+        unit.movementNonExhausted = false;
+        return unit.pos;
     }
 
 

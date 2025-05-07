@@ -1762,6 +1762,7 @@ MonoBehaviour:
   cameraManager: {fileID: 519420030}
   playersAsCPU: 
   debugLinePrefab: {fileID: 399456013}
+  CPU_AnimationWaitTime: 0.4
 --- !u!1001 &210657160
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -9225,6 +9226,7 @@ MonoBehaviour:
   damageRangeTextContainer: {fileID: 0}
   combatTooltip: {fileID: 0}
   CPU_IsCapturing: 0
+  CPU_MoveSquaresList: []
   CPU_StructureList: []
   CPU_CapturableStructureList: []
   CPU_CapturingUnitList: []
@@ -20403,6 +20405,7 @@ MonoBehaviour:
   damageRangeTextContainer: {fileID: 0}
   combatTooltip: {fileID: 0}
   CPU_IsCapturing: 0
+  CPU_MoveSquaresList: []
   CPU_StructureList: []
   CPU_CapturableStructureList: []
   CPU_CapturingUnitList: []
@@ -21269,6 +21272,7 @@ MonoBehaviour:
   damageRangeTextContainer: {fileID: 0}
   combatTooltip: {fileID: 0}
   CPU_IsCapturing: 0
+  CPU_MoveSquaresList: []
   CPU_StructureList: []
   CPU_CapturableStructureList: []
   CPU_CapturingUnitList: []

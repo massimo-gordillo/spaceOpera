@@ -1399,6 +1399,11 @@ public class MasterGrid : MonoBehaviour
 
     public void moveSelectedUnit(Vector2Int pos)
     {
+        if(selectedUnit.pos == pos)
+        {
+            Debug.LogError($"Selected unit at {selectedUnit.pos} is being asked to move to the square it's already on");
+            return;
+        }
         //print("moveSelectedUnit. SelectedUnit is: "+selectedUnit);
         if (selectedUnit != null && whatUnitIsInThisLocation(pos) == null)
         {
