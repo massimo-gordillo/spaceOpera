@@ -909,13 +909,12 @@ public class CPUManager : MonoBehaviour
                                     }*/
                 if (availPath.Count > 0)
                 {
-                    Vector2Int target = masterGrid.GetFurthestTileByMovement(availPath, unit.movementRange);
-                    /*                        if (unit.pos == new Vector2Int(1, 1))
-                                            {
-                                                Debug.Log($"Setting target for {unit.pos} to {target}");
-                                            }*/
+                    //Debug.Log($"Avail path has length {availPath.Count}");
+                    //Vector2Int target = masterGrid.GetFurthestTileByMovement(availPath, unit.movementRange);
+                    Vector2Int target = GetLegalLandSquareFromPath(availPath, unit);
+
                     //don't land on enemyHQ unless it's your capture target
-                    if ((unit.pos - target).magnitude != 0 && (target != defaultTargets[unit.playerControl].pos || unit.CPU_TargetNode == defaultTargets[unit.playerControl]))
+                    if (Manhattan(unit.pos, target) != 0 && (target != defaultTargets[unit.playerControl].pos || unit.CPU_TargetNode == defaultTargets[unit.playerControl]))
                     {
 
                         //Debug.Log($"Moving unit {unit.pos} to {target}");
@@ -1074,7 +1073,7 @@ public class CPUManager : MonoBehaviour
 
 
             }
-            Vector2Int target = masterGrid.GetFurthestTileByMovement(finalPath, unit.movementRange);
+            Vector2Int target = GetLegalLandSquareFromPath(finalPath, unit);
             //target = GetAdjacentPosFromBidirectionalSearch(finalPath, target);
             Debug.Log($"Unit found final target square {target}");
             masterGrid.selectedUnit = unit;
@@ -1126,7 +1125,7 @@ public class CPUManager : MonoBehaviour
                 Vector2Int neighbor = current + dir;
                 if (visited.Contains(neighbor)) continue;
 
-                int legality = masterGrid.legalMove(neighbor, unit);
+                int legality = masterGrid.LegalMove(neighbor, unit);
                 if (legality < 1) continue;
 
                 visited.Add(neighbor);
@@ -1141,6 +1140,30 @@ public class CPUManager : MonoBehaviour
 
         Debug.LogWarning("No reachable square found from target node.");
         return unitPos; // fallback
+    }
+
+    public Vector2Int GetLegalLandSquareFromPath(List<Vector2Int> availPath, BaseUnit unit)
+    {
+        //Vector2Int target = Vector2Int.zero;
+        int count = availPath.Count > unit.movementRange ? unit.movementRange + 1 : availPath.Count;
+        while (count-- > 0)
+        {
+            if (masterGrid.LegalMove(availPath[count], unit) == 1)
+            {
+                return availPath[count];
+            }else
+                Debug.Log($"Unit wants to go to {availPath[count]} but it cannot, so it's going to check {(count > 0 ? availPath[count - 1] : availPath[0])}.");
+            /*                        if (availPath.Count > unit.movementRange)
+                                        target = availPath[unit.movementRange];
+                                    else
+                                        target = availPath[availPath.Count - 1];*/
+        }
+        if (count == 0)
+        {
+            Debug.LogWarning($"CPU Unit {unit.pos} unable to move towards target node because all units in path are allied units");
+        }
+
+        return Vector2Int.zero;
     }
 
 

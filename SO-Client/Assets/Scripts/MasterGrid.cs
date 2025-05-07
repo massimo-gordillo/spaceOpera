@@ -633,14 +633,14 @@ public class MasterGrid : MonoBehaviour
                 checkedCells[xCheck, yCheck] = true;
 
                 // Legal move validation
-                if (legalMove(new Vector2Int(xCheck - 1, yCheck - 1), mTarget) >= 1 && movementRange > 0) //if its a legal move AND the unit isn't only searching for additional attack locations
+                if (LegalMove(new Vector2Int(xCheck - 1, yCheck - 1), mTarget) >= 1 && movementRange > 0) //if its a legal move AND the unit isn't only searching for additional attack locations
                 {
                     // Enqueue the cell with updated range if not already in the queue
                     if (!cellsToCheck.Contains((new Vector2Int(xCheck, yCheck), range - 1)))
                         cellsToCheck.Enqueue((new Vector2Int(xCheck, yCheck), range - 1));
 
                     // Differentiate between movement and attack squares based on range
-                    if (legalMove(new Vector2Int(xCheck - 1, yCheck - 1), mTarget) == 1 && range > attackRange) //totalRange - movementRange
+                    if (LegalMove(new Vector2Int(xCheck - 1, yCheck - 1), mTarget) == 1 && range > attackRange) //totalRange - movementRange
                     {
                         squareQueuesList[0].Enqueue(new Vector2Int(xCheck, yCheck)); // Movement square
                     }
@@ -791,7 +791,7 @@ public class MasterGrid : MonoBehaviour
         foreach (Vector2Int dir in DirectionList())
         {
             Vector2Int neighbor = current + dir;
-            if (parents.ContainsKey(neighbor) || legalMove(neighbor.x, neighbor.y, unit)<=0)
+            if (parents.ContainsKey(neighbor) || LegalMove(neighbor.x, neighbor.y, unit)<=0)
                 continue;
 
             parents[neighbor] = current;
@@ -908,7 +908,7 @@ public class MasterGrid : MonoBehaviour
         {
             Vector2Int neighbor = current + dir;
 
-            if (depths.ContainsKey(neighbor) || legalMove(neighbor, unit) <= 0)
+            if (depths.ContainsKey(neighbor) || LegalMove(neighbor, unit) <= 0)
                 continue;
 
 
@@ -1318,7 +1318,7 @@ public class MasterGrid : MonoBehaviour
     //this will return 1 if a legal move, 0 if illegal move, 2 if allied unit but not a landing square.
     //-1 if it's the same unit
     //eventually this can decrement the number of additional movements (due to terrain) the unit has but that's for later.
-    public int legalMove(Vector2Int pos, BaseUnit mTarget)
+    public int LegalMove(Vector2Int pos, BaseUnit mTarget)
     {
 
         if (!IsInBounds(pos))
