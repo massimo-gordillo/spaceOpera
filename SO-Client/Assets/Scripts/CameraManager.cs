@@ -153,6 +153,23 @@ public class CameraManager : MonoBehaviour
         StartCoroutine(SmoothMoveTo(targetPos, duration));
     }
 
+    /*    private IEnumerator SmoothMoveTo(Vector2 targetPos, float duration)
+        {
+            Vector3 startPos = cam.transform.position;
+            Vector3 endPos = new Vector3(targetPos.x, targetPos.y, startPos.z);
+            float elapsed = 0f;
+
+            while (elapsed < duration)
+            {
+                elapsed += Time.deltaTime;
+                float t = Mathf.SmoothStep(0f, 1f, elapsed / duration);
+                cam.transform.position = Vector3.Lerp(startPos, endPos, t);
+                yield return null;
+            }
+
+            cam.transform.position = endPos;
+        }*/
+
     private IEnumerator SmoothMoveTo(Vector2 targetPos, float duration)
     {
         Vector3 startPos = cam.transform.position;
@@ -162,13 +179,16 @@ public class CameraManager : MonoBehaviour
         while (elapsed < duration)
         {
             elapsed += Time.deltaTime;
-            float t = Mathf.SmoothStep(0f, 1f, elapsed / duration);
-            cam.transform.position = Vector3.Lerp(startPos, endPos, t);
+            float t = elapsed / duration;
+            // Ease in/out using a sine function
+            float curvedT = 0.5f * (1 - Mathf.Cos(t * Mathf.PI));
+            cam.transform.position = Vector3.Lerp(startPos, endPos, curvedT);
             yield return null;
         }
 
         cam.transform.position = endPos;
     }
+
 
 
     private void ApplyCameraBounds()

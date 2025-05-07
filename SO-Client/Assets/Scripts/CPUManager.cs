@@ -41,7 +41,8 @@ public class CPUManager : MonoBehaviour
     List<(BaseUnit, int, int weight)> ertrianAirportProdList;
 
     public GameObject debugLinePrefab;
-    private float CPU_AnimationWaitTime = 0.3f;
+    //private float CPU_AnimationWaitTime = GameMaster.animationDuration;
+    public float CPU_AnimationWaitTime; //set in inspector
 
 
 
@@ -412,7 +413,7 @@ public class CPUManager : MonoBehaviour
         
     }
 
-    public void CPU_GameActionAttack(BaseUnit unit)
+    public IEnumerator CPU_GameActionAttack(BaseUnit unit)
     {
         if (unit.CPU_AttackableUnitList.Count > 0)
         {
@@ -445,6 +446,7 @@ public class CPUManager : MonoBehaviour
             }
             if (candidate != null)
             {
+                
                 //Vector2Int diffV = unit.pos - candidate.pos;
                 int diff = Manhattan(unit.pos, candidate.pos); //Math.Abs(diffV.x) + Math.Abs(diffV.y);
                 if (diff > 1 && diff <= unit.movementRange+unit.attackRange)
@@ -453,13 +455,17 @@ public class CPUManager : MonoBehaviour
                     masterGrid.selectedUnit = unit;
                     masterGrid.moveSelectedUnit(GetAdjacentPosFromBidirectionalSearch(path, candidate.pos)); //assumes attack range of 1 for now.
                     if (Manhattan(unit.pos, candidate.pos) == 1)//for some reason this wasn't always true.
+                    {
+                        yield return new WaitForSeconds(CPU_AnimationWaitTime * 2);
                         masterGrid.unitCombat(unit, candidate);
+                    }
                     else
                         Debug.LogWarning($"Unit {unit.pos} trying to attack {candidate.pos} but they are not adjacent");
                     unit.setNonExhausted(false);
                 }
                 else if (diff == 1)
                 {
+                    yield return new WaitForSeconds(CPU_AnimationWaitTime * 2);
                     masterGrid.selectedUnit = unit;
                     masterGrid.unitCombat(unit, candidate);
                     unit.setNonExhausted(false);
@@ -474,9 +480,10 @@ public class CPUManager : MonoBehaviour
             else
             {
                 Debug.LogWarning($"Unit {unit.pos} told to attack but unable to find a cadidate unit to attack even though attack list is not empty, defaulting to movement.");
-                CPU_MoveUnitTowardsTargetNode(unit);
+                yield return StartCoroutine(CPU_MoveUnitTowardsTargetNode(unit));
             }
         }
+        yield return null;
         
     }
 
@@ -850,12 +857,12 @@ public class CPUManager : MonoBehaviour
             {
                 if (unit.CPU_AttackableResourceUnitList.Count > 0)
                 {
-                    CPU_GameActionAttack(unit);
+                    yield return StartCoroutine(CPU_GameActionAttack(unit));
                 }
                 else
                 {
-                    CPU_MoveUnitTowardsTargetNode(unit);
-                    StartCoroutine(CPU_GameActionCapture(unit));
+                    yield return StartCoroutine(CPU_MoveUnitTowardsTargetNode(unit));
+                    yield return StartCoroutine(CPU_GameActionCapture(unit));
                 }
             }
             else
@@ -863,13 +870,13 @@ public class CPUManager : MonoBehaviour
                 if (unit.CPU_AttackableUnitList.Count > 0)
                 {
                     Debug.Log($"Combat Unit {unit.pos} is being told to attack");
-                    CPU_GameActionAttack(unit);
+                    yield return StartCoroutine(CPU_GameActionAttack(unit));
                 }
                 else
                 {
                     Debug.Log($"Combat Unit {unit.pos} is being told to move");
 
-                    CPU_MoveUnitTowardsTargetNode(unit);
+                    yield return StartCoroutine(CPU_MoveUnitTowardsTargetNode(unit));
                 }
             }
 
@@ -879,11 +886,11 @@ public class CPUManager : MonoBehaviour
         }
     }
 
-    public void CPU_MoveUnitTowardsTargetNode(BaseUnit unit)
+    public IEnumerator CPU_MoveUnitTowardsTargetNode(BaseUnit unit)
     {
         if (unit == null) {
             Debug.LogWarning($"A null unit is being asked to move towards its target node");
-            return;
+            yield break;
         }
             
         NetworkNode targetNode = unit.CPU_TargetNode;
@@ -1075,6 +1082,7 @@ public class CPUManager : MonoBehaviour
 
 
         }
+        yield return null;
 
     }
 
@@ -1140,7 +1148,7 @@ public class CPUManager : MonoBehaviour
     {
         NetworkNode targetNode = unit.CPU_TargetNode;
         Vector2Int nodePos = targetNode.pos;
-        int delta = (int)((unit.pos - nodePos).magnitude);
+        int delta = Manhattan(unit.pos, nodePos);
         if (delta == 0)
         {
             if (targetNode.playerControl != unit.playerControl)
@@ -1149,16 +1157,20 @@ public class CPUManager : MonoBehaviour
                 cameraManager.SetPosition(targetNode.pos);
                 yield return new WaitForSeconds(CPU_AnimationWaitTime);
                 masterGrid.selectedUnit = unit;
-                masterGrid.captureStructure(targetNode.structure);
+                yield return StartCoroutine(masterGrid.captureStructure(targetNode.structure));
+                //yield return new WaitForSeconds(GameMaster.animationDuration*1.5f);
                 unit.CPU_IsCapturing = true;
                 if (targetNode.structure.playerControl == unit.playerControl)
                 {
                     unit.CPU_IsCapturing = false;
                     targetNode.SetCaptured(unit.playerControl, oldPlayer);
                     GiveResourceUnitNodeAssignment(unit);
-                }
+                }else
+                    yield return new WaitForSeconds(CPU_AnimationWaitTime/4);
+
             }
         }
+        
     }
 
     public IEnumerator ProduceUnits(int player, int progeny)

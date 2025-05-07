@@ -176,7 +176,7 @@ public class BaseStructure : MonoBehaviour
 
     }
 
-    public void captureByPercentage(int percentCapturing, int playerCapturing)
+    public IEnumerator captureByPercentage(int percentCapturing, int playerCapturing)
     {
         //int prevCaptureHealth = captureHealth;
         if (playerCapturing != playerControl)
@@ -185,10 +185,11 @@ public class BaseStructure : MonoBehaviour
             if (percentCapturing < captureHealth)
                 SetCaptureHealth(captureHealth - percentCapturing);
             else
-                StartCoroutine(switchAlliance(playerCapturing));
+                yield return StartCoroutine(switchAlliance(playerCapturing));
             //Debug.Log("capture newHealth: " + captureHealth + "selectedUnithealth " + percentCapturing);
         }else
             Debug.LogError("Player " + playerCapturing + " tried to capture their own structure");
+        yield return null;
     }
 
     public void SetCaptureHealth(int newHealth)
@@ -266,8 +267,8 @@ public class BaseStructure : MonoBehaviour
         Transform t = hammerSprite.transform;
         Vector3 startScale = new Vector3(0.01f, 0.01f, 1f);
         Vector3 peakScale = new Vector3(0.9f, 0.9f, 1f);
-        float swoopDuration = GameMaster.animationDuration/6;
-        float holdDuration = GameMaster.animationDuration *2/3;
+        float swoopDuration = GameMaster.animationDuration/8;
+        float holdDuration = GameMaster.animationDuration *3/4;
 
         // Reset initial scale
         t.localScale = startScale;

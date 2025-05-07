@@ -401,14 +401,14 @@ public class MasterGrid : MonoBehaviour
         }
     }
 
-    public void captureStructure(BaseStructure structure)
+    public IEnumerator captureStructure(BaseStructure structure)
     {
         //int healthRatio = selectedUnit.healthCurrent/selectedUnit.healthMax;
         if (selectedUnit != null)
         {
             if (structure != null)
             {
-                structure.captureByPercentage(selectedUnit.getHealthPercentage(), selectedUnit.playerControl);
+                yield return structure.captureByPercentage(selectedUnit.getHealthPercentage(), selectedUnit.playerControl);
             }
 /*            //print("capture health: " + structure.captureHealth + "selectedUnithealth " + selectedUnit.healthCurrent);
             if (selectedUnit.getHealthPercentage() < structure.captureHealth) //do we want to do this math within BaseStructure?
@@ -429,6 +429,7 @@ public class MasterGrid : MonoBehaviour
         }
         else
             print("attempting to capture structure but no selectedUnit to capture it.");
+        yield return null;
     }
 
     public void attackButtonPressed()

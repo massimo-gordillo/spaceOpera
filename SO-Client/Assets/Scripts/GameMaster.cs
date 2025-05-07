@@ -194,8 +194,8 @@ public class GameMaster : MonoBehaviour
         //unitCosts = new List<(BaseUnit, int)>[numPlayers];
         if (CPU_isOn)
         {
-            CPU_PlayersList[1] = false;
-            CPU_PlayersList[2] = false;
+            CPU_PlayersList[1] = true;
+            CPU_PlayersList[2] = true;
         }
 
 
@@ -329,14 +329,14 @@ public class GameMaster : MonoBehaviour
         }
     }
 
-    public void captureButtonPressed()
+/*    public void captureButtonPressed()
     {
         if (selectedStructure != null)
         {
-            masterGrid.captureStructure(selectedStructure);
+            StartCoroutine(masterGrid.captureStructure(selectedStructure));
             hideChoicePanel();
         }
-    }
+    }*/
 
     public void attackButtonPressed()
     {
