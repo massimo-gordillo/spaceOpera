@@ -1,6 +1,6 @@
 gamePieceId,unitName,progeny,ErtrianWeight,VirixWeight,SentusWeight
 0,Infantry,Ertrian,3,3,3
-1,GattlingTank,Ertrian,1,6,4
+1,GattlingTank,Ertrian,2,6,4
 2,LightTank,Ertrian,6,3,4
 3,Artillery,Ertrian,2,1,4
 4,Rockets,Ertrian,2,3,1

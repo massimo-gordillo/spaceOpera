@@ -90,6 +90,7 @@ public class GameMaster : MonoBehaviour
     public static List<(BaseUnit, int)>[] unitCosts;
     //public static List<(BaseUnit, int)>[] CPU_unitMatchupWeights;
     public int virixCheapestUnit;
+    public int airportCheapestUnit;
 
     /*    public static GameMaster Instance
         {
@@ -187,7 +188,7 @@ public class GameMaster : MonoBehaviour
         for (int i = 1; i <= numPlayers; i++)
             setPlayerResources(i);
 
-        SetVirixCheapestUnit();
+        SetCheapestUnits();
         //startupInstantiateUnits();
         //productionPanel.Start();
 
@@ -469,6 +470,7 @@ public class GameMaster : MonoBehaviour
 
     public void CheckNoAvailableActions(int player)
     {
+        int playerProgeny = getPlayerProgeny((byte)player);
         BaseUnit unitFocus = null;
         int unitCount = 0;
         foreach (BaseUnit unit in MasterGrid.playerUnits[player])
@@ -485,17 +487,24 @@ public class GameMaster : MonoBehaviour
         BaseStructure prodFocus = null;
 
         int prodCount = 0;
-        foreach(BaseStructure prod in masterGrid.GetProductionStructures(player))
-        {
-            if (!prod.IsCoveredByUnit()) //assuming this is sufficient to confirm nothing's been created on it.
-            {  
+        if(playerProgeny != 1)
+            foreach(BaseStructure prod in masterGrid.GetProductionStructures(player))
+            {
+                if (prod.IsCoveredByUnit())
+                    continue;
+                if (playerResources[player] < 100)
+                    continue;
+                if (prod.gamePieceId == 202 && playerProgeny == 0 && playerResources[player] < airportCheapestUnit)
+                    continue;
+
+                //if it's not covered, and player has more than 100 OR is an airport can can't afford cheapest airport unit.
+
                 prodCount++;
                 if (prodFocus == null)
                 {
                     prodFocus = prod;
-                }
+                } 
             }
-        }
         if (prodCount + unitCount > 0)
         {
             endTurnConfirmCard.SetActive(true);
@@ -526,7 +535,7 @@ public class GameMaster : MonoBehaviour
             else if (prodFocus != null)
                 endTurnConfirmCardBackButton.onClick.AddListener(delegate { cameraManager.SetPosition(prodFocus.pos); });
             else
-                Debug.LogWarning("Confirmation card triggered but niether unit nor prod found.");
+                Debug.LogWarning("Confirmation card triggered but neither unit nor prod found.");
         }
         else
             initiateEndTurn();
@@ -999,17 +1008,36 @@ public class GameMaster : MonoBehaviour
         return playerResources[p];
     }
 
-    public void SetVirixCheapestUnit() //virix implementation
+    public void SetCheapestUnits() //virix implementation
     {
         List<(BaseUnit, int)> virixCosts = unitCosts[1];
-        int lowest = int.MaxValue;
+        int virixLowest = int.MaxValue;
         foreach((BaseUnit, int) pair in virixCosts)
         {
-            if(pair.Item2 < lowest && pair.Item1.unitName != "Spore")
+            if(pair.Item2 < virixLowest && pair.Item1.unitName != "Spore")
             {
-                lowest = pair.Item2;
+                virixLowest = pair.Item2;
             }
         }
-        virixCheapestUnit = lowest;
+        virixCheapestUnit = virixLowest;
+        if (virixCheapestUnit == int.MaxValue)
+        {
+            Debug.LogWarning("No cheapest virix unit found");
+        }
+
+        int airportLowest = int.MaxValue;
+        List<(BaseUnit, int)> ertrianCosts = unitCosts[0];
+        foreach ((BaseUnit, int) pair in ertrianCosts)
+        {
+            if (pair.Item2 < airportLowest && pair.Item1.unitTerrainType == UnitTerrainType.Air)
+            {
+                airportLowest = pair.Item2;
+            }
+        }
+        airportCheapestUnit = airportLowest;
+        if (airportCheapestUnit == int.MaxValue)
+        {
+            Debug.LogWarning("No cheapest airport unit found");
+        }
     }
 }
