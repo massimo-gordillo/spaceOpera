@@ -1762,7 +1762,7 @@ MonoBehaviour:
   cameraManager: {fileID: 519420030}
   playersAsCPU: 
   debugLinePrefab: {fileID: 399456013}
-  CPU_AnimationWaitTime: 0.4
+  CPU_AnimationWaitTime: 0.7
 --- !u!1001 &210657160
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -9310,6 +9310,7 @@ MonoBehaviour:
   productionFactoryStructurePrefab: {fileID: 6995593645576993131, guid: f3b33a139a5eee8489097ff6b2f17063, type: 3}
   resourceStructurePrefab: {fileID: 8924766781043591748, guid: ddb92d03861e68e40a31738e120ba8ac, type: 3}
   virixCheapestUnit: 0
+  airportCheapestUnit: 0
 --- !u!4 &1024135145
 Transform:
   m_ObjectHideFlags: 0

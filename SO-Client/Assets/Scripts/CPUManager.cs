@@ -1248,17 +1248,19 @@ public class CPUManager : MonoBehaviour
             //yield return null;
         }
 
-        
+
         IEnumerator GenerateSpendErtrianHeuristicV2()
         {
             int totalCash = cash;
+            float beta = 5f;
 
+            // Copy of factories/airports so we can remove used slots
             var availableFactories = new List<BaseStructure>(factories);
             var availableAirports = new List<BaseStructure>(airports);
 
-            List<(BaseUnit unit, BaseStructure structure)> bestBuildPlan = new List<(BaseUnit, BaseStructure)>();
-            float beta = 5f;
+            var bestBuildPlan = new List<(BaseUnit unit, BaseStructure structure)>();
 
+            // Determine opponent progeny
             int opponentProgeny = 0;
             for (int i = 0; i < GameMaster.numPlayers; i++)
             {
@@ -1266,19 +1268,22 @@ public class CPUManager : MonoBehaviour
                 if (p != 0) { opponentProgeny = p; break; }
             }
 
+            // Get our matchup lists
             var ertrianMatchupList = matchupWeights[0, opponentProgeny];
-            var factoryList = ertrianMatchupList.Where(x => x.unit.unitTerrainType == UnitTerrainType.Land).ToList();
-            var airportList = ertrianMatchupList.Where(x => x.unit.unitTerrainType == UnitTerrainType.Air).ToList();
+            var factoryList = ertrianMatchupList
+                .Where(x => x.unit.unitTerrainType == UnitTerrainType.Land)
+                .ToList();
+            var airportList = ertrianMatchupList
+                .Where(x => x.unit.unitTerrainType == UnitTerrainType.Air)
+                .ToList();
 
+            // Random branch (unchanged)
             float roll = UnityEngine.Random.value;
-            //Debug.Log("[AI] Roll=" + roll.ToString("0.00"));
-
             if (roll < 0.3f)
             {
                 int top = factoryList.Concat(airportList).Max(x => x.weight);
                 factoryList = factoryList.Where(x => x.weight < top).ToList();
                 airportList = airportList.Where(x => x.weight < top).ToList();
-                //Debug.Log("[AI] Excluding units >= weight " + top);
             }
             else if (roll < 0.6f)
             {
@@ -1289,80 +1294,61 @@ public class CPUManager : MonoBehaviour
                     bestBuildPlan.Add((infantry.unit, fac));
                     availableFactories.RemoveAt(0);
                     totalCash -= infantry.cost;
-                    //Debug.Log("[AI] Forced Infantry at factory@" + fac.pos);
                 }
             }
-/*            else
-            {
-                Debug.Log("[AI] No random modifier");
-            }*/
-
-
 
             int remainingCash = totalCash;
 
-            foreach (var fac in availableFactories)
-            {
-                (BaseUnit u, int cost, float score)? choice = null;
-                foreach (var tu in factoryList)
-                {
-                    if (tu.cost > remainingCash) continue;
-                    float s = ScoreUnit(tu.weight, tu.cost, remainingCash);
-                    if (choice == null || s > choice.Value.score)
-                        choice = (tu.unit, tu.cost, s);
-                }
-                if (choice != null)
-                {
-                    bestBuildPlan.Add((choice.Value.u, fac));
-                    remainingCash -= choice.Value.cost;
-                    //Debug.Log("[AI] Factory@" + fac.pos + " -> " + choice.Value.u.unitName + " (score " + choice.Value.score.ToString("0.0") + ")");
-                }
 
-            }
-
-            Debug.Log($"AIR: Checking airport prod, count is {availableAirports.Count}");
-            foreach (var air in availableAirports)
+            roll = UnityEngine.Random.value;
+            // Randomize 
+            if (roll < 0.4f)
             {
-                (BaseUnit u, int cost, float score)? choice = null;
-                foreach (var tu in airportList)
-                {
-                    if (tu.cost > remainingCash) continue;
-                    float s = ScoreUnit(tu.weight, tu.cost, remainingCash);
-                    if (choice == null || s > choice.Value.score)
-                        choice = (tu.unit, tu.cost, s);
-                }
-                if (choice != null)
-                {
-                    bestBuildPlan.Add((choice.Value.u, air));
-                    remainingCash -= choice.Value.cost;
-                    Debug.Log("[AI] Airport@" + air.pos + " -> " + choice.Value.u.unitName
-                              + " (score " + choice.Value.score.ToString("0.0") + ")");
-                }
-                else
-                {
-                    Debug.Log("[AI] Airport@" + air.pos + " -> no affordable air unit");
-                }
-            }
-
-            if (bestBuildPlan.Count > 0)
-            {
-                foreach (var entry in bestBuildPlan)
-                {
-                    yield return createUnitAtStructure(entry.unit, entry.structure);
-                }
+                generateSpendForProdType(availableAirports, airportList);
+                generateSpendForProdType(availableFactories, factoryList);
             }
             else
             {
-                Debug.LogWarning("[AI] No units selected for production.");
+                generateSpendForProdType(availableFactories, factoryList);
+                generateSpendForProdType(availableAirports, airportList);
             }
 
+
+            // Fire off production
+            foreach (var (unit, structure) in bestBuildPlan)
+                yield return createUnitAtStructure(unit, structure);
+
+            // Inline scoring
             float ScoreUnit(int w, int c, int remCash)
             {
-                float spent = cash - remCash + c;
-                float bonus = beta * (spent / cash);
-                return w + bonus;
+                float spent = totalCash - remCash + c;
+                return w + beta * (spent / totalCash);
+            }
+
+            // Helper to fill slots
+            void generateSpendForProdType(
+                List<BaseStructure> slots,
+                List<(BaseUnit unit, int cost, int weight)> options)
+            {
+                foreach (var slot in slots)
+                {
+                    (BaseUnit u, int cost, float score)? best = null;
+                    foreach (var opt in options)
+                    {
+                        if (opt.cost > remainingCash) continue;
+                        float s = ScoreUnit(opt.weight, opt.cost, remainingCash);
+                        if (best == null || s > best.Value.score)
+                            best = (opt.unit, opt.cost, s);
+                    }
+                    if (best != null)
+                    {
+                        bestBuildPlan.Add((best.Value.u, slot));
+                        remainingCash -= best.Value.cost;
+                    }
+                }
             }
         }
+
 
 
 
