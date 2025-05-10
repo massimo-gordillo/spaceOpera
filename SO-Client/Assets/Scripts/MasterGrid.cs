@@ -58,6 +58,9 @@ public class MasterGrid : MonoBehaviour
     public List<BaseStructure> prodStructuresList;
     public static Structure_Command[] commandStructures;
 
+
+
+
     // Called by GameMaster
     public void startup(int x, int y, byte[] tilemapByteArray,
         Dictionary<byte, AttributesTile> inputTileAttributes,
@@ -551,7 +554,9 @@ public class MasterGrid : MonoBehaviour
     bool[,] checkedCells,
     List<Queue<Vector2Int>> squareQueuesList)
     {
-        List<Queue<Vector2Int>> offsetQueue = RecursiveFloodFillSearchOffset(mTarget, movementRange, attackRange, cellsToCheck, checkedCells, squareQueuesList);
+        GameMaster.recursionSafetyCounter = 0;
+        List<Queue<Vector2Int>> offsetQueue = RecursiveFloodFillSearchOffset(mTarget, movementRange, attackRange, cellsToCheck, checkedCells, squareQueuesList, 0);
+        //Debug.LogWarning()
         List<Queue<Vector2Int>> correctedQueue = new List<Queue<Vector2Int>>();
 
         // Throw an error if the list has more than 3 items
@@ -597,14 +602,122 @@ public class MasterGrid : MonoBehaviour
     }
 
 
+
+
     public List<Queue<Vector2Int>> RecursiveFloodFillSearchOffset(
     BaseUnit mTarget,
     int movementRange,
     int attackRange,
     Queue<(Vector2Int cell, int range)> cellsToCheck,
     bool[,] checkedCells,
-    List<Queue<Vector2Int>> squareQueuesList)
+    List<Queue<Vector2Int>> squareQueuesList,
+    int recurCheck)
     {
+        int tr = movementRange + attackRange;
+        int unitRecLimit = 2 * tr * (tr + 1) + 1;
+            GameMaster.recursionSafetyCounter++;
+            if (GameMaster.recursionSafetyCounter++ >= gameMaster.recusionSafetyLimit)//unitRecLimit)
+        {
+                //Debug.LogError($"[FloodFill] Max cell processing limit hit: {processedCells}");
+                Debug.LogError($"[RecursiveFloodFillSearchOffset] Recursion safety limit reached at recurCheck={recurCheck}. with {GameMaster.recursionSafetyCounter} total recurs this turn, a local limit of {unitRecLimit} " +
+               $"Current Queue Size: {cellsToCheck.Count}. Movement: {movementRange}, Attack: {attackRange}. " +
+               $"Target: {mTarget?.unitName ?? "null"} at {mTarget.pos}");
+                return squareQueuesList;
+            }
+/*            if (GameMaster.loopSafetyCounter++ >= gameMaster.loopSafetyLimit)
+            {
+
+                    Debug.LogError($"[RecursiveFloodFillSearchOffset] Loop safety limit reached at recurCheck={recurCheck}. we've done {globalRecurCheck} recursions total" +
+                                   $"Current Queue Size: {cellsToCheck.Count}. Movement: {movementRange}, Attack: {attackRange}. " +
+                                   $"Target: {mTarget?.unitName ?? "null"} at {mTarget.pos}");
+
+
+                // Return an empty result instead of null to avoid NRE crashes downstream
+                return new List<Queue<Vector2Int>> {
+                    new Queue<Vector2Int>(), new Queue<Vector2Int>(), new Queue<Vector2Int>()
+                };
+            }*/
+
+            if (cellsToCheck.Count == 0)
+                return squareQueuesList;
+
+            var (checkingCell, range) = cellsToCheck.Dequeue();
+
+            if (range == 0)
+                return squareQueuesList;
+
+            foreach (Vector2Int direction in DirectionList())
+            {
+                Vector2Int adjacentCell = checkingCell + direction;
+                int xCheck = adjacentCell.x;
+                int yCheck = adjacentCell.y;
+
+                if (xCheck >= 0 && xCheck < gridX + 2 && yCheck >= 0 && yCheck < gridY + 2 && !checkedCells[xCheck, yCheck])
+                {
+                    checkedCells[xCheck, yCheck] = true;
+
+                    Vector2Int adjustedCell = new Vector2Int(xCheck - 1, yCheck - 1);
+                    int legal = LegalMove(adjustedCell, mTarget);
+
+                    if (legal >= 1 && movementRange > 0)
+                    {
+                        if (!cellsToCheck.Contains((new Vector2Int(xCheck, yCheck), range - 1)))
+                            cellsToCheck.Enqueue((new Vector2Int(xCheck, yCheck), range - 1));
+
+                        if (legal == 1 && range > attackRange)
+                            squareQueuesList[0].Enqueue(new Vector2Int(xCheck, yCheck));
+                        else if (range <= attackRange)
+                            squareQueuesList[1].Enqueue(new Vector2Int(xCheck, yCheck));
+
+                        BaseStructure structure = whatStructureIsInThisLocation(adjustedCell);
+                        if (structure != null)
+                            squareQueuesList[2].Enqueue(new Vector2Int(xCheck, yCheck));
+                    }
+                    else if (IsInBoundsExtended(xCheck, yCheck))
+                    {
+                        BaseUnit unitAtLocation = whatUnitIsInThisLocation(adjustedCell);
+
+                        if ((mTarget.playerControl != getPlayerTurn() || canUnitAttack(mTarget, unitAtLocation) || unitAtLocation == null) && mTarget.canMoveAndAttack)
+                            squareQueuesList[1].Enqueue(new Vector2Int(xCheck, yCheck));
+
+                        if (!mTarget.canMoveAndAttack && movementRange == 0)
+                            squareQueuesList[1].Enqueue(new Vector2Int(xCheck, yCheck));
+
+                        if (range > 1 && attackRange > 1)
+                        {
+                            if (range > attackRange)
+                            {
+                                if (!cellsToCheck.Contains((new Vector2Int(xCheck, yCheck), attackRange)))
+                                    cellsToCheck.Enqueue((new Vector2Int(xCheck, yCheck), attackRange));
+                            }
+                            else if (!cellsToCheck.Contains((new Vector2Int(xCheck, yCheck), range - 1)))
+                            {
+                                cellsToCheck.Enqueue((new Vector2Int(xCheck, yCheck), range - 1));
+                            }
+                        }
+                    }
+                }
+            }
+
+            return RecursiveFloodFillSearchOffset(mTarget, movementRange, attackRange, cellsToCheck, checkedCells, squareQueuesList, recurCheck + 1);
+        
+    }
+
+    /*public List<Queue<Vector2Int>> RecursiveFloodFillSearchOffset(
+    BaseUnit mTarget,
+    int movementRange,
+    int attackRange,
+    Queue<(Vector2Int cell, int range)> cellsToCheck,
+    bool[,] checkedCells,
+    List<Queue<Vector2Int>> squareQueuesList,
+    int recurCheck)
+    {
+        if (recurCheck >= GameMaster.loopSafetyLimit)
+        {
+            Debug.LogError("RecursiveFloodFillOffset has tripped the loop safety counter");
+            return null;
+        }
+
         // Total range (movement + attack)
         int totalRange = movementRange + attackRange;
 
@@ -683,14 +796,15 @@ public class MasterGrid : MonoBehaviour
         }
 
         // Recursion
-        return RecursiveFloodFillSearchOffset(mTarget, movementRange, attackRange, cellsToCheck, checkedCells, squareQueuesList);
-    }
+        return RecursiveFloodFillSearchOffset(mTarget, movementRange, attackRange, cellsToCheck, checkedCells, squareQueuesList, recurCheck+1);
+    }*/
 
     public void AnimateMovement(BaseUnit unit, Vector2Int start, Vector2Int end)
     {
         
         //Debug.Log($"Animating movement from {start} to {end}");
         List<Vector2Int> path = BidirectionalSearch(start, end, unit, unit.movementRange);
+        //List<Vector2Int> path = BidirectionalSearch(start, end, unit, unit.movementRange);
         //List<Vector2Int> path = BidirectionalSearch(start, end, unit);
 
         //movement animation speed
@@ -698,7 +812,8 @@ public class MasterGrid : MonoBehaviour
 
         if(path.Count == 0)
         {
-            Debug.LogError("No valid path found for movement animation.");
+            Debug.LogWarning("No valid path found for movement animation, jumping");
+            unit.transform.position = new Vector3(end.x, end.y, unit.transform.position.z);
             return;
         }
         
@@ -808,7 +923,7 @@ public class MasterGrid : MonoBehaviour
         return false;
     }*/
 
-    private static List<Vector2Int> ReconstructPath(
+    /*private static List<Vector2Int> ReconstructPath(
     Vector2Int meetingPoint,
     Dictionary<Vector2Int, Vector2Int> parentStart,
     Dictionary<Vector2Int, Vector2Int> parentEnd)
@@ -818,8 +933,15 @@ public class MasterGrid : MonoBehaviour
         // Move from meeting point back to start
         Vector2Int current = meetingPoint;
         path.Add(current); // Explicitly add meeting point
+
+        int loopSafetyCounter = 0;
         while (current != parentStart[current])
         {
+            loopSafetyCounter++;
+            if (loopSafetyCounter >= GameMaster.loopSafetyLimit)
+            {
+                Debug.LogError("ReconstructPath has tripped the loop safety counter");
+            }
             current = parentStart[current];
             path.Add(current);
         }
@@ -829,20 +951,33 @@ public class MasterGrid : MonoBehaviour
         current = meetingPoint; // Reset to meeting point
         while (current != parentEnd[current])
         {
+            loopSafetyCounter++;
+            if (loopSafetyCounter >= GameMaster.loopSafetyLimit)
+            {
+                Debug.LogError("ReconstructPath has tripped the loop safety counter");
+            }
             current = parentEnd[current];
             path.Add(current);
         }
 
         return path;
-    }
+    }*/
 
-    public List<Vector2Int> BidirectionalSearch(
+
+
+
+    /*public List<Vector2Int> BidirectionalSearch(
     Vector2Int start,
     Vector2Int end,
     BaseUnit unit,
     int totalDistance)
     {
-        if(totalDistance <= 0)
+        if(GameMaster.loopSafetyCounter++> GameMaster.loopSafetyLimit)
+        {
+            Debug.LogError("DirectionalSearch has tripped the search limit counter");
+            return null;
+        }
+        if (totalDistance <= 0)
         {
             Debug.LogError($"Bidirectional Search asked to find path for {totalDistance}");
         }
@@ -869,8 +1004,14 @@ public class MasterGrid : MonoBehaviour
         Vector2Int meetingPoint = Vector2Int.zero;
         bool pathFound = false;
 
+        
         while (queueStart.Count > 0 && queueEnd.Count > 0)
         {
+
+            if (GameMaster.loopSafetyCounter++ >= GameMaster.loopSafetyLimit)
+            {
+                Debug.LogError("BidirectionalSearch has tripped the loop safety counter");
+            }
             if (ExpandFrontier(queueStart, parentStart, parentEnd, depthStart, depthLimitPerSide, ref meetingPoint, unit))
             {
                 pathFound = true;
@@ -925,6 +1066,134 @@ public class MasterGrid : MonoBehaviour
         }
 
         return false;
+    }*/
+
+
+    public List<Vector2Int> BidirectionalSearch(
+    Vector2Int start,
+    Vector2Int goal,
+    BaseUnit unit,
+    int totalDistance)
+    {
+
+        if (GameMaster.loopSafetyCounter++ > gameMaster.loopSafetyLimit)
+        {
+            Debug.LogError("DirectionalSearch has tripped the search limit counter");
+            return null;
+        }
+        int depthLimit = (totalDistance + 1) / 2;
+        if (start == goal)
+            return new List<Vector2Int> { start };
+
+        var openStart = new SortedSet<(int f, int g, Vector2Int pos)>(new FgPosComparer());
+        var openGoal = new SortedSet<(int f, int g, Vector2Int pos)>(new FgPosComparer());
+
+        var gStart = new Dictionary<Vector2Int, int> { [start] = 0 };
+        var gGoal = new Dictionary<Vector2Int, int> { [goal] = 0 };
+
+        var parentStart = new Dictionary<Vector2Int, Vector2Int> { [start] = start };
+        var parentGoal = new Dictionary<Vector2Int, Vector2Int> { [goal] = goal };
+
+        var closedStart = new HashSet<Vector2Int>();
+        var closedGoal = new HashSet<Vector2Int>();
+
+        openStart.Add((Manhattan(start, goal), 0, start));
+        openGoal.Add((Manhattan(goal, start), 0, goal));
+
+        while (openStart.Count > 0 && openGoal.Count > 0)
+        {
+            bool expandStart = openStart.Min.f <= openGoal.Min.f;
+
+            var (fCur, gCur, posCur) = expandStart
+                ? PopMin(openStart)
+                : PopMin(openGoal);
+
+            var closed = expandStart ? closedStart : closedGoal;
+            var otherClosed = expandStart ? closedGoal : closedStart;
+            var gThis = expandStart ? gStart : gGoal;
+            var gOther = expandStart ? gGoal : gStart;
+            var parentThis = expandStart ? parentStart : parentGoal;
+            var target = expandStart ? goal : start;
+            var openThis = expandStart ? openStart : openGoal;
+
+
+            closed.Add(posCur);
+
+
+            if (otherClosed.Contains(posCur))
+                return ReconstructPath(posCur, parentStart, parentGoal);
+
+
+            foreach (var dir in DirectionList())
+            {
+                var nb = posCur + dir;
+                if (LegalMove(nb, unit) <= 0)
+                    continue;
+
+
+
+                int gNew = gCur + 1;
+                if (gNew > depthLimit)
+                    continue;
+
+                if (!gThis.TryGetValue(nb, out var gOld) || gNew < gOld)
+                {
+                    gThis[nb] = gNew;
+                    parentThis[nb] = posCur;
+                    int h = Manhattan(nb, target);
+                    openThis.Add((gNew + h, gNew, nb));
+                }
+            }
+        }
+
+        return new List<Vector2Int>();
+    }
+    private (int f, int g, Vector2Int pos) PopMin(
+        SortedSet<(int f, int g, Vector2Int pos)> set)
+    {
+        var min = set.Min;
+        set.Remove(min);
+        return min;
+    }
+    private List<Vector2Int> ReconstructPath(
+        Vector2Int meet,
+        Dictionary<Vector2Int, Vector2Int> pStart,
+        Dictionary<Vector2Int, Vector2Int> pGoal)
+    {
+        var path = new List<Vector2Int>();
+
+        var cur = meet;
+        while (true)
+        {
+            path.Add(cur);
+            if (pStart[cur] == cur) break;
+            cur = pStart[cur];
+        }
+        path.Reverse();
+
+        cur = meet;
+        while (true)
+        {
+            cur = pGoal[cur];
+            path.Add(cur);
+            if (pGoal[cur] == cur) break;
+        }
+
+        return path;
+    }
+
+    private int Manhattan(Vector2Int a, Vector2Int b)
+        => Mathf.Abs(a.x - b.x) + Mathf.Abs(a.y - b.y);
+    private class FgPosComparer : IComparer<(int f, int g, Vector2Int pos)>
+    {
+        public int Compare((int f, int g, Vector2Int pos) a,
+                           (int f, int g, Vector2Int pos) b)
+        {
+            if (a.f != b.f) return a.f - b.f;
+            if (a.g != b.g) return a.g - b.g;
+            if (a.pos.x != b.pos.x) return a.pos.x - b.pos.x;
+            return a.pos.y - b.pos.y;
+        }
     }
 
     public Vector2Int GetFurthestTileByMovement(List<Vector2Int> path, int maxMovement)

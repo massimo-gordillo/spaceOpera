@@ -9387,6 +9387,8 @@ MonoBehaviour:
   resourceStructurePrefab: {fileID: 8924766781043591748, guid: ddb92d03861e68e40a31738e120ba8ac, type: 3}
   virixCheapestUnit: 0
   airportCheapestUnit: 0
+  loopSafetyLimit: 8000
+  recusionSafetyLimit: 200
 --- !u!4 &1024135145
 Transform:
   m_ObjectHideFlags: 0

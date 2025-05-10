@@ -92,6 +92,11 @@ public class GameMaster : MonoBehaviour
     public int virixCheapestUnit;
     public int airportCheapestUnit;
 
+    public int loopSafetyLimit = 10000;
+    public int recusionSafetyLimit = 100;
+    public static int recursionSafetyCounter = 0;
+    public static int loopSafetyCounter = 0;
+
     /*    public static GameMaster Instance
         {
             get
@@ -546,7 +551,8 @@ public class GameMaster : MonoBehaviour
 
     public void StartTurn()
     {
-
+        loopSafetyCounter = 0;
+        recursionSafetyCounter = 0;
         int i = -1;
         do
         { //always increment player number once, then check if that player is still in the game. Go next, never repeat more than num players.

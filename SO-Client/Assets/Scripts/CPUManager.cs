@@ -47,6 +47,7 @@ public class CPUManager : MonoBehaviour
 
 
 
+
     /*  
         Let's precompute a network between structures for movemenet of units.
         I imagine there's a crawling algorithm that does this in linear complexity, I can explore that at a later time.
@@ -321,7 +322,7 @@ public class CPUManager : MonoBehaviour
         Queue<(Vector2Int cell, int range)> cellsToCheck = new Queue<(Vector2Int, int)>();
         bool[,] checkedCells = new bool[masterGrid.gridX + 2, masterGrid.gridY + 2];
         checkedCells[unit.pos.x + 1, unit.pos.y + 1] = true;
-        cellsToCheck.Enqueue((new Vector2Int(unit.pos.x + 1, unit.pos.y + 1), unit.movementRange + 1));//assuming unit only has 1 attack range for the first vectorA* search.
+        cellsToCheck.Enqueue((new Vector2Int(unit.pos.x + 1, unit.pos.y + 1), unit.movementRange));//assuming unit only has 1 attack range for the first vectorA* search.
         List<Queue<Vector2Int>> squareQueuesList = null;
         if (unit.attackRange >= 1)
             squareQueuesList = masterGrid.FloodFillSearch(unit, unit.movementRange, 1, cellsToCheck, checkedCells, new List<Queue<Vector2Int>> { new Queue<Vector2Int>(), new Queue<Vector2Int>(), new Queue<Vector2Int>() });
@@ -435,6 +436,7 @@ public class CPUManager : MonoBehaviour
                     if (damageDelta > mostDamageDelta)
                     {
                         mostDamageDelta = damageDelta;
+                        mostDamageDelta = damageDelta;
                         candidate = attackableResourceUnit;
                     }
                 }
@@ -443,7 +445,7 @@ public class CPUManager : MonoBehaviour
             {
                 //Debug.Log($"Unit {unit.pos} is checking if it should attack {attackableUnit.pos}");
                 double damageDelta = GetDamageCostDelta(unit, attackableUnit);
-                Debug.Log($"Unit {unit.pos} attacking {attackableUnit.pos} has damage delta {damageDelta}");
+                //Debug.Log($"Unit {unit.pos} attacking {attackableUnit.pos} has damage delta {damageDelta}");
                 if (damageDelta > mostDamageDelta)
                 {
                     candidate = attackableUnit;
@@ -971,8 +973,14 @@ public class CPUManager : MonoBehaviour
 
             bool isInDistance = true;
             //while you still have movement available
+
             while (movementLeft > 0)
             {
+                GameMaster.loopSafetyCounter++;
+                if (GameMaster.loopSafetyCounter >= gameMaster.loopSafetyLimit)
+                {
+                    Debug.LogError("CPU_MoveUnitTowardsTargetNode has tripped the loop safety counter");
+                }
                 //search for a path to a cell within min distance from target
                 //Debug.Log($"Unit {unit.pos} has movement available {movementLeft}, searching");
                 foundPath = masterGrid.BidirectionalSearch(
@@ -997,9 +1005,8 @@ public class CPUManager : MonoBehaviour
                     finalPath = foundPath;
                 }
                 if(foundPath == null || foundPath.Count == 0) {
-                    Debug.LogError($"Unable to find a path from {unit.pos} to {nodePos}, has a search value of {Manhattan(unit.pos, nodePos)*4}");
+                    Debug.LogWarning($"Unable to find a path from {unit.pos} to {nodePos}, has a search value of {Manhattan(unit.pos, nodePos)*4}");
                     break; 
-                
                 }
                 /*//if you have movement remaining and you're not in the appropriate distance to the target
                 for (int i = 0; i < movementLeft && !isInDistance; i++)
@@ -1120,9 +1127,13 @@ public class CPUManager : MonoBehaviour
         new Vector2Int(0, -1),
         new Vector2Int(-1, 0)
         };
-
         while (queue.Count > 0)
         {
+            GameMaster.loopSafetyCounter++;
+            if (GameMaster.loopSafetyCounter >= gameMaster.loopSafetyLimit)
+            {
+                Debug.LogError("FindBestReachableSquare has tripped the loop safety counter");
+            }
             var (score, steps, current) = queue.Min;
             queue.Remove(queue.Min);
 
@@ -1278,7 +1289,7 @@ public class CPUManager : MonoBehaviour
                 .ToList();
 
             // Random branch (unchanged)
-            float roll = UnityEngine.Random.value;
+            /*float roll = UnityEngine.Random.value;
             if (roll < 0.3f)
             {
                 int top = factoryList.Concat(airportList).Max(x => x.weight);
@@ -1295,14 +1306,15 @@ public class CPUManager : MonoBehaviour
                     availableFactories.RemoveAt(0);
                     totalCash -= infantry.cost;
                 }
-            }
+            }*/
 
             int remainingCash = totalCash;
 
 
-            roll = UnityEngine.Random.value;
+            float roll2 = UnityEngine.Random.value;
             // Randomize 
-            if (roll < 0.4f)
+            if (true)
+            //if (roll2 < 0.4f)
             {
                 generateSpendForProdType(availableAirports, airportList);
                 generateSpendForProdType(availableFactories, factoryList);
@@ -1584,18 +1596,22 @@ int maxTotalCost)
             queue.Enqueue(hq);
             visitedNodes.Add(hq);
 
-/*            if (priorityNetworkNodes.Contains(hq))
-            {
-                Debug.Log($"HQ at {hq.pos} is found in priorityNetworkNodes.");
-            }
-            else
-            {
-                Debug.LogWarning($"HQ at {hq.pos} is NOT found in priorityNetworkNodes.");
-            }*/
-
+            /*            if (priorityNetworkNodes.Contains(hq))
+                        {
+                            Debug.Log($"HQ at {hq.pos} is found in priorityNetworkNodes.");
+                        }
+                        else
+                        {
+                            Debug.LogWarning($"HQ at {hq.pos} is NOT found in priorityNetworkNodes.");
+                        }*/
 
             while (queue.Count > 0)
             {
+                GameMaster.loopSafetyCounter++;
+                if (GameMaster.loopSafetyCounter >= gameMaster.loopSafetyLimit)
+                {
+                    Debug.LogError("AssignPriorityHeadings has tripped the loop safety counter");
+                }
                 NetworkNode current = queue.Dequeue();
                 //NetworkNode bestNeighbour = null;
                 int currentDist = current.priorityCostToTarget[player];
