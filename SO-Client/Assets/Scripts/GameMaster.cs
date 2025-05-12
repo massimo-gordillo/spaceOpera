@@ -28,7 +28,7 @@ public class GameMaster : MonoBehaviour
     public GameObject choicePanel;
     public MenuProductionPanel productionPanel;
     public GameObject unitChoicePanel;
-    public int playerTurn;
+    public static int playerTurn;
     public static int numPlayers;
     public short turnNumber;
     private bool[] playersNotLost;
@@ -335,14 +335,14 @@ public class GameMaster : MonoBehaviour
         }
     }
 
-/*    public void captureButtonPressed()
+    public void captureButtonPressed()
     {
         if (selectedStructure != null)
         {
             StartCoroutine(masterGrid.captureStructure(selectedStructure));
             hideChoicePanel();
         }
-    }*/
+    }
 
     public void attackButtonPressed()
     {
@@ -679,10 +679,10 @@ public class GameMaster : MonoBehaviour
         productionPanel.gameObject.SetActive(false);
     }
 
-    public int getPlayerTurn()
+/*    public static int getPlayerTurn()
     {
         return playerTurn;
-    }
+    }*/
 
     private void setPlayerResources(int playerTurn)
     {
@@ -866,7 +866,7 @@ public class GameMaster : MonoBehaviour
     public BaseUnit GetInstantiateUnit(BaseUnit unit, Vector2Int pos, int? player)
     {
         if(player==null)
-            unit.playerControl = getPlayerTurn();
+            unit.playerControl = playerTurn;
         else
             unit.playerControl = (int)player;
         unit.spriteContainer.transform.localScale = new Vector2(0.01f, 0.01f);

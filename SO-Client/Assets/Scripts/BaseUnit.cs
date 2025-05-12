@@ -117,7 +117,7 @@ public class BaseUnit : MonoBehaviour
 
 
 
-/*        if (playerControl == masterGrid.getPlayerTurn())
+/*        if (playerControl == masterGrid.GameMaster.playerTurn)
             setNonExhausted(false);
         else
             setNonExhausted(true);*/
@@ -134,10 +134,8 @@ public class BaseUnit : MonoBehaviour
         else
             Debug.LogError("No unitNameTextContainerFound");
 
-        playerColor = GameMaster.playerColors[playerControl];
-        unitNameTextContainer.color = playerColor;
-        defenceValueTextContainer.color = playerColor;
-        damageRangeTextContainer.color = playerColor;
+
+        initializeColors();
 
         hideCrosshairs();
         hideCombatTooltip();
@@ -222,6 +220,18 @@ public class BaseUnit : MonoBehaviour
         cornerSpriteTR.SetActive(b);
         cornerSpriteBL.SetActive(b);
         cornerSpriteBR.SetActive(b);
+    }
+
+    public void initializeColors()
+    {
+        Color playerColor = GameMaster.playerColors[playerControl];
+        cornerSpriteTL.GetComponent<SpriteRenderer>().color = playerColor;  
+        cornerSpriteTR.GetComponent<SpriteRenderer>().color = playerColor;
+        cornerSpriteBL.GetComponent<SpriteRenderer>().color = playerColor;
+        cornerSpriteBR.GetComponent<SpriteRenderer>().color = playerColor;
+        unitNameTextContainer.color = playerColor;
+        defenceValueTextContainer.color = playerColor;
+        damageRangeTextContainer.color = playerColor;
     }
 
     public void showCombatTooltip(int defence, int sentusDefence, double floor, double ceiling)

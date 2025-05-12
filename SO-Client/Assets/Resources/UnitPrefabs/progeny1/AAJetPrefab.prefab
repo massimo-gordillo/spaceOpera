@@ -1583,7 +1583,7 @@ MonoBehaviour:
   healthType: 0
   damageType: 0
   weaponType: 1
-  attributesHash: -8909963634700976128
+  attributesHash: -878689152722272256
   isResourceUnit: 0
   isInfantry: 0
   healthMax: 250
@@ -1591,7 +1591,7 @@ MonoBehaviour:
   baseDamage: 1000
   attackRange: 1
   price: 1800
-  movementRange: 9
+  movementRange: 7
   playerControl: 1
   team: 0
   orientation: 3

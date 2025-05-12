@@ -477,7 +477,7 @@ MonoBehaviour:
   healthType: 1
   damageType: 1
   weaponType: 0
-  attributesHash: -8360844747283103744
+  attributesHash: 4138069185739620352
   isResourceUnit: 0
   isInfantry: 0
   healthMax: 650
@@ -485,7 +485,7 @@ MonoBehaviour:
   baseDamage: 500
   attackRange: 1
   price: 1200
-  movementRange: 4
+  movementRange: 3
   playerControl: 0
   team: 0
   orientation: 3
@@ -520,6 +520,7 @@ MonoBehaviour:
   damageRangeTextContainer: {fileID: 3625887003862409572}
   combatTooltip: {fileID: 3330987806704903206}
   CPU_IsCapturing: 0
+  CPU_MoveSquaresList: []
   CPU_StructureList: []
   CPU_CapturableStructureList: []
   CPU_CapturingUnitList: []
