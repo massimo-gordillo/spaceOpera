@@ -539,7 +539,7 @@ public class CPUManager : MonoBehaviour
         //if unit will fire back calculate that
         if (masterGrid.getDamageBeforeLuck(attacker, defender, false) < defender.healthCurrent)
             firebackCost = Math.Min(masterGrid.getDamageBeforeLuck(defender, attacker, true), attacker.healthCurrent) * attacker.price/attacker.healthMax;
-        if (defender.isResourceUnit || attacker.attackRange > 1)
+        if (defender.isResourceUnit || attacker.attackRange > 1 || (attacker.unitName == "Blacksmith" && defender.unitName == "LightTank"))
             firebackCost = 0;
         double delta = attackCost - firebackCost;
         //Debug.Log($"DELTA: {attacker.pos} checking {defender.pos}, attack cost: {attackCost}, fireback cost: {firebackCost}, delta is {delta}");
@@ -1262,11 +1262,13 @@ public class CPUManager : MonoBehaviour
         //simple make base unit check
         List<BaseStructure> structures = masterGrid.GetStructures(player);
         List<BaseStructure> prods = masterGrid.GetProductionStructures(player);
-        int cash = gameMaster.GetPlayerResources(player);
+        int totalSpend = gameMaster.GetPlayerResources(player);
         List<BaseStructure> factories = new();
         List<BaseStructure> airports = new();
         List<(BaseUnit, int)> factoryProdList = new();
         List<(BaseUnit, int)> airportProdList = new();
+        var bestBuildPlan = new List<(BaseUnit unit, BaseStructure structure)>();
+
         if (progeny == 0)
         {
             /*            int factoryCount = 0;
@@ -1284,6 +1286,7 @@ public class CPUManager : MonoBehaviour
                     airports.Add(structure);
             }
             yield return GenerateSpendErtrianHeuristicV2();
+
             /*            foreach (BaseStructure structure in prods)
                         {
                             if (structure.playerControl == player && structure.structureType == 1)
@@ -1295,12 +1298,82 @@ public class CPUManager : MonoBehaviour
                         }*/
             //yield return null;
         }
+        else if (progeny == 1)
+            yield return null;
+        else if (progeny == 2)
+            yield return GenerateSpendSentus();
+
+        IEnumerator GenerateSpendSentus()
+        {
+
+
+            //var sentusMatchupList = matchupWeights[0, getOpponentProgeny(GameMaster.playerTurn)];
+            //int totalSpend = cash;
+            List<(BaseUnit unit, int cost, int weight)> sentusMatchupList = matchupWeights[2, getOpponentProgeny(GameMaster.playerTurn)];
+            List<BaseStructure> sentusProds = prods;
+
+            // Random branch (unchanged)
+            float roll = UnityEngine.Random.value;
+            //remove the highest weight unit from factory and airport, to add unit creation variety.
+            if (roll < 0.2f)
+            {
+                int top = sentusMatchupList.Max(x => x.weight);
+                sentusMatchupList = sentusMatchupList.Where(x => x.weight < top).ToList();
+            }
+            //guarantee at least one blacksmith unit some % of the time.
+            else if (roll < 0.5f)
+            {
+                var blacksmith = sentusMatchupList.FirstOrDefault(x => x.unit.unitName == "blacksmith");
+                if (blacksmith.unit != null && sentusProds.Count > 0 && totalSpend >= blacksmith.cost)
+                {
+                    var prod = sentusProds[0];
+                    bestBuildPlan.Add((blacksmith.unit, prod));
+                    sentusProds.RemoveAt(0);
+                    totalSpend -= blacksmith.cost;
+                }
+            }
+
+            int remainingCash = totalSpend;
+
+            generateSpendForProdType(sentusProds, sentusMatchupList, remainingCash);
+
+
+
+            // Fire off production
+            foreach (var (unit, structure) in bestBuildPlan)
+                yield return createUnitAtStructure(unit, structure);
+
+
+
+            // Helper to fill slots
+/*            void generateSpendForProdType(
+                List<BaseStructure> slots,
+                List<(BaseUnit unit, int cost, int weight)> options)
+            {
+                foreach (var slot in slots)
+                {
+                    (BaseUnit u, int cost, float score)? best = null;
+                    foreach (var opt in options)
+                    {
+                        if (opt.cost > remainingCash) continue;
+                        float s = ProductionScoreUnit(opt.weight, opt.cost, remainingCash);
+                        if (best == null || s > best.Value.score)
+                            best = (opt.unit, opt.cost, s);
+                    }
+                    if (best != null)
+                    {
+                        bestBuildPlan.Add((best.Value.u, slot));
+                        remainingCash -= best.Value.cost;
+                    }
+                }
+            }*/
+            yield return null;
+        }
 
 
         IEnumerator GenerateSpendErtrianHeuristicV2()
         {
-            int totalCash = cash;
-            float beta = 2f;
+            
 
             // Copy of factories/airports so we can remove used slots
             var availableFactories = new List<BaseStructure>(factories);
@@ -1338,16 +1411,16 @@ public class CPUManager : MonoBehaviour
             else if (roll < 0.5f)
             {
                 var infantry = factoryList.FirstOrDefault(x => x.unit.unitName == "Infantry");
-                if (infantry.unit != null && availableFactories.Count > 0 && totalCash >= infantry.cost)
+                if (infantry.unit != null && availableFactories.Count > 0 && totalSpend >= infantry.cost)
                 {
                     var fac = availableFactories[0];
                     bestBuildPlan.Add((infantry.unit, fac));
                     availableFactories.RemoveAt(0);
-                    totalCash -= infantry.cost;
+                    totalSpend -= infantry.cost;
                 }
             }
 
-            int remainingCash = totalCash;
+            int remainingCash = totalSpend;
 
 
             float roll2 = UnityEngine.Random.value;
@@ -1355,13 +1428,13 @@ public class CPUManager : MonoBehaviour
             //if (true)
             if (roll2 < 0.4f)
             {
-                generateSpendForProdType(availableAirports, airportList);
-                generateSpendForProdType(availableFactories, factoryList);
+                generateSpendForProdType(availableAirports, airportList, remainingCash);
+                generateSpendForProdType(availableFactories, factoryList, remainingCash);
             }
             else
             {
-                generateSpendForProdType(availableFactories, factoryList);
-                generateSpendForProdType(availableAirports, airportList);
+                generateSpendForProdType(availableFactories, factoryList, remainingCash);
+                generateSpendForProdType(availableAirports, airportList, remainingCash);
             }
 
 
@@ -1369,49 +1442,67 @@ public class CPUManager : MonoBehaviour
             foreach (var (unit, structure) in bestBuildPlan)
                 yield return createUnitAtStructure(unit, structure);
 
-            // Inline scoring
-            float ScoreUnit(int w, int c, int remCash)
+
+
+        }
+
+        void generateSpendForProdType(
+        List<BaseStructure> slots,
+        List<(BaseUnit unit, int cost, int weight)> options,
+        int remainingCash)
+        {
+            foreach (var slot in slots)
             {
-                float spent = totalCash - remCash + c;
-                return w + beta * (spent / totalCash);
+                (BaseUnit u, int cost, float score)? best = null;
+                foreach (var opt in options)
+                {
+                    if (opt.cost > remainingCash) continue;
+                    float s = ProductionScoreUnit(opt.weight, opt.cost);
+                    if (best == null || s > best.Value.score)
+                        best = (opt.unit, opt.cost, s);
+                }
+                if (best != null)
+                {
+                    bestBuildPlan.Add((best.Value.u, slot));
+                    remainingCash -= best.Value.cost;
+                }
             }
 
-            // Helper to fill slots
-            void generateSpendForProdType(
-                List<BaseStructure> slots,
-                List<(BaseUnit unit, int cost, int weight)> options)
+            float ProductionScoreUnit(int w, int c)
             {
-                foreach (var slot in slots)
-                {
-                    (BaseUnit u, int cost, float score)? best = null;
-                    foreach (var opt in options)
-                    {
-                        if (opt.cost > remainingCash) continue;
-                        float s = ScoreUnit(opt.weight, opt.cost, remainingCash);
-                        if (best == null || s > best.Value.score)
-                            best = (opt.unit, opt.cost, s);
-                    }
-                    if (best != null)
-                    {
-                        bestBuildPlan.Add((best.Value.u, slot));
-                        remainingCash -= best.Value.cost;
-                    }
-                }
+                float beta = 2f;
+                float spent = totalSpend - remainingCash + c;
+                return w + beta * (spent / totalSpend);
             }
         }
 
 
 
 
-
-
     }
+
+    public int getOpponentProgeny(int player)
+    {
+        //assuming two players for now, in future for multiplayer I can do a weighted average of opp's progenies.
+        for (int i = 1; i <= GameMaster.numPlayers; i++)
+        {
+            if (i != GameMaster.playerTurn)
+                return gameMaster.getPlayerProgeny((byte)i);
+        }
+        return 0;
+    }
+
+    // Inline scoring
+
+
+    // Helper to fill slots
+    
 
 
 
     /*IEnumerator GenerateSpendErtrianV2()
     {
-        int totalCash = cash;
+        int totalSpend = cash;
 
         int maxFactoryCount = factories.Count;
         int maxAirportCount = airports.Count;
@@ -1444,17 +1535,17 @@ public class CPUManager : MonoBehaviour
 
         int testedComboCount = 0;
 
-        foreach (var factoryCombo in GetUnitCombinations(factoryList, maxFactoryCount, totalCash))
+        foreach (var factoryCombo in GetUnitCombinations(factoryList, maxFactoryCount, totalSpend))
         {
-            foreach (var airportCombo in GetUnitCombinations(airportList, maxAirportCount, totalCash))
+            foreach (var airportCombo in GetUnitCombinations(airportList, maxAirportCount, totalSpend))
             {
                 var combined = factoryCombo.Concat(airportCombo).ToList();
                 int totalCost = combined.Sum(x => x.cost);
-                if (totalCost > totalCash)
+                if (totalCost > totalSpend)
                     continue;
 
                 int totalWeight = combined.Sum(x => x.weight);
-                float score = totalWeight + alpha * ((float)totalCost / totalCash);
+                float score = totalWeight + alpha * ((float)totalCost / totalSpend);
                 testedComboCount++;
 
                 Debug.Log($"[AI] Combo #{testedComboCount}: Cost={totalCost}, Weight={totalWeight}, Score={score}");

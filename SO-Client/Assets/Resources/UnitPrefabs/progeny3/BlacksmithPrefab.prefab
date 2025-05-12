@@ -1337,10 +1337,10 @@ MonoBehaviour:
   unitTerrainType: 0
   gamePieceId: 100
   isNotPrototype: 1
-  healthType: 1
+  healthType: 2
   damageType: 1
   weaponType: 0
-  attributesHash: 4534904716278104064
+  attributesHash: -4121604231041908736
   isResourceUnit: 1
   isInfantry: 1
   healthMax: 200
@@ -1383,6 +1383,7 @@ MonoBehaviour:
   damageRangeTextContainer: {fileID: 6478691856551303286}
   combatTooltip: {fileID: 4841086112816722334}
   CPU_IsCapturing: 0
+  CPU_MoveSquaresList: []
   CPU_StructureList: []
   CPU_CapturableStructureList: []
   CPU_CapturingUnitList: []

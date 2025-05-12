@@ -135,7 +135,7 @@ public class GameMaster : MonoBehaviour
         else {
             Debug.LogWarning("Progeny set to -1 selected, defaulting to hard values");
             playerProgeny.Add(1, 0);
-            playerProgeny.Add(2, 0);
+            playerProgeny.Add(2, 2);
         }
 
         
@@ -200,7 +200,7 @@ public class GameMaster : MonoBehaviour
         //unitCosts = new List<(BaseUnit, int)>[numPlayers];
         if (CPU_isOn)
         {
-            CPU_PlayersList[1] = true;
+            CPU_PlayersList[1] = false;
             CPU_PlayersList[2] = true;
         }
 
@@ -679,7 +679,7 @@ public class GameMaster : MonoBehaviour
         productionPanel.gameObject.SetActive(false);
     }
 
-/*    public static int getPlayerTurn()
+/*    public static int GameMaster.playerTurn
     {
         return playerTurn;
     }*/
