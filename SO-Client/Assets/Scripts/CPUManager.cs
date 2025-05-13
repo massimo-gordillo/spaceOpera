@@ -30,12 +30,18 @@ public class CPUManager : MonoBehaviour
     public List<NetworkEdge> networkEdges = new();
     public List<NetworkEdge> priorityNetworkEdgesAir = new();
     public List<NetworkEdge> priorityNetworkEdgesGround = new();
+    public double[,] heatMap;
+    public List<double[,]> structHeatMaps;
+    public TextMesh debugTextPrefab;
+
     public GameMaster gameMaster;
     public MasterGrid masterGrid;
     public CameraManager cameraManager;
 
-    public bool[] playersAsCPU = new bool[GameMaster.numPlayers+1];
-    public List<BaseUnit>[] CPU_Units = new List<BaseUnit>[GameMaster.numPlayers+1];
+
+
+
+    public bool[] playersAsCPU = new bool[GameMaster.numPlayers + 1];
 
     List<(BaseUnit unit, int cost, int weight)>[,] matchupWeights;
     List<(BaseUnit, int, int weight)> ertrianFactoryProdList;
@@ -88,7 +94,7 @@ public class CPUManager : MonoBehaviour
                 Debug.Log($"Adding command structure {structure.pos} to the nodeVectorMap it has {structure.transform.position.x} x pos in world");
 */
             nodeVectorMap.Add(node.pos, node);
-            if(structure.structureType != 0)
+            if (structure.structureType != 0)
             {
                 //Debug.Log($"Adding node {structure.pos} with type {structure.structureType} to priority list");
                 //NetworkNode priorityNode = node;
@@ -102,21 +108,21 @@ public class CPUManager : MonoBehaviour
         //SortByDistanceFromOrigin(structureListArray);
         //Vector2[] structLocs = 
 
-                //generatePairwiseEuclideanDistanceArray(structLocs);
-                //WriteArrayToCSV("EuclideanDistanceArray.csv");
-                //GenerateNaiveStructureNetwork();
-                //ExportVerticiesToCSV();
+        //generatePairwiseEuclideanDistanceArray(structLocs);
+        //WriteArrayToCSV("EuclideanDistanceArray.csv");
+        //GenerateNaiveStructureNetwork();
+        //ExportVerticiesToCSV();
 
         foreach (NetworkNode n in resourceNetworkNodes)
         {
             ConnectStructurePairs(n, 6, false); //specifically 6 as it's two infantry traverse distances
         }
 
-        foreach(NetworkNode n in priorityNetworkNodes)
+        foreach (NetworkNode n in priorityNetworkNodes)
         {
-            ConnectStructurePairs(n, (int)((gameMaster.gridX + gameMaster.gridY)/2), true);
+            ConnectStructurePairs(n, (int)((gameMaster.gridX + gameMaster.gridY) / 2), true);
         }
-        
+
 
         //Debug.Log($"Done searching pairs, node count is {networkEdges.Count}");
 
@@ -125,19 +131,20 @@ public class CPUManager : MonoBehaviour
 
         AssignPriorityHeadingsToHQ();
         SetGroundPriorityNetwork(); //not implemented properly rn.
-        //DebugEdges();
-        //DebugNodes();
+                                    //DebugEdges();
+                                    //DebugNodes();
 
 
 
         //Debug.Log($"Priority node count: {priorityNetworkNodes.Count}, Priority edge air count: {priorityNetworkEdgesAir.Count}, Priority edge ground count: {priorityNetworkEdgesGround.Count}");
-/*        foreach (NetworkNode node in priorityNetworkNodes)
-        {
-            if(node != null) 
-            Debug.Log($"Node {node.pos} has priority direction to {node.priorityNextNodeToTarget[1].pos} for player 1");
-        }*/
+        /*        foreach (NetworkNode node in priorityNetworkNodes)
+                {
+                    if(node != null) 
+                    Debug.Log($"Node {node.pos} has priority direction to {node.priorityNextNodeToTarget[1].pos} for player 1");
+                }*/
 
         InitClosestNeighbour();
+        heatMap = new double[gameMaster.gridX, gameMaster.gridY];
         //StartCoroutine(DrawStructureDebugLines());
     }
 
@@ -291,7 +298,7 @@ public class CPUManager : MonoBehaviour
     {
         commandStructures = new BaseStructure[GameMaster.numPlayers + 1];
         defaultTargets = new NetworkNode[GameMaster.numPlayers + 1];
-        for (int p=1; p<=GameMaster.numPlayers; p++)
+        for (int p = 1; p <= GameMaster.numPlayers; p++)
         {
             commandStructures[p] = MasterGrid.commandStructures[p];
         }
@@ -315,9 +322,9 @@ public class CPUManager : MonoBehaviour
 
     public void CollectPotentialGameActions(BaseUnit unit)
     {
-/*        bool isCurious = false;
-        if (!unit.isResourceUnit)
-            isCurious = true;*/
+        /*        bool isCurious = false;
+                if (!unit.isResourceUnit)
+                    isCurious = true;*/
 
         Queue<(Vector2Int cell, int range)> cellsToCheck = new Queue<(Vector2Int, int)>();
         bool[,] checkedCells = new bool[masterGrid.gridX + 2, masterGrid.gridY + 2];
@@ -355,7 +362,7 @@ public class CPUManager : MonoBehaviour
         unit.CPU_AttackableUnitList = new List<BaseUnit>();
         unit.CPU_AttackableResourceUnitList = new List<BaseUnit>();
         Queue<Vector2Int> tempMovementQueue = squareQueuesList[0];
-        while(tempMovementQueue.Count > 0)
+        while (tempMovementQueue.Count > 0)
         {
             unit.CPU_MoveSquaresList.Add(tempMovementQueue.Dequeue());
         }
@@ -373,9 +380,9 @@ public class CPUManager : MonoBehaviour
                 Debug.Log($"unit {unit.pos} has attack location {attackSquare}");
             */
             BaseUnit attackable = masterGrid.whatUnitIsInThisLocation(attackSquare);
-           /* if (isCurious && attackSquare == new Vector2Int(12, 8))
-                Debug.Log($"BOOL: unit {unit.pos}, has found an attackable? {attackable} owned by player {attackable.playerControl}, can they attack it? {masterGrid.canUnitAttack(unit, attackable)}");
-*/
+            /* if (isCurious && attackSquare == new Vector2Int(12, 8))
+                 Debug.Log($"BOOL: unit {unit.pos}, has found an attackable? {attackable} owned by player {attackable.playerControl}, can they attack it? {masterGrid.canUnitAttack(unit, attackable)}");
+ */
             if (attackable != null)
             {
                 if (unit.attackRange > 1)
@@ -384,9 +391,9 @@ public class CPUManager : MonoBehaviour
                 if (masterGrid.canUnitAttack(unit, attackable))
                 {
                     unit.CPU_AttackableUnitList.Add(attackable);
-                 /*   if (isCurious)
-                        Debug.Log($"counting: Unit {unit.pos} has an attack list of length {unit.CPU_AttackableUnitList.Count}");
-*/
+                    /*   if (isCurious)
+                           Debug.Log($"counting: Unit {unit.pos} has an attack list of length {unit.CPU_AttackableUnitList.Count}");
+   */
                     if (attackable.isResourceUnit)
                     {
                         unit.CPU_AttackableResourceUnitList.Add(attackable);
@@ -394,29 +401,29 @@ public class CPUManager : MonoBehaviour
                 }
             }
         }
-/*
-        //debug for attack list gen.
-        foreach (Vector2Int attackSquare in movementQueue)
-        {
-            BaseUnit attackable = masterGrid.whatUnitIsInThisLocation(attackSquare);
-            if (attackable != null)
-            {
-                if (masterGrid.canUnitAttack(unit, attackable))
+        /*
+                //debug for attack list gen.
+                foreach (Vector2Int attackSquare in movementQueue)
                 {
-                    unit.CPU_AttackableUnitList.Add(attackable);
-                    if (attackable.isResourceUnit)
+                    BaseUnit attackable = masterGrid.whatUnitIsInThisLocation(attackSquare);
+                    if (attackable != null)
                     {
-                        unit.CPU_AttackableResourceUnitList.Add(attackable);
+                        if (masterGrid.canUnitAttack(unit, attackable))
+                        {
+                            unit.CPU_AttackableUnitList.Add(attackable);
+                            if (attackable.isResourceUnit)
+                            {
+                                unit.CPU_AttackableResourceUnitList.Add(attackable);
+                            }
+                        }
                     }
-                }
-            }
-        }*/
+                }*/
 
-/*        if (!unit.isResourceUnit && isCurious)
-        {
-            Debug.Log($"Unit {unit.pos} has an attack queue of length {attackQueue.Count}");
-            Debug.Log($"Unit {unit.pos} has an attack list of length {unit.CPU_AttackableUnitList.Count}");
-        }*/
+        /*        if (!unit.isResourceUnit && isCurious)
+                {
+                    Debug.Log($"Unit {unit.pos} has an attack queue of length {attackQueue.Count}");
+                    Debug.Log($"Unit {unit.pos} has an attack list of length {unit.CPU_AttackableUnitList.Count}");
+                }*/
 
         /*        foreach (BaseUnit attack in attackableUnitList)
                 {
@@ -427,7 +434,7 @@ public class CPUManager : MonoBehaviour
         unit.CPU_StructureList = new List<BaseStructure>();
         unit.CPU_CapturableStructureList = new List<BaseStructure>();
         unit.CPU_CapturingUnitList = new List<BaseUnit>();
-        foreach(Vector2Int structureLoc in structureQueue)
+        foreach (Vector2Int structureLoc in structureQueue)
         {
             BaseStructure structure = masterGrid.whatStructureIsInThisLocation(structureLoc);
             BaseUnit unitAtLoc = masterGrid.whatUnitIsInThisLocation(structureLoc);
@@ -440,7 +447,7 @@ public class CPUManager : MonoBehaviour
         }
 
 
-        
+
     }
 
     public IEnumerator CPU_GameActionAttack(BaseUnit unit)
@@ -508,14 +515,14 @@ public class CPUManager : MonoBehaviour
                     {
                         masterGrid.deleteUnit(unit);
                     }
-                }else if (unit.attackRange > 1)
+                } else if (unit.attackRange > 1)
                 {
                     yield return new WaitForSeconds(CPU_AnimationWaitTime * 2);
                     masterGrid.selectedUnit = unit;
                     masterGrid.unitCombat(unit, candidate);
                     unit.setNonExhausted(false);
                 }
-                
+
             }
             else
             {
@@ -524,7 +531,7 @@ public class CPUManager : MonoBehaviour
             }
         }
         yield return null;
-        
+
     }
 
 
@@ -534,11 +541,11 @@ public class CPUManager : MonoBehaviour
         //Also reduces the value of the attack by the fireback cost, hopefully reducing the # of suicide attacks into larger units.
         //might be nice to prioritize full destroying units over just maxing out cost, but that's good enough for now.
 
-        double attackCost = Math.Min(masterGrid.getDamageBeforeLuck(attacker, defender, false), defender.healthCurrent) * defender.price/defender.healthMax;
+        double attackCost = Math.Min(masterGrid.getDamageBeforeLuck(attacker, defender, false), defender.healthCurrent) * defender.price / defender.healthMax;
         double firebackCost = 0;
         //if unit will fire back calculate that
         if (masterGrid.getDamageBeforeLuck(attacker, defender, false) < defender.healthCurrent)
-            firebackCost = Math.Min(masterGrid.getDamageBeforeLuck(defender, attacker, true), attacker.healthCurrent) * attacker.price/attacker.healthMax;
+            firebackCost = Math.Min(masterGrid.getDamageBeforeLuck(defender, attacker, true), attacker.healthCurrent) * attacker.price / attacker.healthMax;
         if (defender.isResourceUnit || attacker.attackRange > 1 || (attacker.unitName == "Blacksmith" && defender.unitName == "LightTank"))
             firebackCost = 0;
         double delta = attackCost - firebackCost;
@@ -583,7 +590,7 @@ public class CPUManager : MonoBehaviour
                     nodesWithNoNeighbours.Add(n);
             }
 
-            foreach(NetworkNode n in nodesWithNoNeighbours)
+            foreach (NetworkNode n in nodesWithNoNeighbours)
             {
                 n.FindNearestUnclaimedBFS(n, p);
                 if (n.closestUnclaimed[p] == null)
@@ -591,22 +598,22 @@ public class CPUManager : MonoBehaviour
                     Debug.LogWarning($"Node {n.pos} for player {p} has no unclaimed neighbor!");
                 }
             }
-        /*                while (nodesWithNoNeighbours.Count > 0)
-                        {
-                            NetworkNode n = nodesWithNoNeighbours[0];
-                            var closest = n.GetClosestUnclaimedNotMe(p, n);
-                            n.closestUnclaimed[p] = closest;
+            /*                while (nodesWithNoNeighbours.Count > 0)
+                            {
+                                NetworkNode n = nodesWithNoNeighbours[0];
+                                var closest = n.GetClosestUnclaimedNotMe(p, n);
+                                n.closestUnclaimed[p] = closest;
 
-                            if (closest == null)
-                            {
-                                Debug.LogWarning($"Node {n.pos} does not have any closest unclaimed after recursion");
-                                nodesWithNoNeighbours.RemoveAt(0); // Remove anyway to prevent infinite loop
-                            }
-                            else
-                            {
-                                nodesWithNoNeighbours.RemoveAt(0);
-                            }
-                        }*/
+                                if (closest == null)
+                                {
+                                    Debug.LogWarning($"Node {n.pos} does not have any closest unclaimed after recursion");
+                                    nodesWithNoNeighbours.RemoveAt(0); // Remove anyway to prevent infinite loop
+                                }
+                                else
+                                {
+                                    nodesWithNoNeighbours.RemoveAt(0);
+                                }
+                            }*/
 
 
 
@@ -685,12 +692,12 @@ public class CPUManager : MonoBehaviour
 
 
 
-                if (specificNodeVectorMap.TryGetValue(checkPos, out NetworkNode neighbor) && (!isPriority || (isPriority && neighbor!=null && neighbor.structure.structureType != 0)))
+                if (specificNodeVectorMap.TryGetValue(checkPos, out NetworkNode neighbor) && (!isPriority || (isPriority && neighbor != null && neighbor.structure.structureType != 0)))
                 {
-/*                    if (isPriority)
-                    {
-                        Debug.Log($"Adding priority edge {node.pos}, {currentNeighbor.pos}");
-                    }*/
+                    /*                    if (isPriority)
+                                        {
+                                            Debug.Log($"Adding priority edge {node.pos}, {currentNeighbor.pos}");
+                                        }*/
                     // Add the pair to the vertices list with their positions
                     AddEdge(node, neighbor, isPriority);
 
@@ -717,10 +724,10 @@ public class CPUManager : MonoBehaviour
                         if (neighbor.Wpair == null) neighbor.Wpair = node;
                     }
 
-/*                    if (isCurious)
-                    {
-                        Debug.Log($"Pairing location: {origin} with location: {checkPos} with distance {dist} and offset {offsetVector}");
-                    }*/
+                    /*                    if (isCurious)
+                                        {
+                                            Debug.Log($"Pairing location: {origin} with location: {checkPos} with distance {dist} and offset {offsetVector}");
+                                        }*/
 
                     alreadySet = true;
                     break;
@@ -739,7 +746,7 @@ public class CPUManager : MonoBehaviour
             //bool tryGet = nodeVectorMap.TryGetValue(checkPos, out NetworkNode diagNeighbor);
             //always add the edge if not priority, if priority, only add the edge if the structure is a priority structure.
             //if ( tryGet && ((!isPriority) || (isPriority && diagNeighbor.structure.structureType != 0)))
-            if(specificNodeVectorMap.TryGetValue(checkPos, out NetworkNode diagNeighbor) && (!isPriority || (isPriority && diagNeighbor != null && diagNeighbor.structure.structureType != 0)))
+            if (specificNodeVectorMap.TryGetValue(checkPos, out NetworkNode diagNeighbor) && (!isPriority || (isPriority && diagNeighbor != null && diagNeighbor.structure.structureType != 0)))
             {
 
 
@@ -842,16 +849,16 @@ public class CPUManager : MonoBehaviour
 
             Vector3 target = new Vector3(targetV2.x, targetV2.y, 0);
 
-            
-                        if (prevLine != null)
-                        {
-                            LineRenderer prevlr = prevLine.GetComponent<LineRenderer>();
-                            if (prevlr != null)
-                            {
-                                prevlr.startColor = new Color (Color.white.r, Color.white.g, Color.white.b, 0.7f);
-                                prevlr.endColor = new Color(Color.white.r, Color.white.g, Color.white.b, 0.7f);
-                            }
-                        }
+
+            if (prevLine != null)
+            {
+                LineRenderer prevlr = prevLine.GetComponent<LineRenderer>();
+                if (prevlr != null)
+                {
+                    prevlr.startColor = new Color(Color.white.r, Color.white.g, Color.white.b, 0.7f);
+                    prevlr.endColor = new Color(Color.white.r, Color.white.g, Color.white.b, 0.7f);
+                }
+            }
 
             if (startV2 != null && targetV2 != null)
             {
@@ -867,10 +874,10 @@ public class CPUManager : MonoBehaviour
                 prevLine = line;
             }
 
-/*                        DrawTo(structure.NEpair);
-                        DrawTo(structure.NWpair);
-                        DrawTo(structure.SEpair);
-                        DrawTo(structure.SWpair);*/
+            /*                        DrawTo(structure.NEpair);
+                                    DrawTo(structure.NWpair);
+                                    DrawTo(structure.SEpair);
+                                    DrawTo(structure.SWpair);*/
         }
     }
 
@@ -881,7 +888,7 @@ public class CPUManager : MonoBehaviour
             yield return null;
         }
         List<BaseUnit> unitsToCommand = new List<BaseUnit>(MasterGrid.playerUnits[player]);
-        
+
         foreach (BaseUnit unit in unitsToCommand)
         {
             if (GameMaster.isGameComplete)
@@ -892,12 +899,12 @@ public class CPUManager : MonoBehaviour
             NetworkNode targetNode = unit.CPU_TargetNode;
             if (targetNode == null)
             {
-                if(unit.isResourceUnit)
+                if (unit.isResourceUnit)
                     GiveResourceUnitNodeAssignment(unit);
                 else
                     GiveCombatUnitNextNodeAssignment(unit);
                 targetNode = unit.CPU_TargetNode;
-                if(targetNode == null)
+                if (targetNode == null)
                 {
                     Debug.LogWarning($"Unit {unit.pos} coming from {unit.oldPos} has been given no assignment/target node");
                 }
@@ -942,7 +949,7 @@ public class CPUManager : MonoBehaviour
             yield break;
         }
 
-            
+
         NetworkNode targetNode = unit.CPU_TargetNode;
         if (targetNode == null)
             Debug.LogWarning($"Unit {unit.pos} being asked to move but has no target node");
@@ -1001,12 +1008,12 @@ public class CPUManager : MonoBehaviour
 
             List<Vector2Int> foundPath = new();
             List<Vector2Int> finalPath = new();
-/*            foundPath = masterGrid.BidirectionalSearch(
-                unit.pos,
-                nodePos,
-                unit,
-                movementLeft + minDistanceFromTarget // soft extension
-            );*/
+            /*            foundPath = masterGrid.BidirectionalSearch(
+                            unit.pos,
+                            nodePos,
+                            unit,
+                            movementLeft + minDistanceFromTarget // soft extension
+                        );*/
 
             bool isInDistance = true;
             //while you still have movement available
@@ -1027,7 +1034,7 @@ public class CPUManager : MonoBehaviour
                     movementLeft + minDistanceFromTarget // soft extension
                     );
                 //if you're unable to find a cell within the distance, just go as far as you can towards the target node
-                if(foundPath == null || foundPath.Count == 0)
+                if (foundPath == null || foundPath.Count == 0)
                 {
                     //Debug.Log($"Unit {unit.pos} wants to travel max distance to  {nodePos}");
 
@@ -1041,9 +1048,9 @@ public class CPUManager : MonoBehaviour
                     isInDistance = false;
                     finalPath = foundPath;
                 }
-                if(foundPath == null || foundPath.Count == 0) {
-                    Debug.LogWarning($"Unable to find a path from {unit.pos} to {nodePos}, has a search value of {Manhattan(unit.pos, nodePos)*4}");
-                    break; 
+                if (foundPath == null || foundPath.Count == 0) {
+                    Debug.LogWarning($"Unable to find a path from {unit.pos} to {nodePos}, has a search value of {Manhattan(unit.pos, nodePos) * 4}");
+                    break;
                 }
                 /*//if you have movement remaining and you're not in the appropriate distance to the target
                 for (int i = 0; i < movementLeft && !isInDistance; i++)
@@ -1116,15 +1123,15 @@ public class CPUManager : MonoBehaviour
                     finalPath.Add(foundPath[i]);
                     movementLeft--;
                 }
-/*                if (!isInDistance)
-                {
-                    movementLeft = 0;
-                    List<Vector2Int> pathCopy = new(foundPath); // Make a shallow copy
-                    foreach (Vector2Int v in pathCopy)
-                    {
-                        finalPath.Add(v);
-                    }
-                }*/
+                /*                if (!isInDistance)
+                                {
+                                    movementLeft = 0;
+                                    List<Vector2Int> pathCopy = new(foundPath); // Make a shallow copy
+                                    foreach (Vector2Int v in pathCopy)
+                                    {
+                                        finalPath.Add(v);
+                                    }
+                                }*/
 
 
             }
@@ -1210,7 +1217,7 @@ public class CPUManager : MonoBehaviour
             if (masterGrid.LegalMove(availPath[count], unit) == 1)
             {
                 return availPath[count];
-            }else
+            } else
                 Debug.Log($"Unit wants to go to {availPath[count]} but it cannot, so it's going to check {(count > 0 ? availPath[count - 1] : availPath[0])}.");
             /*                        if (availPath.Count > unit.movementRange)
                                         target = availPath[unit.movementRange];
@@ -1249,16 +1256,20 @@ public class CPUManager : MonoBehaviour
                     unit.CPU_IsCapturing = false;
                     targetNode.SetCaptured(unit.playerControl, oldPlayer);
                     GiveResourceUnitNodeAssignment(unit);
-                }else
-                    yield return new WaitForSeconds(CPU_AnimationWaitTime/4);
+                } else
+                    yield return new WaitForSeconds(CPU_AnimationWaitTime / 4);
 
             }
         }
-        
+
     }
 
     public IEnumerator ProduceUnits(int player, int progeny)
     {
+        GetUnitHeatMap();
+        GetStructureHeatMap();
+        //Debug.Log($"Created heatmap with dimensions {heatMap.GetLength(0)},{heatMap.GetLength(1)}");
+        DrawHeatmap(SumHeatMaps(structHeatMaps[GameMaster.playerTurn-1],heatMap));
         //simple make base unit check
         List<BaseStructure> structures = masterGrid.GetStructures(player);
         List<BaseStructure> prods = masterGrid.GetProductionStructures(player);
@@ -1346,34 +1357,34 @@ public class CPUManager : MonoBehaviour
 
 
             // Helper to fill slots
-/*            void generateSpendForProdType(
-                List<BaseStructure> slots,
-                List<(BaseUnit unit, int cost, int weight)> options)
-            {
-                foreach (var slot in slots)
-                {
-                    (BaseUnit u, int cost, float score)? best = null;
-                    foreach (var opt in options)
-                    {
-                        if (opt.cost > remainingCash) continue;
-                        float s = ProductionScoreUnit(opt.weight, opt.cost, remainingCash);
-                        if (best == null || s > best.Value.score)
-                            best = (opt.unit, opt.cost, s);
-                    }
-                    if (best != null)
-                    {
-                        bestBuildPlan.Add((best.Value.u, slot));
-                        remainingCash -= best.Value.cost;
-                    }
-                }
-            }*/
+            /*            void generateSpendForProdType(
+                            List<BaseStructure> slots,
+                            List<(BaseUnit unit, int cost, int weight)> options)
+                        {
+                            foreach (var slot in slots)
+                            {
+                                (BaseUnit u, int cost, float score)? best = null;
+                                foreach (var opt in options)
+                                {
+                                    if (opt.cost > remainingCash) continue;
+                                    float s = ProductionScoreUnit(opt.weight, opt.cost, remainingCash);
+                                    if (best == null || s > best.Value.score)
+                                        best = (opt.unit, opt.cost, s);
+                                }
+                                if (best != null)
+                                {
+                                    bestBuildPlan.Add((best.Value.u, slot));
+                                    remainingCash -= best.Value.cost;
+                                }
+                            }
+                        }*/
             yield return null;
         }
 
 
         IEnumerator GenerateSpendErtrianHeuristicV2()
         {
-            
+
 
             // Copy of factories/airports so we can remove used slots
             var availableFactories = new List<BaseStructure>(factories);
@@ -1382,12 +1393,12 @@ public class CPUManager : MonoBehaviour
             var bestBuildPlan = new List<(BaseUnit unit, BaseStructure structure)>();
 
             // Determine opponent progeny
-/*            int opponentProgeny = 0;
-            for (int i = 0; i < GameMaster.numPlayers; i++)
-            {
-                byte p = gameMaster.getPlayerProgeny((byte)i);
-                if (p != 0) { opponentProgeny = p; break; }
-            }*/
+            /*            int opponentProgeny = 0;
+                        for (int i = 0; i < GameMaster.numPlayers; i++)
+                        {
+                            byte p = gameMaster.getPlayerProgeny((byte)i);
+                            if (p != 0) { opponentProgeny = p; break; }
+                        }*/
 
             // Get our matchup lists
             var ertrianMatchupList = matchupWeights[0, getOpponentProgeny(GameMaster.playerTurn)];
@@ -1496,7 +1507,7 @@ public class CPUManager : MonoBehaviour
 
 
     // Helper to fill slots
-    
+
 
 
 
@@ -1665,7 +1676,7 @@ int maxTotalCost)
         cameraManager.SetPosition((Vector2)prod.pos);
         yield return new WaitForSeconds(CPU_AnimationWaitTime);
         //Debug.Log($"Unit {candidateFactoryUnit.unitName} has price {candidateFactoryUnit.price} compared to cash {cashRemain}");
-        
+
         gameMaster.selectedStructure = prod;
         gameMaster.ProduceUnit(unit, prod.playerControl, false);
         priorityNodeVectorMap.TryGetValue(prod.pos, out unit.CPU_TargetNode);
@@ -1674,23 +1685,23 @@ int maxTotalCost)
     }
 
 
-/*    private void OnDrawGizmos()
-    {
-        Gizmos.color = Color.cyan;
-
-        if (networkEdges == null) return;
-
-        foreach (NetworkEdge e in priorityNetworkEdgesGround)
-        //foreach (NetworkEdge e in networkEdges)
+    /*    private void OnDrawGizmos()
         {
-            Vector2Int from = e.vectorA;
-            Vector2Int to = e.vectorB;
-            Vector3 fromPos = new Vector3(from.x, from.y, 0);
-            Vector3 toPos = new Vector3(to.x, to.y, 0);
+            Gizmos.color = Color.cyan;
 
-            Gizmos.DrawLine(fromPos, toPos);
-        }
-    }*/
+            if (networkEdges == null) return;
+
+            foreach (NetworkEdge e in priorityNetworkEdgesGround)
+            //foreach (NetworkEdge e in networkEdges)
+            {
+                Vector2Int from = e.vectorA;
+                Vector2Int to = e.vectorB;
+                Vector3 fromPos = new Vector3(from.x, from.y, 0);
+                Vector3 toPos = new Vector3(to.x, to.y, 0);
+
+                Gizmos.DrawLine(fromPos, toPos);
+            }
+        }*/
 
 
     public void AssignPriorityHeadingsToHQ()
@@ -1791,13 +1802,13 @@ int maxTotalCost)
             }
         }
 
-/*        for (int p = 1;  p <= GameMaster.numPlayers; p++){
+        /*        for (int p = 1;  p <= GameMaster.numPlayers; p++){
 
-            foreach (NetworkNode node in priorityNetworkNodes)
-            {
-                Debug.Log($"Node {node.pos} is pointing at {node.priorityNextNodeToTarget[p].pos} with cost {node.priorityCostToTarget[p]} for player {p}");
-            }
-        }*/
+                    foreach (NetworkNode node in priorityNetworkNodes)
+                    {
+                        Debug.Log($"Node {node.pos} is pointing at {node.priorityNextNodeToTarget[p].pos} with cost {node.priorityCostToTarget[p]} for player {p}");
+                    }
+                }*/
     }
 
 
@@ -1830,7 +1841,7 @@ int maxTotalCost)
 
             List<Vector2Int> dirs = new();
             //a little hacky using speficially infantry for this but that will be the source of truth for now.
-            dirs = masterGrid.BidirectionalSearch(edge.vectorA, edge.vectorB, PrefabManager.getBaseUnitFromName("Infantry", 0), (int)(edge.distance*1.5));
+            dirs = masterGrid.BidirectionalSearch(edge.vectorA, edge.vectorB, PrefabManager.getBaseUnitFromName("Infantry", 0), (int)(edge.distance * 1.5));
             if (dirs.Count == 0) {
                 edge.isLandAccessible = false;
                 //Debug.Log($"GraphEdge {edge.vectorA}{edge.vectorB} is not land accessible");
@@ -1860,16 +1871,16 @@ int maxTotalCost)
             }
 
         }
-        
+
         Debug.Log("Done checking land accessibility");
     }
 
     public void SetGroundPriorityNetwork()
     {
-        foreach(NetworkEdge edge in priorityNetworkEdgesAir)
+        foreach (NetworkEdge edge in priorityNetworkEdgesAir)
         {
             List<Vector2Int> dirs = new();
-            dirs = masterGrid.BidirectionalSearch(edge.vectorA, edge.vectorB, PrefabManager.getBaseUnitFromName("LightTank", 0), (int)(edge.distance*1.5));
+            dirs = masterGrid.BidirectionalSearch(edge.vectorA, edge.vectorB, PrefabManager.getBaseUnitFromName("LightTank", 0), (int)(edge.distance * 1.5));
             /*            if (dirs.Count == 0)
                             Debug.Log($"Priority GraphEdge {edge.vectorA}{edge.vectorB} is not vehicle accessible");
                         else
@@ -1894,13 +1905,13 @@ int maxTotalCost)
         {
             //Debug.LogWarning($"Current node {currentNode.pos} does not have a closest unclaimed, trying to set");//{currentNode.closestUnclaimed[unit.playerControl].pos} ");
             //currentNode.closestUnclaimed[unit.playerControl] = currentNode.GetClosestUnclaimedNotMe(unit.playerControl, currentNode);
-            currentNode.closestUnclaimed[unit.playerControl] = currentNode.FindNearestUnclaimedBFS(currentNode,unit.playerControl);
+            currentNode.closestUnclaimed[unit.playerControl] = currentNode.FindNearestUnclaimedBFS(currentNode, unit.playerControl);
             //Debug.LogWarning($"Node {currentNode.pos} assigned new unclaimed {currentNode.closestUnclaimed[unit.playerControl].pos}");
         }
 
         if (targetNode == null) {
             targetNode = currentNode.closestUnclaimed[unit.playerControl];
-            if(targetNode == null)
+            if (targetNode == null)
             {
                 Debug.LogError($"Target node for {unit.pos} still null after multiple attempted assignments");
             }
@@ -1954,24 +1965,286 @@ int maxTotalCost)
         {
             Debug.LogWarning($"{unit.pos}'s target node is null because {currentNode} doesn't have a target");
         }
-/*        else
-            Debug.Log($"Setting {unit.pos}'s target node to {unit.CPU_TargetNode.pos}");*/
+        /*        else
+                    Debug.Log($"Setting {unit.pos}'s target node to {unit.CPU_TargetNode.pos}");*/
     }
 
-/*    public static NetworkNode GetUnitAssignment(BaseUnit unit)
-    {
-
-        NetworkNode currentNode = resourceNetworkNodes.Find(n => n.pos == unit.pos);
-
-        if (currentNode == null)
+    /*    public static NetworkNode GetUnitAssignment(BaseUnit unit)
         {
-            currentNode = GetClosestNodeAgnostic(unit.pos, !unit.isResourceUnit);
+
+            NetworkNode currentNode = resourceNetworkNodes.Find(n => n.pos == unit.pos);
+
+            if (currentNode == null)
+            {
+                currentNode = GetClosestNodeAgnostic(unit.pos, !unit.isResourceUnit);
+            }
+
+            NetworkNode targetNode = currentNode.closestUnclaimed[unit.playerControl];
+            targetNode.ClaimByUnit(unit);
+            return targetNode;
+        }*/
+    public void GetUnitHeatMap()
+    {
+        //double[,] tempHeatMap = new double[gameMaster.gridX, gameMaster.gridY];
+        int m;
+        double influenceMulti = 0.001;
+        int influenceRange = 4;
+        for (int i = 1; i <= GameMaster.numPlayers; i++)
+        {
+            if (i % 2 == 0)
+                m = -1;
+            else
+                m = 1;
+            foreach (BaseUnit unit in MasterGrid.playerUnits[i])
+            {
+                InfluenceHeatmap(influenceRange, unit);
+            }
         }
 
-        NetworkNode targetNode = currentNode.closestUnclaimed[unit.playerControl];
-        targetNode.ClaimByUnit(unit);
-        return targetNode;
+        void InfluenceHeatmap(int range, BaseUnit unit)
+        // a heuristic heatmap that ignores terrain concerns.
+        {
+            for (int x = -range; x <= range; x++)
+            {
+                for (int y = -range; y <= range; y++)
+                {
+                    Vector2Int squarePos = unit.pos + new Vector2Int(x, y);
+                    int delta = Math.Abs(x) + Math.Abs(y);
+                    if (masterGrid.IsInBounds(squarePos) && delta <= range)
+                    {
+                        //double inc = m * unit.price / (delta + 1) * influenceMulti;
+                        double inc = Math.Round(m * unit.price / (delta + 1) * influenceMulti, 5);
+                        heatMap[squarePos.x, squarePos.y] += inc;
+                        // Debug.Log($"Adding value {inc} to square {squarePos.x},{squarePos.y}");
+                    }
+                }
+            }
+        }
+    }
+
+
+    /*public void GetStructureHeatMap()
+    {
+        List<double[,]> structHeatMaps = new List<double[,]>();
+        //int m;
+        double influenceMulti = 0.5;
+        int influenceRange = 4;
+        structHeatMaps.Add(new double[masterGrid.gridX, masterGrid.gridY]);
+        structHeatMaps.Add(new double[masterGrid.gridX, masterGrid.gridY]);
+*//*        for (int i = 0; i < GameMaster.numPlayers; i++)
+        {*//*
+        foreach (BaseStructure s in masterGrid.GetStructures(null))
+        {
+            int x = s.pos.x;
+            int y = s.pos.y;
+
+            if(s.playerControl == 0)
+            {
+                if (s.structureType == 0)
+                {
+                    structHeatMaps[0][x, y] -= influenceMulti;
+                    structHeatMaps[1][x, y] += influenceMulti;
+                }
+                else if (s.structureType != 0 && s.structureType != 5)
+                {
+                    structHeatMaps[0][x, y] -= 2*influenceMulti;
+                    structHeatMaps[1][x, y] += 2*influenceMulti;
+                }
+                else
+                {
+                    Debug.LogWarning($"Structure {s.pos} is neutral and not an acceptable structure type");
+                }
+
+            }
+            else
+            {
+                int m = s.playerControl == 1? 1 : -1;
+                if (s.structureType == 0)
+                {
+                    structHeatMaps[0][x, y] += influenceMulti*m; 
+                    structHeatMaps[1][x, y] += influenceMulti*m; //note the sign flip, += here vs -= above
+                }
+                else if (s.structureType != 0 && s.structureType != 5)
+                {
+                    structHeatMaps[0][x, y] += 2 * influenceMulti*m;
+                    structHeatMaps[1][x, y] += 2 * influenceMulti*m;
+                }else if(s.structureType == 5)
+                {
+                    //for player 1, command post of player 2.
+                    if(m==-1)
+                        structHeatMaps[0][x, y] -= 3 * influenceMulti;
+                    //for player 2, command post of player 1
+                    if(m == 1)
+                        structHeatMaps[1][x, y] += 3 * influenceMulti;
+                }
+            }
+        }
+        
+
+
+        //}
     }*/
+
+    public void GetStructureHeatMap()
+    {
+        structHeatMaps = new List<double[,]>
+        {
+            new double[masterGrid.gridX, masterGrid.gridY], // Player 1
+            new double[masterGrid.gridX, masterGrid.gridY]  // Player 2
+        };
+
+        double influenceMulti = 0.5;
+        int influenceRange = 4;
+
+        foreach (BaseStructure s in masterGrid.GetStructures(null))
+        {
+            int owner = s.playerControl;
+            int type = s.structureType;
+
+            double baseInf = (type == 0) ? influenceMulti :
+                             (type != 5) ? 2 * influenceMulti : 3 * influenceMulti;
+
+            if (owner == 0) // Neutral structure
+            {
+                if (type == 0 || type != 5)
+                {
+                    // Pull both players toward it
+                    InfluenceStructureHeatmap(s, baseInf, influenceRange, 0, -1); // Pull P1 (negative)
+                    InfluenceStructureHeatmap(s, baseInf, influenceRange, 1, 1);  // Pull P2 (positive)
+                }
+            }
+            else
+            {
+                int m = owner == 1 ? 1 : -1;
+
+                if (type == 0 || type != 5)
+                {
+                    InfluenceStructureHeatmap(s, baseInf, influenceRange, 0, m);
+                    InfluenceStructureHeatmap(s, baseInf, influenceRange, 1, m);
+                }
+
+                if (type == 5)
+                {
+                    if (m == -1)
+                        InfluenceStructureHeatmap(s, baseInf, influenceRange, 0, -1);
+                    if (m == 1)
+                        InfluenceStructureHeatmap(s, baseInf, influenceRange, 1, 1);
+                }
+            }
+        }
+
+        void InfluenceStructureHeatmap(BaseStructure s, double baseInfluence, int range, int playerIndex, int polarity = 1)
+        {
+            for (int dx = -range; dx <= range; dx++)
+            {
+                for (int dy = -range; dy <= range; dy++)
+                {
+                    int delta = Math.Abs(dx) + Math.Abs(dy);
+                    if (delta > range) continue;
+
+                    Vector2Int squarePos = s.pos + new Vector2Int(dx, dy);
+                    if (!masterGrid.IsInBounds(squarePos)) continue;
+
+                    double falloffInfluence = Math.Round(baseInfluence * polarity / (delta + 1), 5);
+                    structHeatMaps[playerIndex][squarePos.x, squarePos.y] += falloffInfluence;
+                }
+            }
+        }
+
+    }
+
+
+
+
+    public GameObject textPrefab; // Assign HeatmapTextPrefab in the Inspector
+    public Vector3 offset = new Vector3(0, 0.1f, 0); // Slightly above the grid
+    private GameObject[,] textObjects;
+
+    public void DrawHeatmap(double[,] heatMap)
+    {
+        ClearPreviousText();
+
+        int width = heatMap.GetLength(0);
+        int height = heatMap.GetLength(1);
+        textObjects = new GameObject[width, height];
+
+        // First pass to find max absolute value for normalization
+        double maxAbsValue = 0;
+        for (int x = 0; x < width; x++)
+        {
+            for (int y = 0; y < height; y++)
+            {
+                double abs = Math.Abs(heatMap[x, y]);
+                if (abs > maxAbsValue)
+                    maxAbsValue = abs;
+            }
+        }
+
+        // Avoid divide-by-zero
+        if (maxAbsValue < 1e-5)
+            maxAbsValue = 1;
+
+        // Second pass to draw
+        for (int x = 0; x < width; x++)
+        {
+            for (int y = 0; y < height; y++)
+            {
+                double value = heatMap[x, y];
+                Vector3 worldPos = masterGrid.GetWorldPositionFromGrid(new Vector2Int(x, y)) + offset;
+
+                GameObject textObj = Instantiate(textPrefab, worldPos, Quaternion.identity, this.transform);
+                textObj.GetComponent<TextMesh>().text = value.ToString("F4");
+
+                float t = (float)(Math.Abs(value) / maxAbsValue); // Normalize 0–1
+
+                Color color;
+                if (value < 0)
+                    color = Color.Lerp(Color.white, Color.red, t);
+                else if (value > 0)
+                    color = Color.Lerp(Color.white, Color.green, t);
+                else
+                    color = Color.white;
+
+                textObj.GetComponent<TextMesh>().color = color;
+                textObjects[x, y] = textObj;
+            }
+        }
+    }
+
+    public static double[,] SumHeatMaps(double[,] a, double[,] b)
+    {
+        int width = a.GetLength(0);
+        int height = a.GetLength(1);
+
+        if (b.GetLength(0) != width || b.GetLength(1) != height)
+            throw new ArgumentException("Heatmaps must be the same size");
+
+        double[,] result = new double[width, height];
+
+        for (int x = 0; x < width; x++)
+        {
+            for (int y = 0; y < height; y++)
+            {
+                result[x, y] = a[x, y] + b[x, y];
+            }
+        }
+
+        return result;
+    }
+
+
+
+    public void ClearPreviousText()
+    {
+        if (textObjects == null) return;
+
+        foreach (var obj in textObjects)
+        {
+            if (obj != null) Destroy(obj);
+        }
+    }
+
+
     public static  NetworkNode GetClosestNodeAgnostic(Vector2Int targetPos, bool isPriority)
     {
         NetworkNode closestNode = null;

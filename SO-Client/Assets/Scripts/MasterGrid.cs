@@ -2240,4 +2240,10 @@ public class MasterGrid : MonoBehaviour
         //SaveArrayToCSV("SentusDefenceGridPyramid4.csv", populateSentusDefenceGrid(4, 1));
         //SaveArrayToCSV("SentusDefenceGridSquare4.csv", populateSentusDefenceGrid(4, 0));
     }
+
+    public Vector3 GetWorldPositionFromGrid(Vector2Int gridPos)
+    {
+        // Assumes each tile is 1 unit wide and tall, and origin is at (0, 0)
+        return new Vector3(gridPos.x, gridPos.y, 0f);
+    }
 }

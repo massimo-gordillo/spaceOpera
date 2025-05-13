@@ -87,10 +87,14 @@ public class GameMaster : MonoBehaviour
 
     public static bool CPU_isOn = true;
     public static bool[] CPU_PlayersList;
-    public static List<(BaseUnit, int)>[] unitCosts;
     //public static List<(BaseUnit, int)>[] CPU_unitMatchupWeights;
     public int virixCheapestUnit;
     public int airportCheapestUnit;
+
+    //public static List<BaseUnit>[] playerUnits = new List<BaseUnit>[GameMaster.numPlayers + 1];
+    public static List<(BaseUnit, int)>[] unitCosts;
+
+
 
     public int loopSafetyLimit = 10000;
     public int recusionSafetyLimit = 100;
@@ -200,7 +204,7 @@ public class GameMaster : MonoBehaviour
         //unitCosts = new List<(BaseUnit, int)>[numPlayers];
         if (CPU_isOn)
         {
-            CPU_PlayersList[1] = false;
+            CPU_PlayersList[1] = true;
             CPU_PlayersList[2] = true;
         }
 
@@ -861,6 +865,7 @@ public class GameMaster : MonoBehaviour
     public void InstantiateUnit(BaseUnit unit, Vector2Int pos)
     {
         Instantiate(unit, (Vector2)pos, Quaternion.identity, unitContainer);
+        //playerUnits[unit.playerControl].Add(unit);
     }
     
     public BaseUnit GetInstantiateUnit(BaseUnit unit, Vector2Int pos, int? player)
