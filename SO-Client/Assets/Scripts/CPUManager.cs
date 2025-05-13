@@ -1278,7 +1278,7 @@ public class CPUManager : MonoBehaviour
         List<BaseStructure> airports = new();
         List<(BaseUnit, int)> factoryProdList = new();
         List<(BaseUnit, int)> airportProdList = new();
-        var bestBuildPlan = new List<(BaseUnit unit, BaseStructure structure)>();
+        List<(BaseUnit unit, BaseStructure structure)> bestBuildPlan = new ();
 
         if (progeny == 0)
         {
@@ -1346,7 +1346,7 @@ public class CPUManager : MonoBehaviour
 
             int remainingCash = totalSpend;
 
-            generateSpendForProdType(sentusProds, sentusMatchupList, remainingCash);
+            generateSpendForProdType(sentusProds, sentusMatchupList, ref remainingCash);
 
 
 
@@ -1389,8 +1389,6 @@ public class CPUManager : MonoBehaviour
             // Copy of factories/airports so we can remove used slots
             var availableFactories = new List<BaseStructure>(factories);
             var availableAirports = new List<BaseStructure>(airports);
-
-            var bestBuildPlan = new List<(BaseUnit unit, BaseStructure structure)>();
 
             // Determine opponent progeny
             /*            int opponentProgeny = 0;
@@ -1439,19 +1437,20 @@ public class CPUManager : MonoBehaviour
             //if (true)
             if (roll2 < 0.4f)
             {
-                generateSpendForProdType(availableAirports, airportList, remainingCash);
-                generateSpendForProdType(availableFactories, factoryList, remainingCash);
+                generateSpendForProdType(availableAirports, airportList, ref remainingCash);
+                generateSpendForProdType(availableFactories, factoryList, ref remainingCash);
             }
             else
             {
-                generateSpendForProdType(availableFactories, factoryList, remainingCash);
-                generateSpendForProdType(availableAirports, airportList, remainingCash);
+                generateSpendForProdType(availableFactories, factoryList, ref remainingCash);
+                generateSpendForProdType(availableAirports, airportList, ref remainingCash);
             }
-
 
             // Fire off production
             foreach (var (unit, structure) in bestBuildPlan)
+            {
                 yield return createUnitAtStructure(unit, structure);
+            }
 
 
 
@@ -1460,7 +1459,7 @@ public class CPUManager : MonoBehaviour
         void generateSpendForProdType(
         List<BaseStructure> slots,
         List<(BaseUnit unit, int cost, int weight)> options,
-        int remainingCash)
+        ref int remainingCash)
         {
             foreach (var slot in slots)
             {
@@ -1468,21 +1467,24 @@ public class CPUManager : MonoBehaviour
                 foreach (var opt in options)
                 {
                     if (opt.cost > remainingCash) continue;
-                    float s = ProductionScoreUnit(opt.weight, opt.cost);
+                    float s = ProductionScoreUnit(opt.weight, opt.cost, remainingCash);
                     if (best == null || s > best.Value.score)
                         best = (opt.unit, opt.cost, s);
                 }
                 if (best != null)
                 {
+                    Debug.Log($"Adding  {best.Value.u.unitName} to best build plan at struc {slot.pos}");
                     bestBuildPlan.Add((best.Value.u, slot));
+                    Debug.Log($"BestBuildPlan in generateSpend has length {bestBuildPlan.Count}");
+
                     remainingCash -= best.Value.cost;
                 }
             }
 
-            float ProductionScoreUnit(int w, int c)
+            float ProductionScoreUnit(int w, int c, int remain)
             {
                 float beta = 2f;
-                float spent = totalSpend - remainingCash + c;
+                float spent = totalSpend - remain + c;
                 return w + beta * (spent / totalSpend);
             }
         }
