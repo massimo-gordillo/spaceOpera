@@ -1269,7 +1269,9 @@ public class CPUManager : MonoBehaviour
         GetUnitHeatMap();
         GetStructureHeatMap();
         //Debug.Log($"Created heatmap with dimensions {heatMap.GetLength(0)},{heatMap.GetLength(1)}");
-        DrawHeatmap(SumHeatMaps(structHeatMaps[GameMaster.playerTurn-1],heatMap));
+        //heatMap = SumHeatMaps(structHeatMaps[GameMaster.playerTurn - 1], heatMap);
+        DrawHeatmap(heatMap);
+        HighlightStructureWithHighestHeatMapValue();
         //simple make base unit check
         List<BaseStructure> structures = masterGrid.GetStructures(player);
         List<BaseStructure> prods = masterGrid.GetProductionStructures(player);
@@ -2000,11 +2002,11 @@ int maxTotalCost)
                 m = 1;
             foreach (BaseUnit unit in MasterGrid.playerUnits[i])
             {
-                InfluenceHeatmap(influenceRange, unit);
+                InfluenceUnitHeatmap(influenceRange, unit);
             }
         }
 
-        void InfluenceHeatmap(int range, BaseUnit unit)
+        void InfluenceUnitHeatmap(int range, BaseUnit unit)
         // a heuristic heatmap that ignores terrain concerns.
         {
             for (int x = -range; x <= range; x++)
@@ -2015,78 +2017,19 @@ int maxTotalCost)
                     int delta = Math.Abs(x) + Math.Abs(y);
                     if (masterGrid.IsInBounds(squarePos) && delta <= range)
                     {
-                        //double inc = m * unit.price / (delta + 1) * influenceMulti;
-                        double inc = Math.Round(m * unit.price / (delta + 1) * influenceMulti, 5);
-                        heatMap[squarePos.x, squarePos.y] += inc;
-                        // Debug.Log($"Adding value {inc} to square {squarePos.x},{squarePos.y}");
+                        //if it's a water tile, ignore adding weight unless it's a flying unit.
+                        if (masterGrid.whatTileIsInThisLocation(squarePos) != 4 || unit.unitTerrainType == UnitTerrainType.Air)
+                        {
+                            //double inc = m * unit.price / (delta + 1) * influenceMulti;
+                            double inc = Math.Round(m * unit.price / (delta + 1) * influenceMulti, 5);
+                            heatMap[squarePos.x, squarePos.y] += inc;
+                            // Debug.Log($"Adding value {inc} to square {squarePos.x},{squarePos.y}");
+                        }
                     }
                 }
             }
         }
     }
-
-
-    /*public void GetStructureHeatMap()
-    {
-        List<double[,]> structHeatMaps = new List<double[,]>();
-        //int m;
-        double influenceMulti = 0.5;
-        int influenceRange = 4;
-        structHeatMaps.Add(new double[masterGrid.gridX, masterGrid.gridY]);
-        structHeatMaps.Add(new double[masterGrid.gridX, masterGrid.gridY]);
-*//*        for (int i = 0; i < GameMaster.numPlayers; i++)
-        {*//*
-        foreach (BaseStructure s in masterGrid.GetStructures(null))
-        {
-            int x = s.pos.x;
-            int y = s.pos.y;
-
-            if(s.playerControl == 0)
-            {
-                if (s.structureType == 0)
-                {
-                    structHeatMaps[0][x, y] -= influenceMulti;
-                    structHeatMaps[1][x, y] += influenceMulti;
-                }
-                else if (s.structureType != 0 && s.structureType != 5)
-                {
-                    structHeatMaps[0][x, y] -= 2*influenceMulti;
-                    structHeatMaps[1][x, y] += 2*influenceMulti;
-                }
-                else
-                {
-                    Debug.LogWarning($"Structure {s.pos} is neutral and not an acceptable structure type");
-                }
-
-            }
-            else
-            {
-                int m = s.playerControl == 1? 1 : -1;
-                if (s.structureType == 0)
-                {
-                    structHeatMaps[0][x, y] += influenceMulti*m; 
-                    structHeatMaps[1][x, y] += influenceMulti*m; //note the sign flip, += here vs -= above
-                }
-                else if (s.structureType != 0 && s.structureType != 5)
-                {
-                    structHeatMaps[0][x, y] += 2 * influenceMulti*m;
-                    structHeatMaps[1][x, y] += 2 * influenceMulti*m;
-                }else if(s.structureType == 5)
-                {
-                    //for player 1, command post of player 2.
-                    if(m==-1)
-                        structHeatMaps[0][x, y] -= 3 * influenceMulti;
-                    //for player 2, command post of player 1
-                    if(m == 1)
-                        structHeatMaps[1][x, y] += 3 * influenceMulti;
-                }
-            }
-        }
-        
-
-
-        //}
-    }*/
 
     public void GetStructureHeatMap()
     {
@@ -2212,6 +2155,27 @@ int maxTotalCost)
                 textObjects[x, y] = textObj;
             }
         }
+    }
+
+    public void HighlightStructureWithHighestHeatMapValue()
+    {
+        int m = GameMaster.playerTurn == 1 ? -1 : 1;
+        double highest = -1000;
+        BaseStructure highestStructure = null;
+        foreach (BaseStructure s in masterGrid.GetStructures(GameMaster.playerTurn))
+        {
+            if (s.structureType != 0 || s.IsCoveredByUnit())
+                continue;
+            double current = heatMap[s.pos.x,s.pos.y]*m;
+            if (current > highest)
+            {
+                highest = current;
+                highestStructure = s;
+            }
+        }
+        highestStructure.healthCanvas.SetActive(true);
+        highestStructure.healthTextContainer.text = highest.ToString();
+        highestStructure.healthTextContainer.fontSize += 1;
     }
 
     public static double[,] SumHeatMaps(double[,] a, double[,] b)
