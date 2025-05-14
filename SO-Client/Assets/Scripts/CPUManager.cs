@@ -1274,28 +1274,14 @@ public class CPUManager : MonoBehaviour
         List<BaseStructure> structures = masterGrid.GetStructures(player);
         List<BaseStructure> prods = masterGrid.GetProductionStructures(player);
         int totalSpend = gameMaster.GetPlayerResources(player);
-        List<BaseStructure> factories = new();
-        List<BaseStructure> airports = new();
-        List<(BaseUnit, int)> factoryProdList = new();
-        List<(BaseUnit, int)> airportProdList = new();
+
         List<(BaseUnit unit, BaseStructure structure)> bestBuildPlan = new ();
 
         if (progeny == 0)
         {
             /*            int factoryCount = 0;
                         int airportCount = 0;*/
-            foreach (BaseStructure structure in prods)
-            {
-                if (structure.IsCoveredByUnit())
-                {
-                    Debug.LogWarning($"Prod structure {structure.pos} is covered by unit");
-                    continue;
-                }
-                if (structure.structureType == 1)
-                    factories.Add(structure);
-                if (structure.structureType == 2)
-                    airports.Add(structure);
-            }
+
             yield return GenerateSpendErtrianHeuristicV2();
 
             /*            foreach (BaseStructure structure in prods)
@@ -1384,8 +1370,22 @@ public class CPUManager : MonoBehaviour
 
         IEnumerator GenerateSpendErtrianHeuristicV2()
         {
-
-
+            List<BaseStructure> factories = new();
+            List<BaseStructure> airports = new();
+            List<(BaseUnit, int)> factoryProdList = new();
+            List<(BaseUnit, int)> airportProdList = new();
+            foreach (BaseStructure structure in prods)
+            {
+                if (structure.IsCoveredByUnit())
+                {
+                    //Debug.LogWarning($"Prod structure {structure.pos} is covered by unit");
+                    continue;
+                }
+                if (structure.structureType == 1)
+                    factories.Add(structure);
+                if (structure.structureType == 2)
+                    airports.Add(structure);
+            }
             // Copy of factories/airports so we can remove used slots
             var availableFactories = new List<BaseStructure>(factories);
             var availableAirports = new List<BaseStructure>(airports);
@@ -1400,10 +1400,10 @@ public class CPUManager : MonoBehaviour
 
             // Get our matchup lists
             var ertrianMatchupList = matchupWeights[0, getOpponentProgeny(GameMaster.playerTurn)];
-            var factoryList = ertrianMatchupList
+            var landProductionList = ertrianMatchupList
                 .Where(x => x.unit.unitTerrainType == UnitTerrainType.Land)
                 .ToList();
-            var airportList = ertrianMatchupList
+            var airProductionList = ertrianMatchupList
                 .Where(x => x.unit.unitTerrainType == UnitTerrainType.Air)
                 .ToList();
 
@@ -1412,14 +1412,14 @@ public class CPUManager : MonoBehaviour
             //remove the highest weight unit from factory and airport, to add unit creation variety.
             if (roll < 0.2f)
             {
-                int top = factoryList.Concat(airportList).Max(x => x.weight);
-                factoryList = factoryList.Where(x => x.weight < top).ToList();
-                airportList = airportList.Where(x => x.weight < top).ToList();
+                int top = landProductionList.Concat(airProductionList).Max(x => x.weight);
+                landProductionList = landProductionList.Where(x => x.weight < top).ToList();
+                airProductionList = airProductionList.Where(x => x.weight < top).ToList();
             }
             //guarantee at least one infantry unit some % of the time.
             else if (roll < 0.5f)
             {
-                var infantry = factoryList.FirstOrDefault(x => x.unit.unitName == "Infantry");
+                var infantry = landProductionList.FirstOrDefault(x => x.unit.unitName == "Infantry");
                 if (infantry.unit != null && availableFactories.Count > 0 && totalSpend >= infantry.cost)
                 {
                     var fac = availableFactories[0];
@@ -1437,13 +1437,13 @@ public class CPUManager : MonoBehaviour
             //if (true)
             if (roll2 < 0.4f)
             {
-                generateSpendForProdType(availableAirports, airportList, ref remainingCash);
-                generateSpendForProdType(availableFactories, factoryList, ref remainingCash);
+                generateSpendForProdType(availableAirports, airProductionList, ref remainingCash);
+                generateSpendForProdType(availableFactories, landProductionList, ref remainingCash);
             }
             else
             {
-                generateSpendForProdType(availableFactories, factoryList, ref remainingCash);
-                generateSpendForProdType(availableAirports, airportList, ref remainingCash);
+                generateSpendForProdType(availableFactories, landProductionList, ref remainingCash);
+                generateSpendForProdType(availableAirports, airProductionList, ref remainingCash);
             }
 
             // Fire off production
@@ -1468,6 +1468,7 @@ public class CPUManager : MonoBehaviour
                 {
                     if (opt.cost > remainingCash) continue;
                     float s = ProductionScoreUnit(opt.weight, opt.cost, remainingCash);
+                    Debug.Log($"Scoring of unit {opt.unit.unitName} has cost {opt.cost} and score {s}");
                     if (best == null || s > best.Value.score)
                         best = (opt.unit, opt.cost, s);
                 }
@@ -1541,16 +1542,16 @@ public class CPUManager : MonoBehaviour
         // Grab list of units Ertrian (0) vs opponent
         var ertrianMatchupList = matchupWeights[0, opponentProgeny];
 
-        var factoryList = ertrianMatchupList.Where(x => x.unit.unitTerrainType == UnitTerrainType.Land).ToList();
-        var airportList = ertrianMatchupList.Where(x => x.unit.unitTerrainType == UnitTerrainType.Air).ToList();
+        var landProductionList = ertrianMatchupList.Where(x => x.unit.unitTerrainType == UnitTerrainType.Land).ToList();
+        var airProductionList = ertrianMatchupList.Where(x => x.unit.unitTerrainType == UnitTerrainType.Air).ToList();
 
-        Debug.Log($"[AI] Factory buildable units: {factoryList.Count}, Airport buildable units: {airportList.Count}");
+        Debug.Log($"[AI] Factory buildable units: {landProductionList.Count}, Airport buildable units: {airProductionList.Count}");
 
         int testedComboCount = 0;
 
-        foreach (var factoryCombo in GetUnitCombinations(factoryList, maxFactoryCount, totalSpend))
+        foreach (var factoryCombo in GetUnitCombinations(landProductionList, maxFactoryCount, totalSpend))
         {
-            foreach (var airportCombo in GetUnitCombinations(airportList, maxAirportCount, totalSpend))
+            foreach (var airportCombo in GetUnitCombinations(airProductionList, maxAirportCount, totalSpend))
             {
                 var combined = factoryCombo.Concat(airportCombo).ToList();
                 int totalCost = combined.Sum(x => x.cost);

@@ -139,7 +139,7 @@ public class GameMaster : MonoBehaviour
         else {
             Debug.LogWarning("Progeny set to -1 selected, defaulting to hard values");
             playerProgeny.Add(1, 0);
-            playerProgeny.Add(2, 2);
+            playerProgeny.Add(2, 0);
         }
 
         
@@ -278,6 +278,8 @@ public class GameMaster : MonoBehaviour
                 initProdStructures.Add(MasterGrid.commandStructures[player]);
             foreach (BaseStructure prod in initProdStructures)
             {
+                if (prod.structureType != 1)
+                    continue;
                 if (progeny == 0)
                 {
                     //BaseUnit infantryUnitPrefab = Resources.Load<BaseUnit>("UnitPrefabs/progeny1/InfantryPrefab");
