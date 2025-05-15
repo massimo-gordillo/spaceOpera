@@ -12,6 +12,7 @@ TagManager:
   - BaseUnitTag
   - BaseStructureTag
   - ProductionStructureTag
+  - UIStyleTag
   layers:
   - Default
   - TransparentFX
