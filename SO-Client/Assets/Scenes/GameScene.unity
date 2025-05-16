@@ -9489,8 +9489,8 @@ MonoBehaviour:
   turnNumber: 0
   playerTurnText: {fileID: 2010402610}
   playerResourceText: {fileID: 1998717953}
-  unitContainer: {fileID: 0}
-  structureContainer: {fileID: 0}
+  unitContainer: {fileID: 472514404}
+  structureContainer: {fileID: 533859703}
   gameValues: {fileID: 11400000, guid: 78e3fa714feb6dc49b40450b2814e1e1, type: 2}
   infantryUnitPrefab: {fileID: 7803690413202824681, guid: 983ef1501268ffe41b8514bfa205ddc5, type: 3}
   attackButton: {fileID: 99806018}

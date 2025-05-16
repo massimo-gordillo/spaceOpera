@@ -30,7 +30,7 @@ public class CPUManager : MonoBehaviour
     public List<NetworkEdge> networkEdges = new();
     public List<NetworkEdge> priorityNetworkEdgesAir = new();
     public List<NetworkEdge> priorityNetworkEdgesGround = new();
-    public double[,] heatMap;
+    public List<double[,]> heatMaps = new();
     public List<double[,]> structHeatMaps;
     public TextMesh debugTextPrefab;
 
@@ -144,7 +144,10 @@ public class CPUManager : MonoBehaviour
                 }*/
 
         InitClosestNeighbour();
-        heatMap = new double[gameMaster.gridX, gameMaster.gridY];
+        for(int i = 1; 1<=GameMaster.numPlayers; i++)
+        {
+            heatMaps.Add(new double[gameMaster.gridX, gameMaster.gridY]);
+        }
         //StartCoroutine(DrawStructureDebugLines());
     }
 
@@ -1274,11 +1277,11 @@ public class CPUManager : MonoBehaviour
 
     public IEnumerator ProduceUnits(int player, int progeny)
     {
-        GetUnitHeatMap();
+        GetUnitHeatMaps();
         GetStructureHeatMap();
-        //Debug.Log($"Created heatmap with dimensions {heatMap.GetLength(0)},{heatMap.GetLength(1)}");
-        //heatMap = SumHeatMaps(structHeatMaps[GameMaster.playerTurn - 1], heatMap);
-        DrawHeatmap(heatMap);
+        //Debug.Log($"Created heatmap with dimensions {heatMaps.GetLength(0)},{heatMaps.GetLength(1)}");
+        //heatMaps = SumHeatMaps(structHeatMaps[GameMaster.playerTurn - 1], heatMaps);
+        DrawHeatmap(heatMaps[1]);
         HighlightStructureWithHighestHeatMapValue();
         //simple make base unit check
         List<BaseStructure> structures = masterGrid.GetStructures(player);
@@ -1996,25 +1999,25 @@ int maxTotalCost)
             targetNode.ClaimByUnit(unit);
             return targetNode;
         }*/
-    public void GetUnitHeatMap()
+    public void GetUnitHeatMaps()
     {
         //double[,] tempHeatMap = new double[gameMaster.gridX, gameMaster.gridY];
         int m;
         double influenceMulti = 0.001;
         int influenceRange = 4;
-        for (int i = 1; i <= GameMaster.numPlayers; i++)
+        for (int i = 0; i < GameMaster.numPlayers; i++)
         {
-            if (i % 2 == 0)
+            if (i % 2 == 1)
                 m = -1;
             else
                 m = 1;
             foreach (BaseUnit unit in MasterGrid.playerUnits[i])
             {
-                InfluenceUnitHeatmap(influenceRange, unit);
+                InfluenceUnitHeatmap(influenceRange, unit, i);
             }
         }
 
-        void InfluenceUnitHeatmap(int range, BaseUnit unit)
+        void InfluenceUnitHeatmap(int range, BaseUnit unit, int otherPlayer)
         // a heuristic heatmap that ignores terrain concerns.
         {
             for (int x = -range; x <= range; x++)
@@ -2030,7 +2033,7 @@ int maxTotalCost)
                         {
                             //double inc = m * unit.price / (delta + 1) * influenceMulti;
                             double inc = Math.Round(m * unit.price / (delta + 1) * influenceMulti, 5);
-                            heatMap[squarePos.x, squarePos.y] += inc;
+                            heatMaps[otherPlayer][squarePos.x, squarePos.y] += inc;
                             // Debug.Log($"Adding value {inc} to square {squarePos.x},{squarePos.y}");
                         }
                     }
@@ -2174,7 +2177,7 @@ int maxTotalCost)
         {
             if (s.structureType != 0 || s.IsCoveredByUnit())
                 continue;
-            double current = heatMap[s.pos.x,s.pos.y]*m;
+            double current = heatMaps[1][s.pos.x,s.pos.y]*m;
             if (current > highest)
             {
                 highest = current;
@@ -2184,6 +2187,7 @@ int maxTotalCost)
         highestStructure.healthCanvas.SetActive(true);
         highestStructure.healthTextContainer.text = highest.ToString();
         highestStructure.healthTextContainer.fontSize += 1;
+        highestStructure.neutralSpriteFill.color = Color.red;
     }
 
     public static double[,] SumHeatMaps(double[,] a, double[,] b)
