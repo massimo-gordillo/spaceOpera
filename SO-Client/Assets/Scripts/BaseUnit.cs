@@ -28,17 +28,14 @@ public class BaseUnit : MonoBehaviour
     public int healthMax;
     public int healthCurrent;
     //public int type;
-    public int baseDamage = 50;
-    public int attackRange = 1;
-    public int price = 999;
-    public int movementRange = 3;
+    public int baseDamage ;
+    public int attackRange;
+    public int price;
+    public int movementRange;
     public int playerControl;
     public int team;
-    public int orientation = 1;
+    public int orientation;
     public Vector2Int pos;
-    //private Color baseColor; //currently unused.
-    private Color originalLightsColor;
-    private bool originalLightsColorSet = false;
     public bool movementNonExhausted;
     public bool nonExhausted;
     public bool undoingMovement = false;
@@ -74,20 +71,19 @@ public class BaseUnit : MonoBehaviour
     public TMP_Text defenceValueTextContainer;
     public TMP_Text damageRangeTextContainer;
     public GameObject combatTooltip;
-    //use healthTextContainer.text= to update text.
-    private Color playerColor;
+    public Image tooltipImage;
 
     //public bool CPU_isOn = true;
     //public bool CPU_controlled = false;
     //public Vector2Int CPU_Heading;
     public NetworkNode CPU_TargetNode;
     public bool CPU_IsCapturing;
-    public List<Vector2Int> CPU_MoveSquaresList = new List<Vector2Int>();
-    public List<BaseStructure> CPU_StructureList = new List<BaseStructure>();
-    public List<BaseStructure> CPU_CapturableStructureList = new List<BaseStructure>();
-    public List<BaseUnit> CPU_CapturingUnitList = new List<BaseUnit>();
-    public List<BaseUnit> CPU_AttackableUnitList = new List<BaseUnit>();
-    public List<BaseUnit> CPU_AttackableResourceUnitList = new List<BaseUnit>();
+    public List<Vector2Int> CPU_MoveSquaresList = new();
+    public List<BaseStructure> CPU_StructureList = new();
+    public List<BaseStructure> CPU_CapturableStructureList = new();
+    public List<BaseUnit> CPU_CapturingUnitList = new();
+    public List<BaseUnit> CPU_AttackableUnitList = new();
+    public List<BaseUnit> CPU_AttackableResourceUnitList = new();
 
 
 
@@ -115,21 +111,10 @@ public class BaseUnit : MonoBehaviour
         if ((playerControl+1) % 2 == 1)
             flipSprites();
 
-
-
-/*        if (playerControl == masterGrid.GameMaster.playerTurn)
-            setNonExhausted(false);
-        else
-            setNonExhausted(true);*/
-
-        //playerControl = 1; //will have to set dynamically later
-
-        //healthMax = 100;
-        //healthCurrent= healthMax;
         setHealth(healthMax);
         if (unitNameTextContainer != null)
         {
-            unitNameTextContainer.text = $"P{playerControl}'s {progeny} {unitName}";
+            unitNameTextContainer.text = $"P{playerControl}'s {unitName}";
         }
         else
             Debug.LogError("No unitNameTextContainerFound");
@@ -230,8 +215,8 @@ public class BaseUnit : MonoBehaviour
         cornerSpriteBL.GetComponent<SpriteRenderer>().color = playerColor;
         cornerSpriteBR.GetComponent<SpriteRenderer>().color = playerColor;
         unitNameTextContainer.color = playerColor;
-        defenceValueTextContainer.color = playerColor;
-        damageRangeTextContainer.color = playerColor;
+        //defenceValueTextContainer.color = playerColor;
+        //damageRangeTextContainer.color = playerColor;
     }
 
     public void showCombatTooltip(int defence, int sentusDefence, double floor, double ceiling)
@@ -245,10 +230,14 @@ public class BaseUnit : MonoBehaviour
             floor = 0;
         if (ceiling < 0)
             ceiling = 0;
-        defenceValueTextContainer.text = $"Defence: {defence}";
+        defenceValueTextContainer.text = $"Def: {defence}";
         if (sentusDefence > 0)
             defenceValueTextContainer.text += $" + {sentusDefence}";
-        damageRangeTextContainer.text = $"{(int)(floor*100)}% - {(int)(ceiling*100)}%";
+        damageRangeTextContainer.text = $"{(int)(ceiling*100)}% - {(int)(floor*100)}%";
+        Color playerColor = GameMaster.playerColors[playerControl];
+        //make transparent
+        Color transparentColor = new Color(playerColor.r, playerColor.g, playerColor.b, 0.6f);
+        tooltipImage.color = transparentColor;
     }
 
     public void setHealth(double health)
