@@ -329,12 +329,15 @@ public class CPUManager : MonoBehaviour
         Queue<(Vector2Int cell, int range)> cellsToCheck = new Queue<(Vector2Int, int)>();
         bool[,] checkedCells = new bool[masterGrid.gridX + 2, masterGrid.gridY + 2];
         checkedCells[unit.pos.x + 1, unit.pos.y + 1] = true;
-        cellsToCheck.Enqueue((new Vector2Int(unit.pos.x + 1, unit.pos.y + 1), unit.movementRange));//assuming unit only has 1 attack range for the first vectorA* search.
         List<Queue<Vector2Int>> squareQueuesList = null;
         if (unit.attackRange == 1)
+        {
+            cellsToCheck.Enqueue((new Vector2Int(unit.pos.x + 1, unit.pos.y + 1), unit.movementRange + 1));//assuming unit only has 1 attack range for the first vectorA* search.
             squareQueuesList = masterGrid.FloodFillSearch(unit, unit.movementRange, 1, cellsToCheck, checkedCells, new List<Queue<Vector2Int>> { new Queue<Vector2Int>(), new Queue<Vector2Int>(), new Queue<Vector2Int>() });
+        }
         if (unit.attackRange > 1) //notably this logic is the same in masterGrid.drawMovement. I suspect I should generalize drawMovement, it would be much better.
         {
+            cellsToCheck.Enqueue((new Vector2Int(unit.pos.x + 1, unit.pos.y + 1), unit.movementRange));
             squareQueuesList = masterGrid.FloodFillSearch(unit, unit.movementRange, 0, cellsToCheck, checkedCells, new List<Queue<Vector2Int>> { new Queue<Vector2Int>(), new Queue<Vector2Int>(), new Queue<Vector2Int>() });
             cellsToCheck.Clear();
             cellsToCheck.Enqueue((new Vector2Int(unit.pos.x + 1, unit.pos.y + 1), unit.attackRange));
@@ -348,11 +351,11 @@ public class CPUManager : MonoBehaviour
             if (squareQueuesListRangedAttack != null && squareQueuesListRangedAttack[1].Count > 0)
                 foreach (var item in squareQueuesListRangedAttack[1])
                 {
-                    Debug.Log($"Enqueuing {item} into cell to check for ranged unit at {unit.pos}");
+                    //Debug.Log($"Enqueuing {item} into cell to check for ranged unit at {unit.pos}");
                     squareQueuesList[1].Enqueue(item);
                 }
         }
-        //masterGrid.ManualTestAndPrintLogQueueSizes(squareQueuesList);
+        masterGrid.ManualTestAndPrintLogQueueSizes(squareQueuesList);
         //Debug.LogError($"unit {unit.pos} has printed it's queue sizes ^");
         Queue<Vector2Int> movementQueue = squareQueuesList[0];
         Queue<Vector2Int> attackQueue = squareQueuesList[1];
@@ -370,10 +373,10 @@ public class CPUManager : MonoBehaviour
                     foreach (Vector2Int m in movementQueue)
                         //attackQueue.Enqueue(m);
                         Debug.Log($"unit {unit.pos} has movement location {m}");*/
-        if (unit.attackRange > 1)
+/*        if (unit.attackRange > 1)
         {
             Debug.Log($"Ranged unit at {unit.pos} has attack queue of {attackQueue.Count}");
-        }
+        }*/
         foreach (Vector2Int attackSquare in attackQueue)
         {
             /*if(isCurious)
@@ -385,9 +388,9 @@ public class CPUManager : MonoBehaviour
  */
             if (attackable != null)
             {
-                if (unit.attackRange > 1)
+/*                if (unit.attackRange > 1)
                     Debug.Log($"unit found at location {attackSquare} by {unit.pos}, it is an {attackable.unitName} owned by player {attackable.playerControl}, can they attack it? {masterGrid.canUnitAttack(unit, attackable)}");
-
+*/
                 if (masterGrid.canUnitAttack(unit, attackable))
                 {
                     unit.CPU_AttackableUnitList.Add(attackable);
@@ -463,9 +466,9 @@ public class CPUManager : MonoBehaviour
                 if (attackableResourceUnit != null && attackableResourceUnit.CPU_IsCapturing)
                 {
                     double damageDelta = GetDamageCostDelta(unit, attackableResourceUnit);
+                    //Debug.Log($"Unit {unit.pos} candidate unit to attack is {attackableResourceUnit.pos} has damage delta {damageDelta}");
                     if (damageDelta > mostDamageDelta)
                     {
-                        mostDamageDelta = damageDelta;
                         mostDamageDelta = damageDelta;
                         candidate = attackableResourceUnit;
                     }
@@ -475,7 +478,7 @@ public class CPUManager : MonoBehaviour
             {
                 //Debug.Log($"Unit {unit.pos} is checking if it should attack {attackableUnit.pos}");
                 double damageDelta = GetDamageCostDelta(unit, attackableUnit);
-                //Debug.Log($"Unit {unit.pos} attacking {attackableUnit.pos} has damage delta {damageDelta}");
+                //Debug.LogError($"Unit {unit.pos} attacking {attackableUnit.pos} has damage delta {damageDelta}");
                 if (damageDelta > mostDamageDelta)
                 {
                     candidate = attackableUnit;
@@ -496,6 +499,7 @@ public class CPUManager : MonoBehaviour
                         masterGrid.moveSelectedUnit(GetAdjacentPosFromBidirectionalSearch(path, candidate.pos)); //assumes attack range of 1 for now.
                         if (Manhattan(unit.pos, candidate.pos) == 1)//for some reason this wasn't always true.
                         {
+                            cameraManager.SetPosition(unit.pos);
                             yield return new WaitForSeconds(CPU_AnimationWaitTime * 2);
                             masterGrid.unitCombat(unit, candidate);
                         }
@@ -505,6 +509,7 @@ public class CPUManager : MonoBehaviour
                     }
                     else if (diff == 1)
                     {
+                        cameraManager.SetPosition(unit.pos);
                         yield return new WaitForSeconds(CPU_AnimationWaitTime * 2);
                         masterGrid.selectedUnit = unit;
                         masterGrid.unitCombat(unit, candidate);
@@ -517,6 +522,7 @@ public class CPUManager : MonoBehaviour
                     }
                 } else if (unit.attackRange > 1)
                 {
+                    cameraManager.SetPosition(unit.pos);
                     yield return new WaitForSeconds(CPU_AnimationWaitTime * 2);
                     masterGrid.selectedUnit = unit;
                     masterGrid.unitCombat(unit, candidate);
@@ -529,7 +535,9 @@ public class CPUManager : MonoBehaviour
                 Debug.LogWarning($"Unit {unit.pos} told to attack but unable to find a cadidate unit to attack even though attack list is not empty, defaulting to movement.");
                 yield return StartCoroutine(CPU_MoveUnitTowardsTargetNode(unit));
             }
-        }
+        }else
+            Debug.LogWarning($"Unit {unit.pos} told to attack but has no attackableUnitList.");
+
         yield return null;
 
     }
@@ -546,7 +554,7 @@ public class CPUManager : MonoBehaviour
         //if unit will fire back calculate that
         if (masterGrid.getDamageBeforeLuck(attacker, defender, false) < defender.healthCurrent)
             firebackCost = Math.Min(masterGrid.getDamageBeforeLuck(defender, attacker, true), attacker.healthCurrent) * attacker.price / attacker.healthMax;
-        if (defender.isResourceUnit || attacker.attackRange > 1 || (attacker.unitName == "Blacksmith" && defender.unitName == "LightTank"))
+        if (defender.isResourceUnit || !defender.canFireBack)//|| (attacker.unitName == "Blacksmith" && defender.unitName == "LightTank"))
             firebackCost = 0;
         double delta = attackCost - firebackCost;
         //Debug.Log($"DELTA: {attacker.pos} checking {defender.pos}, attack cost: {attackCost}, fireback cost: {firebackCost}, delta is {delta}");
@@ -1470,15 +1478,15 @@ public class CPUManager : MonoBehaviour
                 {
                     if (opt.cost > remainingCash) continue;
                     float s = ProductionScoreUnit(opt.weight, opt.cost, remainingCash);
-                    Debug.Log($"Scoring of unit {opt.unit.unitName} has cost {opt.cost} and score {s}");
+                    //Debug.Log($"Scoring of unit {opt.unit.unitName} has cost {opt.cost} and score {s}");
                     if (best == null || s > best.Value.score)
                         best = (opt.unit, opt.cost, s);
                 }
                 if (best != null)
                 {
-                    Debug.Log($"Adding  {best.Value.u.unitName} to best build plan at struc {slot.pos}");
+                    //Debug.Log($"Adding  {best.Value.u.unitName} to best build plan at struc {slot.pos}");
                     bestBuildPlan.Add((best.Value.u, slot));
-                    Debug.Log($"BestBuildPlan in generateSpend has length {bestBuildPlan.Count}");
+                    //Debug.Log($"BestBuildPlan in generateSpend has length {bestBuildPlan.Count}");
 
                     remainingCash -= best.Value.cost;
                 }
@@ -2235,18 +2243,19 @@ int maxTotalCost)
         return closestNode;
     }
 
-    public void LogicCheckUnits(int player)
+    public IEnumerator LogicCheckUnits(int player)
     {
         foreach(BaseUnit unit in MasterGrid.playerUnits[player])
         {
-            if (unit.nonExhausted)
+            if (unit.movementNonExhausted)
             {
-                Debug.LogWarning($"Unit {unit.pos} is nonExhausted. It has target node {unit.CPU_TargetNode.pos} and attackable list count {unit.CPU_AttackableUnitList.Count}, but it didn't do anything. Moving to a random legal square.");
+                Debug.LogError($"Unit {unit.pos} is nonExhausted. It has target node {unit.CPU_TargetNode.pos} and attackable list count {unit.CPU_AttackableUnitList.Count}, but it didn't do anything. Moving to a random legal square.");
                 masterGrid.selectedUnit = unit;
                 masterGrid.moveSelectedUnit(GetRandomWalk(unit));
 
             }
         }
+        yield return null;
     }
 
     /*  Reference a json of the production weights for each unit against a certain matchup.

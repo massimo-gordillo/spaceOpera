@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.U2D;
+using System.Text;
 
 public class MenuProductionPanel : MonoBehaviour
 {
@@ -51,7 +52,8 @@ public class MenuProductionPanel : MonoBehaviour
             //newButton.spritePrefab = spritePrefabInstance;
 
             // Set the button properties
-            newButton.buttonText.text = $"{attributesBaseUnit.unitName}\n{attributesBaseUnit.price}";
+            newButton.nameText.text = $"{InsertSpacesBeforeCapitals(attributesBaseUnit.unitName)}";
+            newButton.priceText.text = $"{attributesBaseUnit.price}";
             prefabManager.setSprites(attributesBaseUnit, spritePrefabInstance);
             newButton.unitPrefab = prefabManager.getPrefabFromPath(attributesBaseUnit.prefabPath);
 
@@ -140,7 +142,23 @@ public class MenuProductionPanel : MonoBehaviour
             Button uiButton = button.GetComponent<Button>();
             if (uiButton != null)
             {
-                uiButton.interactable = playerResources >= button.GetPrice();
+                if(playerResources >= button.GetPrice())
+                {
+                    uiButton.interactable = true;
+                    button.nameText.color = new Color32(255, 183, 0, 255); // Normal color
+                    button.priceText.color = new Color32(255, 183, 0, 255); // Normal color                    
+                    button.GetComponent<Image>().color = new Color32(255, 183, 0, 255); // Normal color      
+
+                    button.spritePrefabUIVariant.baseColor = GameMaster.playerColors[GameMaster.playerTurn];
+                }
+                else
+                {
+                    uiButton.interactable = false;
+                    button.nameText.color = new Color32(100, 100, 100, 255);
+                    button.priceText.color = new Color32(100, 100, 100, 255);
+                    button.GetComponent<Image>().color = new Color32(100, 100, 100, 255);
+                    button.spritePrefabUIVariant.baseColor = new Color32(100, 100, 100, 255);
+                }
             }
             if(button.GetUnitName() == "Spore")
             {
@@ -150,6 +168,26 @@ public class MenuProductionPanel : MonoBehaviour
 
 
 
+    }
+
+    static string InsertSpacesBeforeCapitals(string input)
+    {
+        if (string.IsNullOrEmpty(input))
+            return input;
+
+        StringBuilder sb = new StringBuilder();
+        sb.Append(input[0]);
+
+        for (int i = 1; i < input.Length; i++)
+        {
+            char c = input[i];
+            if (char.IsUpper(c))
+                sb.Append(' ');
+
+            sb.Append(c);
+        }
+
+        return sb.ToString();
     }
 
 }

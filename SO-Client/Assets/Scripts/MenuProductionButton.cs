@@ -6,8 +6,9 @@ using TMPro;
 
 public class MenuProductionButton : MonoBehaviour
 {
-    public TMP_Text buttonText;
-    public StaticSprite spritePrefab;
+    public TMP_Text nameText;
+    public TMP_Text priceText;
+    //public StaticSprite spritePrefab;
     public GameObject unitPrefab;
     public StaticSprite spritePrefabUIVariant;
     public GameMaster gameMaster;

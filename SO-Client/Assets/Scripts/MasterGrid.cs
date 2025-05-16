@@ -862,6 +862,9 @@ public class MasterGrid : MonoBehaviour
 
         cameraManager.ClearFollowTarget();
 
+        if (unit.pos != new Vector2Int((int)Math.Round(unit.transform.position.x, 1), (int)Math.Round(unit.transform.position.y, 1)))
+            Debug.LogError($"Selected unit {unit.pos} is at {unit.transform.position} after moving to {finalPos}");
+
         //Debug.Log("Movement animation complete.");
     }
 
@@ -1260,6 +1263,15 @@ public class MasterGrid : MonoBehaviour
         // Print the count of items in each queue
         Debug.Log($"Movement Queue Size: {movementQueue.Count}");
         Debug.Log($"Attack Queue Size: {attackQueue.Count}");
+        if (attackQueue.Count>0)
+        {
+            foreach(Vector2Int pos in attackQueue)
+            {
+                BaseUnit attackUnit = whatUnitIsInThisLocation(pos);
+                if (attackUnit != null && attackUnit.playerControl != GameMaster.playerTurn)
+                    Debug.Log($"Attack Queue Position: {pos} is occupied by {attackUnit.unitName}");
+            }
+        }
         Debug.Log($"Structure Queue Size: {structureQueue.Count}");
     }
 
@@ -1685,6 +1697,7 @@ public class MasterGrid : MonoBehaviour
 
     public void moveSelectedUnit(Vector2Int pos)
     {
+        //BaseUnit testUnit = selectedUnit;
         if(selectedUnit.pos == pos)
         {
             Debug.LogError($"Selected unit at {selectedUnit.pos} is being asked to move to the square it's already on");
@@ -1738,21 +1751,27 @@ public class MasterGrid : MonoBehaviour
 
 
             }
-
+            
             clearMovement();
+            
 
         }
         else
             Debug.LogWarning($"Unit {selectedUnit.pos} trying to move to {pos} but can't because there's a unit there");
+        
+
     }
 
 
-    //you should do better position checking but this is fine for now
     public void setUnitInGrid(Vector2Int pos, BaseUnit unit)
     {
-        //unitGrid[gridX-x, gridY-y] = unit;
-        unitGrid[pos.x, pos.y] = unit;
-        unit.pos = pos;
+        if (whatUnitIsInThisLocation(pos) == null)
+        {
+            unitGrid[pos.x, pos.y] = unit;
+            unit.pos = pos;
+        }
+        else
+            Debug.LogError($"Setting unit {unit.pos} to {pos} but can't because there's a unit there");
     }
 
     public void setStructureInGrid(Vector2Int pos, BaseStructure structure)

@@ -64,8 +64,6 @@ public class GameMaster : MonoBehaviour
     public Button endTurnConfirmCardBackButton;
     public TMP_Text endTurnConfirmCardText;
     public static float animationDuration = 0.6f;
-    public float holdDuration;
-    public float swoopDuration;
 
     private RectTransform announcementCardRT;
     private Vector2 offScreenLeft;
@@ -232,8 +230,7 @@ public class GameMaster : MonoBehaviour
         
         announcementCardRT.anchoredPosition = offScreenRight;
         announcementCardRT.position = offScreenRight;
-        holdDuration = 0.001f;
-        swoopDuration = 0.5f;
+
         //WaitForSeconds(0.5);
         if(isAnimating)
             AnimateStartTurnCard(1);
@@ -278,7 +275,7 @@ public class GameMaster : MonoBehaviour
                 initProdStructures.Add(MasterGrid.commandStructures[player]);
             foreach (BaseStructure prod in initProdStructures)
             {
-                if (prod.structureType != 1)
+                if (prod.structureType != 1 && prod.structureType != 5)
                     continue;
                 if (progeny == 0)
                 {
@@ -456,7 +453,8 @@ public class GameMaster : MonoBehaviour
     {
         hideChoicePanel();
         endTurnButton.interactable = false;
-        CheckNoAvailableActions(playerTurn);
+        if(!isGameComplete)
+            CheckNoAvailableActions(playerTurn);
     }
 
     public void initiateEndTurn()
@@ -619,7 +617,7 @@ public class GameMaster : MonoBehaviour
         yield return StartCoroutine(CPUManager.ProduceUnits(playerTurn, playerProgeny[(byte)playerTurn]));
         if (isAnimating)
             yield return new WaitForSeconds(0.5f);
-        CPUManager.LogicCheckUnits(playerTurn);
+        yield return CPUManager.LogicCheckUnits(playerTurn);
         endTurnButton.interactable = true;
         endTurnButtonPressed();
     }
@@ -645,32 +643,37 @@ public class GameMaster : MonoBehaviour
     {
         if (CPU_PlayersList[playerTurn]) //don't display player choices if it's a cpu player
             return;
-        //print(structure);
-        if (attackableUnitsBool || capturableStructureBool )
+
+        if (attackableUnitsBool || capturableStructureBool)
         {
             choicePanel.SetActive(true);
             unitChoicePanel.SetActive(true);
 
-            //clickableAttackButton(attackableUnitsBool);
-            //clickableCaptureButton(capturableStructureBool);
+            // Set interactable and color for attack button
             attackButton.interactable = attackableUnitsBool;
+            var attackColor = attackableUnitsBool ? new Color32(255, 183, 0, 255) : new Color32(100, 100, 100, 255);
+            attackButton.GetComponentInChildren<TMP_Text>().color = attackColor;
+            attackButton.GetComponent<Image>().color = attackColor;
+
+            // Set interactable and color for capture button
             captureButton.interactable = capturableStructureBool;
+            var captureColor = capturableStructureBool ? new Color32(255, 183, 0, 255) : new Color32(100, 100, 100, 255);
+            captureButton.GetComponentInChildren<TMP_Text>().color = captureColor;
+            captureButton.GetComponent<Image>().color = captureColor;
+
+            // Set interactable and color for undo movement button
             undoMovementButton.interactable = hasMoved;
-            if(hasMoved)
+            var undoColor = hasMoved ? new Color32(255, 183, 0, 255) : new Color32(100, 100, 100, 255);
+            undoMovementButton.GetComponentInChildren<TMP_Text>().color = undoColor;
+            undoMovementButton.GetComponent<Image>().color = undoColor;
+
+            // Set bottom button text
+            if (hasMoved)
                 bottomButtonText.text = "Do Nothing";
             else
                 bottomButtonText.text = "Exit";
         }
     }
-
-/*    public void clickableAttackButton(bool b)
-    {
-        attackButton.interactable = b;
-    }
-    public void clickableCaptureButton(bool b)
-    {
-        captureButton.interactable = b;
-    }*/
 
     public void hideChoicePanel()
     {
@@ -735,9 +738,25 @@ public class GameMaster : MonoBehaviour
     private void displayWinnerCard(int player)
     {
         promptCard.SetActive(true);
-        promptCardMainText.text = $"Player {player} wins!";
-        promptCardQuestionText.text = "Return to main menu?";
         endTurnButton.interactable = false;
+        bool humanPlayer = false;
+        foreach(bool p in CPU_PlayersList)
+            humanPlayer = humanPlayer || !p;
+        if (humanPlayer)
+        {
+            string openText = "Player ";
+            if (CPU_PlayersList[player])
+                openText = "CPU P";
+            promptCardMainText.text = openText + $"{player} wins!";
+            promptCardMainText.color = playerColors[player];
+            promptCardQuestionText.text = "Return to main menu?";
+        }else
+        {
+            promptCardMainText.text = $"Game Ended";
+            promptCardQuestionText.text = "Return to main menu?";
+        }
+
+
         masterGrid.playerWins(player);
     }
 
@@ -938,7 +957,11 @@ public class GameMaster : MonoBehaviour
         Vector2 endPos = (player % 2 == 0) ? offScreenRight : offScreenLeft;
         Vector2 startPos = (player % 2 == 0) ? offScreenLeft : offScreenRight;
 
-        announcementCardText.text = $"Player {player}'s turn!";
+        string openText = "Player ";
+        if (CPU_PlayersList[player])
+            openText = "CPU P";
+
+        announcementCardText.text = openText + $"{player}'s turn!";
         announcementCardRT.anchoredPosition = startPos;
 
         StartCoroutine(SwoopInAndOutTurnCard(startPos, centerPosition, endPos));
@@ -947,9 +970,9 @@ public class GameMaster : MonoBehaviour
     private IEnumerator SwoopInAndOutTurnCard(Vector2 startPos, Vector2 centerPos, Vector2 endPos)
     {
         endTurnButton.GetComponent<Button>().interactable = false; 
-        yield return SwoopTurnCard(startPos, centerPos, swoopDuration*1.5f, easeOutCubic);
-        yield return new WaitForSeconds(holdDuration);
-        yield return SwoopTurnCard(centerPos, endPos, swoopDuration, easeInCubic);
+        yield return SwoopTurnCard(startPos, centerPos, animationDuration*1.5f, easeOutCubic);
+        yield return new WaitForSeconds(animationDuration);
+        yield return SwoopTurnCard(centerPos, endPos, animationDuration, easeInCubic);
         //I don't like this being here but I need to wait.
         //endTurnButton.GetComponent<Button>().interactable = !CPU_PlayersList[playerTurn];
         endTurnButton.GetComponent<Button>().interactable = true;
@@ -980,11 +1003,11 @@ public class GameMaster : MonoBehaviour
     public void ConcedePlayer(int p)
     {
         playersNotLost[p] = false;
-        if(p == playerTurn)
+        CheckIfWinner();
+        if (p == playerTurn)
         {
             endTurnButtonPressed();
         }
-        CheckIfWinner();
     }
 
     private void CheckIfWinner()
