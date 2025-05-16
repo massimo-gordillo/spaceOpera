@@ -144,7 +144,7 @@ public class CPUManager : MonoBehaviour
                 }*/
 
         InitClosestNeighbour();
-        for(int i = 1; 1<=GameMaster.numPlayers; i++)
+        for(int i = 1; i<=GameMaster.numPlayers; i++)
         {
             heatMaps.Add(new double[gameMaster.gridX, gameMaster.gridY]);
         }
