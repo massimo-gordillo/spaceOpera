@@ -333,10 +333,10 @@ public class CPUManager : MonoBehaviour
         bool[,] checkedCells = new bool[masterGrid.gridX + 2, masterGrid.gridY + 2];
         checkedCells[unit.pos.x + 1, unit.pos.y + 1] = true;
         List<Queue<Vector2Int>> squareQueuesList = null;
-        if (unit.attackRange == 1)
+        if (unit.attackRange <= 1)
         {
-            cellsToCheck.Enqueue((new Vector2Int(unit.pos.x + 1, unit.pos.y + 1), unit.movementRange + 1));//assuming unit only has 1 attack range for the first vectorA* search.
-            squareQueuesList = masterGrid.FloodFillSearch(unit, unit.movementRange, 1, cellsToCheck, checkedCells, new List<Queue<Vector2Int>> { new Queue<Vector2Int>(), new Queue<Vector2Int>(), new Queue<Vector2Int>() });
+            cellsToCheck.Enqueue((new Vector2Int(unit.pos.x + 1, unit.pos.y + 1), unit.movementRange + unit.attackRange));
+            squareQueuesList = masterGrid.FloodFillSearch(unit, unit.movementRange, unit.attackRange, cellsToCheck, checkedCells, new List<Queue<Vector2Int>> { new Queue<Vector2Int>(), new Queue<Vector2Int>(), new Queue<Vector2Int>() });
         }
         if (unit.attackRange > 1) //notably this logic is the same in masterGrid.drawMovement. I suspect I should generalize drawMovement, it would be much better.
         {
@@ -1510,10 +1510,15 @@ public class CPUManager : MonoBehaviour
             if (unitsToBuild.Count == 0)
                 yield break;
 
+            int m = 1;
+            //if player 1, invert heatmap values to get the opposite effect
+            if (GameMaster.playerTurn % 2 == 1)
+                m = -1;
+
             // 4. Sort resource structures by heatmap value (highest first)
             double[,] heatMap = SumHeatMaps(structHeatMaps[GameMaster.playerTurn-1], heatMaps[GameMaster.playerTurn-1]);
             var sortedStructures = virixResources
-                .OrderByDescending(s => heatMap[s.pos.x, s.pos.y])
+                .OrderByDescending(s => m*heatMap[s.pos.x, s.pos.y])
                 .ToList();
 
             // 5. Assign priciest units to hottest structures

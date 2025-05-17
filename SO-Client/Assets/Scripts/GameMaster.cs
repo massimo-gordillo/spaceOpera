@@ -136,11 +136,17 @@ public class GameMaster : MonoBehaviour
         }
         else {
             Debug.LogWarning("Progeny set to -1 selected, defaulting to hard values");
-            playerProgeny.Add(1, 0);
+            playerProgeny.Add(1, 1);
             playerProgeny.Add(2, 1);
         }
 
-        
+        if (CPU_isOn)
+        {
+            CPU_PlayersList[1] = false;
+            CPU_PlayersList[2] = true;
+        }
+
+
         playerColors = new Color32[numPlayers + 1];
         playerColors[0] = new Color32(255, 255, 255, 255);
         playerColors[1] = new Color32(63, 44, 255, 255);
@@ -200,11 +206,7 @@ public class GameMaster : MonoBehaviour
         //productionPanel.Start();
 
         //unitCosts = new List<(BaseUnit, int)>[numPlayers];
-        if (CPU_isOn)
-        {
-            CPU_PlayersList[1] = true;
-            CPU_PlayersList[2] = true;
-        }
+
 
 
 

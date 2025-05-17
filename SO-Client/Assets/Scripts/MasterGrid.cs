@@ -1250,7 +1250,12 @@ public class MasterGrid : MonoBehaviour
     public void ManualTestAndPrintLogQueueSizes(List<Queue<Vector2Int>> squareQueuesList)
     {
         // Ensure the list has exactly 3 queues
-        if (squareQueuesList == null || squareQueuesList.Count != 3)
+        if (squareQueuesList == null)
+        {
+            Debug.LogError($"The squareQueuesList is null");
+            return;
+        }
+        if(squareQueuesList.Count != 3)
         {
             Debug.LogError($"The squareQueuesList does not contain exactly 3 queues, it contains only {squareQueuesList.Count}");
             return;
@@ -1262,18 +1267,18 @@ public class MasterGrid : MonoBehaviour
         Queue<Vector2Int> structureQueue = squareQueuesList[2];
 
         // Print the count of items in each queue
-        Debug.Log($"Movement Queue Size: {movementQueue.Count}");
-        Debug.Log($"Attack Queue Size: {attackQueue.Count}");
+        //Debug.Log($"Movement Queue Size: {movementQueue.Count}");
+        //Debug.Log($"Attack Queue Size: {attackQueue.Count}");
         if (attackQueue.Count>0)
         {
             foreach(Vector2Int pos in attackQueue)
             {
                 BaseUnit attackUnit = whatUnitIsInThisLocation(pos);
-                if (attackUnit != null && attackUnit.playerControl != GameMaster.playerTurn)
-                    Debug.Log($"Attack Queue Position: {pos} is occupied by {attackUnit.unitName}");
+/*                if (attackUnit != null && attackUnit.playerControl != GameMaster.playerTurn)
+                    Debug.Log($"Attack Queue Position: {pos} is occupied by {attackUnit.unitName}");*/
             }
         }
-        Debug.Log($"Structure Queue Size: {structureQueue.Count}");
+        //Debug.Log($"Structure Queue Size: {structureQueue.Count}");
     }
 
     void DrawSquaresFromSearch(List<Queue<Vector2Int>> squareQueuesList)
