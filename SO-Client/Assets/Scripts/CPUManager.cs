@@ -1281,8 +1281,9 @@ public class CPUManager : MonoBehaviour
         GetStructureHeatMap();
         //Debug.Log($"Created heatmap with dimensions {heatMaps.GetLength(0)},{heatMaps.GetLength(1)}");
         //heatMaps = SumHeatMaps(structHeatMaps[GameMaster.playerTurn - 1], heatMaps);
-        DrawHeatmap(heatMaps[1]);
-        HighlightStructureWithHighestHeatMapValue();
+        //DrawHeatmap(structHeatMaps[GameMaster.playerTurn-1]);
+        //DrawHeatmap(SumHeatMaps(structHeatMaps[1], heatMaps[1]));
+        //HighlightStructureWithHighestHeatMapValue();
         //simple make base unit check
         List<BaseStructure> structures = masterGrid.GetStructures(player);
         List<BaseStructure> prods = masterGrid.GetProductionStructures(player);
@@ -1309,7 +1310,7 @@ public class CPUManager : MonoBehaviour
             //yield return null;
         }
         else if (progeny == 1)
-            yield return null;
+            yield return GenerateSpendVirix();
         else if (progeny == 2)
             yield return GenerateSpendSentus();
 
@@ -1467,6 +1468,61 @@ public class CPUManager : MonoBehaviour
 
 
 
+        }
+
+        IEnumerator GenerateSpendVirix()
+        {
+            // 1. Get all resource structures controlled by Virix and not covered by a unit
+            List<BaseStructure> virixResources = masterGrid.GetStructures(GameMaster.playerTurn)
+                .Where(s => s.structureType == 0 && !s.IsCoveredByUnit())
+                .ToList();
+
+            int maxUnits = virixResources.Count;
+            if (maxUnits == 0)
+                yield break;
+
+            int totalSpend = gameMaster.GetPlayerResources(GameMaster.playerTurn);
+
+            // 2. Get Virix matchup list (assuming Virix is progeny 1, adjust if needed)
+            int opponentProgeny = getOpponentProgeny(GameMaster.playerTurn);
+            var virixMatchupList = matchupWeights[1, opponentProgeny]
+                .OrderByDescending(x => x.cost) // Sort by cost descending
+                .ToList();
+
+            // 3. Greedily buy as many of the most expensive units as possible
+            List<(BaseUnit unit, int cost, int weight)> unitsToBuild = new();
+            int remainingCash = totalSpend;
+            int remainingSlots = maxUnits;
+            foreach (var (unit, cost, weight) in virixMatchupList)
+            {
+                if(unit.unitName == "Spore")
+                    continue; // Skip Spore unit
+                while (remainingCash >= cost && remainingSlots > 0)
+                {
+                    unitsToBuild.Add((unit, cost, weight));
+                    remainingCash -= cost;
+                    remainingSlots--;
+                }
+                if (remainingSlots == 0)
+                    break;
+            }
+
+            if (unitsToBuild.Count == 0)
+                yield break;
+
+            // 4. Sort resource structures by heatmap value (highest first)
+            double[,] heatMap = SumHeatMaps(structHeatMaps[GameMaster.playerTurn-1], heatMaps[GameMaster.playerTurn-1]);
+            var sortedStructures = virixResources
+                .OrderByDescending(s => heatMap[s.pos.x, s.pos.y])
+                .ToList();
+
+            // 5. Assign priciest units to hottest structures
+            for (int i = 0; i < unitsToBuild.Count && i < sortedStructures.Count; i++)
+            {
+                (BaseUnit unit, int cost, int weight) = unitsToBuild[i];
+                var structure = sortedStructures[i];
+                yield return createUnitAtStructure(unit, structure);
+            }
         }
 
         void generateSpendForProdType(
@@ -2004,16 +2060,16 @@ int maxTotalCost)
         //double[,] tempHeatMap = new double[gameMaster.gridX, gameMaster.gridY];
         int m;
         double influenceMulti = 0.001;
-        int influenceRange = 4;
+        //int influenceRange = 4;
         for (int i = 0; i < GameMaster.numPlayers; i++)
         {
-            if (i % 2 == 1)
+            if (i % 2 == 0)
                 m = -1;
             else
                 m = 1;
             foreach (BaseUnit unit in MasterGrid.playerUnits[i])
             {
-                InfluenceUnitHeatmap(influenceRange, unit, i);
+                InfluenceUnitHeatmap(unit.movementRange+unit.attackRange+1, unit, i);
             }
         }
 
@@ -2092,6 +2148,8 @@ int maxTotalCost)
 
         void InfluenceStructureHeatmap(BaseStructure s, double baseInfluence, int range, int playerIndex, int polarity = 1)
         {
+            if (s.playerControl == playerIndex + 1)
+                return;
             for (int dx = -range; dx <= range; dx++)
             {
                 for (int dy = -range; dy <= range; dy++)
@@ -2177,7 +2235,8 @@ int maxTotalCost)
         {
             if (s.structureType != 0 || s.IsCoveredByUnit())
                 continue;
-            double current = heatMaps[1][s.pos.x,s.pos.y]*m;
+            double current = structHeatMaps[1][s.pos.x,s.pos.y]*m;
+            //double current = SumHeatMaps(structHeatMaps[1], heatMaps[1])[s.pos.x,s.pos.y]*m;
             if (current > highest)
             {
                 highest = current;
@@ -2185,8 +2244,9 @@ int maxTotalCost)
             }
         }
         highestStructure.healthCanvas.SetActive(true);
-        highestStructure.healthTextContainer.text = highest.ToString();
-        highestStructure.healthTextContainer.fontSize += 1;
+        Debug.Log($"Highest structure value is :{highest}, at {highestStructure.pos}");
+        highestStructure.healthTextContainer.text = (highest*100).ToString();
+        //highestStructure.healthTextContainer.fontSize += 1;
         highestStructure.neutralSpriteFill.color = Color.red;
     }
 
@@ -2251,8 +2311,9 @@ int maxTotalCost)
     {
         foreach(BaseUnit unit in MasterGrid.playerUnits[player])
         {
-            if (unit.movementNonExhausted)
+            if (unit.movementNonExhausted && unit.unitName != "seed")
             {
+                Debug.Log($"Unit name is {unit.unitName} at {unit.pos}");
                 Debug.LogError($"Unit {unit.pos} is nonExhausted. It has target node {unit.CPU_TargetNode.pos} and attackable list count {unit.CPU_AttackableUnitList.Count}, but it didn't do anything. Moving to a random legal square.");
                 masterGrid.selectedUnit = unit;
                 masterGrid.moveSelectedUnit(GetRandomWalk(unit));
@@ -2525,10 +2586,13 @@ int maxTotalCost)
         }*/
     }
 
+    
+
 
 
 
 
 }
+
 
 

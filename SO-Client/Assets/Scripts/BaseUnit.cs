@@ -361,13 +361,18 @@ public class BaseUnit : MonoBehaviour
         yield return new WaitForSeconds(GameMaster.animationDuration);
         healthTextContainer.gameObject.SetActive(false);
         StartCoroutine(AnimateCollapseAndBlacken());
-        explosionAnimator.gameObject.SetActive(true);
-        explosionAnimator.Play("UnitExplosion");
+        if (unitName != "seed")
+        {
+            explosionAnimator.gameObject.SetActive(true);
+            explosionAnimator.Play("UnitExplosion");
+            // Wait until the animation finishes
+            float length = explosionAnimator.GetCurrentAnimatorStateInfo(0).length;
+            yield return new WaitForSeconds(length);
+        }
 
 
-        // Wait until the animation finishes
-        float length = explosionAnimator.GetCurrentAnimatorStateInfo(0).length;
-        yield return new WaitForSeconds(length);
+
+        
     }
 
     public IEnumerator AnimateCollapseAndBlacken()

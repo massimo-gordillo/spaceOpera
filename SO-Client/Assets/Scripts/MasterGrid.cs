@@ -425,6 +425,7 @@ public class MasterGrid : MonoBehaviour
             //Trying virix implementation where spore kills itself upon capturing
             if (structure.playerControl == selectedUnit.playerControl && selectedUnit.unitName == "Spore")
             {
+                selectedUnit.explosionAnimator.enabled = false;
                 deleteUnit(selectedUnit);
                 createVirixSeed(structure.pos);
             }
