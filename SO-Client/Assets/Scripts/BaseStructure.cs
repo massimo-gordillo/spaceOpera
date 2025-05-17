@@ -87,7 +87,7 @@ public class BaseStructure : MonoBehaviour
     public IEnumerator switchAlliance(int capturePlayerInt)
     {
         yield return StartCoroutine(AnimateCaptureHealth(captureHealth, 0));
-        yield return new WaitForSeconds(GameMaster.animationDuration / 3);
+        yield return new WaitForSeconds(GameMaster.globalAnimationDuration / 3);
         if (structureType == 5 && playerControl != capturePlayerInt)
             gameMaster.ConcedePlayer(playerControl);
 
@@ -207,7 +207,7 @@ public class BaseStructure : MonoBehaviour
         if (to <= maxCaptureHealth)
         {
 
-            float duration = GameMaster.animationDuration;
+            float duration = GameMaster.globalAnimationDuration;
             //float halfDuration = totalDuration * 0.5f;
             int displayValue = from;
 
@@ -257,8 +257,8 @@ public class BaseStructure : MonoBehaviour
         Transform t = hammerSprite.transform;
         Vector3 startScale = new Vector3(0.01f, 0.01f, 1f);
         Vector3 peakScale = new Vector3(0.9f, 0.9f, 1f);
-        float swoopDuration = GameMaster.animationDuration/8;
-        float holdDuration = GameMaster.animationDuration *3/4;
+        float swoopDuration = GameMaster.globalAnimationDuration/8;
+        float holdDuration = GameMaster.globalAnimationDuration *3/4;
 
         // Reset initial scale
         t.localScale = startScale;
@@ -296,10 +296,11 @@ public class BaseStructure : MonoBehaviour
 
     public IEnumerator AnimateIncome(int income)
     {
+        incomeAnimationCanvasGroup.gameObject.SetActive(true);
         yield return new WaitForSeconds(GameMaster.swoopCardAnimationDuration);
-        float duration = GameMaster.animationDuration*1.5f; // total time from bottom to top
-        float fadeInTime = GameMaster.animationDuration/5f;
-        float fadeOutTime = GameMaster.animationDuration / 5f;
+        float duration = GameMaster.globalAnimationDuration*1.5f; // total time from bottom to top
+        float fadeInTime = GameMaster.globalAnimationDuration/5f;
+        float fadeOutTime = GameMaster.globalAnimationDuration / 5f;
         float startY = -0.35f;
         float endY = 0.25f;
         float elapsedTime = 0;
@@ -335,9 +336,10 @@ public class BaseStructure : MonoBehaviour
             {
                 incomeAnimationCanvasGroup.alpha = 1f;
             }
-
             yield return null;
         }
+        incomeAnimationCanvasGroup.gameObject.SetActive(false);
+
     }
 
     public void turnOffCaptureSprites()

@@ -48,7 +48,7 @@ public class CPUManager : MonoBehaviour
     List<(BaseUnit, int, int weight)> ertrianAirportProdList;
 
     public GameObject debugLinePrefab;
-    //private float CPU_AnimationWaitTime = GameMaster.animationDuration;
+    //private float CPU_AnimationWaitTime = GameMaster.globalAnimationDuration;
     public float CPU_AnimationWaitTime; //set in inspector
 
 
@@ -157,146 +157,7 @@ public class CPUManager : MonoBehaviour
         ImportMatchupWeights();
     }
 
-    public void DebugNodes()
-    {
-        Debug.Log($"Starting Debug Nodes. num nodes: {priorityNetworkNodes.Count}, num edges: {priorityNetworkEdgesAir.Count}");
-
-        foreach (NetworkNode node in priorityNetworkNodes)
-        {
-            // --- Validate localEdges ---
-            foreach (NetworkEdge edge in node.localEdges)
-            {
-                bool edgeFound = false;
-                foreach (NetworkEdge edgeRef in priorityNetworkEdgesAir)
-                {
-                    if (edgeRef.Equals(edge)) // Optional: use this if you implemented Equals()
-                    {
-                        if (!object.ReferenceEquals(edge, edgeRef))
-                        {
-                            Debug.LogError($"Edge in node {node.pos} matches by value but not by reference.");
-                            Debug.Log($"EdgeRef Hash: {RuntimeHelpers.GetHashCode(edgeRef)}, Edge Hash: {RuntimeHelpers.GetHashCode(edge)}");
-                        }
-                        edgeFound = true;
-                        break;
-                    }
-                }
-
-                if (!edgeFound)
-                {
-                    Debug.LogError($"Edge in node {node.pos} not found in priorityNetworkEdgesAir.");
-                }
-
-                // Check the edge’s connected nodes too
-                NetworkNode other = edge.GetOtherNode(node);
-                NetworkNode matchOther = priorityNetworkNodes.Find(n => n.pos == other.pos);
-                if (matchOther == null)
-                {
-                    Debug.LogError($"Edge from node {node.pos} points to node at {other.pos} not found in priorityNetworkNodes.");
-                }
-                else if (!object.ReferenceEquals(other, matchOther))
-                {
-                    Debug.LogError($"Edge from node {node.pos} points to different instance of node at {other.pos}.");
-                    Debug.Log($"Other Hash: {RuntimeHelpers.GetHashCode(other)}, Match Hash: {RuntimeHelpers.GetHashCode(matchOther)}");
-                }
-            }
-
-            // --- Validate localNodes ---
-            foreach (NetworkNode neighbor in node.localNodes)
-            {
-                NetworkNode matchNeighbor = priorityNetworkNodes.Find(n => n.pos == neighbor.pos);
-                if (matchNeighbor == null)
-                {
-                    Debug.LogError($"Node {node.pos} has neighbor at {neighbor.pos} not found in priorityNetworkNodes.");
-                }
-                else if (!object.ReferenceEquals(neighbor, matchNeighbor))
-                {
-                    Debug.LogError($"Node {node.pos} has neighbor at {neighbor.pos} that is a different instance.");
-                    Debug.Log($"Neighbor Hash: {RuntimeHelpers.GetHashCode(neighbor)}, Match Hash: {RuntimeHelpers.GetHashCode(matchNeighbor)}");
-                }
-            }
-        }
-        Debug.Log("Debug Nodes complete");
-    }
-
-    public void DebugEdges()
-    {
-        foreach (NetworkEdge edge in priorityNetworkEdgesAir)
-        {
-            NetworkNode nodeA = edge.nodeA;
-            NetworkNode nodeB = edge.nodeB;
-
-            // Try to find a node in the list that matches by pos
-            NetworkNode matchA = priorityNetworkNodes.Find(n => n.pos == nodeA.pos);
-            NetworkNode matchB = priorityNetworkNodes.Find(n => n.pos == nodeB.pos);
-
-            // Check nodeA
-            if (matchA != null && !object.ReferenceEquals(nodeA, matchA))
-            {
-                Debug.LogError($"NodeA mismatch at {nodeA.pos}. Instance mismatch! (edge node vs node list)");
-                Debug.Log($"NodeA Hash: {RuntimeHelpers.GetHashCode(nodeA)}, MatchA Hash: {RuntimeHelpers.GetHashCode(matchA)}");
-            }
-
-            // Check nodeB
-            if (matchB != null && !object.ReferenceEquals(nodeB, matchB))
-            {
-                Debug.LogError($"NodeB mismatch at {nodeB.pos}. Instance mismatch! (edge node vs node list)");
-                Debug.Log($"NodeB Hash: {RuntimeHelpers.GetHashCode(nodeB)}, MatchB Hash: {RuntimeHelpers.GetHashCode(matchB)}");
-            }
-
-            // Optional: error if no match at all (i.e. the edge points to a node not in priorityNetworkNodes)
-            if (matchA == null)
-                Debug.LogError($"No match in priorityNetworkNodes for nodeA at {nodeA.pos}");
-            if (matchB == null)
-                Debug.LogError($"No match in priorityNetworkNodes for nodeB at {nodeB.pos}");
-        }
-    }
-
-    /*public void InitClosestNeighbour()
-    {
-        for (int p = 1; p <= GameMaster.numPlayers; p++)
-        {
-            Queue<NetworkNode> bfsQueue = new Queue<NetworkNode>();
-            HashSet<NetworkNode> visited = new HashSet<NetworkNode>();
-
-            // First pass: assign closestUnclaimed to direct neighbors
-            foreach (NetworkNode n in resourceNetworkNodes)
-            {
-                n.CalculateClosestUnclaimedNeighbour(p);
-                if (n.closestUnclaimed[p] != null)
-                {
-                    bfsQueue.Enqueue(n);
-                    visited.Add(n);
-                }
-            }
-
-            // Second pass: BFS to assign unclaimed from neighbors
-            while (bfsQueue.Count > 0)
-            {
-                NetworkNode current = bfsQueue.Dequeue();
-
-                foreach (NetworkEdge edge in current.localEdges.OrderBy(e => e.distance))
-                {
-                    NetworkNode currentNeighbor = edge.GetOtherNode(current);
-                    if (currentNeighbor == null || visited.Contains(currentNeighbor))
-                        continue;
-
-                    // Inherit closest unclaimed from current node
-                    currentNeighbor.closestUnclaimed[p] = current.closestUnclaimed[p];
-                    bfsQueue.Enqueue(currentNeighbor);
-                    visited.Add(currentNeighbor);
-                }
-            }
-
-            // Optional: Warn if any nodes still didn't get assigned
-            foreach (NetworkNode n in resourceNetworkNodes)
-            {
-                if (n.closestUnclaimed[p] == null)
-                {
-                    Debug.LogWarning($"Node {n.pos} for player {p} has no unclaimed currentNeighbor!");
-                }
-            }
-        }
-    }*/
+    
     public void SetDefaultTargets() //assuming two players for now.
     {
         commandStructures = new BaseStructure[GameMaster.numPlayers + 1];
@@ -1260,7 +1121,7 @@ public class CPUManager : MonoBehaviour
                 yield return new WaitForSeconds(CPU_AnimationWaitTime);
                 masterGrid.selectedUnit = unit;
                 yield return StartCoroutine(masterGrid.captureStructure(targetNode.structure));
-                //yield return new WaitForSeconds(GameMaster.animationDuration*1.5f);
+                //yield return new WaitForSeconds(GameMaster.globalAnimationDuration*1.5f);
                 unit.CPU_IsCapturing = true;
                 if (targetNode.structure.playerControl == unit.playerControl)
                 {
@@ -2591,7 +2452,148 @@ int maxTotalCost)
         }*/
     }
 
-    
+    public void DebugNodes()
+    {
+        Debug.Log($"Starting Debug Nodes. num nodes: {priorityNetworkNodes.Count}, num edges: {priorityNetworkEdgesAir.Count}");
+
+        foreach (NetworkNode node in priorityNetworkNodes)
+        {
+            // --- Validate localEdges ---
+            foreach (NetworkEdge edge in node.localEdges)
+            {
+                bool edgeFound = false;
+                foreach (NetworkEdge edgeRef in priorityNetworkEdgesAir)
+                {
+                    if (edgeRef.Equals(edge)) // Optional: use this if you implemented Equals()
+                    {
+                        if (!object.ReferenceEquals(edge, edgeRef))
+                        {
+                            Debug.LogError($"Edge in node {node.pos} matches by value but not by reference.");
+                            Debug.Log($"EdgeRef Hash: {RuntimeHelpers.GetHashCode(edgeRef)}, Edge Hash: {RuntimeHelpers.GetHashCode(edge)}");
+                        }
+                        edgeFound = true;
+                        break;
+                    }
+                }
+
+                if (!edgeFound)
+                {
+                    Debug.LogError($"Edge in node {node.pos} not found in priorityNetworkEdgesAir.");
+                }
+
+                // Check the edge’s connected nodes too
+                NetworkNode other = edge.GetOtherNode(node);
+                NetworkNode matchOther = priorityNetworkNodes.Find(n => n.pos == other.pos);
+                if (matchOther == null)
+                {
+                    Debug.LogError($"Edge from node {node.pos} points to node at {other.pos} not found in priorityNetworkNodes.");
+                }
+                else if (!object.ReferenceEquals(other, matchOther))
+                {
+                    Debug.LogError($"Edge from node {node.pos} points to different instance of node at {other.pos}.");
+                    Debug.Log($"Other Hash: {RuntimeHelpers.GetHashCode(other)}, Match Hash: {RuntimeHelpers.GetHashCode(matchOther)}");
+                }
+            }
+
+            // --- Validate localNodes ---
+            foreach (NetworkNode neighbor in node.localNodes)
+            {
+                NetworkNode matchNeighbor = priorityNetworkNodes.Find(n => n.pos == neighbor.pos);
+                if (matchNeighbor == null)
+                {
+                    Debug.LogError($"Node {node.pos} has neighbor at {neighbor.pos} not found in priorityNetworkNodes.");
+                }
+                else if (!object.ReferenceEquals(neighbor, matchNeighbor))
+                {
+                    Debug.LogError($"Node {node.pos} has neighbor at {neighbor.pos} that is a different instance.");
+                    Debug.Log($"Neighbor Hash: {RuntimeHelpers.GetHashCode(neighbor)}, Match Hash: {RuntimeHelpers.GetHashCode(matchNeighbor)}");
+                }
+            }
+        }
+        Debug.Log("Debug Nodes complete");
+    }
+
+    public void DebugEdges()
+    {
+        foreach (NetworkEdge edge in priorityNetworkEdgesAir)
+        {
+            NetworkNode nodeA = edge.nodeA;
+            NetworkNode nodeB = edge.nodeB;
+
+            // Try to find a node in the list that matches by pos
+            NetworkNode matchA = priorityNetworkNodes.Find(n => n.pos == nodeA.pos);
+            NetworkNode matchB = priorityNetworkNodes.Find(n => n.pos == nodeB.pos);
+
+            // Check nodeA
+            if (matchA != null && !object.ReferenceEquals(nodeA, matchA))
+            {
+                Debug.LogError($"NodeA mismatch at {nodeA.pos}. Instance mismatch! (edge node vs node list)");
+                Debug.Log($"NodeA Hash: {RuntimeHelpers.GetHashCode(nodeA)}, MatchA Hash: {RuntimeHelpers.GetHashCode(matchA)}");
+            }
+
+            // Check nodeB
+            if (matchB != null && !object.ReferenceEquals(nodeB, matchB))
+            {
+                Debug.LogError($"NodeB mismatch at {nodeB.pos}. Instance mismatch! (edge node vs node list)");
+                Debug.Log($"NodeB Hash: {RuntimeHelpers.GetHashCode(nodeB)}, MatchB Hash: {RuntimeHelpers.GetHashCode(matchB)}");
+            }
+
+            // Optional: error if no match at all (i.e. the edge points to a node not in priorityNetworkNodes)
+            if (matchA == null)
+                Debug.LogError($"No match in priorityNetworkNodes for nodeA at {nodeA.pos}");
+            if (matchB == null)
+                Debug.LogError($"No match in priorityNetworkNodes for nodeB at {nodeB.pos}");
+        }
+    }
+
+    /*public void InitClosestNeighbour()
+    {
+        for (int p = 1; p <= GameMaster.numPlayers; p++)
+        {
+            Queue<NetworkNode> bfsQueue = new Queue<NetworkNode>();
+            HashSet<NetworkNode> visited = new HashSet<NetworkNode>();
+
+            // First pass: assign closestUnclaimed to direct neighbors
+            foreach (NetworkNode n in resourceNetworkNodes)
+            {
+                n.CalculateClosestUnclaimedNeighbour(p);
+                if (n.closestUnclaimed[p] != null)
+                {
+                    bfsQueue.Enqueue(n);
+                    visited.Add(n);
+                }
+            }
+
+            // Second pass: BFS to assign unclaimed from neighbors
+            while (bfsQueue.Count > 0)
+            {
+                NetworkNode current = bfsQueue.Dequeue();
+
+                foreach (NetworkEdge edge in current.localEdges.OrderBy(e => e.distance))
+                {
+                    NetworkNode currentNeighbor = edge.GetOtherNode(current);
+                    if (currentNeighbor == null || visited.Contains(currentNeighbor))
+                        continue;
+
+                    // Inherit closest unclaimed from current node
+                    currentNeighbor.closestUnclaimed[p] = current.closestUnclaimed[p];
+                    bfsQueue.Enqueue(currentNeighbor);
+                    visited.Add(currentNeighbor);
+                }
+            }
+
+            // Optional: Warn if any nodes still didn't get assigned
+            foreach (NetworkNode n in resourceNetworkNodes)
+            {
+                if (n.closestUnclaimed[p] == null)
+                {
+                    Debug.LogWarning($"Node {n.pos} for player {p} has no unclaimed currentNeighbor!");
+                }
+            }
+        }
+    }*/
+
+
 
 
 

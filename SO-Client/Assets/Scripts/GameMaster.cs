@@ -63,8 +63,8 @@ public class GameMaster : MonoBehaviour
     public GameObject endTurnConfirmCard;
     public Button endTurnConfirmCardBackButton;
     public TMP_Text endTurnConfirmCardText;
-    public static float animationDuration = 0.6f;
-    public static float swoopCardAnimationDuration = animationDuration*4;
+    public static float globalAnimationDuration = 0.6f;
+    public static float swoopCardAnimationDuration = globalAnimationDuration*4;
 
     private RectTransform announcementCardRT;
     private Vector2 offScreenLeft;
@@ -84,7 +84,8 @@ public class GameMaster : MonoBehaviour
     static int player2ProgenySelected;
     public static Color32[] playerColors;
 
-    public static bool CPU_isOn = true;
+    public static bool CPU_isOn =true;
+    private static bool CPU_isMasterDebugging = false;
     public static bool[] CPU_PlayersList;
     //public static List<(BaseUnit, int)>[] CPU_unitMatchupWeights;
     public int virixCheapestUnit;
@@ -144,7 +145,7 @@ public class GameMaster : MonoBehaviour
         if (CPU_isOn)
         {
             CPU_PlayersList[1] = false;
-            CPU_PlayersList[2] = false;
+            CPU_PlayersList[2] = true;
         }
 
 
@@ -421,11 +422,11 @@ public class GameMaster : MonoBehaviour
             selectedStructure = null;
             return;
         }
-
+        int previousSpend = playerResources[playerTurn];
         playerResources[playerTurn] -= unit.price;
         //unit.playerControl = playerTurn;
-        
 
+        StartCoroutine(AnimateResourceText(previousSpend, playerResources[playerTurn],false));
         //need a way to set to exhausted from here so the units don't have to start exhausted on the 1st turn.
         BaseUnit tempUnit = GetInstantiateUnit(unit, selectedStructure.pos, null);
         //BaseUnit tempUnit = Instantiate(unit, new Vector2(selectedStructure.xPos, selectedStructure.yPos), Quaternion.identity, unitContainer);
@@ -482,6 +483,11 @@ public class GameMaster : MonoBehaviour
 
     public void CheckNoAvailableActions(int player)
     {
+        if (CPU_isOn && CPU_PlayersList[player] && !CPU_isMasterDebugging)
+        {
+            initiateEndTurn();
+            return;
+        }
         int playerProgeny = getPlayerProgeny((byte)player);
         BaseUnit unitFocus = null;
         int unitCount = 0;
@@ -598,6 +604,8 @@ public class GameMaster : MonoBehaviour
         }
         masterGrid.refreshUnits(playerTurn);
 
+        //EndTurnButtonSwitch();
+
         if (CPU_isOn && CPU_PlayersList[playerTurn] && !isGameComplete)
         {
             RunCPUForPlayer(playerTurn);
@@ -615,13 +623,14 @@ public class GameMaster : MonoBehaviour
     public IEnumerator RunCPUForPlayerDelay(int playerTurn)
     {
         if (isAnimating)
-            yield return new WaitForSeconds(1.0f);
+            yield return new WaitForSeconds(GameMaster.swoopCardAnimationDuration);
         yield return StartCoroutine(CPUManager.CommandUnits(playerTurn));
         yield return StartCoroutine(CPUManager.ProduceUnits(playerTurn, playerProgeny[(byte)playerTurn]));
         if (isAnimating)
-            yield return new WaitForSeconds(0.5f);
+            yield return new WaitForSeconds(GameMaster.globalAnimationDuration);
         yield return CPUManager.LogicCheckUnits(playerTurn);
-        endTurnButton.interactable = true;
+/*        if(CPU_isMasterDebugging)
+            endTurnButton.interactable = true;*/
         endTurnButtonPressed();
     }
 
@@ -703,14 +712,14 @@ public class GameMaster : MonoBehaviour
         if (getPlayerProgeny((byte)playerTurn) == 0)
             incomeWithMultiplier = structureResourcePerTurn * 1.1;
         int num = 0;
-        Debug.Log($"Player {playerTurn} has {num} structures");
         foreach (BaseStructure s in masterGrid.GetStructures(playerTurn)){
             num++;
             StartCoroutine(s.AnimateIncome((int)incomeWithMultiplier));
         }
-
+        int startResources = playerResources[playerTurn];
         playerResources[playerTurn] = playerResources[playerTurn] + baseResourcePerTurn + (int)incomeWithMultiplier * num;
-        playerResourceText.text = ""+playerResources[playerTurn];
+        
+        StartCoroutine(AnimateResourceText(startResources, playerResources[playerTurn],true));
     }
 
 /*    public void playerLoses (int player)
@@ -936,7 +945,23 @@ public class GameMaster : MonoBehaviour
         t.localScale = endScale;
     }
 
+    private IEnumerator AnimateResourceText(int startValue, int endValue, bool wait)
+    {
+        float elapsed = 0f;
+        float animationTime = globalAnimationDuration * 0.8f;
+        if (wait)
+            yield return new WaitForSeconds(swoopCardAnimationDuration);
+        while (elapsed < animationTime)
+        {
+            elapsed += Time.deltaTime;
+            float t = Mathf.Clamp01(elapsed / animationTime);
+            int currentValue = Mathf.RoundToInt(Mathf.Lerp(startValue, endValue, t));
+            playerResourceText.text = currentValue.ToString();
+            yield return null;
+        }
 
+        playerResourceText.text = endValue.ToString(); // Ensure it ends at exact value
+    }
 
     /*    public void ConvertFileToGameState()
         {
@@ -982,13 +1007,13 @@ public class GameMaster : MonoBehaviour
 
     private IEnumerator SwoopInAndOutTurnCard(Vector2 startPos, Vector2 centerPos, Vector2 endPos)
     {
-        endTurnButton.GetComponent<Button>().interactable = false; 
+        endTurnButton.interactable = false; 
         yield return SwoopTurnCard(startPos, centerPos, swoopCardAnimationDuration/2f, easeOutCubic);
-        yield return new WaitForSeconds(animationDuration/2f);
-        yield return SwoopTurnCard(centerPos, endPos, animationDuration, easeInCubic); // * 3 / 8
+        yield return new WaitForSeconds(globalAnimationDuration/2f);
+        yield return SwoopTurnCard(centerPos, endPos, globalAnimationDuration, easeInCubic); // * 3 / 8
         //I don't like this being here but I need to wait.
         //endTurnButton.GetComponent<Button>().interactable = !CPU_PlayersList[playerTurn];
-        endTurnButton.GetComponent<Button>().interactable = true;
+        EndTurnButtonSwitch();
     }
 
     private IEnumerator SwoopTurnCard(Vector2 startPos, Vector2 endPos, float duration, System.Func<float, float> easingFunction)
@@ -1050,6 +1075,14 @@ public class GameMaster : MonoBehaviour
             Debug.LogError("No players have not lost");
         }
 
+    }
+
+    public void EndTurnButtonSwitch()
+    {
+        if (CPU_isMasterDebugging || !(CPU_PlayersList[playerTurn] && CPU_isOn))
+            endTurnButton.interactable = true;
+        else
+            endTurnButton.interactable = false;
     }
 
     public int GetPlayerResources(int p)

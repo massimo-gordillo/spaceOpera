@@ -288,9 +288,9 @@ public class BaseUnit : MonoBehaviour
     {
         swordsSprite.gameObject.SetActive(true);
 
-        float scaleUpDuration = GameMaster.animationDuration/6;
-        float holdDuration = GameMaster.animationDuration* 3  / 4;
-        float scaleDownDuration = GameMaster.animationDuration / 12; ;
+        float scaleUpDuration = GameMaster.globalAnimationDuration/6;
+        float holdDuration = GameMaster.globalAnimationDuration* 3  / 4;
+        float scaleDownDuration = GameMaster.globalAnimationDuration / 12; ;
 
         Transform t = swordsSprite.transform;
         Vector3 startScale = new Vector3(0.01f, 0.01f, 1f);
@@ -358,7 +358,7 @@ public class BaseUnit : MonoBehaviour
     public IEnumerator AnimateDestroy()
     {
         healthTextContainer.text = "0";
-        yield return new WaitForSeconds(GameMaster.animationDuration);
+        yield return new WaitForSeconds(GameMaster.globalAnimationDuration);
         healthTextContainer.gameObject.SetActive(false);
         StartCoroutine(AnimateCollapseAndBlacken());
         if (unitName != "seed")
