@@ -64,6 +64,7 @@ public class GameMaster : MonoBehaviour
     public Button endTurnConfirmCardBackButton;
     public TMP_Text endTurnConfirmCardText;
     public static float animationDuration = 0.6f;
+    public static float swoopCardAnimationDuration = animationDuration*4;
 
     private RectTransform announcementCardRT;
     private Vector2 offScreenLeft;
@@ -137,13 +138,13 @@ public class GameMaster : MonoBehaviour
         else {
             Debug.LogWarning("Progeny set to -1 selected, defaulting to hard values");
             playerProgeny.Add(1, 1);
-            playerProgeny.Add(2, 1);
+            playerProgeny.Add(2, 0);
         }
 
         if (CPU_isOn)
         {
             CPU_PlayersList[1] = false;
-            CPU_PlayersList[2] = true;
+            CPU_PlayersList[2] = false;
         }
 
 
@@ -199,7 +200,7 @@ public class GameMaster : MonoBehaviour
         playerResources = new int[numPlayers + 1];
         playerResources[0] = 0;
         for (int i = 1; i <= numPlayers; i++)
-            setPlayerResources(i);
+            playerResources[i] = baseResourcePerTurn;
 
         SetCheapestUnits();
         //startupInstantiateUnits();
@@ -697,8 +698,18 @@ public class GameMaster : MonoBehaviour
 
     private void setPlayerResources(int playerTurn)
     {
-        int num = masterGrid.numCapturedResourceLocations(playerTurn);
-        playerResources[playerTurn] = playerResources[playerTurn] + baseResourcePerTurn + structureResourcePerTurn * num;
+        
+        double incomeWithMultiplier = structureResourcePerTurn;
+        if (getPlayerProgeny((byte)playerTurn) == 0)
+            incomeWithMultiplier = structureResourcePerTurn * 1.1;
+        int num = 0;
+        Debug.Log($"Player {playerTurn} has {num} structures");
+        foreach (BaseStructure s in masterGrid.GetStructures(playerTurn)){
+            num++;
+            StartCoroutine(s.AnimateIncome((int)incomeWithMultiplier));
+        }
+
+        playerResources[playerTurn] = playerResources[playerTurn] + baseResourcePerTurn + (int)incomeWithMultiplier * num;
         playerResourceText.text = ""+playerResources[playerTurn];
     }
 
@@ -972,9 +983,9 @@ public class GameMaster : MonoBehaviour
     private IEnumerator SwoopInAndOutTurnCard(Vector2 startPos, Vector2 centerPos, Vector2 endPos)
     {
         endTurnButton.GetComponent<Button>().interactable = false; 
-        yield return SwoopTurnCard(startPos, centerPos, animationDuration*1.5f, easeOutCubic);
-        yield return new WaitForSeconds(animationDuration);
-        yield return SwoopTurnCard(centerPos, endPos, animationDuration, easeInCubic);
+        yield return SwoopTurnCard(startPos, centerPos, swoopCardAnimationDuration/2f, easeOutCubic);
+        yield return new WaitForSeconds(animationDuration/2f);
+        yield return SwoopTurnCard(centerPos, endPos, animationDuration, easeInCubic); // * 3 / 8
         //I don't like this being here but I need to wait.
         //endTurnButton.GetComponent<Button>().interactable = !CPU_PlayersList[playerTurn];
         endTurnButton.GetComponent<Button>().interactable = true;

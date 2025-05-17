@@ -1905,17 +1905,6 @@ public class MasterGrid : MonoBehaviour
         }
     }
 
-    public int numCapturedResourceLocations(int player)
-    {
-        int num = 0;
-        for (int i = 0; i < gridX; i++)
-            for (int j = 0; j < gridY; j++)
-                if (structureGrid[i, j] != null)
-                    if (structureGrid[i, j].playerControl == player)
-                        num++;
-        return num;
-    }
-
     public void presentChoicesAtLocation(Vector2Int pos, BaseUnit unit)
     {
         if(unit.canMoveAndAttack || unit.movementNonExhausted)

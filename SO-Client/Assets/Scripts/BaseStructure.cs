@@ -20,27 +20,15 @@ public class BaseStructure : MonoBehaviour
     public StaticSprite neutralSpriteContainer;
     public SpriteRenderer neutralSpriteFill;
     public SpriteRenderer hammerSprite;
-    
-/*    public SpriteRenderer progeny0SpriteRenderer;
-    public SpriteRenderer progeny1SpriteRenderer;
-    public SpriteRenderer progeny2SpriteRenderer;*/
+    public CanvasGroup incomeAnimationCanvasGroup;
+    public TMP_Text incomeAnimationText;
+    public GameObject incomeAnimationSprite;
 
     public StaticSprite progeny0CaptureSpriteContainer;
-/*    public SpriteRenderer progeny0ResourceCaptureSpriteFillSR;
-    public SpriteRenderer progeny0ResourceCaptureSpriteTrimSR;
-    public SpriteRenderer progeny0ResourceCaptureSpriteLightsSR;*/
     public StaticSprite progeny1CaptureSpriteContainer;
-/*    public SpriteRenderer progeny1CaptureSpriteFillSR;
-    public SpriteRenderer progeny1CaptureSpriteTrimSR;
-    public SpriteRenderer progeny1CaptureSpriteLightsSR;*/
     public StaticSprite progeny2ResourceCaptureSpriteContainer;
-/*    public SpriteRenderer progeny2ResourceCaptureSpriteFillSR;
-    public SpriteRenderer progeny2ResourceCaptureSpriteTrimSR;
-    public SpriteRenderer progeny2ResourceCaptureSpriteLightsSR;*/
     public StaticSprite progeny2ProductionCaptureSpriteContainer;
-/*    public SpriteRenderer progeny2ProductionCaptureSpriteFillSR;
-    public SpriteRenderer progeny2ProductionCaptureSpriteTrimSR;
-    public SpriteRenderer progeny2ProductionCaptureSpriteLightsSR;*/
+
 
 
 
@@ -76,10 +64,12 @@ public class BaseStructure : MonoBehaviour
         {
             setCaptureHealth(maxCaptureHealth);
         }*/
-/*        if (structureType == 5)
-        {
-            MasterGrid.commandStructures[playerControl] = this;
-        }*/
+        /*        if (structureType == 5)
+                {
+                    MasterGrid.commandStructures[playerControl] = this;
+                }*/
+        incomeAnimationText.GetComponent<RectTransform>().sizeDelta = new Vector2(0.7f, 0.4f);
+        incomeAnimationSprite.GetComponent<RectTransform>().sizeDelta = new Vector2(0.2f, 0.2f);
 
     }
 
@@ -302,6 +292,52 @@ public class BaseStructure : MonoBehaviour
         // Ensure fully shrunk and deactivate
         t.localScale = startScale;
         hammerSprite.gameObject.SetActive(false);
+    }
+
+    public IEnumerator AnimateIncome(int income)
+    {
+        yield return new WaitForSeconds(GameMaster.swoopCardAnimationDuration);
+        float duration = GameMaster.animationDuration*1.5f; // total time from bottom to top
+        float fadeInTime = GameMaster.animationDuration/5f;
+        float fadeOutTime = GameMaster.animationDuration / 5f;
+        float startY = -0.35f;
+        float endY = 0.25f;
+        float elapsedTime = 0;
+        RectTransform rectTransform = incomeAnimationCanvasGroup.GetComponent<RectTransform>();
+
+        if (incomeAnimationCanvasGroup == null)
+        {
+            Debug.LogError("CanvasGroup reference is null!");
+        }
+
+        incomeAnimationCanvasGroup.alpha = 0f;
+        incomeAnimationText.text = "+ " + income.ToString();
+        while (elapsedTime < duration)
+        {
+            elapsedTime += Time.deltaTime;
+            float t = Mathf.Clamp01(elapsedTime / duration);
+
+            // Interpolate position
+            float y = Mathf.Lerp(startY, endY, t);
+            Vector3 pos = rectTransform.localPosition;
+            rectTransform.localPosition = new Vector3(pos.x, y, pos.z);
+
+            // Handle fade
+            if (elapsedTime < fadeInTime)
+            {
+                incomeAnimationCanvasGroup.alpha = Mathf.InverseLerp(0, fadeInTime, elapsedTime);
+            }
+            else if (elapsedTime > duration - fadeOutTime)
+            {
+                incomeAnimationCanvasGroup.alpha = Mathf.InverseLerp(duration, duration - fadeOutTime, elapsedTime);
+            }
+            else
+            {
+                incomeAnimationCanvasGroup.alpha = 1f;
+            }
+
+            yield return null;
+        }
     }
 
     public void turnOffCaptureSprites()

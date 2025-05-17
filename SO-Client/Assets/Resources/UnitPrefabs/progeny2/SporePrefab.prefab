@@ -639,7 +639,7 @@ Transform:
   m_GameObject: {fileID: 2367283697873198596}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.01, y: 0.01, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 562047367638127260}
@@ -1903,16 +1903,16 @@ MonoBehaviour:
   healthType: 0
   damageType: 0
   weaponType: 0
-  attributesHash: 6444522552755748864
+  attributesHash: -3462915677021536256
   isResourceUnit: 1
   isInfantry: 1
   healthMax: 50
   healthCurrent: 0
   baseDamage: 0
   attackRange: 0
-  price: 100
+  price: 50
   movementRange: 3
-  playerControl: 0
+  playerControl: 1
   team: 0
   orientation: 3
   pos: {x: 0, y: 0}
