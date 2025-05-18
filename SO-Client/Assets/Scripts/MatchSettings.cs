@@ -6,12 +6,14 @@ using UnityEngine;
 //examples include: map selection, map skin, player color selection.
 public static class MatchSettings {
 
-    static public int numPlayers;
+    static public int numPlayers = 2;
     static public int[] playerProgenys;
     static public bool isInit=false;
     public static Color32[] playerColors;
+    static public bool[] playerIsCPU = new bool[numPlayers];
+    static public bool CPU_isOn = false;
 
-    
+
 
 
     static public void SetNumPlayers(int numPlayers)

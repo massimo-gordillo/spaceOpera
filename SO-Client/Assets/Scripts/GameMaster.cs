@@ -84,7 +84,7 @@ public class GameMaster : MonoBehaviour
     static int player2ProgenySelected;
     public static Color32[] playerColors;
 
-    public static bool CPU_isOn =true;
+    public static bool CPU_isOn = true;
     private static bool CPU_isMasterDebugging = false;
     public static bool[] CPU_PlayersList;
     //public static List<(BaseUnit, int)>[] CPU_unitMatchupWeights;
@@ -154,17 +154,31 @@ public class GameMaster : MonoBehaviour
             playerProgeny.Add(2, 0);
         }
 
-        if (CPU_isOn)
+        if (MatchSettings.CPU_isOn || CPU_isOn)
         {
+            CPU_isOn = true;
+            if (MatchSettings.playerIsCPU.Length==numPlayers)
+                for(int i=0; i < numPlayers; i++)
+                {
+                    CPU_PlayersList[i+1] = MatchSettings.playerIsCPU[i];
+                }
+            else
+                Debug.LogError("Incorrect number of players in MatchSettings CPU count");
+
+        }
+
+        if(!MatchSettings.CPU_isOn && CPU_isOn)
+        {
+            Debug.LogWarning("Match settings says CPU is off but manual CPU is on, defaulting to hard values.");
             CPU_PlayersList[1] = false;
             CPU_PlayersList[2] = true;
         }
 
 
-/*        playerColors = new Color32[numPlayers + 1];
-        playerColors[0] = new Color32(255, 255, 255, 255);
-        playerColors[1] = new Color32(63, 44, 255, 255);
-        playerColors[2] = new Color32(230, 19, 53, 255);*/
+        /*        playerColors = new Color32[numPlayers + 1];
+                playerColors[0] = new Color32(255, 255, 255, 255);
+                playerColors[1] = new Color32(63, 44, 255, 255);
+                playerColors[2] = new Color32(230, 19, 53, 255);*/
         //Debug.Log($"player 1 is progeny {getPlayerProgeny(0)}, player 2 is progeny {getPlayerProgeny(1)}");
 
         unitCosts = new List<(BaseUnit, int)>[3];

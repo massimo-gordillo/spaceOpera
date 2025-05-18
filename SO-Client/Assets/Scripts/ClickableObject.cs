@@ -9,10 +9,10 @@ public class ClickableObject : MonoBehaviour
     protected virtual void Start()
     {
         cameraManager = Camera.main.GetComponent<CameraManager>();
-        if (cameraManager == null)
+/*        if (cameraManager == null)
         {
             Debug.LogWarning("CameraDrag component not found on the main camera.");
-        }
+        }*/
     }
 
 
