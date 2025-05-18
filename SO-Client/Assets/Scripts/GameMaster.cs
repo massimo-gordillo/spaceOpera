@@ -78,7 +78,7 @@ public class GameMaster : MonoBehaviour
     public BaseStructure productionAirportStructurePrefab;
     public BaseStructure productionFactoryStructurePrefab;
     public BaseStructure resourceStructurePrefab;
-    private string gameStateFilePath = "Assets/InitializationData/Maps/Map3/Map3GameState.dat";
+    //private string gameStateFilePath = "Assets/InitializationData/Maps/Map3/Map3GameState.dat";
 
     static int player1ProgenySelected;
     static int player2ProgenySelected;
@@ -123,13 +123,25 @@ public class GameMaster : MonoBehaviour
         //Debug.Log("Initializing game");
         match_id = Guid.Parse("aaaaaaaa-8761-4e77-a086-a7365ae9e0b4");
         turnNumber = 1;
-        if(MatchSettings.isInit==false)
+
+        if (!MatchSettings.isInit)
         {
             //Debug.LogWarning("MatchSettings.numPlayers is null, defaulting to 2");
             MatchSettings.SetNumPlayers(2);
+            MatchSettings.SetPlayerColours();
+            MatchSettings.isInit = true;
+            
             numPlayers = 2; //will set dynamically later
-        }else
+            SetPlayerColors(true);
+
+        }
+        else
+        {
+            
             numPlayers = 2;
+            SetPlayerColors(false);
+        }
+        
 
         if (MatchSettings.playerProgenys[0]>=0 && MatchSettings.playerProgenys[1] >= 0)
         {   
@@ -149,10 +161,10 @@ public class GameMaster : MonoBehaviour
         }
 
 
-        playerColors = new Color32[numPlayers + 1];
+/*        playerColors = new Color32[numPlayers + 1];
         playerColors[0] = new Color32(255, 255, 255, 255);
         playerColors[1] = new Color32(63, 44, 255, 255);
-        playerColors[2] = new Color32(230, 19, 53, 255);
+        playerColors[2] = new Color32(230, 19, 53, 255);*/
         //Debug.Log($"player 1 is progeny {getPlayerProgeny(0)}, player 2 is progeny {getPlayerProgeny(1)}");
 
         unitCosts = new List<(BaseUnit, int)>[3];
@@ -216,7 +228,7 @@ public class GameMaster : MonoBehaviour
 
     void Start()
     {
-        //have to wait until start to init the production panel because it needs to wait for GameValuesSO.
+        //have to wait until start to isInit the production panel because it needs to wait for GameValuesSO.
         productionPanel.init();
 
         //animation
@@ -1120,6 +1132,23 @@ public class GameMaster : MonoBehaviour
         if (airportCheapestUnit == int.MaxValue)
         {
             Debug.LogWarning("No cheapest airport unit found");
+        }
+    }
+
+    public static void SetPlayerColors(bool isInit)
+    {
+        playerColors = new Color32[numPlayers + 1];
+        if (isInit)
+        {
+            playerColors[0] = MatchSettings.playerColors[0];
+            playerColors[1] = MatchSettings.playerColors[1];
+            playerColors[2] = MatchSettings.playerColors[2];
+        }
+        else
+        {
+            playerColors[0] = new Color32(255, 255, 255, 255);
+            playerColors[1] = new Color32(63, 44, 255, 255);
+            playerColors[2] = new Color32(230, 19, 53, 255);
         }
     }
 }

@@ -209,7 +209,7 @@ public class BaseUnit : MonoBehaviour
 
     public void initializeColors()
     {
-        Color playerColor = GameMaster.playerColors[playerControl];
+        Color playerColor = MatchSettings.playerColors[playerControl];
         cornerSpriteTL.GetComponent<SpriteRenderer>().color = playerColor;  
         cornerSpriteTR.GetComponent<SpriteRenderer>().color = playerColor;
         cornerSpriteBL.GetComponent<SpriteRenderer>().color = playerColor;
@@ -234,7 +234,7 @@ public class BaseUnit : MonoBehaviour
         if (sentusDefence > 0)
             defenceValueTextContainer.text += $" + {sentusDefence}";
         damageRangeTextContainer.text = $"{(int)(ceiling*100)}% - {(int)(floor*100)}%";
-        Color playerColor = GameMaster.playerColors[playerControl];
+        Color playerColor = MatchSettings.playerColors[playerControl];
         //make transparent
         Color transparentColor = new Color(playerColor.r, playerColor.g, playerColor.b, 0.6f);
         tooltipImage.color = transparentColor;

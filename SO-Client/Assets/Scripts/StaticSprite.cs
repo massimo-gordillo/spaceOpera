@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class StaticSprite : ClickableObject
 {
@@ -12,6 +13,10 @@ public class StaticSprite : ClickableObject
     public SpriteRenderer fillSR;
     public SpriteRenderer trimSR;
     public SpriteRenderer lightsSR;
+    public Image fillImage;
+    public Image trimImage;
+    public Image lightsImage;
+    public bool isUIVariant;
 
     // Start is called before the first frame update
     protected override void Start()
@@ -120,7 +125,7 @@ public class StaticSprite : ClickableObject
             //Debug.Log($"for nonexhausted unit {nonExhausted}, saturation changed from {oldSaturation} to {saturation}, and value changed from {oldValue}, to {value}");
 
             Color adjustedFillColor = Color.HSVToRGB(hue, saturation, value);
-            fillSR.color = adjustedFillColor;
+            SetFillColor(adjustedFillColor);
 
             // Adjust brightness of spriteLightsSR, keeping its original hue and saturation
             float lightsHue, lightsSaturation, lightsValue;
@@ -128,13 +133,13 @@ public class StaticSprite : ClickableObject
 
             float adjustedLightsValue = nonExhausted ? lightsValue : lightsValue * 0.7f;
             Color adjustedLightsColor = Color.HSVToRGB(lightsHue, lightsSaturation, adjustedLightsValue);
-            lightsSR.color = adjustedLightsColor;
+            SetLightsColor(adjustedLightsColor);
 
             // Debug.Log($"Adjusted fill: {adjustedFillColor}, adjusted lights: {lightsColor}");
         } else if (player == 0)
         {
-            lightsSR.color = lightsColor;
-            fillSR.color = baseColor;
+            SetFillColor(baseColor);
+            SetLightsColor(lightsColor);
         }
     
     }
@@ -147,6 +152,21 @@ public class StaticSprite : ClickableObject
         }
     }
 
+    public void SetFillColor(Color c)
+    {
+        if(fillSR != null)
+            fillSR.color = c;
+        if (fillImage != null)
+            fillImage.color = c;
+    }
+
+    public void SetLightsColor(Color c)
+    {
+        if (lightsSR != null)
+            lightsSR.color = c;
+        if (lightsImage != null)
+            lightsImage.color = c;
+    }
     /*public void setColorStructure(SpriteRenderer sprite) //Should this be combined with baseUnit.setColor? Maybe Mastergrid does this modification.
     {
         int player = playerControl;

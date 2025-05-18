@@ -17,7 +17,8 @@ namespace SlimUI.ModernMenu{
         private InputAction continueAction;
 		public GameValuesSO gameValuesSO;
 		public bool isGameValuesLoaded = false;
-		//public GameMaster gameMaster;// = new GameMaster();
+        public static bool isAnimating = false;
+        //public GameMaster gameMaster;// = new GameMaster();
 
         // campaign button sub menu
         [Header("MENUS")]
@@ -160,13 +161,17 @@ namespace SlimUI.ModernMenu{
         void Start(){
 			CameraObject = transform.GetComponent<Animator>();
             //keep initial cameraManager still
-            CameraObject.SetFloat("Animate", 0);
 
             playMenu.SetActive(false);
 			exitMenu.SetActive(false);
 			if(extrasMenu) extrasMenu.SetActive(false);
 			firstMenu.SetActive(true);
 			mainMenu.SetActive(true);
+
+            if (!isAnimating)
+            {
+                muteMusic();
+            }
 
 			SetThemeColors();
 		}

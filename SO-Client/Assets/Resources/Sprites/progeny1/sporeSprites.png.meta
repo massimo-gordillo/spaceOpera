@@ -47,7 +47,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 32
+  spritePixelsToUnits: 100
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -67,10 +67,10 @@ TextureImporter:
   platformSettings:
   - serializedVersion: 3
     buildTarget: DefaultTexturePlatform
-    maxTextureSize: 512
+    maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 0
+    textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -119,8 +119,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 15e840fafa3269b40b5317f874f6a592
-      internalID: 157978293
+      spriteID: 796fbfe7da5ea2a4f8a24c675e748b0f
+      internalID: -522073816
       vertices: []
       indices: 
       edges: []
@@ -140,8 +140,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: fa7e6db7d63c9a646bf03ea40040af32
-      internalID: -1575009024
+      spriteID: 39babedc177e45747a38bc400ee32015
+      internalID: -1382238411
       vertices: []
       indices: 
       edges: []
@@ -161,8 +161,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: da1ba5433fc56e44c990c171555cc6d2
-      internalID: -142783421
+      spriteID: fb676fafbb410dd41af7c5faddce4d63
+      internalID: 1417827560
       vertices: []
       indices: 
       edges: []
@@ -182,8 +182,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 93d68156de955214abe1fcf08e56027a
-      internalID: 652986050
+      spriteID: f21ef54955b74e34f9584534ff575193
+      internalID: -589332654
       vertices: []
       indices: 
       edges: []
@@ -199,10 +199,10 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      sporeSprites_0: 157978293
-      sporeSprites_1: -1575009024
-      sporeSprites_2: -142783421
-      sporeSprites_3: 652986050
+      sporeSprites_0: -522073816
+      sporeSprites_1: -1382238411
+      sporeSprites_2: 1417827560
+      sporeSprites_3: -589332654
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0

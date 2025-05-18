@@ -9,6 +9,10 @@ public static class MatchSettings {
     static public int numPlayers;
     static public int[] playerProgenys;
     static public bool isInit=false;
+    public static Color32[] playerColors;
+
+    
+
 
     static public void SetNumPlayers(int numPlayers)
     {
@@ -22,7 +26,6 @@ public static class MatchSettings {
         for(int i = 0;i <= numPlayers; i++)
             MasterGrid.playerUnits[i] = new List<BaseUnit>();
         GameMaster.CPU_PlayersList = new bool[numPlayers + 1];
-        isInit = true;
     }
 
     public static void SetPlayerProgeny(int playerIndex, int progeny)
@@ -35,5 +38,13 @@ public static class MatchSettings {
         {
             Debug.LogError("Invalid player index or array not initialized.");
         }
+    }
+
+    public static void SetPlayerColours()
+    {
+        playerColors = new Color32[numPlayers + 1];
+        playerColors[0] = new Color32(255, 255, 255, 255);
+        playerColors[1] = new Color32(63, 44, 255, 255);
+        playerColors[2] = new Color32(230, 19, 53, 255);
     }
 }

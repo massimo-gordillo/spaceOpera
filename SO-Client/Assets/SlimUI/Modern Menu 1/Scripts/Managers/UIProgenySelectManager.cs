@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Data;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -12,6 +13,11 @@ public class UIProgenySelectManager : MonoBehaviour
     public Button player2SelectProgeny0;
     public Button player2SelectProgeny1;
     public Button player2SelectProgeny2;
+    //I could make this dynamic later, but would need to create a dynamic number of buttons and define them dynamically, possible, but for later.
+
+    public static Color32[] playerColors;
+    private static int numPlayers = 2;
+
 
     public Button startButton;
     public TextMeshPro startButtonText;
@@ -25,12 +31,12 @@ public class UIProgenySelectManager : MonoBehaviour
 
     void Start()
     {
-        //I could make this dynamic later, but would need to create a dynamic number of buttons and define them dynamically, possible, but for later.
-        int numPlayers = 2;
         //playerProgenys = new int[numPlayers];
         MatchSettings.SetNumPlayers(numPlayers);
-        baseColor = player1SelectProgeny0.GetComponent<Image>().color;
-        dimColor = baseColor * 0.7f;
+        MatchSettings.SetPlayerColours();
+        MatchSettings.isInit = true;
+        //baseColor = player1SelectProgeny0.GetComponent<Image>().color;
+        //dimColor = baseColor * 0.7f;
         playerButtons[0,0]= player1SelectProgeny0;
         playerButtons[0,1] = player1SelectProgeny1;
         playerButtons[0,2] = player1SelectProgeny2;
@@ -39,6 +45,7 @@ public class UIProgenySelectManager : MonoBehaviour
         playerButtons[1,2] = player2SelectProgeny2;
         startButton.interactable = false;
         setStartButton(false);
+        setColors();
     }
 
     //has to be single parameter to be used in button click event
@@ -79,8 +86,8 @@ public class UIProgenySelectManager : MonoBehaviour
         MatchSettings.playerProgenys[1] = -1;
         for (int i = 0; i < 3; i++)
         {
-            brightenButton(playerButtons[0, i]);
-            brightenButton(playerButtons[1, i]);
+            brightenButton(playerButtons[0, i], 0);
+            brightenButton(playerButtons[1, i], 1);
         }
         setStartButton(false);
     }
@@ -92,10 +99,10 @@ public class UIProgenySelectManager : MonoBehaviour
         {
             if (i!=progeny)
             {
-                dimButton(playerButtons[player,i]);
+                dimButton(playerButtons[player,i], player);
             }else
             {
-                brightenButton(playerButtons[player, i]);
+                brightenButton(playerButtons[player, i], player);
             }
         }
     }
@@ -114,15 +121,35 @@ public class UIProgenySelectManager : MonoBehaviour
         }
     }
 
-    public void dimButton(Button button)
+    public void setColors()
     {
-        //Debug.Log("Dimming button from " + button.image.color + " to " + dimColor);
-        button.image.color = dimColor;
+        for(int i =0; i<2; i++)
+        {
+            for(int j = 0; j < 3; j++)
+            {
+                    playerButtons[i,j].GetComponent<Image>().color = MatchSettings.playerColors[i+1];
+                    playerButtons[i, j].GetComponentInChildren<StaticSprite>().fillImage.color = MatchSettings.playerColors[i + 1];
+            }
+        }
     }
 
-    public void brightenButton(Button button)
+    public void dimButton(Button button, int player)
     {
-        button.image.color = baseColor;
+        //Debug.Log("Dimming button from " + button.image.color + " to " + dimColor);
+        button.image.color = (Color)MatchSettings.playerColors[player+1] * 0.7f;
+        foreach (Image i in button.GetComponentsInChildren<Image>())
+        {
+            i.color = (Color)MatchSettings.playerColors[player+1] * 0.7f;
+        }
+    }
+
+    public void brightenButton(Button button, int player)
+    {
+        button.image.color = MatchSettings.playerColors[player+1];
+        foreach (Image i in button.GetComponentsInChildren<Image>())
+        {
+            i.color = (Color)MatchSettings.playerColors[player + 1];
+        }
     }
 
     public void setPlayerProgeny(int player, int progeny)

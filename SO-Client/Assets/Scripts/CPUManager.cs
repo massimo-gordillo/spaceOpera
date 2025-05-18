@@ -862,8 +862,6 @@ public class CPUManager : MonoBehaviour
         {
             int minDistanceFromTarget = 3;
             int movementLeft = unit.movementRange;
-            bool isStepwiseMovement = true;
-
             //Debug.Log($"Target for {unit.pos} target node is {unit.CPU_TargetNode.pos}");
 
 

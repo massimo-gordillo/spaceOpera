@@ -11,7 +11,7 @@ public class ClickableObject : MonoBehaviour
         cameraManager = Camera.main.GetComponent<CameraManager>();
         if (cameraManager == null)
         {
-            Debug.LogError("CameraDrag component not found on the main camera.");
+            Debug.LogWarning("CameraDrag component not found on the main camera.");
         }
     }
 

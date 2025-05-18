@@ -51,7 +51,7 @@ public class UIScriptAnimator : MonoBehaviour
         skipButtonText.color = new Color(skipButtonText.color.r, skipButtonText.color.g, skipButtonText.color.b, 0.25f);
         //logoFinalPosition = logoSprite.transform.position;
         SetStartText();
-        if (!hasAnimated)
+        if (!hasAnimated && UIMenuManager.isAnimating)
         {
             StartCoroutine(TypeText());
             StartCoroutine(IntroAnimations());

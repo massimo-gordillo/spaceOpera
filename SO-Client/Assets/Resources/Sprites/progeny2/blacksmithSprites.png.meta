@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 0d4cb5050be074e49976ee730e94774a
+guid: 4da2f61a935b68e4aa6520ea68bd032f
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -47,7 +47,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 32
+  spritePixelsToUnits: 100
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -67,10 +67,10 @@ TextureImporter:
   platformSettings:
   - serializedVersion: 3
     buildTarget: DefaultTexturePlatform
-    maxTextureSize: 512
+    maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 0
+    textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -119,8 +119,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 9ff63aa6706449140b2b00fc12ef252a
-      internalID: 1371962019
+      spriteID: b572f568f88af4b488c3f9d6c340a8ef
+      internalID: 519680452
       vertices: []
       indices: 
       edges: []
@@ -140,8 +140,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 199def221a66f074396c8278660ad019
-      internalID: 383887029
+      spriteID: b6a9dc108a59bcd4cb0c5e5e6b79caf0
+      internalID: 805543245
       vertices: []
       indices: 
       edges: []
@@ -161,8 +161,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 7be7a8a74e1183549a608b081db6ce1b
-      internalID: -1474161901
+      spriteID: 6b738d902c1f0d240840ec51061d062c
+      internalID: 1446902460
       vertices: []
       indices: 
       edges: []
@@ -182,8 +182,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: e1d5cff4b4505d141a9d2f286e934108
-      internalID: 1982446670
+      spriteID: 6e7445ae8ee47204bb62274d948cad4d
+      internalID: -798089864
       vertices: []
       indices: 
       edges: []
@@ -199,10 +199,10 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      blacksmithSprites_0: 1371962019
-      blacksmithSprites_1: 383887029
-      blacksmithSprites_2: -1474161901
-      blacksmithSprites_3: 1982446670
+      blacksmithSprites_0: 519680452
+      blacksmithSprites_1: 805543245
+      blacksmithSprites_2: 1446902460
+      blacksmithSprites_3: -798089864
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0

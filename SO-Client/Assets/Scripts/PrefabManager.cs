@@ -282,7 +282,10 @@ public class PrefabManager
             }
             else
             {
-                spritePrefab.fillSR.sprite = fillSprite;
+                if(spritePrefab.isUIVariant)
+                    spritePrefab.fillImage.sprite = fillSprite;
+                else
+                    spritePrefab.fillSR.sprite = fillSprite;
             }
 
             Sprite trimSprite = Resources.Load<Sprite>(trimSpritePath);
@@ -292,18 +295,28 @@ public class PrefabManager
             }
             else
             {
-                spritePrefab.trimSR.sprite = trimSprite;
+                if(spritePrefab.isUIVariant)
+                    spritePrefab.trimImage.sprite = trimSprite;
+                else
+                    spritePrefab.trimSR.sprite = trimSprite;
             }
 
             Sprite lightsSprite = Resources.Load<Sprite>(lightsSpritePath);
             if (lightsSprite == null)
             {
                 //UnityEngine.Debug.Log($"Failed to load lights sprite from path: {lightsSpritePath}");
-                spritePrefab.lightsSR.sprite = null;
+                if(spritePrefab.isUIVariant)
+                    spritePrefab.lightsImage.sprite = null;
+                else
+                    spritePrefab.lightsSR.sprite = null;
+                
             }
             else
             {
-                spritePrefab.lightsSR.sprite = lightsSprite;
+                if(spritePrefab.isUIVariant)
+                    spritePrefab.lightsImage.sprite = lightsSprite;
+                else
+                    spritePrefab.lightsSR.sprite = lightsSprite;
             }
 
 
@@ -328,9 +341,18 @@ public class PrefabManager
             //UnityEngine.Debug.Log($"Loaded {sprites.Length} sprites for {attributes.unitName} at path: {basePath}");
 
             // Ensure we have enough sprites to assign
-            if (sprites.Length > 1) spritePrefab.fillSR.sprite = sprites[1];
-            if (sprites.Length > 2) spritePrefab.trimSR.sprite = sprites[2];
-            if (sprites.Length > 3) spritePrefab.lightsSR.sprite = sprites[3];
+            if (spritePrefab.isUIVariant)
+            {
+                if (sprites.Length > 1) spritePrefab.fillImage.sprite = sprites[1];
+                if (sprites.Length > 2) spritePrefab.trimImage.sprite = sprites[2];
+                if (sprites.Length > 3) spritePrefab.lightsImage.sprite = sprites[3];
+            }
+            else
+            {
+                if (sprites.Length > 1) spritePrefab.fillSR.sprite = sprites[1];
+                if (sprites.Length > 2) spritePrefab.trimSR.sprite = sprites[2];
+                if (sprites.Length > 3) spritePrefab.lightsSR.sprite = sprites[3];
+            }
         }
 
 
