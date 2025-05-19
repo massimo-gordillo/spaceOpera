@@ -3943,6 +3943,10 @@ MonoBehaviour:
   fillSR: {fileID: 0}
   trimSR: {fileID: 0}
   lightsSR: {fileID: 0}
+  fillImage: {fileID: 0}
+  trimImage: {fileID: 0}
+  lightsImage: {fileID: 0}
+  isUIVariant: 0
 --- !u!50 &350041783
 Rigidbody2D:
   serializedVersion: 4
@@ -6962,6 +6966,10 @@ MonoBehaviour:
   fillSR: {fileID: 0}
   trimSR: {fileID: 0}
   lightsSR: {fileID: 0}
+  fillImage: {fileID: 0}
+  trimImage: {fileID: 0}
+  lightsImage: {fileID: 0}
+  isUIVariant: 0
 --- !u!50 &580983544
 Rigidbody2D:
   serializedVersion: 4
@@ -9316,6 +9324,10 @@ MonoBehaviour:
   fillSR: {fileID: 0}
   trimSR: {fileID: 0}
   lightsSR: {fileID: 0}
+  fillImage: {fileID: 0}
+  trimImage: {fileID: 0}
+  lightsImage: {fileID: 0}
+  isUIVariant: 0
 --- !u!50 &869400660
 Rigidbody2D:
   serializedVersion: 4

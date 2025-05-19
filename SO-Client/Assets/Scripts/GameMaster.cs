@@ -174,23 +174,40 @@ public class GameMaster : MonoBehaviour
             CPU_PlayersList[2] = true;
         }
 
+        if (CPU_isOn)
+        {
+            bool allCPU = true;
+            for(int i = 1; i <= numPlayers; i++)
+            {
+                allCPU = allCPU && CPU_PlayersList[i];
+            }
+            if (allCPU)
+            {
+                concedeMenuButton.GetComponent<TMP_Text>().text = "End Game";
+            }
+        }
+
 
         /*        playerColors = new Color32[numPlayers + 1];
                 playerColors[0] = new Color32(255, 255, 255, 255);
                 playerColors[1] = new Color32(63, 44, 255, 255);
                 playerColors[2] = new Color32(230, 19, 53, 255);*/
         //Debug.Log($"player 1 is progeny {getPlayerProgeny(0)}, player 2 is progeny {getPlayerProgeny(1)}");
-
-        unitCosts = new List<(BaseUnit, int)>[3];
-        for(int i = 0; i<3; i++)
+        if (PrefabManager.unitCosts != null)
+            unitCosts = PrefabManager.unitCosts;
+        else
         {
-            unitCosts[i] = new List<(BaseUnit, int)>();
+            unitCosts = new List<(BaseUnit, int)>[numPlayers+1];
+            for (int i = 0; i < numPlayers+1; i++)
+            {
+                unitCosts[i] = new List<(BaseUnit, int)>();
+            }
         }
-/*        CPU_unitMatchupWeights = new List<(BaseUnit, int)>[3];
-        for (int i = 0; i < 3; i++)
-        {
-            CPU_unitMatchupWeights[i] = new List<(BaseUnit, int)>();
-        }*/
+        /*        CPU_unitMatchupWeights = new List<(BaseUnit, int)>[3];
+                for (int i = 0; i < 3; i++)
+                {
+                    CPU_unitMatchupWeights[i] = new List<(BaseUnit, int)>();
+                }*/
         /*        foreach(List<(BaseUnit, int)> pair in unitCosts)
                 {
                     pair = new List<(BaseUnit, int)>();

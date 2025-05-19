@@ -7,6 +7,7 @@ public class PrefabManager
 {
     private GameValuesSO gameValuesSO;
 
+    public static List<(BaseUnit, int)>[] unitCosts;
     /*    public void setGameValues(GameValuesSO setGameValuesSO)
         {
             gameValuesSO = setGameValuesSO;
@@ -32,9 +33,14 @@ public class PrefabManager
             modifyPrefab(prefabPath, unitAttributes);
         }
 
+        unitCosts = new List<(BaseUnit, int)>[3];
+        for(int i = 0; i < unitCosts.Length; i++)
+        {
+            unitCosts[i] = new List<(BaseUnit, int)>();
+        }
         if (prefab != null) {
-            //Debug.Log($"popoulating unit price list for progeny num {(int)prefab.progeny}");
-            GameMaster.unitCosts[(int)prefab.progeny].Add((prefab, prefab.price));
+            //Debug.Log($"popoulating unit {prefab.unitName} price list for progeny num {(int)prefab.progeny}");
+            unitCosts[(int)prefab.progeny].Add((prefab, prefab.price));
         }
 /*        else
         {
