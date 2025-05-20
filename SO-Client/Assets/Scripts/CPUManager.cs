@@ -2215,6 +2215,22 @@ int maxTotalCost)
             .SelectMany(list => list)
             .ToDictionary(tuple => tuple.Item1.gamePieceId, tuple => (tuple.Item1, tuple.Item2));
 
+        /*        var allCosts = GameMaster.unitCosts
+                .Where(list => list != null) // filter out null lists
+                .SelectMany(list => list)
+                .ToDictionary(tuple => tuple.Item1.gamePieceId, tuple => (tuple.Item1, tuple.Item2));*/
+
+
+/*        foreach (var unitCost in allCosts)
+        {
+            Debug.Log($"Printing allCosts, Unit: {unitCost.Value.Item1.unitName}, ID: {unitCost.Key}, Cost: {unitCost.Value.Item2}");
+        }
+        for (int i = 0; i < 3; i++)
+            foreach(var unitCost in GameMaster.unitCosts[i])
+            {
+                Debug.Log($"Printing unitCosts, Unit: {unitCost.Item1.unitName}, ID: {unitCost.Item1.gamePieceId}, Cost: {unitCost.Item2}");
+            }*/
+
         // Parse CSV lines
         for (int i = 1; i < lines.Count; i++) // skip header
         {

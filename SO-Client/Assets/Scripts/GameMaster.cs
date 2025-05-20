@@ -150,7 +150,7 @@ public class GameMaster : MonoBehaviour
         }
         else {
             Debug.LogWarning("Progeny set to -1 selected, defaulting to hard values");
-            playerProgeny.Add(1, 1);
+            playerProgeny.Add(1, 0);
             playerProgeny.Add(2, 0);
         }
 
@@ -170,7 +170,7 @@ public class GameMaster : MonoBehaviour
         if(!MatchSettings.CPU_isOn && CPU_isOn)
         {
             Debug.LogWarning("Match settings says CPU is off but manual CPU is on, defaulting to hard values.");
-            CPU_PlayersList[1] = false;
+            CPU_PlayersList[1] = true;
             CPU_PlayersList[2] = true;
         }
 
@@ -181,37 +181,19 @@ public class GameMaster : MonoBehaviour
             {
                 allCPU = allCPU && CPU_PlayersList[i];
             }
-            if (allCPU)
+/*            if (allCPU)
             {
                 concedeMenuButton.GetComponent<TMP_Text>().text = "End Game";
-            }
+            }*/
         }
 
-
-        /*        playerColors = new Color32[numPlayers + 1];
-                playerColors[0] = new Color32(255, 255, 255, 255);
-                playerColors[1] = new Color32(63, 44, 255, 255);
-                playerColors[2] = new Color32(230, 19, 53, 255);*/
-        //Debug.Log($"player 1 is progeny {getPlayerProgeny(0)}, player 2 is progeny {getPlayerProgeny(1)}");
-        if (PrefabManager.unitCosts != null)
-            unitCosts = PrefabManager.unitCosts;
-        else
+        unitCosts = new List<(BaseUnit, int)>[3];
+        for (int i = 0; i < 3; i++)
         {
-            unitCosts = new List<(BaseUnit, int)>[numPlayers+1];
-            for (int i = 0; i < numPlayers+1; i++)
-            {
-                unitCosts[i] = new List<(BaseUnit, int)>();
-            }
+            unitCosts[i] = new List<(BaseUnit, int)>();
         }
-        /*        CPU_unitMatchupWeights = new List<(BaseUnit, int)>[3];
-                for (int i = 0; i < 3; i++)
-                {
-                    CPU_unitMatchupWeights[i] = new List<(BaseUnit, int)>();
-                }*/
-        /*        foreach(List<(BaseUnit, int)> pair in unitCosts)
-                {
-                    pair = new List<(BaseUnit, int)>();
-                }*/
+
+
         //initializes all unit values, modifies their prefab and sprites.
         //initializes all Tilebases for tilemap
         //only does anything if it hasn't already been initialized.
@@ -245,6 +227,21 @@ public class GameMaster : MonoBehaviour
         playerResources[0] = 0;
         for (int i = 1; i <= numPlayers; i++)
             playerResources[i] = baseResourcePerTurn;
+
+/*        if (PrefabManager.unitCosts != null)
+        {
+            Debug.Log("unitCosts is not null, using prefab manager unit costs.");
+            unitCosts = PrefabManager.unitCosts;
+        }
+        else
+        {
+            Debug.Log("unitCosts is null, creating new unitCosts.");
+            unitCosts = new List<(BaseUnit, int)>[numPlayers + 1];
+            for (int i = 0; i < numPlayers + 1; i++)
+            {
+                unitCosts[i] = new List<(BaseUnit, int)>();
+            }
+        }*/
 
         SetCheapestUnits();
         //startupInstantiateUnits();

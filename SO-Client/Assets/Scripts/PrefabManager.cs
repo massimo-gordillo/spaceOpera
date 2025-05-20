@@ -33,19 +33,21 @@ public class PrefabManager
             modifyPrefab(prefabPath, unitAttributes);
         }
 
-        unitCosts = new List<(BaseUnit, int)>[3];
-        for(int i = 0; i < unitCosts.Length; i++)
-        {
-            unitCosts[i] = new List<(BaseUnit, int)>();
-        }
-        if (prefab != null) {
-            //Debug.Log($"popoulating unit {prefab.unitName} price list for progeny num {(int)prefab.progeny}");
-            unitCosts[(int)prefab.progeny].Add((prefab, prefab.price));
-        }
-/*        else
-        {
-            UnityEngine.Debug.Log($"for unit {unitAttributes.unitName}, prefab check ok");
-        }*/
+        GameMaster.unitCosts[(int)prefab.progeny].Add((prefab, prefab.price));
+
+        /*        unitCosts = new List<(BaseUnit, int)>[3];
+                for(int i = 0; i < unitCosts.Length; i++)
+                {
+                    unitCosts[i] = new List<(BaseUnit, int)>();
+                }
+                if (prefab != null) {
+                    Debug.Log($"popoulating unit {prefab.unitName} price list for progeny num {(int)prefab.progeny}, id is {prefab.gamePieceId}");
+                    unitCosts[(int)prefab.progeny].Add((prefab, prefab.price));
+                }
+                else
+                {
+                    UnityEngine.Debug.Log($"for unit {unitAttributes.unitName}, prefab is null");
+                }*/
     }
 
     public GameObject getPrefabFromPath(string prefabPath)

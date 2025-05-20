@@ -1343,7 +1343,7 @@ MonoBehaviour:
   attackRange: 1
   price: 800
   movementRange: 5
-  playerControl: 1
+  playerControl: 0
   team: 0
   orientation: 3
   pos: {x: 0, y: 0}
@@ -1411,7 +1411,7 @@ Transform:
   m_GameObject: {fileID: 5413792574459136315}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.01, y: 0.01, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4820157860386435678}
@@ -1466,6 +1466,10 @@ MonoBehaviour:
   fillSR: {fileID: 5092328200350862809}
   trimSR: {fileID: 3216773881544973175}
   lightsSR: {fileID: 6144970052887093714}
+  fillImage: {fileID: 0}
+  trimImage: {fileID: 0}
+  lightsImage: {fileID: 0}
+  isUIVariant: 0
 --- !u!1 &5542489618972792759
 GameObject:
   m_ObjectHideFlags: 0
@@ -1780,6 +1784,10 @@ MonoBehaviour:
   fillSR: {fileID: 0}
   trimSR: {fileID: 0}
   lightsSR: {fileID: 0}
+  fillImage: {fileID: 0}
+  trimImage: {fileID: 0}
+  lightsImage: {fileID: 0}
+  isUIVariant: 0
 --- !u!1 &6563889781055226540
 GameObject:
   m_ObjectHideFlags: 0
