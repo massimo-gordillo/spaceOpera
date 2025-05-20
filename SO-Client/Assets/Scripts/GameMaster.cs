@@ -126,7 +126,7 @@ public class GameMaster : MonoBehaviour
 
         if (!MatchSettings.isInit)
         {
-            //Debug.LogWarning("MatchSettings.numPlayers is null, defaulting to 2");
+            Debug.LogWarning("MatchSettings.numPlayers is null, defaulting to 2");
             MatchSettings.SetNumPlayers(2);
             MatchSettings.SetPlayerColours();
             MatchSettings.isInit = true;
@@ -186,11 +186,13 @@ public class GameMaster : MonoBehaviour
                 concedeMenuButton.GetComponent<TMP_Text>().text = "End Game";
             }*/
         }
-
-        unitCosts = new List<(BaseUnit, int)>[3];
-        for (int i = 0; i < 3; i++)
+        if (unitCosts == null)
         {
-            unitCosts[i] = new List<(BaseUnit, int)>();
+            unitCosts = new List<(BaseUnit, int)>[3];
+            for (int i = 0; i < 3; i++)
+            {
+                unitCosts[i] = new List<(BaseUnit, int)>();
+            }
         }
 
 

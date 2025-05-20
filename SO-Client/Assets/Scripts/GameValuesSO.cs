@@ -155,10 +155,19 @@ public class GameValuesSO : ScriptableObject
             return;
         //MG: 25-03-31: an improvement could exist here, where you only load the units relevant to the level/progeny. Future performance improvement.
 
+        if (GameMaster.unitCosts == null)
+        {
+            GameMaster.unitCosts = new List<(BaseUnit, int)>[3];
+            for (int i = 0; i < GameMaster.unitCosts.Length; i++)
+            {
+                GameMaster.unitCosts[i] = new List<(BaseUnit, int)>();
+            }
+        }
+
         //string filePath = Path.Combine(Application.streamingAssetsPath, fileName);
 
-        //string[] lines = File.ReadAllLines(filePath);
-        //string csv = loadCSVFromJSON(fileName);
+            //string[] lines = File.ReadAllLines(filePath);
+            //string csv = loadCSVFromJSON(fileName);
         List<string> lines = LoadCSVFromJSON("UnitValues.json");
 
         //loop to iterate through the JSON output and convert it to a string array

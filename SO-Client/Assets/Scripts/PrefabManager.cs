@@ -7,7 +7,7 @@ public class PrefabManager
 {
     private GameValuesSO gameValuesSO;
 
-    public static List<(BaseUnit, int)>[] unitCosts;
+    //public static List<(BaseUnit, int)>[] unitCosts;
     /*    public void setGameValues(GameValuesSO setGameValuesSO)
         {
             gameValuesSO = setGameValuesSO;
@@ -33,7 +33,8 @@ public class PrefabManager
             modifyPrefab(prefabPath, unitAttributes);
         }
 
-        GameMaster.unitCosts[(int)prefab.progeny].Add((prefab, prefab.price));
+        if (unitAttributes.isNotPrototype)
+            GameMaster.unitCosts[(int)prefab.progeny].Add((prefab, prefab.price));
 
         /*        unitCosts = new List<(BaseUnit, int)>[3];
                 for(int i = 0; i < unitCosts.Length; i++)

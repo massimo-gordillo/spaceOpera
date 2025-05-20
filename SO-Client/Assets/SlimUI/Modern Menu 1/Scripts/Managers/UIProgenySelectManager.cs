@@ -38,7 +38,7 @@ public class UIProgenySelectManager : MonoBehaviour
         //playerProgenys = new int[numPlayers];
         MatchSettings.SetNumPlayers(numPlayers);
         MatchSettings.SetPlayerColours();
-        MatchSettings.isInit = false;
+        MatchSettings.isInit = true;
         //baseColor = player1SelectProgeny0.GetComponent<Image>().color;
         //dimColor = baseColor * 0.7f;
         playerButtons[0,0]= player1SelectProgeny0;
@@ -201,7 +201,8 @@ public class UIProgenySelectManager : MonoBehaviour
     {
         //player -= 1;
         //playerProgenys[player] = progeny;
-        MatchSettings.playerProgenys[player -1] = progeny;
+        //MatchSettings.playerProgenys[player -1] = progeny;
+        MatchSettings.SetPlayerProgeny(player - 1, progeny);
     }
 
     public void SetPlayerCPU(int player, bool isCPU)
