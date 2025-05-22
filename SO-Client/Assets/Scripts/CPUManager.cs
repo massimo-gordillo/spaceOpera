@@ -1155,7 +1155,7 @@ public class CPUManager : MonoBehaviour
             /*            int factoryCount = 0;
                         int airportCount = 0;*/
 
-            yield return GenerateSpendErtrianHeuristicV2();
+            yield return GenerateSpendErtrian();
 
             /*            foreach (BaseStructure structure in prods)
                         {
@@ -1241,7 +1241,7 @@ public class CPUManager : MonoBehaviour
         }
 
 
-        IEnumerator GenerateSpendErtrianHeuristicV2()
+        IEnumerator GenerateSpendErtrian()
         {
             List<BaseStructure> factories = new();
             List<BaseStructure> airports = new();
