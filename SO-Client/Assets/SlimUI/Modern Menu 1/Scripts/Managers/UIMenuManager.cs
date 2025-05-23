@@ -98,6 +98,7 @@ namespace SlimUI.ModernMenu{
         public TMP_Text startGameButtonText;
 
         public GameObject progenySelectMenu;
+        public TutorialManager tutorialManager;
 
 
         void Awake()
@@ -264,11 +265,18 @@ namespace SlimUI.ModernMenu{
             CameraObject.SetFloat("Animate", 2);
         }
 
-/*        public void Position0()
+        public void Position4()
         {
             DisablePlayCampaign();
-            CameraObject.SetFloat("Animate", 10);
-        }*/
+            tutorialManager.FadeIn(true);
+            CameraObject.SetFloat("Animate", 3);
+        }
+
+        /*        public void Position0()
+                {
+                    DisablePlayCampaign();
+                    CameraObject.SetFloat("Animate", 10);
+                }*/
 
         void DisablePanels(){
 			PanelControls.SetActive(false);
