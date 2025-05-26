@@ -17,10 +17,12 @@ public class TutorialCardUI
 public class TutorialManager : MonoBehaviour
 {
     [Header("References")]
-    public ScrollRect scrollRect;
     public UIMenuManager menuManager;
-    public float scrollSpeed = 5f;
-    public float scrollDelay = 0.02f;
+    public float menuScale = 0.02f; // Scale factor for the menu
+    public Vector3 tutorialStartPosition;
+    public float tutorialSpacing = 200f;
+    public float tutorialPanDuration;
+    //public float scrollDelay = 0.02f;
 
     private List<TutorialCardUI> tutorialCards = new List<TutorialCardUI>();
     private int currentIndex = 0;
@@ -31,20 +33,18 @@ public class TutorialManager : MonoBehaviour
 
     void Start()
     {
-        foreach (Transform child in scrollRect.content)
+        tutorialStartPosition = transform.position; // Store initial position
+        FadeIn(false);
+        foreach (Transform child in transform)
         {
-            RectTransform card = child.GetComponent<RectTransform>();
-
-            /*            Button nextButton = card.Find("NextButton")?.GetComponent<Button>();
-                        Button backButton = card.Find("BackButton")?.GetComponent<Button>();
-                        Button menuButton = card.Find("MenuButton")?.GetComponent<Button>();*/
+            RectTransform card = child as RectTransform;
+            if (card == null || !card.gameObject.activeInHierarchy) continue;
 
             Button nextButton = FindComponentInChildrenByName<Button>(card, "NextButton");
             Button backButton = FindComponentInChildrenByName<Button>(card, "BackButton");
             Button menuButton = FindComponentInChildrenByName<Button>(card, "MenuButton");
 
             Debug.Log($"Card '{card.name}': NextButton={(nextButton != null ? "Found" : "Missing")}, BackButton={(backButton != null ? "Found" : "Missing")}, MenuButton={(menuButton != null ? "Found" : "Missing")}");
-
 
             var cardUI = new TutorialCardUI
             {
@@ -141,8 +141,10 @@ public class TutorialManager : MonoBehaviour
             tutorialCards.Add(cardUI);
         }
 
-        scrollRect.verticalNormalizedPosition = 1f;
+        //scrollRect.verticalNormalizedPosition = 1f;
+        
         UpdateButtonInteractivity();
+        DisableOutsideButtons();
     }
 
     private T FindComponentInChildrenByName<T>(Transform parent, string childName) where T : Component
@@ -158,8 +160,6 @@ public class TutorialManager : MonoBehaviour
         Debug.LogWarning($"Could NOT find {typeof(T).Name} named '{childName}' under '{parent.name}'");
         return null;
     }
-
-
 
     public void Translate(int direction)
     {
@@ -179,40 +179,34 @@ public class TutorialManager : MonoBehaviour
         Translate(direction);
     }
 
-
     private IEnumerator SmoothScrollToIndex(int targetIndex)
     {
-        Debug.Log($"[Scroll] Starting scroll from index {currentIndex} to {targetIndex}");
-        Debug.Log($"Content height: {scrollRect.content.rect.height}, Viewport height: {scrollRect.viewport.rect.height}");
+        RectTransform managerRect = GetComponent<RectTransform>();
+        float cardHeight = tutorialCards[0].card.rect.height; // Assumes all cards are the same height
 
+        // Calculate the target anchoredPosition.y (move up for higher indices)
+        //float targetY = 28f*targetIndex + tutorialStartPosition.y;
+        float targetY = (cardHeight + tutorialSpacing) * targetIndex * menuScale + tutorialStartPosition.y;
+
+        float startY = managerRect.anchoredPosition.y;// + tutorialStartPosition.y;
+        float t = 0f;
         isScrolling = true;
         DisableAllButtons();
 
-        float start = scrollRect.verticalNormalizedPosition;
-        float end = (1f - (targetIndex / (float)(tutorialCards.Count - 1)));
-        Debug.Log($"[Scroll] Start pos: {start}, Target pos: {end}");
-
-        float t = 0;
 
         while (t < 1f)
         {
-            t += Time.deltaTime * scrollSpeed;
-            float lerped = Mathf.Lerp(start, end, t);
-            scrollRect.verticalNormalizedPosition = lerped;
-            //Debug.Log($"[Scroll] t: {t:F2}, lerped: {lerped:F2}");
-            yield return new WaitForSeconds(scrollDelay);
+            t += Time.deltaTime / tutorialPanDuration;
+            float newY = Mathf.Lerp(startY, targetY, Mathf.Clamp01(t));
+            managerRect.anchoredPosition = new Vector2(managerRect.anchoredPosition.x, newY);
+            yield return null;
         }
-        //Debug.Log($"[Scroll] Lerp finished. t: {t:F2}");
 
-        scrollRect.verticalNormalizedPosition = end;
+        managerRect.anchoredPosition = new Vector2(managerRect.anchoredPosition.x, targetY);
         currentIndex = targetIndex;
-
-        Debug.Log($"[Scroll] Finished. Current index: {currentIndex}, final position: {scrollRect.verticalNormalizedPosition}");
-
         isScrolling = false;
         UpdateButtonInteractivity();
     }
-
 
     private void UpdateButtonInteractivity()
     {
@@ -238,6 +232,15 @@ public class TutorialManager : MonoBehaviour
 
     }
 
+    public void DisableOutsideButtons()
+    {
+        tutorialCards[0].backButton.onClick.RemoveAllListeners(); // Remove any existing listeners
+        tutorialCards[0].backButton.onClick.AddListener(BackToMenu);
+        tutorialCards[0].backButton.GetComponent<TMP_Text>().text = "<< Back"; // Change text to "Back to Menu"
+        //tutorialCards[0].backButton.gameObject.SetActive(false); // Disable back button on first card
+        tutorialCards[tutorialCards.Count - 1].nextButton.gameObject.SetActive(false); // Disable next button on last card
+    }
+
     private void DisableAllButtons()
     {
         foreach (var card in tutorialCards)
@@ -255,6 +258,17 @@ public class TutorialManager : MonoBehaviour
             FadeIn(false); // Fade to black
             menuManager.Position1();
         }
+        StartCoroutine(AnimateBackToMenu());
+    }
+
+    public IEnumerator AnimateBackToMenu()
+    {
+        int diff = 2;
+        if (currentIndex < 2)
+            diff = currentIndex;
+        yield return StartCoroutine(SmoothScrollToIndex(currentIndex - diff));
+        currentIndex = 0;
+        StartCoroutine(SmoothScrollToIndex(currentIndex));
     }
 
     public void FadeIn(bool fade)
@@ -282,5 +296,4 @@ public class TutorialManager : MonoBehaviour
 
         canvasGroup.alpha = targetAlpha;
     }
-
 }
