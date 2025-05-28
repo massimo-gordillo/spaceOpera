@@ -102,8 +102,12 @@ Orange #FF8A5C
 
 Player 
 Blue: #3034ff
+2nd blue: #2C5EFF
 
-massimogordillo@hotmail.com
+Base Colors:
+Ertrian Blue: 0036FF
+Virix Green: 009F0A
+Sentus Orange: FF8129
 
 
 SELECT 
@@ -183,3 +187,46 @@ ATTRIBUTIONS:
 FreePik - www.freepik.com
 AbtoCreative - flaticon.com/authors/abtocreative
 Music
+SlimMenu
+
+Screenshots to take:
+
+MAP:
+total map view
+
+Capturing:
+Capture unit on a structure
+capture button
+200 health
+
+Income:
+Captured structure +100
+
+Producing Units:
+Click on production structure
+Create unit buttons
+Unit created on top of structure
+
+Moving Units:
+Unit's movement range view
+Click to move
+
+Attacking:
+Unit's movement range view (same as before)
+Adjacent to enemy
+Attack Button
+Click on unit
+Swords
+
+Health:
+Health value not 100%
+Destroy sprite
+
+Special:
+Ranged Unit view
+Flying units
+Virix Spore
+
+Sentus defence squares
+Virix unit on bismuth
+

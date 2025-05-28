@@ -84,7 +84,7 @@ public class GameMaster : MonoBehaviour
     static int player2ProgenySelected;
     public static Color32[] playerColors;
 
-    public static bool CPU_isOn = true;
+    public static bool CPU_isOn = false;
     private static bool CPU_isMasterDebugging = false;
     public static bool[] CPU_PlayersList;
     //public static List<(BaseUnit, int)>[] CPU_unitMatchupWeights;
@@ -150,8 +150,8 @@ public class GameMaster : MonoBehaviour
         }
         else {
             Debug.LogWarning("Progeny set to -1 selected, defaulting to hard values");
-            playerProgeny.Add(1, 0);
-            playerProgeny.Add(2, 0);
+            playerProgeny.Add(1, 1);
+            playerProgeny.Add(2, 2);
         }
 
         if (MatchSettings.CPU_isOn || CPU_isOn)
