@@ -12,6 +12,7 @@ public class TutorialCardUI
     public Button nextButton;
     public Button backButton;
     public Button menuButton;
+    public TMP_Text pageNum;
 }
 
 public class TutorialManager : MonoBehaviour
@@ -43,15 +44,17 @@ public class TutorialManager : MonoBehaviour
             Button nextButton = FindComponentInChildrenByName<Button>(card, "NextButton");
             Button backButton = FindComponentInChildrenByName<Button>(card, "BackButton");
             Button menuButton = FindComponentInChildrenByName<Button>(card, "MenuButton");
+            TMP_Text pageNum = FindComponentInChildrenByName<TMP_Text>(card, "PageNum");
 
-            Debug.Log($"Card '{card.name}': NextButton={(nextButton != null ? "Found" : "Missing")}, BackButton={(backButton != null ? "Found" : "Missing")}, MenuButton={(menuButton != null ? "Found" : "Missing")}");
+            //Debug.Log($"Card '{card.name}': NextButton={(nextButton != null ? "Found" : "Missing")}, BackButton={(backButton != null ? "Found" : "Missing")}, MenuButton={(menuButton != null ? "Found" : "Missing")}");
 
             var cardUI = new TutorialCardUI
             {
                 card = card,
                 nextButton = nextButton,
                 backButton = backButton,
-                menuButton = menuButton
+                menuButton = menuButton,
+                pageNum = pageNum
             };
 
             // Hook up buttons
@@ -96,7 +99,7 @@ public class TutorialManager : MonoBehaviour
             if (nextButton != null)
             {
                 nextButton.onClick.AddListener(() => Translate(1));
-                nextButton.onClick.AddListener(() => Debug.Log("Test click for NextButton"));
+                //nextButton.onClick.AddListener(() => Debug.Log("Test click for NextButton"));
 
                 //Debug.Log($"[Setup] Added listener to NextButton on card '{card.name}'. Persistent listeners in Inspector: {nextButton.onClick.GetPersistentEventCount()}");
             }
@@ -140,9 +143,23 @@ public class TutorialManager : MonoBehaviour
 
             tutorialCards.Add(cardUI);
         }
+        int i = 0;
+        foreach(TutorialCardUI card in tutorialCards)
+        {
+            i++;
+            if (card.pageNum != null)
+            {
+                card.pageNum.text = $"{i} / {tutorialCards.Count}";
+                //Debug.Log($"Set page number for card '{i.card.name}' to: {i.pageNum.text}");
+            }
+            else
+            {
+                Debug.LogWarning($"No TMP_Text found for page number in card '{i}'");
+            }
+        }
 
         //scrollRect.verticalNormalizedPosition = 1f;
-        
+
         UpdateButtonInteractivity();
         DisableOutsideButtons();
     }
@@ -163,7 +180,7 @@ public class TutorialManager : MonoBehaviour
 
     public void Translate(int direction)
     {
-        Debug.Log($"Translate called with direction: {direction} (currentIndex = {currentIndex})");
+        //Debug.Log($"Translate called with direction: {direction} (currentIndex = {currentIndex})");
         if (isScrolling) return;
 
         int targetIndex = currentIndex + direction;
@@ -174,7 +191,7 @@ public class TutorialManager : MonoBehaviour
 
     void TranslateFromIndex(int fromIndex, int direction)
     {
-        Debug.Log($"Translating from index {fromIndex} by {direction}");
+        //Debug.Log($"Translating from index {fromIndex} by {direction}");
         if (fromIndex != currentIndex) return;
         Translate(direction);
     }
@@ -236,9 +253,16 @@ public class TutorialManager : MonoBehaviour
     {
         tutorialCards[0].backButton.onClick.RemoveAllListeners(); // Remove any existing listeners
         tutorialCards[0].backButton.onClick.AddListener(BackToMenu);
-        tutorialCards[0].backButton.GetComponent<TMP_Text>().text = "<< Back"; // Change text to "Back to Menu"
+        tutorialCards[0].backButton.GetComponentInChildren<TMP_Text>().text = "<< Back"; // Change text to "Back to Menu"
         //tutorialCards[0].backButton.gameObject.SetActive(false); // Disable back button on first card
-        tutorialCards[tutorialCards.Count - 1].nextButton.gameObject.SetActive(false); // Disable next button on last card
+        
+        //tutorialCards[tutorialCards.Count - 1].nextButton.gameObject.SetActive(false); // Disable next button on last card
+        tutorialCards[tutorialCards.Count - 1].nextButton.onClick.RemoveAllListeners(); // Remove any existing listeners
+        tutorialCards[tutorialCards.Count - 1].nextButton.onClick.AddListener(menuManager.Position3);
+        tutorialCards[tutorialCards.Count - 1].nextButton.onClick.AddListener(() => FadeIn(false));
+        tutorialCards[tutorialCards.Count - 1].nextButton.GetComponentInChildren<TMP_Text>().text = "Play!";
+        tutorialCards[tutorialCards.Count - 1].nextButton.GetComponent<RectTransform>().sizeDelta = new Vector2(600f, 130f); // Adjust size for "Play!" button
+
     }
 
     private void DisableAllButtons()

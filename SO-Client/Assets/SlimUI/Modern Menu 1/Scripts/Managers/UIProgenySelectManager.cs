@@ -142,10 +142,12 @@ public class UIProgenySelectManager : MonoBehaviour
         if (b)
         {
             startButton.interactable = true;
-            startButtonText.text = "Start >>";
+            startButtonText.text = "Start";
+            startButton.image.color = new Color32(255, 183, 0, 255);
         }
         else
         {
+            startButton.image.color = new Color32(100, 100, 100, 255);
             startButton.interactable = false;
             startButtonText.text = "Select...";
         }
