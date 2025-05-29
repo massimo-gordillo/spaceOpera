@@ -13,7 +13,7 @@ using Unity.Mathematics;
 
 public class CPUManager : MonoBehaviour
 {
-    private bool isInit = false;
+    //private bool isInit = false;
     public BaseUnit[,] unitGrid;
     public BaseStructure[,] structureGrid;
     public BaseStructure[] commandStructures;
@@ -87,9 +87,15 @@ public class CPUManager : MonoBehaviour
         List<BaseStructure> structureList = masterGrid.GetStructures(null);
         structureGrid = masterGrid.structureGrid;
         SortByDistanceFromOrigin(structureList);
+
         nodeVectorMap = new();
         structureListArray = new BaseStructure[structureList.Count];
         structuresEuclideanDistance = new double[structureList.Count, structureList.Count];
+        priorityNetworkNodes = new();
+        priorityNodeVectorMap = new();
+        resourceNetworkNodes = new();
+        heatMaps = new List<double[,]>();
+
         foreach (BaseStructure structure in structureList)
         {
             NetworkNode node = new NetworkNode(structure);
