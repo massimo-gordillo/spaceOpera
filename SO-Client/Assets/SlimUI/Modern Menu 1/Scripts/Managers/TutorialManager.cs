@@ -287,8 +287,8 @@ public class TutorialManager : MonoBehaviour
 
     public IEnumerator AnimateBackToMenu()
     {
-        int diff = 2;
-        if (currentIndex < 2)
+        int diff = 1;
+        if (currentIndex < diff)
             diff = currentIndex;
         yield return StartCoroutine(SmoothScrollToIndex(currentIndex - diff));
         currentIndex = 0;
@@ -313,6 +313,15 @@ public class TutorialManager : MonoBehaviour
 
         while (time < fadeDuration)
         {
+            //manual work around for TMP_Text alpha as they're not TMP_Text UI elements
+            foreach (TutorialCardUI card in tutorialCards)
+            {
+                foreach (TMP_Text text in card.card.GetComponentsInChildren<TMP_Text>())
+                {
+                    text.alpha = Mathf.Lerp(startAlpha, targetAlpha, time / fadeDuration);
+                }
+            }
+
             time += Time.deltaTime;
             canvasGroup.alpha = Mathf.Lerp(startAlpha, targetAlpha, time / fadeDuration);
             yield return null;

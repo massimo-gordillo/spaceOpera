@@ -11340,21 +11340,17 @@ PrefabInstance:
       value: 20.460022
       objectReference: {fileID: 0}
     - target: {fileID: 3050759292701144297, guid: a47d8d4e096a17848a0f741f038ece1f, type: 3}
-      propertyPath: m_fontAsset
-      value: 
-      objectReference: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-    - target: {fileID: 3050759292701144297, guid: a47d8d4e096a17848a0f741f038ece1f, type: 3}
-      propertyPath: m_sharedMaterial
-      value: 
-      objectReference: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-    - target: {fileID: 3050759292701144297, guid: a47d8d4e096a17848a0f741f038ece1f, type: 3}
       propertyPath: m_hasFontAssetChanged
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3139455621024966035, guid: a47d8d4e096a17848a0f741f038ece1f, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+      objectReference: {fileID: 21809785584020342, guid: 0b65c99348f068b49bef5db0bb76a6e4, type: 2}
+    - target: {fileID: 3154105737262483150, guid: a47d8d4e096a17848a0f741f038ece1f, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5190504983037159459, guid: a47d8d4e096a17848a0f741f038ece1f, type: 3}
       propertyPath: m_Name
       value: Welcome
