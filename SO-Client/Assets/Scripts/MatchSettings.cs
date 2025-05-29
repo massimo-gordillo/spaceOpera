@@ -46,7 +46,7 @@ public static class MatchSettings {
     {
         playerColors = new Color32[numPlayers + 1];
         playerColors[0] = new Color32(255, 255, 255, 255);
-        playerColors[1] = new Color32(63, 44, 255, 255);
+        playerColors[1] = new Color32(44, 94, 255, 255);
         playerColors[2] = new Color32(230, 19, 53, 255);
     }
 }

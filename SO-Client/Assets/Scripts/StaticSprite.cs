@@ -119,8 +119,8 @@ public class StaticSprite : ClickableObject
             float oldValue = value;
 
             // Adjust saturation and brightness for exhaustion
-            saturation = nonExhausted ? 0.9f : 0.6f;
-            value = nonExhausted ? 0.95f : 0.75f;
+            saturation = nonExhausted ? 0.9f : 0.5f;
+            value = nonExhausted ? 0.95f : 0.60f;
 
             //Debug.Log($"for nonexhausted unit {nonExhausted}, saturation changed from {oldSaturation} to {saturation}, and value changed from {oldValue}, to {value}");
 
@@ -131,7 +131,7 @@ public class StaticSprite : ClickableObject
             float lightsHue, lightsSaturation, lightsValue;
             Color.RGBToHSV(lightsColor, out lightsHue, out lightsSaturation, out lightsValue);
 
-            float adjustedLightsValue = nonExhausted ? lightsValue : lightsValue * 0.7f;
+            float adjustedLightsValue = nonExhausted ? lightsValue : lightsValue * 0.3f;
             Color adjustedLightsColor = Color.HSVToRGB(lightsHue, lightsSaturation, adjustedLightsValue);
             SetLightsColor(adjustedLightsColor);
 

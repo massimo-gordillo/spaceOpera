@@ -233,7 +233,10 @@ public class BaseUnit : MonoBehaviour
         defenceValueTextContainer.text = $"Def: {defence}";
         if (sentusDefence > 0)
             defenceValueTextContainer.text += $" + {sentusDefence}";
-        damageRangeTextContainer.text = $"{(int)(ceiling*100)}% - {(int)(floor*100)}%";
+        if (floor >= 1)
+            damageRangeTextContainer.text = "100%";
+        else
+            damageRangeTextContainer.text = $"{(int)(floor * 100)} - {(int)(ceiling * 100)}%";
         Color playerColor = MatchSettings.playerColors[playerControl];
         //make transparent
         Color transparentColor = new Color(playerColor.r, playerColor.g, playerColor.b, 0.6f);
