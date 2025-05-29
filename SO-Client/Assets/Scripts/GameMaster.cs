@@ -7,6 +7,7 @@ using TMPro;
 using System.IO;
 using UnityEngine.SceneManagement;
 using JetBrains.Annotations;
+using UnityEngine.InputSystem;
 //using System.Diagnostics;
 //using MessagePack;
 
@@ -14,43 +15,63 @@ public class GameMaster : MonoBehaviour
 {
     //private static GameMaster _instance;
 
+    [Header("Managers")]
     public MasterGrid masterGrid;
     public TilemapManager tilemapManager;
     //private PrefabManager prefabManager = new PrefabManager();
     public SupabaseManager supabaseManager;
     public CPUManager CPUManager;
     public CameraManager cameraManager;
-
-    public Guid match_id;
-
     public Canvas canvas;
+
+    [Header("Game Values")]
+    public Guid match_id;
+    public GameValuesSO gameValues;
+    public int gridX;
+    public int gridY;
     public BaseStructure selectedStructure;
-    public GameObject choicePanel;
-    public MenuProductionPanel productionPanel;
-    public GameObject unitChoicePanel;
     public static int playerTurn;
     public static int numPlayers;
     public short turnNumber;
     private bool[] playersNotLost;
     public static bool isGameComplete = false;
-    /*public byte[] playerProgeny;*/
     public static Dictionary<byte, byte> playerProgeny = new Dictionary<byte, byte>();
-    public TMP_Text playerTurnText;
-    public TMP_Text playerResourceText;
     private int[] playerResources;
     private int baseResourcePerTurn;
     private int structureResourcePerTurn;
+    //private string gameStateFilePath = "Assets/InitializationData/Maps/Map3/Map3GameState.dat";
+
+
+    [Header("Game Prefab References")]
+    public BaseUnit infantryUnitPrefab;
+    public BaseStructure commandStructurePrefab;
+    public BaseStructure productionAirportStructurePrefab;
+    public BaseStructure productionFactoryStructurePrefab;
+    public BaseStructure resourceStructurePrefab;
+
+
+    [Header("Game Containers")]
     public Transform unitContainer;
     public Transform structureContainer;
-    public GameValuesSO gameValues;
-    public BaseUnit infantryUnitPrefab;
+
+
+
+    [Header("Game Action UI Items")]
+    public GameObject choicePanel;
+    public MenuProductionPanel productionPanel;
+    public GameObject unitChoicePanel;
+    public TMP_Text playerTurnText;
+    public TMP_Text playerResourceText;
     public Button attackButton;
     public Button captureButton;
     public Button undoMovementButton;
     public Button endTurnButton;
     public TMP_Text bottomButtonText;
+    public GameObject endTurnConfirmCard;
+    public Button endTurnConfirmCardBackButton;
+    public TMP_Text endTurnConfirmCardText;
 
-    public static bool isAnimating;
+    [Header("Menus")]
     public GameObject announcementCard;
     public TMP_Text announcementCardText;
     public GameObject promptCard;
@@ -60,63 +81,41 @@ public class GameMaster : MonoBehaviour
     public TMP_Text promptCardButtonRightText;
     public Button concedeMenuButton;
     public Button backToMenuButton;
-    public GameObject endTurnConfirmCard;
-    public Button endTurnConfirmCardBackButton;
-    public TMP_Text endTurnConfirmCardText;
+    public GameObject loadingScreen;
+    public Slider loadingBar;
+    public TMP_Text loadPromptText;
+    public AsyncOperation sceneLoadingOperation = null;
+    private InputAction continueAction;
+
+    [Header("Animations")]
+    public static bool isAnimating;
     public static float globalAnimationDuration = 0.6f;
     public static float swoopCardAnimationDuration = globalAnimationDuration*4;
-
     private RectTransform announcementCardRT;
     private Vector2 offScreenLeft;
     private Vector2 offScreenRight;
     private Vector2 centerPosition;
-
-    public int gridX;
-    public int gridY;
-
-    public BaseStructure commandStructurePrefab;
-    public BaseStructure productionAirportStructurePrefab;
-    public BaseStructure productionFactoryStructurePrefab;
-    public BaseStructure resourceStructurePrefab;
-    //private string gameStateFilePath = "Assets/InitializationData/Maps/Map3/Map3GameState.dat";
-
-    static int player1ProgenySelected;
-    static int player2ProgenySelected;
     public static Color32[] playerColors;
 
+    [Header("CPU")]
     public static bool CPU_isOn = false;
     private static bool CPU_isMasterDebugging = false;
     public static bool[] CPU_PlayersList;
-    //public static List<(BaseUnit, int)>[] CPU_unitMatchupWeights;
     public int virixCheapestUnit;
     public int airportCheapestUnit;
-
-    //public static List<BaseUnit>[] playerUnits = new List<BaseUnit>[GameMaster.numPlayers + 1];
     public static List<(BaseUnit, int)>[] unitCosts;
+    //public static List<(BaseUnit, int)>[] CPU_unitMatchupWeights;
+    //public static List<BaseUnit>[] playerUnits = new List<BaseUnit>[GameMaster.numPlayers + 1];
 
 
 
+
+    [Header("Loop Safety")]
     public int loopSafetyLimit = 10000;
     public int recusionSafetyLimit = 100;
     public static int recursionSafetyCounter = 0;
     public static int loopSafetyCounter = 0;
 
-    /*    public static GameMaster Instance
-        {
-            get
-            {
-                if (_instance == null)
-                {
-                    _instance = FindObjectOfType<GameMaster>();
-                    if (_instance == null)
-                    {
-                        // Optionally, create the instance if it's not found (this depends on your use case)
-                        _instance = new GameObject("GameMaster").AddComponent<GameMaster>();
-                    }
-                }
-                return _instance;
-            }
-        }*/
 
     private void Awake()
     {
@@ -789,15 +788,91 @@ public class GameMaster : MonoBehaviour
             isGameComplete = true;
             concedeMenuButton.interactable = false;
             backToMenuButton.interactable = true;
+            backToMenuButton.image.color = new Color32(255, 175, 0, 255);
             endTurnButton.interactable = false;
             displayWinnerCard(player);
         }
     }
-
-    public void ReturnToMainMenu()
+    public void LoadMainMenuScreen()
     {
-        SceneManager.LoadSceneAsync("MenuScene");
+        StartCoroutine(LoadAsynchronously("MenuScene"));
     }
+
+    IEnumerator LoadAsynchronously(string sceneName)
+    {
+        canvas.gameObject.SetActive(false);
+        choicePanel.SetActive(false);
+        loadingScreen.SetActive(true);
+        loadPromptText.text = "Loading... Main Menu";
+
+        float displayedProgress = 0.05f;
+        loadingBar.value = displayedProgress;
+
+        yield return null; // Let UI render first frame
+
+        // --- Fake initial scroll ---
+        float initialScrollTarget = 0.4f;
+        float scrollTime = 0.2f;
+        float elapsed = 0f;
+
+        while (elapsed < scrollTime)
+        {
+            elapsed += Time.deltaTime;
+            //displayedProgress = initialScrollTarget * elapsed / scrollTime;
+            displayedProgress = Mathf.Lerp(0.1f, initialScrollTarget, elapsed / scrollTime);
+            loadingBar.value = displayedProgress;
+            yield return null;
+        }
+
+        // --- Begin real loading ---
+        AsyncOperation operation = SceneManager.LoadSceneAsync(sceneName);
+        operation.allowSceneActivation = false;
+
+        while (!operation.isDone)
+        {
+            float targetProgress = Mathf.Clamp01(operation.progress / 0.9f);
+
+            if (displayedProgress < targetProgress)
+                displayedProgress += Time.deltaTime;
+            else
+                displayedProgress = targetProgress;
+
+            //loadingBar.value = Mathf.Lerp(loadingBar.value, displayedProgress, 0.3f);
+            if(displayedProgress > initialScrollTarget)
+                loadingBar.value = displayedProgress;
+
+            if (operation.progress >= 0.9f)
+            {
+                loadPromptText.text = "Loading... Done";
+                displayedProgress = Mathf.MoveTowards(displayedProgress, 1f, Time.deltaTime * 0.9f);
+                loadingBar.value = Mathf.Lerp(loadingBar.value, displayedProgress, 0.3f);
+
+                if (displayedProgress >= 0.99f)
+                {
+                    loadingBar.value = 1f;
+
+                    // Fade out only content, not the whole canvas
+                    CanvasGroup cg = loadingScreen.GetComponentInChildren<CanvasGroup>();
+                    float fadeDuration = 0.15f;
+                    float t = 0f;
+
+                    while (t < fadeDuration)
+                    {
+                        t += Time.deltaTime;
+                        cg.alpha = Mathf.Lerp(1f, 0f, t / fadeDuration);
+                        yield return null;
+                    }
+
+                    cg.alpha = 0f;
+                    operation.allowSceneActivation = true;
+                }
+            }
+
+            yield return null;
+        }
+    }
+
+
 
     private void displayWinnerCard(int player)
     {
