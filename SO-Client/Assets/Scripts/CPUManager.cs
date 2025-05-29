@@ -13,7 +13,7 @@ using Unity.Mathematics;
 
 public class CPUManager : MonoBehaviour
 {
-
+    private bool isInit = false;
     public BaseUnit[,] unitGrid;
     public BaseStructure[,] structureGrid;
     public BaseStructure[] commandStructures;
@@ -79,12 +79,16 @@ public class CPUManager : MonoBehaviour
 
     public void naiveV1Start()
     {
+/*        if (isInit)
+            return;
+        else
+            isInit = true;*/
         Debug.Log("Calling to start CPUManager");
         List<BaseStructure> structureList = masterGrid.GetStructures(null);
         structureGrid = masterGrid.structureGrid;
         SortByDistanceFromOrigin(structureList);
-        //nodeVectorMap = new();
-        //structureListArray = new BaseStructure[structureList.Count];
+        nodeVectorMap = new();
+        structureListArray = new BaseStructure[structureList.Count];
         structuresEuclideanDistance = new double[structureList.Count, structureList.Count];
         foreach (BaseStructure structure in structureList)
         {
@@ -153,13 +157,14 @@ public class CPUManager : MonoBehaviour
 
     public void Start()
     {
-        SetDefaultTargets();
+        StartCoroutine(SetDefaultTargets());
         ImportMatchupWeights();
     }
 
     
-    public void SetDefaultTargets() //assuming two players for now.
+    public IEnumerator SetDefaultTargets() //assuming two players for now.
     {
+        yield return null;
         commandStructures = new BaseStructure[GameMaster.numPlayers + 1];
         defaultTargets = new NetworkNode[GameMaster.numPlayers + 1];
         for (int p = 1; p <= GameMaster.numPlayers; p++)

@@ -35,7 +35,7 @@ public class BaseStructure : MonoBehaviour
 
 
     // Start is called before the first frame update
-    protected virtual void Start()
+    public virtual void Initialize()
     {
         gamePieceId = 200 + structureType; //structure ids start at 200.
         pos = new Vector2Int((int)transform.position.x, (int)transform.position.y);
@@ -52,7 +52,7 @@ public class BaseStructure : MonoBehaviour
 /*        if (structureType != 200)
                 setColor(neutralSpriteFill);
         if (playerControl != 0)*/
-        setCaptureSpritesAndColor();
+        
 
 
         if (IsCoveredByUnit())
@@ -71,9 +71,15 @@ public class BaseStructure : MonoBehaviour
         incomeAnimationText.GetComponent<RectTransform>().sizeDelta = new Vector2(0.7f, 0.4f);
         incomeAnimationSprite.GetComponent<RectTransform>().sizeDelta = new Vector2(0.2f, 0.2f);
 
+        StartCoroutine(WaitedSetColour());
+        
     }
 
-    
+    public IEnumerator WaitedSetColour()
+    {
+        yield return null;
+        setCaptureSpritesAndColor();
+    }
 
 
 
@@ -160,7 +166,8 @@ public class BaseStructure : MonoBehaviour
         }
         else
         {
-            //Debug.Log($"Player is 0 for structure {this.name}");
+/*            if(structureType == 1)
+                Debug.Log($"Player is 0 for structure {this.name} at {this.pos}");*/
             neutralSpriteContainer.SetColor(0, true, true);
         }
 

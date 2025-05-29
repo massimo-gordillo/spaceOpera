@@ -8,6 +8,7 @@ using UnityEngine;
 //using Newtonsoft.Json.Linq;
 using System.IO;
 using System.Text;
+using Cysharp.Threading.Tasks.Triggers;
 
 
 
@@ -55,7 +56,7 @@ public class MasterGrid : MonoBehaviour
 
     public List<BaseStructure> structuresList;
     public List<BaseStructure> prodStructuresList;
-    public static Structure_Command[] commandStructures;
+    public static Structure_Command[] commandStructures = new Structure_Command[3]; //assume 2 players for now
 
 
 
@@ -83,15 +84,19 @@ public class MasterGrid : MonoBehaviour
         attackableUnits = new List<BaseUnit>();
         spriteOffStructures = new List<BaseStructure>();
 
-        
+        foreach (BaseStructure structure in GetStructures(null))
+        {
+            structure.Initialize();
+        }
 
-        attackLuckDomain = 10;
+
+            attackLuckDomain = 10;
         defenceMultiplier = 4.0;
         firebackMultiplier = 0.7;
         //Dictionary<(byte, byte), GamePieceInfo> gameStateDict = ConvertGameStateToList();
         //printUnitGrid();
 
-        commandStructures = new Structure_Command[GameMaster.numPlayers+1];
+
         structuresList = GetStructures(null);
         prodStructuresList = GetProductionStructures(null);
         commandStructures[0] = null;

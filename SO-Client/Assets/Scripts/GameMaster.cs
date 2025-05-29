@@ -35,7 +35,7 @@ public class GameMaster : MonoBehaviour
     public short turnNumber;
     private bool[] playersNotLost;
     public static bool isGameComplete = false;
-    public static Dictionary<byte, byte> playerProgeny = new Dictionary<byte, byte>();
+    public static Dictionary<byte, byte> playerProgeny;
     private int[] playerResources;
     private int baseResourcePerTurn;
     private int structureResourcePerTurn;
@@ -119,7 +119,7 @@ public class GameMaster : MonoBehaviour
 
     private void Awake()
     {
-        //Debug.Log("Initializing game");
+        //Debug.Log("GameMaster Awake called");
         match_id = Guid.Parse("aaaaaaaa-8761-4e77-a086-a7365ae9e0b4");
         turnNumber = 1;
 
@@ -140,8 +140,8 @@ public class GameMaster : MonoBehaviour
             numPlayers = 2;
             SetPlayerColors(false);
         }
-        
 
+        playerProgeny = new Dictionary<byte, byte>();
         if (MatchSettings.playerProgenys[0]>=0 && MatchSettings.playerProgenys[1] >= 0)
         {   
             playerProgeny.Add(1, (byte)MatchSettings.playerProgenys[0]);
@@ -257,6 +257,7 @@ public class GameMaster : MonoBehaviour
 
     void Start()
     {
+        isGameComplete = false;
         //have to wait until start to isInit the production panel because it needs to wait for GameValuesSO.
         productionPanel.init();
 
@@ -276,8 +277,23 @@ public class GameMaster : MonoBehaviour
         announcementCardRT.anchoredPosition = offScreenRight;
         announcementCardRT.position = offScreenRight;
 
+/*        if (MasterGrid.commandStructures[1] == null || MasterGrid.commandStructures[2] == null)
+        {
+            foreach (BaseStructure structure in masterGrid.GetStructures(null))
+            {
+                if (structure.structureType == 5 && structure is Structure_Command commandStructure)
+                {
+                    if(commandStructure.playerControl!=0)
+                        MasterGrid.commandStructures[commandStructure.playerControl] = commandStructure;
+                    else
+                        Debug.LogWarning("Command structure found with player control 0");
+                }
+            }
+        }*/
+
+
         //WaitForSeconds(0.5);
-        if(isAnimating)
+        if (isAnimating)
             AnimateStartTurnCard(1);
         cameraManager.SetPosition(MasterGrid.commandStructures[1].pos);
 
