@@ -198,10 +198,10 @@ public class TutorialManager : MonoBehaviour
 
     private IEnumerator SmoothScrollToIndex(int targetIndex)
     {
-        if (targetIndex == 0)
+/*        if (targetIndex == 0)
         {
             Debug.Log("SmoothScrollToIndex: Target index is 0, returning to menu.");
-        }
+        }*/
         RectTransform managerRect = GetComponent<RectTransform>();
         float cardHeight = tutorialCards[0].card.rect.height; // Assumes all cards are the same height
 
@@ -214,14 +214,14 @@ public class TutorialManager : MonoBehaviour
         isScrolling = true;
         DisableAllButtons();
 
-        if(targetIndex == 0)
-/*        {
+  /*      if(targetIndex == 0)
+        {
             // If we're scrolling to the first card, reset the position to the start
             targetY = tutorialStartPosition.y;
             startY = managerRect.anchoredPosition.y; // Keep the current position
-        }*/
+        }
         Debug.Log($"[Scroll] startY: {startY}, targetY: {targetY}, tutorialStartPosition.y: {tutorialStartPosition.y}");
-
+*/
 
         while (t < 1f)
         {
@@ -235,7 +235,7 @@ public class TutorialManager : MonoBehaviour
         currentIndex = targetIndex;
         isScrolling = false;
         UpdateButtonInteractivity();
-        Debug.Log($"[Scroll] Scrolled to index {currentIndex} (targetIndex = {targetIndex})");
+        //Debug.Log($"[Scroll] Scrolled to index {currentIndex} (targetIndex = {targetIndex})");
     }
 
     private void UpdateButtonInteractivity()
@@ -305,14 +305,14 @@ public class TutorialManager : MonoBehaviour
 
     public IEnumerator AnimateBackToMenu()
     {
-        Debug.Log("Animating back to menu...");
+        //Debug.Log("Animating back to menu...");
         FadeIn(false); // Fade to black
         int diff = 1;
         if (currentIndex < diff)
             diff = currentIndex;
         yield return StartCoroutine(SmoothScrollToIndex(currentIndex - diff));
         currentIndex = 0;
-        Debug.Log($"[AnimateBackToMenu] Set current Index to {currentIndex}");
+        //Debug.Log($"[AnimateBackToMenu] Set current Index to {currentIndex}");
         yield return StartCoroutine(SmoothScrollToIndex(currentIndex));
     }
 

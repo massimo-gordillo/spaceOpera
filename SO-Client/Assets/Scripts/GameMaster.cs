@@ -764,7 +764,7 @@ public class GameMaster : MonoBehaviour
 
     private void setPlayerResources(int playerTurn)
     {
-        
+        playerResourceText.text = playerResources[playerTurn].ToString();
         double incomeWithMultiplier = structureResourcePerTurn;
         if (getPlayerProgeny((byte)playerTurn) == 0)
             incomeWithMultiplier = structureResourcePerTurn * 1.1;
