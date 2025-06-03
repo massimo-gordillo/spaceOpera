@@ -198,6 +198,10 @@ public class TutorialManager : MonoBehaviour
 
     private IEnumerator SmoothScrollToIndex(int targetIndex)
     {
+        if (targetIndex == 0)
+        {
+            Debug.Log("SmoothScrollToIndex: Target index is 0, returning to menu.");
+        }
         RectTransform managerRect = GetComponent<RectTransform>();
         float cardHeight = tutorialCards[0].card.rect.height; // Assumes all cards are the same height
 
@@ -209,6 +213,14 @@ public class TutorialManager : MonoBehaviour
         float t = 0f;
         isScrolling = true;
         DisableAllButtons();
+
+        if(targetIndex == 0)
+/*        {
+            // If we're scrolling to the first card, reset the position to the start
+            targetY = tutorialStartPosition.y;
+            startY = managerRect.anchoredPosition.y; // Keep the current position
+        }*/
+        Debug.Log($"[Scroll] startY: {startY}, targetY: {targetY}, tutorialStartPosition.y: {tutorialStartPosition.y}");
 
 
         while (t < 1f)
@@ -223,6 +235,7 @@ public class TutorialManager : MonoBehaviour
         currentIndex = targetIndex;
         isScrolling = false;
         UpdateButtonInteractivity();
+        Debug.Log($"[Scroll] Scrolled to index {currentIndex} (targetIndex = {targetIndex})");
     }
 
     private void UpdateButtonInteractivity()
@@ -258,8 +271,13 @@ public class TutorialManager : MonoBehaviour
         
         //tutorialCards[tutorialCards.Count - 1].nextButton.gameObject.SetActive(false); // Disable next button on last card
         tutorialCards[tutorialCards.Count - 1].nextButton.onClick.RemoveAllListeners(); // Remove any existing listeners
+        tutorialCards[tutorialCards.Count - 1].nextButton.onClick.AddListener(() => Debug.Log("NextButton clicked!"));
+
         tutorialCards[tutorialCards.Count - 1].nextButton.onClick.AddListener(menuManager.Position3);
-        tutorialCards[tutorialCards.Count - 1].nextButton.onClick.AddListener(() => FadeIn(false));
+        //tutorialCards[tutorialCards.Count - 1].nextButton.onClick.AddListener(() => FadeIn(false));
+        tutorialCards[tutorialCards.Count - 1].nextButton.onClick.AddListener(() => StartCoroutine(AnimateBackToMenu()));
+
+        //tutorialCards[tutorialCards.Count - 1].nextButton.onClick.AddListener(() => BackToMenu());
         tutorialCards[tutorialCards.Count - 1].nextButton.GetComponentInChildren<TMP_Text>().text = "Play!";
         tutorialCards[tutorialCards.Count - 1].nextButton.GetComponent<RectTransform>().sizeDelta = new Vector2(600f, 130f); // Adjust size for "Play!" button
 
@@ -279,7 +297,7 @@ public class TutorialManager : MonoBehaviour
     {
         if (menuManager != null)
         {
-            FadeIn(false); // Fade to black
+            
             menuManager.Position1();
         }
         StartCoroutine(AnimateBackToMenu());
@@ -287,19 +305,22 @@ public class TutorialManager : MonoBehaviour
 
     public IEnumerator AnimateBackToMenu()
     {
+        Debug.Log("Animating back to menu...");
+        FadeIn(false); // Fade to black
         int diff = 1;
         if (currentIndex < diff)
             diff = currentIndex;
         yield return StartCoroutine(SmoothScrollToIndex(currentIndex - diff));
         currentIndex = 0;
-        StartCoroutine(SmoothScrollToIndex(currentIndex));
+        Debug.Log($"[AnimateBackToMenu] Set current Index to {currentIndex}");
+        yield return StartCoroutine(SmoothScrollToIndex(currentIndex));
     }
 
     public void FadeIn(bool fade)
     {
         if (canvasGroup == null) return;
 
-        StopAllCoroutines(); // stop any existing fade
+        //StopAllCoroutines(); // stop any existing fade
         if (fade)
             StartCoroutine(FadeCanvasGroup(1f)); // fade to opaque (black)
         else
@@ -328,5 +349,14 @@ public class TutorialManager : MonoBehaviour
         }
 
         canvasGroup.alpha = targetAlpha;
+
+        foreach (TutorialCardUI card in tutorialCards)
+        {
+            foreach (TMP_Text text in card.card.GetComponentsInChildren<TMP_Text>())
+            {
+                text.alpha = targetAlpha;
+            }
+        }
+
     }
 }
