@@ -49,6 +49,9 @@ public class StaticSprite : ClickableObject
 
     public override void HandleClick()
     {
+        //if it's a CPU controlled and it's the CPU's turn, do nothing
+        if (GameMaster.CPU_isOn && GameMaster.CPU_PlayersList[GameMaster.playerTurn])
+            return;
         //Debug.Log("Clicked on: " + gameObject.name);
         if (parentComponentBaseUnit != null)
             parentComponentBaseUnit.staticSpriteHasBeenClicked();

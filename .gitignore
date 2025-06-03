@@ -55,3 +55,6 @@ sysinfo.txt
 #Ignore future changes to prefabs
 SO-Client/Assets/Resources/UnitPrefabs/progeny1/*
 SO-Client/.vs/*
+
+# WebGL build files
+SO-Client/webGLBuild
