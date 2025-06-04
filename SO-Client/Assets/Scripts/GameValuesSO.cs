@@ -42,12 +42,8 @@ public class GameValuesSO : ScriptableObject
         }
     }
 
-    /*    public void LoadCSVFromJSON(string fileName, Action<List<string>> callback)
-        {
-            StartCoroutine(LoadCSVCoroutine(fileName, callback));
-        }*/
 
-    public static List<string> LoadCSVFromJSON(string fileName)
+    /*public static List<string> LoadCSVFromJSON(string fileName)
     {
         string filePath = Path.Combine(Application.streamingAssetsPath, fileName);
         string csvText = null;
@@ -65,7 +61,7 @@ public class GameValuesSO : ScriptableObject
                 return null;
             }
             csvText = request.downloadHandler.text;
-            /*            using (UnityWebRequest request = UnityWebRequest.Get(filePath))
+            *//*            using (UnityWebRequest request = UnityWebRequest.Get(filePath))
                         {
                             var operation = request.SendWebRequest();
                             while (!operation.isDone) { }  // Block execution
@@ -77,7 +73,7 @@ public class GameValuesSO : ScriptableObject
                             }
 
                             csvText = request.downloadHandler.text;
-                        }*/
+                        }*//*
         }
         else
         {
@@ -95,58 +91,27 @@ public class GameValuesSO : ScriptableObject
         return !string.IsNullOrEmpty(csvText)
             ? new List<string>(csvText.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.None))
             : null;
-    }
+    }*/
 
-
-    /*public string[] loadCSVFromJSON(string fileName)
+    public static List<string> LoadCSVFromJSON(string fileNameWithoutExtension)
     {
-        string filePath = Path.Combine(Application.streamingAssetsPath, fileName);
-        string csvText = null;
+        // Load the CSV as a TextAsset from the Resources folder
+        TextAsset csvFile = Resources.Load<TextAsset>("GameValues/"+fileNameWithoutExtension);
 
-        // For Android, we need to use UnityWebRequest
-        if (filePath.StartsWith("jar:"))
+        if (csvFile == null)
         {
-            using (UnityWebRequest request = UnityWebRequest.Get(filePath))
-            {
-                yield return request.SendWebRequest();
-
-                if (request.result != UnityWebRequest.Result.Success)
-                {
-                    Debug.LogError("Failed to load CSV: " + request.error);
-                }
-                else
-                {
-                    csvText = request.downloadHandler.text;
-                    Debug.Log("CSV Loaded: " + csvText.Substring(0, Mathf.Min(20, csvText.Length))); // Log first 100 chars
-                }
-            }
-        }
-        else
-        {
-            // For PC, Mac, etc., use File.ReadAllText
-            if (File.Exists(filePath))
-            {
-                csvText = File.ReadAllText(filePath);
-                Debug.Log("CSV Loaded: " + csvText.Substring(0, Mathf.Min(100, csvText.Length)));
-            }
-            else
-            {
-                Debug.LogError("CSV file not found: " + filePath);
-            }
-        }
-
-        if (csvText != null)
-        {
-            //loop to iterate through the JSON output and convert it to a string array
-            return csvText.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.None);
-        }
-        else
-        {
-            Debug.LogError("csv read is empty");
+            Debug.LogError("CSV file not found in Resources: " + fileNameWithoutExtension);
             return null;
         }
 
-    }*/
+        // Split the CSV text into lines
+        return new List<string>(
+            csvFile.text.Split(new[] { "\r\n", "\n" }, StringSplitOptions.None)
+        );
+    }
+
+
+
 
     public void LoadUnitsFromCSV()
     {
@@ -166,9 +131,10 @@ public class GameValuesSO : ScriptableObject
 
         //string filePath = Path.Combine(Application.streamingAssetsPath, fileName);
 
-            //string[] lines = File.ReadAllLines(filePath);
-            //string csv = loadCSVFromJSON(fileName);
-        List<string> lines = LoadCSVFromJSON("UnitValues.json");
+        //string[] lines = File.ReadAllLines(filePath);
+        //string csv = loadCSVFromJSON(fileName);
+        List<string> lines = LoadCSVFromJSON("UnitValues");
+        //List<string> lines = LoadCSVFromJSON("UnitValues.json");
 
         //loop to iterate through the JSON output and convert it to a string array
         //string[] lines = csv.Split(new string[] {"\r\n", "\n" }, StringSplitOptions.None);
@@ -255,7 +221,7 @@ public class GameValuesSO : ScriptableObject
             return;
 
         byteToAttributesTileDictionary = new Dictionary<byte, AttributesTile>();
-        List<string> lines = LoadCSVFromJSON("TileValues.json");
+        List<string> lines = LoadCSVFromJSON("TileValues");
         //string[] lines = File.ReadAllLines(filePath);
 
         if (lines == null || lines.Count <= 1)
@@ -341,7 +307,7 @@ public class GameValuesSO : ScriptableObject
         if (isInit)
             return;
 
-        List<string> lines = LoadCSVFromJSON("UnitValuesCombatMultipliers.json");
+        List<string> lines = LoadCSVFromJSON("UnitValuesCombatMultipliers");
 
         if (lines == null || lines.Count < 2) // Ensure there are at least headers + 1 row
         {

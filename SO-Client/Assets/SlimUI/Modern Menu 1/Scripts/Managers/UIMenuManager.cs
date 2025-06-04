@@ -171,7 +171,7 @@ namespace SlimUI.ModernMenu{
 
             if (!isAnimating)
             {
-                muteMusic();
+                muteMusic(0.25f);
             }
 
 			SetThemeColors();
@@ -395,7 +395,7 @@ namespace SlimUI.ModernMenu{
             PanelSelect.SetActive(false);
             loadingMenu.SetActive(true);
 			loadPromptText.text = "Loading...";
-            StartCoroutine(muteMusic());
+            StartCoroutine(muteMusic(1.3f));
 
             // Start the game values loading coroutine (no need to store the coroutine in an AsyncOperation)
             StartCoroutine(LoadGameValuesAsync());
@@ -429,19 +429,27 @@ namespace SlimUI.ModernMenu{
             }
         }
 
-        IEnumerator muteMusic()
+        IEnumerator muteMusic(float duration)
         {
-            float duration = 0.25f;
-            float elapsedTime = 0;
-            while(elapsedTime < duration)
+            float startVolume = introAudio.volume;
+            float elapsedTime = 0f;
+
+            while (elapsedTime < duration)
             {
                 elapsedTime += Time.deltaTime;
-                introAudio.volume = Mathf.Lerp(1f, 0f, elapsedTime / duration);
+                float t = Mathf.Clamp01(elapsedTime / duration);
+
+                // Ease-out cubic: y = 1 - (1 - t)^3
+                float easedT = 1f - Mathf.Pow(1f - t, 3f);
+
+                introAudio.volume = Mathf.Lerp(startVolume, 0f, easedT);
                 yield return null;
             }
-            introAudio.volume = 0;
-            yield return null;
+
+            introAudio.volume = 0f;
         }
+
+
 
         public void setSceneLoadOperationTrue()
         {

@@ -2046,7 +2046,7 @@ public class CPUManager : MonoBehaviour
             }
         }
 
-        List<string> lines = GameValuesSO.LoadCSVFromJSON("MatchupWeights.json");
+        List<string> lines = GameValuesSO.LoadCSVFromJSON("MatchupWeights");
         if (lines == null || lines.Count < 2)
         {
             Debug.LogError("CSV file not loaded or empty.");
