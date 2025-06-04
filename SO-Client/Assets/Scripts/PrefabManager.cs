@@ -300,7 +300,7 @@ public class PrefabManager
             Sprite trimSprite = Resources.Load<Sprite>(trimSpritePath);
             if (trimSprite == null)
             {
-                //UnityEngine.Debug.Log($"Failed to load trim sprite from path: {trimSpritePath}");
+                UnityEngine.Debug.Log($"Failed to load trim sprite from path: {trimSpritePath}");
             }
             else
             {
@@ -315,7 +315,7 @@ public class PrefabManager
             {
                 //UnityEngine.Debug.Log($"Failed to load lights sprite from path: {lightsSpritePath}");
                 if(spritePrefab.isUIVariant)
-                    spritePrefab.lightsImage.sprite = null;
+                    spritePrefab.lightsImage.gameObject.SetActive(false);
                 else
                     spritePrefab.lightsSR.sprite = null;
                 
