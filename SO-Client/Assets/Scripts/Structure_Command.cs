@@ -24,7 +24,7 @@ public class Structure_Command : BaseStructure
     public override void Initialize()
     {
         base.Initialize(); 
-        Debug.Log($"[CommandStructure] Start called. pos is {pos} and playerControl is {playerControl}, with progeny {gameMaster.getPlayerProgeny((byte)playerControl)}");
+        //Debug.Log($"[CommandStructure] Start called. pos is {pos} and playerControl is {playerControl}, with progeny {gameMaster.getPlayerProgeny((byte)playerControl)}");
         MasterGrid.commandStructures[playerControl] = this;
         TurnOffCommandSprites();
         if (gameMaster.getPlayerProgeny((byte)playerControl) == 0)
