@@ -1432,8 +1432,8 @@ VideoPlayer:
   m_EnabledAudioTracks: 01
   m_DirectAudioMutes: 01
   m_ControlledAudioTrackCount: 1
-  m_PlayOnAwake: 1
-  m_SkipOnDrop: 1
+  m_PlayOnAwake: 0
+  m_SkipOnDrop: 0
   m_Looping: 1
   m_WaitForFirstFrame: 1
   m_FrameReadyEventEnabled: 0
@@ -2667,8 +2667,8 @@ VideoPlayer:
   m_EnabledAudioTracks: 01
   m_DirectAudioMutes: 01
   m_ControlledAudioTrackCount: 1
-  m_PlayOnAwake: 1
-  m_SkipOnDrop: 1
+  m_PlayOnAwake: 0
+  m_SkipOnDrop: 0
   m_Looping: 1
   m_WaitForFirstFrame: 1
   m_FrameReadyEventEnabled: 0
@@ -3831,7 +3831,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3737977924034485653, guid: edb02daa5bdd29b4c816da9fd4659b0d, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 218.77777
+      value: 229.74329
       objectReference: {fileID: 0}
     - target: {fileID: 3737977924034485653, guid: edb02daa5bdd29b4c816da9fd4659b0d, type: 3}
       propertyPath: m_SizeDelta.y
@@ -4366,7 +4366,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3737977924034485653, guid: edb02daa5bdd29b4c816da9fd4659b0d, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 218.77777
+      value: 229.74329
       objectReference: {fileID: 0}
     - target: {fileID: 3737977924034485653, guid: edb02daa5bdd29b4c816da9fd4659b0d, type: 3}
       propertyPath: m_SizeDelta.y
@@ -4511,7 +4511,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3737977924034485653, guid: edb02daa5bdd29b4c816da9fd4659b0d, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 205.44444
+      value: 216.40996
       objectReference: {fileID: 0}
     - target: {fileID: 3737977924034485653, guid: edb02daa5bdd29b4c816da9fd4659b0d, type: 3}
       propertyPath: m_SizeDelta.y
@@ -6104,7 +6104,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3737977924034485653, guid: edb02daa5bdd29b4c816da9fd4659b0d, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -94.9037
+      value: -91.200005
       objectReference: {fileID: 0}
     - target: {fileID: 3737977924034485653, guid: edb02daa5bdd29b4c816da9fd4659b0d, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -6352,7 +6352,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3737977924034485653, guid: edb02daa5bdd29b4c816da9fd4659b0d, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 205.44444
+      value: 216.40996
       objectReference: {fileID: 0}
     - target: {fileID: 3737977924034485653, guid: edb02daa5bdd29b4c816da9fd4659b0d, type: 3}
       propertyPath: m_SizeDelta.y
@@ -7325,7 +7325,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3737977924034485653, guid: edb02daa5bdd29b4c816da9fd4659b0d, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 146.58333
+      value: 154.80746
       objectReference: {fileID: 0}
     - target: {fileID: 3737977924034485653, guid: edb02daa5bdd29b4c816da9fd4659b0d, type: 3}
       propertyPath: m_SizeDelta.y
@@ -7573,7 +7573,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3737977924034485653, guid: edb02daa5bdd29b4c816da9fd4659b0d, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -94.9037
+      value: -91.200005
       objectReference: {fileID: 0}
     - target: {fileID: 3737977924034485653, guid: edb02daa5bdd29b4c816da9fd4659b0d, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -7977,7 +7977,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3737977924034485653, guid: edb02daa5bdd29b4c816da9fd4659b0d, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 146.58333
+      value: 154.80746
       objectReference: {fileID: 0}
     - target: {fileID: 3737977924034485653, guid: edb02daa5bdd29b4c816da9fd4659b0d, type: 3}
       propertyPath: m_SizeDelta.y
@@ -8401,7 +8401,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3737977924034485653, guid: edb02daa5bdd29b4c816da9fd4659b0d, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 218.77777
+      value: 229.74329
       objectReference: {fileID: 0}
     - target: {fileID: 3737977924034485653, guid: edb02daa5bdd29b4c816da9fd4659b0d, type: 3}
       propertyPath: m_SizeDelta.y
@@ -8559,6 +8559,10 @@ PrefabInstance:
     - target: {fileID: 5190504983037159458, guid: a47d8d4e096a17848a0f741f038ece1f, type: 3}
       propertyPath: m_Enabled
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5190504983037159458, guid: a47d8d4e096a17848a0f741f038ece1f, type: 3}
+      propertyPath: m_Spacing
+      value: 40
       objectReference: {fileID: 0}
     - target: {fileID: 5190504983037159458, guid: a47d8d4e096a17848a0f741f038ece1f, type: 3}
       propertyPath: m_Padding.m_Bottom
@@ -8750,7 +8754,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5190504984426591600, guid: a47d8d4e096a17848a0f741f038ece1f, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 574.2
+      value: 468.2
       objectReference: {fileID: 0}
     - target: {fileID: 5190504984426591600, guid: a47d8d4e096a17848a0f741f038ece1f, type: 3}
       propertyPath: m_AnchoredPosition.x
@@ -10646,8 +10650,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 990, y: -389.77}
-  m_SizeDelta: {x: 2027, y: 779.54}
+  m_AnchoredPosition: {x: 990, y: -343.7}
+  m_SizeDelta: {x: 893.4, y: 687.3}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &805599527
 MonoBehaviour:
@@ -11838,7 +11842,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3737977924034485653, guid: edb02daa5bdd29b4c816da9fd4659b0d, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -94.9037
+      value: -91.200005
       objectReference: {fileID: 0}
     - target: {fileID: 3737977924034485653, guid: edb02daa5bdd29b4c816da9fd4659b0d, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -12970,8 +12974,8 @@ VideoPlayer:
   m_EnabledAudioTracks: 01
   m_DirectAudioMutes: 01
   m_ControlledAudioTrackCount: 1
-  m_PlayOnAwake: 1
-  m_SkipOnDrop: 1
+  m_PlayOnAwake: 0
+  m_SkipOnDrop: 0
   m_Looping: 1
   m_WaitForFirstFrame: 1
   m_FrameReadyEventEnabled: 0
@@ -14224,7 +14228,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3737977924034485653, guid: edb02daa5bdd29b4c816da9fd4659b0d, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 146.58333
+      value: 154.80746
       objectReference: {fileID: 0}
     - target: {fileID: 3737977924034485653, guid: edb02daa5bdd29b4c816da9fd4659b0d, type: 3}
       propertyPath: m_SizeDelta.y
@@ -15262,8 +15266,8 @@ VideoPlayer:
   m_EnabledAudioTracks: 01
   m_DirectAudioMutes: 01
   m_ControlledAudioTrackCount: 1
-  m_PlayOnAwake: 1
-  m_SkipOnDrop: 1
+  m_PlayOnAwake: 0
+  m_SkipOnDrop: 0
   m_Looping: 1
   m_WaitForFirstFrame: 1
   m_FrameReadyEventEnabled: 0
@@ -18046,8 +18050,8 @@ VideoPlayer:
   m_EnabledAudioTracks: 01
   m_DirectAudioMutes: 01
   m_ControlledAudioTrackCount: 1
-  m_PlayOnAwake: 1
-  m_SkipOnDrop: 1
+  m_PlayOnAwake: 0
+  m_SkipOnDrop: 0
   m_Looping: 1
   m_WaitForFirstFrame: 1
   m_FrameReadyEventEnabled: 0
@@ -21931,8 +21935,8 @@ VideoPlayer:
   m_EnabledAudioTracks: 01
   m_DirectAudioMutes: 01
   m_ControlledAudioTrackCount: 1
-  m_PlayOnAwake: 1
-  m_SkipOnDrop: 1
+  m_PlayOnAwake: 0
+  m_SkipOnDrop: 0
   m_Looping: 1
   m_WaitForFirstFrame: 1
   m_FrameReadyEventEnabled: 0
@@ -22094,7 +22098,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3737977924034485653, guid: edb02daa5bdd29b4c816da9fd4659b0d, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 205.44444
+      value: 216.40996
       objectReference: {fileID: 0}
     - target: {fileID: 3737977924034485653, guid: edb02daa5bdd29b4c816da9fd4659b0d, type: 3}
       propertyPath: m_SizeDelta.y
@@ -22926,7 +22930,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3737977924034485653, guid: edb02daa5bdd29b4c816da9fd4659b0d, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 146.58333
+      value: 154.80746
       objectReference: {fileID: 0}
     - target: {fileID: 3737977924034485653, guid: edb02daa5bdd29b4c816da9fd4659b0d, type: 3}
       propertyPath: m_SizeDelta.y
