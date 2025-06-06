@@ -17,7 +17,7 @@ namespace SlimUI.ModernMenu{
         private InputAction continueAction;
 		public GameValuesSO gameValuesSO;
 		public bool isGameValuesLoaded = false;
-        public static bool isAnimating = false;
+        public static bool isAnimating = true;
         //public GameMaster gameMaster;// = new GameMaster();
 
         // campaign button sub menu

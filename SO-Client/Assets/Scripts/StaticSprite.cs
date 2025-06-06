@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+//using System;
 
 public class StaticSprite : ClickableObject
 {
@@ -17,6 +18,7 @@ public class StaticSprite : ClickableObject
     public Image trimImage;
     public Image lightsImage;
     public bool isUIVariant;
+    public bool isFlyingUnit = false;
 
     // Start is called before the first frame update
     protected override void Start()
@@ -40,12 +42,56 @@ public class StaticSprite : ClickableObject
     }
 
     // Update is called once per frame
-    void Update()
+/*    void Update()
     {
-        //SetColor(2, true, true);
-        //if(parentGameObject != null && parentComponentBaseStructure!=null && parentComponentBaseStructure.playerControl != 0) 
-         //   Debug.Log($"Main sprite color for type {parentComponentBaseStructure.structureType} is: {fillSR.color}");
-    }
+        if (isFlyingUnit)
+        {
+            float amplitude = 0.0001f;
+            float frequency = 0.25f;
+
+            float offsetY = Mathf.Sin(Time.time * frequency * 2 * Mathf.PI) * amplitude;
+
+            RectTransform rt = GetComponent<RectTransform>();
+
+            // Use current position as base and add vertical sway
+            Vector2 currentBase = rt.anchoredPosition;
+            //currentBase.y = parentComponentBaseUnit.transform.position.y; // Get this from the unit each frame
+            rt.anchoredPosition = currentBase + new Vector2(0f, offsetY);
+        }
+    }*/
+
+
+    //private float internalTimeOffset;
+
+    /*void Update()
+    {
+        if (isFlyingUnit)
+        {
+            float amplitude = 0.0002f;
+            float frequency = 0.25f;
+
+            // Compute precise offset
+            float offsetY = Mathf.Sin(Time.time * frequency * 2f * Mathf.PI) * amplitude;
+
+            // Add offset to parent anchored position
+            RectTransform rt = GetComponent<RectTransform>();
+            //RectTransform parentRt = parentComponentBaseUnit.GetComponent<RectTransform>();
+
+            Vector2 parentPos = parentComponentBaseUnit.pos; //anchoredPosition;
+
+            float offsetYRounded = (float)Math.Round(offsetY, 7);
+
+            Vector2 newPos = parentPos + new Vector2(0f, offsetYRounded);
+
+*//*            // Option 1: Round to fewer decimal places (e.g., 5 digits)
+            newPos.y = newPos.y+(float)Math.Round(offsetY, 7);*//*
+            Debug.Log("Offset Y: " + offsetYRounded + ", New Position: " + newPos);
+
+            rt.anchoredPosition = newPos;
+        }
+    }*/
+
+
 
     public override void HandleClick()
     {

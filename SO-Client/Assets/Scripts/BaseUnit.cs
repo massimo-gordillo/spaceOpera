@@ -131,6 +131,10 @@ public class BaseUnit : MonoBehaviour
 
 /*        if (GameMaster.CPU_isOn && GameMaster.CPU_PlayersList[playerControl])
             CPU_AssignNewTarget();*/
+        if(unitTerrainType == UnitTerrainType.Air)
+        {
+            spriteContainer.isFlyingUnit = true;
+        }
 
     }
     // Update is called once per frame

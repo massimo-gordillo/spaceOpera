@@ -29,7 +29,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 5637648716276387384}
+  m_Father: {fileID: 7063101401177682733}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &4255863450333907627
@@ -538,7 +538,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 5637648716276387384}
+  m_Father: {fileID: 7063101401177682733}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &5769997744403727696
@@ -925,10 +925,10 @@ Transform:
   - {fileID: 5242782188598566563}
   - {fileID: 8613811753352416629}
   - {fileID: 1183232705167966057}
-  - {fileID: 5637648716276387384}
   - {fileID: 2203585945390195949}
   - {fileID: 5532626638299158426}
   - {fileID: 7295383149633765020}
+  - {fileID: 7063101401177682733}
   - {fileID: 2737406805973191567}
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -963,7 +963,7 @@ MonoBehaviour:
   attackRange: 1
   price: 700
   movementRange: 6
-  playerControl: 1
+  playerControl: 0
   team: 0
   orientation: 3
   pos: {x: 0, y: 0}
@@ -1034,7 +1034,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 5896875182881056385}
-  m_RootOrder: 6
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &4465549098313609922
 SpriteRenderer:
@@ -1322,6 +1322,7 @@ MonoBehaviour:
   trimImage: {fileID: 0}
   lightsImage: {fileID: 0}
   isUIVariant: 0
+  isFlyingUnit: 0
 --- !u!1 &4555690703699007774
 GameObject:
   m_ObjectHideFlags: 0
@@ -2097,7 +2098,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 5637648716276387384}
+  m_Father: {fileID: 7063101401177682733}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &768561882642666597
@@ -2160,7 +2161,7 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 5637648716276387384}
+  - component: {fileID: 7063101401177682733}
   - component: {fileID: 3768267346537238324}
   - component: {fileID: 7531739712564029691}
   m_Layer: 0
@@ -2170,8 +2171,8 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &5637648716276387384
-Transform:
+--- !u!224 &7063101401177682733
+RectTransform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -2179,15 +2180,20 @@ Transform:
   m_GameObject: {fileID: 6986009529861519976}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.01, y: 0.01, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 5573425366814191749}
   - {fileID: 3994754272330857519}
   - {fileID: 6932847273214913050}
   m_Father: {fileID: 5896875182881056385}
-  m_RootOrder: 3
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 100, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!61 &3768267346537238324
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -2238,6 +2244,7 @@ MonoBehaviour:
   trimImage: {fileID: 0}
   lightsImage: {fileID: 0}
   isUIVariant: 0
+  isFlyingUnit: 0
 --- !u!1 &7540973985638649999
 GameObject:
   m_ObjectHideFlags: 0
@@ -2509,7 +2516,7 @@ RectTransform:
   - {fileID: 2956130075575741436}
   - {fileID: 8060403380791415617}
   m_Father: {fileID: 5896875182881056385}
-  m_RootOrder: 5
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -2546,5 +2553,5 @@ Transform:
   m_Children:
   - {fileID: 136927312742537198}
   m_Father: {fileID: 5896875182881056385}
-  m_RootOrder: 4
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
