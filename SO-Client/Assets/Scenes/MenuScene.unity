@@ -542,16 +542,16 @@ PrefabInstance:
     - target: {fileID: 6258568407009221891, guid: a47d8d4e096a17848a0f741f038ece1f, type: 3}
       propertyPath: m_text
       value: '\u25E6 At the beginning of your turn, each controlled structure gives
-        +100 BISMUTH
+        +100 <B>BISMUTH</B>
 
-        \u25E6 Spend BISMUTH to create your army
+        \u25E6 Spend <B>BISMUTH</B> to build your army
 
         \u25E6
         Ertrians get a 10% income bonus'
       objectReference: {fileID: 0}
     - target: {fileID: 6258568407009221891, guid: a47d8d4e096a17848a0f741f038ece1f, type: 3}
       propertyPath: m_fontSize
-      value: 92.1
+      value: 92.15
       objectReference: {fileID: 0}
     - target: {fileID: 7347441085577183295, guid: a47d8d4e096a17848a0f741f038ece1f, type: 3}
       propertyPath: m_AnchorMax.y
@@ -1996,13 +1996,17 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6258568407009221891, guid: a47d8d4e096a17848a0f741f038ece1f, type: 3}
       propertyPath: m_text
-      value: '\u25E6 Put a CAPTURE UNIT on a structure and press capture
+      value: '\u25E6 Put a <B>Capture Unit</B> on a structure and press capture
 
         \u25E6
         Each structure has 200 HP
 
         \u25E6 Capturing takes 2 turns at full
         health.'
+      objectReference: {fileID: 0}
+    - target: {fileID: 6258568407009221891, guid: a47d8d4e096a17848a0f741f038ece1f, type: 3}
+      propertyPath: m_fontSize
+      value: 75.75
       objectReference: {fileID: 0}
     - target: {fileID: 7347441085577183295, guid: a47d8d4e096a17848a0f741f038ece1f, type: 3}
       propertyPath: m_AnchorMax.y
@@ -3206,17 +3210,17 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6258568407009221891, guid: a47d8d4e096a17848a0f741f038ece1f, type: 3}
       propertyPath: m_text
-      value: '\u25E6 Ertrian: Ranged units and bonus income
+      value: '\u25E6 <B>Ertrian</B>: Ranged units and bonus income from <B>BISMUTH</B>
 
-        \u25E6 Virix:
-        Free spores every turn and can create units on bismuth
+        \u25E6
+        <B>Virix</B>: Free spores every turn and can create units on <B>BISMUTH</B>
 
-        \u25E6 Sentus:
-        Bonus defense near Bismuth'
+        \u25E6
+        <B>Sentus</B>: Bonus defense near <B>BISMUTH</B>'
       objectReference: {fileID: 0}
     - target: {fileID: 6258568407009221891, guid: a47d8d4e096a17848a0f741f038ece1f, type: 3}
       propertyPath: m_fontSize
-      value: 92.1
+      value: 92.15
       objectReference: {fileID: 0}
     - target: {fileID: 7347441085577183295, guid: a47d8d4e096a17848a0f741f038ece1f, type: 3}
       propertyPath: m_AnchorMax.y
@@ -9232,12 +9236,12 @@ PrefabInstance:
     - target: {fileID: 6258568407009221891, guid: a47d8d4e096a17848a0f741f038ece1f, type: 3}
       propertyPath: m_text
       value: "\\u25E6 Ranged units can attack at a distance but can\u2019t move and
-        shoot in one turn\n\\u25E6 BLUE SQUARES are movement range\n\\u25E6 RED LINE
-        outlines attack range\n"
+        shoot in one turn\n\\u25E6 <color=#ADD8E6>Blue Tiles</color> are movement
+        range\n\\u25E6 <color=#FF9999>Red Lines</color> outlines attack range\n"
       objectReference: {fileID: 0}
     - target: {fileID: 6258568407009221891, guid: a47d8d4e096a17848a0f741f038ece1f, type: 3}
       propertyPath: m_fontSize
-      value: 78.95
+      value: 80.15
       objectReference: {fileID: 0}
     - target: {fileID: 7347441085577183295, guid: a47d8d4e096a17848a0f741f038ece1f, type: 3}
       propertyPath: m_AnchorMax.y
@@ -14557,11 +14561,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5190504983679333667, guid: a47d8d4e096a17848a0f741f038ece1f, type: 3}
       propertyPath: m_fontSize
-      value: 150
+      value: 136.85
       objectReference: {fileID: 0}
     - target: {fileID: 5190504983679333667, guid: a47d8d4e096a17848a0f741f038ece1f, type: 3}
       propertyPath: m_fontStyle
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5190504983679333677, guid: a47d8d4e096a17848a0f741f038ece1f, type: 3}
       propertyPath: m_AnchorMax.y
@@ -14633,17 +14637,17 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6258568407009221891, guid: a47d8d4e096a17848a0f741f038ece1f, type: 3}
       propertyPath: m_text
-      value: 'Commander, welcome to Tactica: a Space Opera
+      value: 'Commander, welcome to \n<I>Tactica: a Space Opera</I>
 
-        Your goal is
-        to conquer this frontier sector for its BISMUTH
+        Your
+        goal is to conquer this frontier sector for its <B>BISMUTH</B>
 
-        Defend your structures,
-        create an army, and defeat your enemy'
+        Build
+        an army, defend your structures, and conquer the sector'
       objectReference: {fileID: 0}
     - target: {fileID: 6258568407009221891, guid: a47d8d4e096a17848a0f741f038ece1f, type: 3}
       propertyPath: m_fontSize
-      value: 90.8
+      value: 81.75
       objectReference: {fileID: 0}
     - target: {fileID: 6258568407009221891, guid: a47d8d4e096a17848a0f741f038ece1f, type: 3}
       propertyPath: m_VerticalAlignment
@@ -17267,11 +17271,11 @@ PrefabInstance:
         \u25E6 Reduce to 0% to destroy
 
         \u25E6
-        Most units fight back but weaker'
+        Most units fight back but much weaker'
       objectReference: {fileID: 0}
     - target: {fileID: 6258568407009221891, guid: a47d8d4e096a17848a0f741f038ece1f, type: 3}
       propertyPath: m_fontSize
-      value: 92.5
+      value: 76.8
       objectReference: {fileID: 0}
     - target: {fileID: 6569832155290268996, guid: a47d8d4e096a17848a0f741f038ece1f, type: 3}
       propertyPath: m_IsActive
@@ -17677,15 +17681,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6258568407009221891, guid: a47d8d4e096a17848a0f741f038ece1f, type: 3}
       propertyPath: m_text
-      value: 'Three PROGENY fight for control of the BISMUTH:
+      value: 'Three <B>PROGENY</B> fight for control of the <B>BISMUTH</B>:
 
-        \u25E6 Ertrians
-        mine it for trade
+        \u25E6
+        <B>Ertrians</B> mine it for trade
 
-        \u25E6 Virix grow from it
+        \u25E6 <B>Virix</B> grow from
+        it
 
-        \u25E6 Sentus
-        draw power from it'
+        \u25E6 <B>Sentus</B> draw power from it'
       objectReference: {fileID: 0}
     - target: {fileID: 6258568407009221891, guid: a47d8d4e096a17848a0f741f038ece1f, type: 3}
       propertyPath: m_fontSize
@@ -18523,17 +18527,17 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6258568407009221891, guid: a47d8d4e096a17848a0f741f038ece1f, type: 3}
       propertyPath: m_text
-      value: '\u25E6 Enemy units in RED TILES are attackable
+      value: '\u25E6 Enemy units in <color=#FF9999>Red Tiles</color> are attackable
 
-        \u25E6 Move
-        adjacent by clicking BLUE TILE and select Attack
+        \u25E6
+        Move adjacent by clicking a <color=#ADD8E6>Blue Tile</color> and select Attack
 
-        \u25E6 Preview
-        damage before committing'
+        \u25E6
+        Preview damage before committing'
       objectReference: {fileID: 0}
     - target: {fileID: 6258568407009221891, guid: a47d8d4e096a17848a0f741f038ece1f, type: 3}
       propertyPath: m_fontSize
-      value: 92.1
+      value: 83.25
       objectReference: {fileID: 0}
     - target: {fileID: 6569832155290268996, guid: a47d8d4e096a17848a0f741f038ece1f, type: 3}
       propertyPath: m_IsActive
@@ -19065,12 +19069,13 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6258568407009221891, guid: a47d8d4e096a17848a0f741f038ece1f, type: 3}
       propertyPath: m_text
-      value: "\\u25E6 Each player has a Command Structure\n\\u25E6 Capture the enemy\u2019s,
-        protect your own\n\\u25E6 Use BISMUTH to build your forces"
+      value: "\\u25E6 Each player has a <B>Command Structure</B>\n\\u25E6 Capture
+        the enemy\u2019s and protect your own\n\\u25E6 Use <B>BISMUTH</B> to build
+        your forces"
       objectReference: {fileID: 0}
     - target: {fileID: 6258568407009221891, guid: a47d8d4e096a17848a0f741f038ece1f, type: 3}
       propertyPath: m_fontSize
-      value: 92.1
+      value: 92.15
       objectReference: {fileID: 0}
     - target: {fileID: 7347441085577183295, guid: a47d8d4e096a17848a0f741f038ece1f, type: 3}
       propertyPath: m_AnchorMax.y
@@ -20174,17 +20179,17 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6258568407009221891, guid: a47d8d4e096a17848a0f741f038ece1f, type: 3}
       propertyPath: m_text
-      value: '\u25E6 You''re ready to command your PROGENY forces
+      value: '\u25E6 You''re ready to command your <B>Progeny</B> forces
 
         \u25E6
-        Capture BISMUTH, outplay your enemies, claim victory
+        Capture <B>BISMUTH</B>, outplay your enemies, and claim victory
 
-        \u25E6 Go forth
-        and conquer the sector!'
+        \u25E6
+        Go forth and conquer the sector!'
       objectReference: {fileID: 0}
     - target: {fileID: 6258568407009221891, guid: a47d8d4e096a17848a0f741f038ece1f, type: 3}
       propertyPath: m_fontSize
-      value: 95.3
+      value: 93.9
       objectReference: {fileID: 0}
     - target: {fileID: 7347441085577183295, guid: a47d8d4e096a17848a0f741f038ece1f, type: 3}
       propertyPath: m_AnchorMax.y
@@ -21693,12 +21698,17 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6258568407009221891, guid: a47d8d4e096a17848a0f741f038ece1f, type: 3}
       propertyPath: m_text
-      value: '\u25E6 Click a unit to see movement range (BLUE TILES)
+      value: '\u25E6 Click on a unit to see its movement range <color=#ADD8E6>(Blue
+        Tiles)</color>
 
-        \u25E6
-        Click a BLUE TILE to move
+        \u25E6 Click on a <color=#ADD8E6>Blue Tile</color>
+        to move
 
         \u25E6 Terrain and enemies block paths'
+      objectReference: {fileID: 0}
+    - target: {fileID: 6258568407009221891, guid: a47d8d4e096a17848a0f741f038ece1f, type: 3}
+      propertyPath: m_fontSize
+      value: 81.7
       objectReference: {fileID: 0}
     - target: {fileID: 6569832155290268996, guid: a47d8d4e096a17848a0f741f038ece1f, type: 3}
       propertyPath: m_IsActive
@@ -22587,14 +22597,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6258568407009221891, guid: a47d8d4e096a17848a0f741f038ece1f, type: 3}
       propertyPath: m_text
-      value: 'Only CAPTURE UNITS can capture structures
+      value: 'Only <B>Capture Units</B> can capture structures
 
-        \u25E6 Ertrian Infantry
+        \u25E6 <B>Ertrian</B>
+        Infantry
 
-        \u25E6
-        Virix Spore
+        \u25E6 <B>Virix</B> Spore
 
-        \u25E6 Sentus Blacksmith'
+        \u25E6 <B>Sentus</B>
+        Blacksmith'
       objectReference: {fileID: 0}
     - target: {fileID: 7347441085577183295, guid: a47d8d4e096a17848a0f741f038ece1f, type: 3}
       propertyPath: m_AnchorMax.y
@@ -33955,7 +33966,7 @@ AudioSource:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1213614133249755}
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 8300000, guid: f607320fa2bcfdd4bb92209c2ee82f82, type: 3}
