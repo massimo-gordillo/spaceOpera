@@ -71,6 +71,7 @@ namespace SlimUI.ModernMenu{
             //if no playerprefs set default volume
             if (!PlayerPrefs.HasKey("MusicVolume"))
             {
+				Debug.Log("Setting playerPrefs MusicVolume to default value of 1.0f");
                 PlayerPrefs.SetFloat("MusicVolume", 1.0f);
                 PlayerPrefs.Save();
 
@@ -225,10 +226,12 @@ namespace SlimUI.ModernMenu{
 
 		public void MusicSlider (){
 			//PlayerPrefs.SetFloat("MusicVolume", sliderValue);
+			Debug.Log($"Setting slider value to: {musicSlider.GetComponent<Slider>().value}");
 			PlayerPrefs.SetFloat("MusicVolume", musicSlider.GetComponent<Slider>().value);
 		}
 
-		public void SensitivityXSlider (){
+
+        public void SensitivityXSlider (){
 			PlayerPrefs.SetFloat("XSensitivity", sliderValueXSensitivity);
 		}
 

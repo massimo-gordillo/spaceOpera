@@ -29,7 +29,7 @@ public class TutorialManager : MonoBehaviour
 
     private List<TutorialCardUI> tutorialCards = new List<TutorialCardUI>();
     private int currentIndex = 0;
-    private int videoIndex = -1;
+    //private int videoIndex = -1;
     private bool isScrolling = false;
 
     public CanvasGroup canvasGroup; // Assign in inspector or via script
@@ -42,9 +42,11 @@ public class TutorialManager : MonoBehaviour
         "Tutorial-Movement",
         "Tutorial-Attack",
         "Tutorial-Attack-2",
-        "Tutorial-Ranged",
-        "Tutorial-Flying"
+        "Tutorial-Flying",
+        "Tutorial-Ranged"
     };
+
+    Dictionary<int, string> videoPaths = new Dictionary<int, string>();
 
     void Start()
     {
@@ -61,16 +63,7 @@ public class TutorialManager : MonoBehaviour
             TMP_Text pageNum = FindComponentInChildrenByName<TMP_Text>(card, "PageNum");
             VideoPlayer videoPlayer = card.GetComponentInChildren<VideoPlayer>(true);
 
-            if (videoPlayer != null)
-            {
-                videoIndex++;
-                string videoPath = System.IO.Path.Combine(Application.streamingAssetsPath, "TutorialVideos/"+videoNames[videoIndex] +".mp4");
-                videoPlayer.url = videoPath;
-                //videoPlayer.Pause();
 
-                //videoPlayer.frame = 1; // Reset video to start
-                videoPlayer.Play();
-            }
 
             
 
@@ -173,25 +166,43 @@ public class TutorialManager : MonoBehaviour
             tutorialCards.Add(cardUI);
         }
         int i = 0;
+        int videoCount = 0;
         foreach(TutorialCardUI card in tutorialCards)
         {
-            i++;
+            if (card.videoPlayer != null)
+            {
+                string videoPath = System.IO.Path.Combine(Application.streamingAssetsPath, "TutorialVideos/" + videoNames[videoCount] + ".mp4");
+                videoPaths.Add(i, videoPath);
+                card.videoPlayer.url = videoPath;
+                
+
+                card.videoPlayer.frame = 1; // Reset video to start
+                card.videoPlayer.Pause();
+                //card.videoPlayer.Play();
+                videoCount++;
+            }
             if (card.pageNum != null)
             {
-                card.pageNum.text = $"{i} / {tutorialCards.Count}";
+                card.pageNum.text = $"{i+1} / {tutorialCards.Count}";
                 //Debug.Log($"Set page number for card '{i.card.name}' to: {i.pageNum.text}");
             }
             else
             {
                 Debug.LogWarning($"No TMP_Text found for page number in card '{i}'");
             }
+            i++;
         }
 
         //scrollRect.verticalNormalizedPosition = 1f;
 
         UpdateButtonInteractivity();
         DisableOutsideButtons();
-        videoIndex = -1;
+        //videoIndex = -1;
+    }
+
+    void OnVideoError()
+    {
+
     }
 
     private T FindComponentInChildrenByName<T>(Transform parent, string childName) where T : Component
@@ -228,18 +239,21 @@ public class TutorialManager : MonoBehaviour
 
     private IEnumerator SmoothScrollToIndex(int targetIndex)
     {
-/*        if (tutorialCards[currentIndex].videoPlayer != null)
+        if (tutorialCards[currentIndex].videoPlayer != null && targetIndex!=currentIndex)
         {
             Debug.Log($"Stopping video player on card {currentIndex} before scrolling.");
-            tutorialCards[currentIndex].videoPlayer.frame = 0; // Reset video to start
+            //tutorialCards[currentIndex].videoPlayer.frame = 0; // Reset video to start
             tutorialCards[currentIndex].videoPlayer.Pause();
-            
-        }*/
-
-/*        if (targetIndex == 0)
+        }
+        if(tutorialCards[targetIndex].videoPlayer != null)
         {
-            Debug.Log("SmoothScrollToIndex: Target index is 0, returning to menu.");
-        }*/
+            StartCoroutine(WaitPlayVideo(targetIndex));
+        }
+
+        /*        if (targetIndex == 0)
+                {
+                    Debug.Log("SmoothScrollToIndex: Target index is 0, returning to menu.");
+                }*/
         RectTransform managerRect = GetComponent<RectTransform>();
         float cardHeight = tutorialCards[0].card.rect.height; // Assumes all cards are the same height
 
@@ -330,6 +344,17 @@ public class TutorialManager : MonoBehaviour
         tutorialCards[tutorialCards.Count - 1].nextButton.GetComponentInChildren<TMP_Text>().text = "Play!";
         tutorialCards[tutorialCards.Count - 1].nextButton.GetComponent<RectTransform>().sizeDelta = new Vector2(600f, 130f); // Adjust size for "Play!" button
 
+    }
+
+    public IEnumerator WaitPlayVideo(int targetIndex)
+    {
+        Debug.Log($"[Scroll] Preparing video player on card {targetIndex} before scrolling.");
+        tutorialCards[targetIndex].videoPlayer.url = videoPaths[targetIndex];
+        tutorialCards[targetIndex].videoPlayer.frame = 0;
+        tutorialCards[targetIndex].videoPlayer.Prepare();
+        yield return new WaitForSeconds(tutorialPanDuration);
+        //tutorialCards[currentIndex].videoPlayer.Stop();
+        tutorialCards[targetIndex].videoPlayer.Play();
     }
 
     private void DisableAllButtons()
