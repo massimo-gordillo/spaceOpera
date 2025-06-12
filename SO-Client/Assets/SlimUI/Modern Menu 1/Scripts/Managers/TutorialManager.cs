@@ -29,10 +29,22 @@ public class TutorialManager : MonoBehaviour
 
     private List<TutorialCardUI> tutorialCards = new List<TutorialCardUI>();
     private int currentIndex = 0;
+    private int videoIndex = -1;
     private bool isScrolling = false;
 
     public CanvasGroup canvasGroup; // Assign in inspector or via script
     public float fadeDuration = 0.5f; // Fade speed
+
+    string[] videoNames = new string[]
+    {
+        "Tutorial-Capture",
+        "Tutorial-Produce",
+        "Tutorial-Movement",
+        "Tutorial-Attack",
+        "Tutorial-Attack-2",
+        "Tutorial-Ranged",
+        "Tutorial-Flying"
+    };
 
     void Start()
     {
@@ -51,9 +63,13 @@ public class TutorialManager : MonoBehaviour
 
             if (videoPlayer != null)
             {
-                
-                videoPlayer.Pause();
-                videoPlayer.frame = 1; // Reset video to start
+                videoIndex++;
+                string videoPath = System.IO.Path.Combine(Application.streamingAssetsPath, "TutorialVideos/"+videoNames[videoIndex] +".mp4");
+                videoPlayer.url = videoPath;
+                //videoPlayer.Pause();
+
+                //videoPlayer.frame = 1; // Reset video to start
+                videoPlayer.Play();
             }
 
             
@@ -175,6 +191,7 @@ public class TutorialManager : MonoBehaviour
 
         UpdateButtonInteractivity();
         DisableOutsideButtons();
+        videoIndex = -1;
     }
 
     private T FindComponentInChildrenByName<T>(Transform parent, string childName) where T : Component
@@ -211,13 +228,14 @@ public class TutorialManager : MonoBehaviour
 
     private IEnumerator SmoothScrollToIndex(int targetIndex)
     {
-        if (tutorialCards[currentIndex].videoPlayer != null)
+/*        if (tutorialCards[currentIndex].videoPlayer != null)
         {
             Debug.Log($"Stopping video player on card {currentIndex} before scrolling.");
             tutorialCards[currentIndex].videoPlayer.frame = 0; // Reset video to start
             tutorialCards[currentIndex].videoPlayer.Pause();
             
-        }
+        }*/
+
 /*        if (targetIndex == 0)
         {
             Debug.Log("SmoothScrollToIndex: Target index is 0, returning to menu.");
@@ -256,7 +274,7 @@ public class TutorialManager : MonoBehaviour
         isScrolling = false;
         UpdateButtonInteractivity();
 
-        if(tutorialCards[currentIndex].videoPlayer != null)
+/*        if(tutorialCards[currentIndex].videoPlayer != null)
         {
             Debug.Log($"[Scroll] Restarting video player on card {currentIndex} after scrolling.");
             tutorialCards[currentIndex].videoPlayer.Prepare();
@@ -264,7 +282,7 @@ public class TutorialManager : MonoBehaviour
             yield return new WaitForSeconds(tutorialPanDuration);
             //tutorialCards[currentIndex].videoPlayer.Stop();
             tutorialCards[currentIndex].videoPlayer.Play();
-        }
+        }*/
 
         //Debug.Log($"[Scroll] Scrolled to index {currentIndex} (targetIndex = {targetIndex})");
     }

@@ -19,6 +19,7 @@ public class StaticSprite : ClickableObject
     public Image lightsImage;
     public bool isUIVariant;
     public bool isFlyingUnit = false;
+    public RectTransform rt;
 
     // Start is called before the first frame update
     protected override void Start()
@@ -35,30 +36,33 @@ public class StaticSprite : ClickableObject
             lightsColor = new Color(255, 255, 255, 255);
             
         }
-/*        else
-        {
-            Debug.Log("No parent found for StaticSprite " + this.GetInstanceID());
-        }*/
+        /*        else
+                {
+                    Debug.Log("No parent found for StaticSprite " + this.GetInstanceID());
+                }*/
+        rt = GetComponent<RectTransform>();
     }
 
     // Update is called once per frame
-/*    void Update()
+    void Update()
     {
         if (isFlyingUnit)
         {
-            float amplitude = 0.0001f;
-            float frequency = 0.25f;
+            float amplitude = 0.03f;
+            //float amplitude = 0.0005f;
+            //float frequency = 10f;
+            float frequency = 0.30f;
 
             float offsetY = Mathf.Sin(Time.time * frequency * 2 * Mathf.PI) * amplitude;
-
-            RectTransform rt = GetComponent<RectTransform>();
-
+            
             // Use current position as base and add vertical sway
-            Vector2 currentBase = rt.anchoredPosition;
+            Vector2 currentBase = new Vector2 (parentComponentBaseUnit.transform.position.x, parentComponentBaseUnit.transform.position.y);
+            //Vector2 currentBase = rt.anchoredPosition;
             //currentBase.y = parentComponentBaseUnit.transform.position.y; // Get this from the unit each frame
-            rt.anchoredPosition = currentBase + new Vector2(0f, offsetY);
+            rt.transform.position = currentBase + new Vector2(0f, offsetY);
+            //rt.anchoredPosition = currentBase + new Vector2(0f, offsetY);
         }
-    }*/
+    }
 
 
     //private float internalTimeOffset;
