@@ -388,7 +388,7 @@ public class GameMaster : MonoBehaviour
     {
         //Debug.Log("Structure at pos " + structure.xPos + ", " + structure.yPos + " has been clicked.");
         //should probably try/catch if structure is null
-        if (structure!=null && structure.playerControl == playerTurn && (structure.structureType != 0 && structure.structureType != 5) || (getPlayerProgeny((byte)playerTurn)==1 && playerTurn == structure.playerControl) )
+        if (structure!=null && structure.playerControl == playerTurn && structure.structureType != 5 && ((getPlayerProgeny((byte)playerTurn) != 1 && structure.structureType != 0) || (getPlayerProgeny((byte)playerTurn)== 1 && structure.structureType== 0)))// && playerTurn == structure.playerControl) )
         {
             choicePanel.SetActive(true);
 

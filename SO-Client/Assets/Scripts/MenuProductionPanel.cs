@@ -69,7 +69,8 @@ public class MenuProductionPanel : MonoBehaviour
             }
             else if(attributesBaseUnit.progeny == Progeny.Virix)
             {
-                parent = prodListProgeny1;
+                if(attributesBaseUnit.unitName != "Spore") //don't add spore to Virix production list
+                    parent = prodListProgeny1;
             }
             else if (attributesBaseUnit.progeny == Progeny.Sentus)
             {

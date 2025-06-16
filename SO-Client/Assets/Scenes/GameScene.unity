@@ -4179,6 +4179,8 @@ MonoBehaviour:
   trimImage: {fileID: 0}
   lightsImage: {fileID: 0}
   isUIVariant: 0
+  isFlyingUnit: 0
+  rt: {fileID: 0}
 --- !u!50 &350041783
 Rigidbody2D:
   serializedVersion: 4
@@ -7202,6 +7204,8 @@ MonoBehaviour:
   trimImage: {fileID: 0}
   lightsImage: {fileID: 0}
   isUIVariant: 0
+  isFlyingUnit: 0
+  rt: {fileID: 0}
 --- !u!50 &580983544
 Rigidbody2D:
   serializedVersion: 4
@@ -9560,6 +9564,8 @@ MonoBehaviour:
   trimImage: {fileID: 0}
   lightsImage: {fileID: 0}
   isUIVariant: 0
+  isFlyingUnit: 0
+  rt: {fileID: 0}
 --- !u!50 &869400660
 Rigidbody2D:
   serializedVersion: 4

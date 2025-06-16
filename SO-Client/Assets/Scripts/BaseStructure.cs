@@ -25,7 +25,8 @@ public class BaseStructure : MonoBehaviour
     public GameObject incomeAnimationSprite;
 
     public StaticSprite progeny0CaptureSpriteContainer;
-    public StaticSprite progeny1CaptureSpriteContainer;
+    public StaticSprite progeny1ResourceCaptureSpriteContainer;
+    public StaticSprite progeny1ProductionCaptureSpriteContainer;
     public StaticSprite progeny2ResourceCaptureSpriteContainer;
     public StaticSprite progeny2ProductionCaptureSpriteContainer;
 
@@ -136,9 +137,17 @@ public class BaseStructure : MonoBehaviour
                 }
                 else if (progeny == 1)
                 {
-                    progeny1CaptureSpriteContainer.gameObject.SetActive(true);
-                    progeny1CaptureSpriteContainer.SetColor(playerControl, true, true);
-                    neutralSpriteContainer.SetColor(0, true, true);
+                    if (IsProduction())
+                    {
+                        progeny1ProductionCaptureSpriteContainer.gameObject.SetActive(true);
+                        progeny1ProductionCaptureSpriteContainer.SetColor(playerControl, true, true);
+                        neutralSpriteContainer.SetColor(0, true, true);
+                    }
+                    else { 
+                        progeny1ResourceCaptureSpriteContainer.gameObject.SetActive(true);
+                        progeny1ResourceCaptureSpriteContainer.SetColor(playerControl, true, true);
+                        neutralSpriteContainer.SetColor(0, true, true);
+                    }
                 }
                 else if (progeny == 2)
                 {
@@ -355,8 +364,10 @@ public class BaseStructure : MonoBehaviour
             neutralSpriteContainer.ToggleSprites(true);
         //progeny0SpriteRenderer.gameObject.SetActive(false);
         //progeny1SpriteRenderer.gameObject.SetActive(false);
-        if(progeny1CaptureSpriteContainer!=null)
-            progeny1CaptureSpriteContainer.gameObject.SetActive(false);
+        if(progeny1ResourceCaptureSpriteContainer!=null)
+            progeny1ResourceCaptureSpriteContainer.gameObject.SetActive(false);
+        if(progeny1ProductionCaptureSpriteContainer!=null)
+            progeny1ProductionCaptureSpriteContainer.gameObject.SetActive(false);
         //progeny2SpriteRenderer.gameObject.SetActive(false);
         /*        progeny0ResourceCaptureSpriteFillSR.gameObject.SetActive(false);
                 progeny0ResourceCaptureSpriteTrimSR.gameObject.SetActive(false);
