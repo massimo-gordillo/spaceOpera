@@ -39,6 +39,8 @@ public class GameMaster : MonoBehaviour
     private int[] playerResources;
     private int baseResourcePerTurn;
     private int structureResourcePerTurn;
+    public byte inspectorInputProgenyPlayer1;
+    public byte inspectorInputProgenyPlayer2;
     //private string gameStateFilePath = "Assets/InitializationData/Maps/Map3/Map3GameState.dat";
 
 
@@ -149,8 +151,8 @@ public class GameMaster : MonoBehaviour
         }
         else {
             Debug.LogWarning("Progeny set to -1 selected, defaulting to hard values");
-            playerProgeny.Add(1, 0);
-            playerProgeny.Add(2, 1);
+            playerProgeny.Add(1, inspectorInputProgenyPlayer1);
+            playerProgeny.Add(2, inspectorInputProgenyPlayer2);
         }
 
         if (MatchSettings.CPU_isOn || CPU_isOn)
