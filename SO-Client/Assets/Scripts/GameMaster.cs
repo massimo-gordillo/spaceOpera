@@ -171,7 +171,7 @@ public class GameMaster : MonoBehaviour
         if(!MatchSettings.CPU_isOn && CPU_isOn)
         {
             Debug.LogWarning("Match settings says CPU is off but manual CPU is on, defaulting to hard values.");
-            CPU_PlayersList[1] = true;
+            CPU_PlayersList[1] = false;
             CPU_PlayersList[2] = true;
         }
 
@@ -582,7 +582,7 @@ public class GameMaster : MonoBehaviour
                     prodFocus = prod;
                 } 
             }
-        if (prodCount + unitCount > 0)
+        if (prodCount + unitCount > 0 || (playerProgeny == 1 && playerResources[player] >= virixCheapestUnit))
         {
             endTurnConfirmCard.SetActive(true);
             String message = "";
@@ -602,7 +602,19 @@ public class GameMaster : MonoBehaviour
             }
             if (getPlayerProgeny((byte)player) == 1 && playerResources[player] >= virixCheapestUnit)
             {
-                message += $"You have {playerResources[player]} unspent bismuth!\n";
+                message += $"You have {playerResources[player]} unspent bismuth!";
+                if (unitCount == 0)
+                {
+                    message += "\nClick on a bisumth location you control to create a unit.";
+                    foreach (BaseStructure s in masterGrid.GetStructures(player))
+                    {
+                        if (s.structureType == 0 && s.IsCoveredByUnit() == false)
+                        {
+                            prodFocus = s;
+                            break;
+                        }
+                    }
+                }
             }
             //message += "Are you sure you want to end your turn?";
             endTurnConfirmCardText.text = message;

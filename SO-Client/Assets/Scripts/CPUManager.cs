@@ -1464,23 +1464,24 @@ public class CPUManager : MonoBehaviour
     }
 
 
-    /*    private void OnDrawGizmos()
+    /*private void OnDrawGizmos()
+    {
+        Debug.Log("Drawing Gizmos for network edges.");
+        Gizmos.color = Color.cyan;
+
+        if (networkEdges == null) return;
+
+        foreach (NetworkEdge e in networkEdges)
+        //foreach (NetworkEdge e in networkEdges)
         {
-            Gizmos.color = Color.cyan;
+            Vector2Int from = e.vectorA;
+            Vector2Int to = e.vectorB;
+            Vector3 fromPos = new Vector3(from.x, from.y, 0);
+            Vector3 toPos = new Vector3(to.x, to.y, 0);
 
-            if (networkEdges == null) return;
-
-            foreach (NetworkEdge e in priorityNetworkEdgesGround)
-            //foreach (NetworkEdge e in networkEdges)
-            {
-                Vector2Int from = e.vectorA;
-                Vector2Int to = e.vectorB;
-                Vector3 fromPos = new Vector3(from.x, from.y, 0);
-                Vector3 toPos = new Vector3(to.x, to.y, 0);
-
-                Gizmos.DrawLine(fromPos, toPos);
-            }
-        }*/
+            Gizmos.DrawLine(fromPos, toPos);
+        }
+    }*/
 
 
     public void AssignPriorityHeadingsToHQ()
