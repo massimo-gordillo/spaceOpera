@@ -1380,7 +1380,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4548533291501861208}
-  m_RootOrder: 6
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &5117658928831491176
 SpriteRenderer:
@@ -1588,6 +1588,12 @@ MonoBehaviour:
   fillSR: {fileID: 0}
   trimSR: {fileID: 0}
   lightsSR: {fileID: 0}
+  fillImage: {fileID: 0}
+  trimImage: {fileID: 0}
+  lightsImage: {fileID: 0}
+  isUIVariant: 0
+  isFlyingUnit: 0
+  rt: {fileID: 0}
 --- !u!1 &4548533291501861214
 GameObject:
   m_ObjectHideFlags: 0
@@ -1620,10 +1626,10 @@ Transform:
   - {fileID: 4548533290679335253}
   - {fileID: 480454219139180204}
   - {fileID: 5959277192361299510}
-  - {fileID: 4903681118816913139}
   - {fileID: 1798495883849624493}
   - {fileID: 5998074681789259681}
   - {fileID: 5979159122595394363}
+  - {fileID: 2049156440278822995}
   - {fileID: 3861572109855902075}
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -1948,7 +1954,7 @@ RectTransform:
   - {fileID: 4137096447327198653}
   - {fileID: 3489976674811936171}
   m_Father: {fileID: 4548533291501861208}
-  m_RootOrder: 5
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -1985,7 +1991,7 @@ Transform:
   m_Children:
   - {fileID: 4075927327848357223}
   m_Father: {fileID: 4548533291501861208}
-  m_RootOrder: 4
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &8317914215630156814
 GameObject:
@@ -2213,6 +2219,18 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 4548533291501861208}
     m_Modifications:
+    - target: {fileID: 2690641474368353305, guid: 88268c20a16956b4c9b0579543f1d861, type: 3}
+      propertyPath: m_RootOrder
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 2690641474368353305, guid: 88268c20a16956b4c9b0579543f1d861, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2690641474368353305, guid: 88268c20a16956b4c9b0579543f1d861, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5309568537644243473, guid: 88268c20a16956b4c9b0579543f1d861, type: 3}
       propertyPath: m_RootOrder
       value: 1
@@ -2289,9 +2307,9 @@ SpriteRenderer:
   m_CorrespondingSourceObject: {fileID: 3662765650668672947, guid: 88268c20a16956b4c9b0579543f1d861, type: 3}
   m_PrefabInstance: {fileID: 4118265635416130634}
   m_PrefabAsset: {fileID: 0}
---- !u!4 &4903681118816913139 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 9019121506473607865, guid: 88268c20a16956b4c9b0579543f1d861, type: 3}
+--- !u!224 &2049156440278822995 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 2690641474368353305, guid: 88268c20a16956b4c9b0579543f1d861, type: 3}
   m_PrefabInstance: {fileID: 4118265635416130634}
   m_PrefabAsset: {fileID: 0}
 --- !u!212 &5089449104217959101 stripped

@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 4da2f61a935b68e4aa6520ea68bd032f
+guid: bf3bec097bcfcb947bc90e00a5fa7b25
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -90,6 +90,18 @@ TextureImporter:
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
     buildTarget: Android
     maxTextureSize: 2048
     resizeAlgorithm: 0
@@ -119,8 +131,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: b572f568f88af4b488c3f9d6c340a8ef
-      internalID: 519680452
+      spriteID: f6576e35b742134479ee7076cf3487b7
+      internalID: -584820129
       vertices: []
       indices: 
       edges: []
@@ -140,8 +152,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: b6a9dc108a59bcd4cb0c5e5e6b79caf0
-      internalID: 805543245
+      spriteID: 9c6e05a23699e9e489010cbeea12c41d
+      internalID: 860743200
       vertices: []
       indices: 
       edges: []
@@ -161,8 +173,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 6b738d902c1f0d240840ec51061d062c
-      internalID: 1446902460
+      spriteID: 805262d53c3db0a428b0fc35a02d20aa
+      internalID: 1236906563
       vertices: []
       indices: 
       edges: []
@@ -182,8 +194,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 6e7445ae8ee47204bb62274d948cad4d
-      internalID: -798089864
+      spriteID: 157c3c6f7bdea14499052240b2ee921d
+      internalID: -1966541356
       vertices: []
       indices: 
       edges: []
@@ -199,10 +211,10 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      blacksmithSprites_0: 519680452
-      blacksmithSprites_1: 805543245
-      blacksmithSprites_2: 1446902460
-      blacksmithSprites_3: -798089864
+      blacksmithSprites_0: -584820129
+      blacksmithSprites_1: 860743200
+      blacksmithSprites_2: 1236906563
+      blacksmithSprites_3: -1966541356
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0

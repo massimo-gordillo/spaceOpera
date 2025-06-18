@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 644f5c6eea466a045862a59c162bbf1f
+guid: 4cbf7d0c382981d4cb67d254fad5545c
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -67,10 +67,10 @@ TextureImporter:
   platformSettings:
   - serializedVersion: 3
     buildTarget: DefaultTexturePlatform
-    maxTextureSize: 2048
+    maxTextureSize: 512
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 1
+    textureCompression: 0
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -79,18 +79,6 @@ TextureImporter:
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
     buildTarget: Standalone
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 1
-    compressionQuality: 50
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    overridden: 0
-    androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 0
-  - serializedVersion: 3
-    buildTarget: WebGL
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
@@ -113,11 +101,23 @@ TextureImporter:
     overridden: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: WebGL
+    maxTextureSize: 512
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: archerSprites_0
+      name: horsemenSprites_0
       rect:
         serializedVersion: 2
         x: 0
@@ -131,14 +131,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 65b9466e204b21145a08aafe3eb56009
-      internalID: 10012694
+      spriteID: ab8c736701ef514419bc91a78a26e45f
+      internalID: 781535559
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: archerSprites_1
+      name: horsemenSprites_1
       rect:
         serializedVersion: 2
         x: 32
@@ -152,14 +152,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: ea5da9a4b33b6424888825c886852ce7
-      internalID: -1616582171
+      spriteID: b467f87eb3e2f1d409edd783cac2a930
+      internalID: -22287288
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: archerSprites_2
+      name: horsemenSprites_2
       rect:
         serializedVersion: 2
         x: 0
@@ -173,14 +173,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 91e952da5287d3b46b27e0f978cc3aba
-      internalID: -182511527
+      spriteID: 6dc8cafc2c4a1c849bc64eb996a68e82
+      internalID: 437017144
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: archerSprites_3
+      name: horsemenSprites_3
       rect:
         serializedVersion: 2
         x: 32
@@ -194,8 +194,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: b52ee95efb4e9b44999a9d0098ca5e02
-      internalID: -1917661076
+      spriteID: 6c0b7e5cf3a0c9e408b2cfd497d7db53
+      internalID: 1508306336
       vertices: []
       indices: 
       edges: []
@@ -211,10 +211,10 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      archerSprites_0: 10012694
-      archerSprites_1: -1616582171
-      archerSprites_2: -182511527
-      archerSprites_3: -1917661076
+      horsemenSprites_0: 781535559
+      horsemenSprites_1: -22287288
+      horsemenSprites_2: 437017144
+      horsemenSprites_3: 1508306336
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0

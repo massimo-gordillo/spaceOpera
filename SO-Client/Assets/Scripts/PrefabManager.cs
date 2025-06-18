@@ -23,7 +23,7 @@ public class PrefabManager
 
         if (prefab == null || prefab.attributesHash != unitAttributes.attributesHash || updateAllPrefabsFlag)
         {
-            if (prefab.attributesHash != unitAttributes.attributesHash && prefab != null)
+            if (prefab != null && prefab.attributesHash != unitAttributes.attributesHash )
             {
                 UnityEngine.Debug.Log($"prefab {unitAttributes.unitName} has different attribute hash, rebuilding.");
             }
@@ -31,6 +31,7 @@ public class PrefabManager
             string basePrefabPath = "UnitPrefabs/BaseUnitBasePrefab";
             ClonePrefab(basePrefabPath, prefabPath);
             modifyPrefab(prefabPath, unitAttributes);
+            prefab = getBaseUnitFromPath(prefabPath);
         }
 
         if (unitAttributes.isNotPrototype)

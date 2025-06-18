@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 644f5c6eea466a045862a59c162bbf1f
+guid: 03b441ff391f4024ab81711cc0a761b6
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -117,7 +117,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: archerSprites_0
+      name: balloonSprites_0
       rect:
         serializedVersion: 2
         x: 0
@@ -131,14 +131,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 65b9466e204b21145a08aafe3eb56009
-      internalID: 10012694
+      spriteID: 8a96c166563282748aff51fde8b92642
+      internalID: -846470493
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: archerSprites_1
+      name: balloonSprites_1
       rect:
         serializedVersion: 2
         x: 32
@@ -152,14 +152,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: ea5da9a4b33b6424888825c886852ce7
-      internalID: -1616582171
+      spriteID: f41731f4630b9ae42b2d519c4f570f6e
+      internalID: 1847739475
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: archerSprites_2
+      name: balloonSprites_2
       rect:
         serializedVersion: 2
         x: 0
@@ -173,14 +173,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 91e952da5287d3b46b27e0f978cc3aba
-      internalID: -182511527
+      spriteID: 1ea94f08d6b228c4b9803af9a0080563
+      internalID: -695309099
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: archerSprites_3
+      name: balloonSprites_3
       rect:
         serializedVersion: 2
         x: 32
@@ -194,8 +194,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: b52ee95efb4e9b44999a9d0098ca5e02
-      internalID: -1917661076
+      spriteID: 5267e3b63aa504d4abdc2d2220422164
+      internalID: -181663518
       vertices: []
       indices: 
       edges: []
@@ -211,10 +211,10 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      archerSprites_0: 10012694
-      archerSprites_1: -1616582171
-      archerSprites_2: -182511527
-      archerSprites_3: -1917661076
+      balloonSprites_0: -846470493
+      balloonSprites_1: 1847739475
+      balloonSprites_2: -695309099
+      balloonSprites_3: -181663518
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0

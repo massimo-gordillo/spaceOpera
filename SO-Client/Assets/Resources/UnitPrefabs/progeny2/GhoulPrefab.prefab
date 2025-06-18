@@ -1423,7 +1423,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 100, y: 100}
+  m_SizeDelta: {x: 1, y: 1}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!61 &4487890976697165555
 BoxCollider2D:
@@ -1476,6 +1476,7 @@ MonoBehaviour:
   lightsImage: {fileID: 0}
   isUIVariant: 0
   isFlyingUnit: 0
+  rt: {fileID: 0}
 --- !u!1 &5542489618972792759
 GameObject:
   m_ObjectHideFlags: 0
@@ -1795,6 +1796,7 @@ MonoBehaviour:
   lightsImage: {fileID: 0}
   isUIVariant: 0
   isFlyingUnit: 0
+  rt: {fileID: 0}
 --- !u!1 &6563889781055226540
 GameObject:
   m_ObjectHideFlags: 0

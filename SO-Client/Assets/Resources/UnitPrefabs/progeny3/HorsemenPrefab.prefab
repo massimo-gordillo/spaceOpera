@@ -159,6 +159,7 @@ MonoBehaviour:
   lightsImage: {fileID: 0}
   isUIVariant: 0
   isFlyingUnit: 0
+  rt: {fileID: 0}
 --- !u!1 &152011949908247906
 GameObject:
   m_ObjectHideFlags: 0
@@ -463,7 +464,7 @@ SpriteRenderer:
   m_SortingLayerID: -1655538903
   m_SortingLayer: 3
   m_SortingOrder: 0
-  m_Sprite: {fileID: -22287288, guid: 4cbf7d0c382981d4cb67d254fad5545c, type: 3}
+  m_Sprite: {fileID: 742001971, guid: f8b410460553bc5418b210adf6ae97ac, type: 3}
   m_Color: {r: 0.899371, g: 0.07636155, b: 0.20890827, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -708,10 +709,10 @@ MonoBehaviour:
   healthType: 1
   damageType: 1
   weaponType: 0
-  attributesHash: 569372911656239104
+  attributesHash: 4211670869912584192
   isResourceUnit: 0
   isInfantry: 0
-  healthMax: 900
+  healthMax: 1000
   healthCurrent: 0
   baseDamage: 350
   attackRange: 1
@@ -873,7 +874,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 100, y: 100}
+  m_SizeDelta: {x: 1, y: 1}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!61 &1246710308287559982
 BoxCollider2D:
@@ -926,6 +927,7 @@ MonoBehaviour:
   lightsImage: {fileID: 0}
   isUIVariant: 0
   isFlyingUnit: 0
+  rt: {fileID: 0}
 --- !u!1 &5095746344916218646
 GameObject:
   m_ObjectHideFlags: 0
@@ -1430,7 +1432,7 @@ SpriteRenderer:
   m_SortingLayerID: -1655538903
   m_SortingLayer: 3
   m_SortingOrder: 0
-  m_Sprite: {fileID: 437017144, guid: 4cbf7d0c382981d4cb67d254fad5545c, type: 3}
+  m_Sprite: {fileID: 29352272, guid: f8b410460553bc5418b210adf6ae97ac, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -2372,7 +2374,7 @@ SpriteRenderer:
   m_SortingLayerID: -1655538903
   m_SortingLayer: 3
   m_SortingOrder: 0
-  m_Sprite: {fileID: 1508306336, guid: 4cbf7d0c382981d4cb67d254fad5545c, type: 3}
+  m_Sprite: {fileID: 550761245, guid: f8b410460553bc5418b210adf6ae97ac, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
