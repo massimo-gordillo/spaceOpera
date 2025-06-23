@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 2afa68a0c9430d048873b3fa30f9c266
+guid: c3a48be061db60a46a657df69b9ec601
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -67,10 +67,10 @@ TextureImporter:
   platformSettings:
   - serializedVersion: 3
     buildTarget: DefaultTexturePlatform
-    maxTextureSize: 512
+    maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 0
+    textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -79,6 +79,18 @@ TextureImporter:
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
     buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: WebGL
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
@@ -101,23 +113,11 @@ TextureImporter:
     overridden: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
-  - serializedVersion: 3
-    buildTarget: WebGL
-    maxTextureSize: 512
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 0
-    compressionQuality: 50
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    overridden: 0
-    androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: venusSprites_0
+      name: jumperSprites_0
       rect:
         serializedVersion: 2
         x: 0
@@ -131,14 +131,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 0234a8fd9787b554c82c444c007daf43
-      internalID: 1578664181
+      spriteID: 186f038040ab8224381b2f099abd2c10
+      internalID: 168633687
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: venusSprites_1
+      name: jumperSprites_1
       rect:
         serializedVersion: 2
         x: 32
@@ -152,14 +152,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: c1b93f394976b0848ad4a2a003b8be54
-      internalID: 1011823936
+      spriteID: fe36d8eefe5b89746af771450f1ae897
+      internalID: 1760342722
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: venusSprites_2
+      name: jumperSprites_2
       rect:
         serializedVersion: 2
         x: 0
@@ -173,14 +173,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 9210132a379f0e248979725d8e87da50
-      internalID: -263973546
+      spriteID: 3cdc2dcda805e1940a1c1738e9a89f24
+      internalID: -1468398581
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: venusSprites_3
+      name: jumperSprites_3
       rect:
         serializedVersion: 2
         x: 32
@@ -194,8 +194,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 69d3cdc433898f64cb9cff78de1ec2e2
-      internalID: 337596956
+      spriteID: c1e3a7104350759428ed80e34220e113
+      internalID: 2100457366
       vertices: []
       indices: 
       edges: []
@@ -211,10 +211,10 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      venusSprites_0: 1578664181
-      venusSprites_1: 1011823936
-      venusSprites_2: -263973546
-      venusSprites_3: 337596956
+      jumperSprites_0: 168633687
+      jumperSprites_1: 1760342722
+      jumperSprites_2: -1468398581
+      jumperSprites_3: 2100457366
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0

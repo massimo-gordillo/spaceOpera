@@ -57,7 +57,7 @@ public class PrefabManager
         GameObject prefab = Resources.Load<GameObject>(prefabPath.Replace("Assets/Resources/", "").Replace(".prefab", ""));
         if (prefab == null)
         {
-            UnityEngine.Debug.LogWarning("Prefab not found at path: " + prefabPath);
+            UnityEngine.Debug.LogError("Prefab not found at path: " + prefabPath);
         }
         return prefab;
     }
@@ -254,7 +254,6 @@ public class PrefabManager
             return;
         }
 
-        //UnityEnginer.Debug.LogError($"Setting sprites for {attributes.unitName}.");
 
         // Validate enum conversion
         int progenyIndex;
@@ -333,6 +332,8 @@ public class PrefabManager
         }
         else //newer implementation
         {
+            //UnityEngine.Debug.Log($"Setting sprites for {attributes.unitName}.");
+
             basePath = $"Sprites/progeny{progenyIndex}/{unitNameLower}Sprites";
 /*            basePath = $"Sprites/progeny{progenyIndex}/{unitNameLower}Sprites/{unitNameLower}_";
             fillSpritePath = $"{basePath}1";
@@ -341,7 +342,7 @@ public class PrefabManager
             Sprite[] sprites = Resources.LoadAll<Sprite>(basePath);
             if (sprites == null || sprites.Length == 0)
             {
-                UnityEngine.Debug.LogError($"Failed to load sprites from path: {basePath}");
+                UnityEngine.Debug.Log($"Failed to load sprites from path: {basePath}");
                 return;
             }
             /*            //sprite image has to be a multi sprites and in the order of 0: full sprite, 1: fill, 2: trim, 3:lights.

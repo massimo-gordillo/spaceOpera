@@ -7893,13 +7893,14 @@ GameObject:
   - component: {fileID: 657177013}
   - component: {fileID: 657177015}
   - component: {fileID: 657177016}
+  - component: {fileID: 657177017}
   m_Layer: 5
   m_Name: ProductionPanel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &657177013
 RectTransform:
   m_ObjectHideFlags: 0
@@ -7949,6 +7950,20 @@ MonoBehaviour:
   prodListProgeny1: {fileID: 402348447}
   prodListProgeny2: {fileID: 242758796}
   spritePrefabTemplate: {fileID: 0}
+--- !u!114 &657177017
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 657177012}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3312d7739989d2b4e91e6319e9a96d76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Padding: {x: 0, y: 0, z: 0, w: 0}
+  m_Softness: {x: 0, y: 0}
 --- !u!1001 &657948029
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -10737,8 +10752,8 @@ MonoBehaviour:
   gridY: 20
   selectedStructure: {fileID: 0}
   turnNumber: 0
-  inspectorInputProgenyPlayer1: 0
-  inspectorInputProgenyPlayer2: 0
+  inspectorInputProgenyPlayer1: 1
+  inspectorInputProgenyPlayer2: 2
   infantryUnitPrefab: {fileID: 7803690413202824681, guid: 983ef1501268ffe41b8514bfa205ddc5, type: 3}
   commandStructurePrefab: {fileID: 8663485981121422305, guid: 71e7db29bb8159048a60acdf62cc9b4f, type: 3}
   productionAirportStructurePrefab: {fileID: 8663485981121422305, guid: 731afedc4371ad14880021af703f2c09, type: 3}
