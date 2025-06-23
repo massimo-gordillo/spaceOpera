@@ -40,6 +40,8 @@ public class MenuProductionPanel : MonoBehaviour
         {
             if (!kvp.Value.isNotPrototype)
                 continue;
+            if(kvp.Value.unitName == "Spore")
+                continue; //don't add spore to production list  
 
             AttributesBaseUnit attributesBaseUnit = kvp.Value;
 
@@ -69,8 +71,8 @@ public class MenuProductionPanel : MonoBehaviour
             }
             else if(attributesBaseUnit.progeny == Progeny.Virix)
             {
-                if(attributesBaseUnit.unitName != "Spore") //don't add spore to Virix production list
-                    parent = prodListProgeny1;
+                //if(attributesBaseUnit.unitName != "Spore") //don't add spore to Virix production list
+                parent = prodListProgeny1;
             }
             else if (attributesBaseUnit.progeny == Progeny.Sentus)
             {

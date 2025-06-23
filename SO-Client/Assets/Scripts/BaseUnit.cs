@@ -111,6 +111,8 @@ public class BaseUnit : MonoBehaviour
         if ((playerControl+1) % 2 == 1)
             flipSprites();
 
+        //Debug.Log($"Setting health {healthCurrent} to health max {healthMax}");
+        healthCurrent = healthMax; //set current health to max health on start
         setHealth(healthMax);
         if (unitNameTextContainer != null)
         {
@@ -249,15 +251,19 @@ public class BaseUnit : MonoBehaviour
 
     public void setHealth(double health)
     {
-        //round down to the nearest 1% of max health
-        int healthStep = Math.Max(1, healthMax / 100); // Ensure healthStep is at least 1
-        healthCurrent = (int)(health - (health % healthStep));
-        updateHealthUI();
+        if (health != healthCurrent)
+        {
+            //round down to the nearest 1% of max health
+            int healthStep = Math.Max(1, healthMax / 100); // Ensure healthStep is at least 1
+            healthCurrent = (int)(health - (health % healthStep));
+            updateHealthUI();
+        }
     }
 
     public int getHealthPercentage()
     {
-        return (int)((double)healthCurrent / (double)healthMax * 100);
+        //Debug.Log($"Calculating health percentage for {unitName}: Current Health = {healthCurrent} vs {(double)healthCurrent}, Max Health = {(double)healthMax}");
+        return (int)(((double)healthCurrent / (double)healthMax) * 100);
     }
 
     public void updateHealthUI()
