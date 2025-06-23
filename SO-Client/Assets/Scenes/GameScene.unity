@@ -10737,8 +10737,8 @@ MonoBehaviour:
   gridY: 20
   selectedStructure: {fileID: 0}
   turnNumber: 0
-  inspectorInputProgenyPlayer1: 1
-  inspectorInputProgenyPlayer2: 2
+  inspectorInputProgenyPlayer1: 0
+  inspectorInputProgenyPlayer2: 0
   infantryUnitPrefab: {fileID: 7803690413202824681, guid: 983ef1501268ffe41b8514bfa205ddc5, type: 3}
   commandStructurePrefab: {fileID: 8663485981121422305, guid: 71e7db29bb8159048a60acdf62cc9b4f, type: 3}
   productionAirportStructurePrefab: {fileID: 8663485981121422305, guid: 731afedc4371ad14880021af703f2c09, type: 3}

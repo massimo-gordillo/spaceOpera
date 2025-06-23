@@ -1343,7 +1343,7 @@ MonoBehaviour:
   attackRange: 1
   price: 800
   movementRange: 5
-  playerControl: 0
+  playerControl: 2
   team: 0
   orientation: 3
   pos: {x: 0, y: 0}
@@ -1411,7 +1411,7 @@ RectTransform:
   m_GameObject: {fileID: 5413792574459136315}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.01, y: 0.01, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4820157860386435678}

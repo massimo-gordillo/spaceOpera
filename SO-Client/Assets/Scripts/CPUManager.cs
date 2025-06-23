@@ -268,13 +268,21 @@ public class CPUManager : MonoBehaviour
 */
                 if (masterGrid.canUnitAttack(unit, attackable))
                 {
-                    unit.CPU_AttackableUnitList.Add(attackable);
-                    /*   if (isCurious)
-                           Debug.Log($"counting: Unit {unit.pos} has an attack list of length {unit.CPU_AttackableUnitList.Count}");
-   */
-                    if (attackable.isResourceUnit)
+                    //check if squares adjacent to the attackable unit are also in the movement queue AND there's no unit in that square, add them to the attackable list.
+                    foreach(Vector2Int dir in masterGrid.DirectionList())
                     {
-                        unit.CPU_AttackableResourceUnitList.Add(attackable);
+                        Vector2Int adjacentSquare = attackSquare + dir;
+                        if (unit.CPU_MoveSquaresList.Contains(adjacentSquare) && masterGrid.whatUnitIsInThisLocation(adjacentSquare) == null)
+                        {
+                            unit.CPU_AttackableUnitList.Add(attackable);
+                            /*   if (isCurious)
+                                   Debug.Log($"counting: Unit {unit.pos} has an attack list of length {unit.CPU_AttackableUnitList.Count}");
+           */
+                            if (attackable.isResourceUnit)
+                            {
+                                unit.CPU_AttackableResourceUnitList.Add(attackable);
+                            }
+                        }
                     }
                 }
             }
