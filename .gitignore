@@ -58,3 +58,5 @@ SO-Client/.vs/*
 
 # WebGL build files
 SO-Client/webGLBuild
+SO-Client/webGLBuild*.zip
+SO-Client/Assets/BuildReports
