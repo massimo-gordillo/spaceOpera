@@ -98,6 +98,7 @@ public class GameMaster : MonoBehaviour
     private Vector2 offScreenRight;
     private Vector2 centerPosition;
     public static Color32[] playerColors;
+    public AudioSource musicAudio;
 
     [Header("CPU")]
     public static bool CPU_isOn = false;
@@ -833,6 +834,7 @@ public class GameMaster : MonoBehaviour
         canvas.gameObject.SetActive(false);
         choicePanel.SetActive(false);
         loadingScreen.SetActive(true);
+        StartCoroutine(muteMusic(1.5f));
         loadPromptText.text = "Loading... Main Menu";
 
         float displayedProgress = 0.05f;
@@ -868,8 +870,10 @@ public class GameMaster : MonoBehaviour
                 displayedProgress = targetProgress;
 
             //loadingBar.value = Mathf.Lerp(loadingBar.value, displayedProgress, 0.3f);
-            if(displayedProgress > initialScrollTarget)
+            if (displayedProgress > initialScrollTarget)
                 loadingBar.value = displayedProgress;
+            else
+                loadingBar.value = initialScrollTarget;
 
             if (operation.progress >= 0.9f)
             {
@@ -1285,5 +1289,31 @@ public class GameMaster : MonoBehaviour
             playerColors[1] = new Color32(63, 44, 255, 255);
             playerColors[2] = new Color32(230, 19, 53, 255);
         }
+    }
+    
+    public void callMuteMusic()
+    {
+        StartCoroutine(muteMusic(0.25f));
+    }
+
+    public IEnumerator muteMusic(float duration)
+    {
+        
+        float startVolume = musicAudio.volume;
+        float elapsedTime = 0f;
+
+        while (elapsedTime < duration)
+        {
+            elapsedTime += Time.deltaTime;
+            float t = Mathf.Clamp01(elapsedTime / duration);
+
+            // Ease-out cubic: y = 1 - (1 - t)^3
+            float easedT = 1f - Mathf.Pow(1f - t, 3f);
+
+            musicAudio.volume = Mathf.Lerp(startVolume, 0f, easedT);
+            yield return null;
+        }
+
+        musicAudio.volume = 0f;
     }
 }

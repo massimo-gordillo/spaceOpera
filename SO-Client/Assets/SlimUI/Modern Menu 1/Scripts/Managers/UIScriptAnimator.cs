@@ -9,6 +9,8 @@ public class UIScriptAnimator : MonoBehaviour
     private static bool hasAnimated = false;
 
     public GameObject textContainer;
+    public GameObject startButtonScreen;
+    public AudioSource audioSource;
     Vector3 textContainerStartPosition;
 
     public TextMeshPro textDisplay;
@@ -51,7 +53,19 @@ public class UIScriptAnimator : MonoBehaviour
         skipButtonText.color = new Color(skipButtonText.color.r, skipButtonText.color.g, skipButtonText.color.b, 0.25f);
         //logoFinalPosition = logoSprite.transform.position;
         SetStartText();
-        AnimateIntro();
+
+        //if start button screen is active, don't run the intro animation
+        if (!hasAnimated)
+        {
+            audioSource.Pause();
+            startButtonScreen.SetActive(true);
+        }
+        if (!startButtonScreen.activeSelf)
+        {
+            AnimateIntro();
+        }
+
+        
 
     }
 
@@ -59,6 +73,7 @@ public class UIScriptAnimator : MonoBehaviour
     {
         if (!hasAnimated && UIMenuManager.isAnimating)
         {
+            audioSource.Play();
             StartCoroutine(TypeText());
             StartCoroutine(IntroAnimations());
             hasAnimated = true;
