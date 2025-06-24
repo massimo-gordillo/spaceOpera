@@ -100,7 +100,7 @@ public class GameMaster : MonoBehaviour
     public static Color32[] playerColors;
 
     [Header("CPU")]
-    public static bool CPU_isOn = true;
+    public static bool CPU_isOn = false;
     private static bool CPU_isMasterDebugging = false;
     public static bool[] CPU_PlayersList;
     public int virixCheapestUnit;
