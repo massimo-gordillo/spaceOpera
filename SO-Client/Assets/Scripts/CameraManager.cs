@@ -46,9 +46,9 @@ public class CameraManager : MonoBehaviour
 
     void Update()
     {
-        if(GameMaster.CPU_isOn && GameMaster.CPU_PlayersList[GameMaster.playerTurn])
+        if((GameMaster.CPU_isOn && GameMaster.CPU_PlayersList[GameMaster.playerTurn]) || GameMaster.isGameComplete)
         {
-            return; // Do not allow camera movement during CPU turns
+            return; // Do not allow camera movement during CPU turns unless game is over.
         }
         Vector2 inputPosition;
         bool isPressing = false;
