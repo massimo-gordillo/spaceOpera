@@ -52,11 +52,11 @@ public class GameMaster : MonoBehaviour
     public BaseStructure resourceStructurePrefab;
 
 
-    [Header("Game Containers")]
+    [Header("Transform Containers")]
     public Transform unitContainer;
     public Transform structureContainer;
 
-    [Header("Game Action UI Items")]
+    [Header("UI Items")]
     public GameObject choicePanel;
     public MenuProductionPanel productionPanel;
     public GameObject unitChoicePanel;
@@ -142,7 +142,7 @@ public class GameMaster : MonoBehaviour
             if (!MatchSettings.CPU_isOn)
             {
                 Debug.LogWarning("Match settings says CPU is off but manual CPU is on, defaulting to hard values.");
-                CPU_PlayersList[1] = true;
+                CPU_PlayersList[1] = false;
                 CPU_PlayersList[2] = true;
             }
         }
@@ -227,12 +227,14 @@ public class GameMaster : MonoBehaviour
         }
         
         setPlayerTurnText(playerTurn);
+        
+
 
         playerResources = new int[numPlayers + 1];
         playerResources[0] = 0;
         for (int i = 1; i <= numPlayers; i++)
             playerResources[i] = baseResourcePerTurn;
-
+        playerResourceText.text = playerResources[1].ToString();
         //Required for prompt card to know if a player can still create a unit at the end of their turn or not.
         SetCheapestUnits();
 

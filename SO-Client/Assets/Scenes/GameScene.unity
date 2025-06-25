@@ -11745,8 +11745,8 @@ MonoBehaviour:
   gridY: 20
   selectedStructure: {fileID: 0}
   turnNumber: 0
-  inspectorInputProgenyPlayer1: 0
-  inspectorInputProgenyPlayer2: 2
+  inspectorInputProgenyPlayer1: 1
+  inspectorInputProgenyPlayer2: 1
   infantryUnitPrefab: {fileID: 7803690413202824681, guid: 983ef1501268ffe41b8514bfa205ddc5, type: 3}
   commandStructurePrefab: {fileID: 8663485981121422305, guid: 71e7db29bb8159048a60acdf62cc9b4f, type: 3}
   productionAirportStructurePrefab: {fileID: 8663485981121422305, guid: 731afedc4371ad14880021af703f2c09, type: 3}
@@ -26419,7 +26419,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 1200
+  m_text: 200
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 15addbb2b245ec249aebc2b817a94630, type: 2}
   m_sharedMaterial: {fileID: 5833942852483699036, guid: 15addbb2b245ec249aebc2b817a94630, type: 2}

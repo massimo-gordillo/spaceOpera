@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.U2D;
 using System.Text;
+using System.Linq;
 
 public class MenuProductionPanel : MonoBehaviour
 {
@@ -36,7 +37,12 @@ public class MenuProductionPanel : MonoBehaviour
             Debug.LogWarning("gamevaluesSO getAttributesBaseUnit is null");
         }
 
-        foreach (var kvp in attributesBaseUnits)
+        var sortedByPrice = attributesBaseUnits.OrderBy(kvp => kvp.Value.price).ToList();
+
+        //attributesBaseUnits = attributesBaseUnits.OrderBy(kvp => kvp.Value.price).ToList();
+        // Sort by price
+
+        foreach (var kvp in sortedByPrice)
         {
             if (!kvp.Value.isNotPrototype)
                 continue;
