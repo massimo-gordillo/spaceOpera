@@ -2114,7 +2114,7 @@ public class CPUManager : MonoBehaviour
 
             if (!allCosts.TryGetValue((byte)gamePieceId, out var unitInfo))
             {
-                Debug.LogWarning($"Unit with gamePieceID '{gamePieceId}' not found in unitCosts.");
+                //Debug.LogWarning($"Unit with gamePieceID '{gamePieceId}' not found in unitCosts.");
                 continue;
             }
 
