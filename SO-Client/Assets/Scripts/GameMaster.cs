@@ -37,8 +37,8 @@ public class GameMaster : MonoBehaviour
     public static bool isGameComplete = false;
     public static Dictionary<byte, byte> playerProgeny;
     private int[] playerResources;
-    private int baseResourcePerTurn;
-    private int structureResourcePerTurn;
+    private int baseResourcePerTurn = 200;
+    private int structureResourcePerTurn = 100;
     public byte inspectorInputProgenyPlayer1;
     public byte inspectorInputProgenyPlayer2;
     //private string gameStateFilePath = "Assets/InitializationData/Maps/Map3/Map3GameState.dat";
@@ -55,8 +55,6 @@ public class GameMaster : MonoBehaviour
     [Header("Game Containers")]
     public Transform unitContainer;
     public Transform structureContainer;
-
-
 
     [Header("Game Action UI Items")]
     public GameObject choicePanel;
@@ -92,7 +90,7 @@ public class GameMaster : MonoBehaviour
     [Header("Animations")]
     public static bool isAnimating;
     public static float globalAnimationDuration = 0.6f;
-    public static float swoopCardAnimationDuration = globalAnimationDuration*4;
+    public static float swoopCardAnimationDuration = 2.4f;
     private RectTransform announcementCardRT;
     private Vector2 offScreenLeft;
     private Vector2 offScreenRight;
@@ -102,6 +100,7 @@ public class GameMaster : MonoBehaviour
 
     [Header("CPU")]
     public static bool CPU_isOn = false;
+    public static bool CPU_isOn_manual = true;
     private static bool CPU_isMasterDebugging = false;
     public static bool[] CPU_PlayersList;
     public int virixCheapestUnit;
@@ -113,7 +112,7 @@ public class GameMaster : MonoBehaviour
 
 
 
-    [Header("Loop Safety")]
+    [Header("Loop/Recursion Safety")]
     public int loopSafetyLimit = 10000;
     public int recusionSafetyLimit = 100;
     public static int recursionSafetyCounter = 0;
@@ -125,25 +124,49 @@ public class GameMaster : MonoBehaviour
         //Debug.Log("GameMaster Awake called");
         match_id = Guid.Parse("aaaaaaaa-8761-4e77-a086-a7365ae9e0b4");
         turnNumber = 1;
+        numPlayers = 2; //will set dynamically later
 
+        //Turn on CPU if game is started through MenuScene, otherwise if I've set it manually.
+        if (MatchSettings.CPU_isOn || (!MatchSettings.isInit && CPU_isOn_manual))
+        {
+            CPU_isOn = true;
+            CPU_PlayersList = new bool[numPlayers + 1];
+            if (MatchSettings.playerIsCPU.Length == numPlayers)
+                for (int i = 0; i < numPlayers; i++)
+                {
+                    CPU_PlayersList[i + 1] = MatchSettings.playerIsCPU[i];
+                }
+            else
+                Debug.LogError("Incorrect number of players in MatchSettings CPU count");
+
+            if (!MatchSettings.CPU_isOn)
+            {
+                Debug.LogWarning("Match settings says CPU is off but manual CPU is on, defaulting to hard values.");
+                CPU_PlayersList[1] = true;
+                CPU_PlayersList[2] = true;
+            }
+        }
+
+        //If the MatchSettings not initialized through the MenuScene, set the default values.
         if (!MatchSettings.isInit)
         {
             Debug.LogWarning("MatchSettings.numPlayers is null, defaulting to 2");
             MatchSettings.SetNumPlayers(2);
             MatchSettings.SetPlayerColours();
             MatchSettings.isInit = true;
+            musicAudio.Pause();
+
             
-            numPlayers = 2; //will set dynamically later
             SetPlayerColors(true);
 
         }
         else
         {
-            
             numPlayers = 2;
             SetPlayerColors(false);
         }
 
+        //if progeny is not set in MenuScene, set it to the inspector values.
         playerProgeny = new Dictionary<byte, byte>();
         if (MatchSettings.playerProgenys[0]>=0 && MatchSettings.playerProgenys[1] >= 0)
         {   
@@ -156,26 +179,6 @@ public class GameMaster : MonoBehaviour
             playerProgeny.Add(2, inspectorInputProgenyPlayer2);
         }
 
-        if (MatchSettings.CPU_isOn || CPU_isOn)
-        {
-            CPU_isOn = true;
-            if (MatchSettings.playerIsCPU.Length==numPlayers)
-                for(int i=0; i < numPlayers; i++)
-                {
-                    CPU_PlayersList[i+1] = MatchSettings.playerIsCPU[i];
-                }
-            else
-                Debug.LogError("Incorrect number of players in MatchSettings CPU count");
-
-        }
-
-        if(!MatchSettings.CPU_isOn && CPU_isOn)
-        {
-            Debug.LogWarning("Match settings says CPU is off but manual CPU is on, defaulting to hard values.");
-            CPU_PlayersList[1] = true;
-            CPU_PlayersList[2] = true;
-        }
-
         if (CPU_isOn)
         {
             bool allCPU = true;
@@ -183,10 +186,10 @@ public class GameMaster : MonoBehaviour
             {
                 allCPU = allCPU && CPU_PlayersList[i];
             }
-/*            if (allCPU)
+            if (allCPU)
             {
-                concedeMenuButton.GetComponent<TMP_Text>().text = "End Game";
-            }*/
+                concedeMenuButton.GetComponentInChildren<TMP_Text>().text = "End Game";
+            }
         }
         if (unitCosts == null)
         {
@@ -215,47 +218,31 @@ public class GameMaster : MonoBehaviour
 
         playersNotLost = new bool[numPlayers+1];
         //playerProgeny = new byte[numPlayers + 1];
-        
 
 
-        for (int i = 0; i <= numPlayers; i++)
+        playersNotLost[0] = false;
+        for (int i = 1; i <= numPlayers; i++)
         {
             playersNotLost[i] = true;
-            //playerProgeny[i] = 0;
         }
-        playersNotLost[0] = false;
+        
         setPlayerTurnText(playerTurn);
-        baseResourcePerTurn = 200;
-        structureResourcePerTurn = 100;
+
         playerResources = new int[numPlayers + 1];
         playerResources[0] = 0;
         for (int i = 1; i <= numPlayers; i++)
             playerResources[i] = baseResourcePerTurn;
 
-/*        if (PrefabManager.unitCosts != null)
-        {
-            Debug.Log("unitCosts is not null, using prefab manager unit costs.");
-            unitCosts = PrefabManager.unitCosts;
-        }
-        else
-        {
-            Debug.Log("unitCosts is null, creating new unitCosts.");
-            unitCosts = new List<(BaseUnit, int)>[numPlayers + 1];
-            for (int i = 0; i < numPlayers + 1; i++)
-            {
-                unitCosts[i] = new List<(BaseUnit, int)>();
-            }
-        }*/
-
+        //Required for prompt card to know if a player can still create a unit at the end of their turn or not.
         SetCheapestUnits();
+
+
+
+
         //startupInstantiateUnits();
         //productionPanel.Start();
 
         //unitCosts = new List<(BaseUnit, int)>[numPlayers];
-
-
-
-
     }
 
     void Start()
@@ -1160,8 +1147,8 @@ public class GameMaster : MonoBehaviour
     {
         endTurnButton.interactable = false; 
         yield return SwoopTurnCard(startPos, centerPos, swoopCardAnimationDuration/2f, easeOutCubic);
-        yield return new WaitForSeconds(globalAnimationDuration/2f);
-        yield return SwoopTurnCard(centerPos, endPos, globalAnimationDuration, easeInCubic); // * 3 / 8
+        yield return new WaitForSeconds(swoopCardAnimationDuration / 7f);
+        yield return SwoopTurnCard(centerPos, endPos, swoopCardAnimationDuration/3f, easeInCubic); // * 3 / 8
         //I don't like this being here but I need to wait.
         //endTurnButton.GetComponent<Button>().interactable = !CPU_PlayersList[playerTurn];
         EndTurnButtonSwitch();

@@ -19,8 +19,8 @@ gamePieceId,unitName,progeny,isResourceUnit,unitTerrainType,isInfantry,price,hea
 54,Jumper,Virix,FALSE,land,FALSE,2000,850,800,light,heavy,melee,heavy melee,TRUE,TRUE,TRUE,TRUE,1,4,TRUE,0,TRUE
 55,Vampire,Virix,FALSE,air,FALSE,1400,700,500,light,light,melee,light melee,TRUE,TRUE,TRUE,TRUE,1,5,TRUE,0,TRUE
 100,Blacksmith,Sentus,TRUE,land,TRUE,100,200,100,heavy,heavy,melee,heavy melee,TRUE,FALSE,FALSE,FALSE,1,3,TRUE,0,TRUE
-101,Archer,Sentus,FALSE,land,FALSE,500,400,200,light,light,projectile,light projectile,TRUE,TRUE,TRUE,TRUE,1,4,TRUE,0,TRUE
+101,Archer,Sentus,FALSE,land,FALSE,500,350,200,light,light,projectile,light projectile,TRUE,TRUE,TRUE,TRUE,1,4,TRUE,0,TRUE
 102,Horsemen,Sentus,FALSE,land,FALSE,900,1000,350,medium,heavy,melee,heavy melee,TRUE,FALSE,FALSE,TRUE,1,6,TRUE,0,TRUE
 103,Zeppelin,Sentus,FALSE,air,FALSE,1000,1300,200,light,light,projectile,light projectile,TRUE,TRUE,TRUE,TRUE,1,4,TRUE,0,TRUE
-104,Catapult,Sentus,FALSE,land,FALSE,1700,1100,900,medium,heavy,projectile,heavy projectile,TRUE,FALSE,FALSE,TRUE,1,5,TRUE,0,TRUE
+104,Catapult,Sentus,FALSE,land,FALSE,1700,1600,900,medium,heavy,projectile,heavy projectile,TRUE,FALSE,FALSE,TRUE,1,5,TRUE,0,TRUE
 105,Wizard,Sentus,FALSE,land,FALSE,2100,1200,1400,heavy,heavy,projectile,heavy projectile,TRUE,TRUE,FALSE,TRUE,1,6,TRUE,0,TRUE

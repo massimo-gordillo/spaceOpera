@@ -27,7 +27,7 @@ public static class MatchSettings {
         MasterGrid.playerUnits = new List<BaseUnit>[numPlayers+1];
         for(int i = 0;i <= numPlayers; i++)
             MasterGrid.playerUnits[i] = new List<BaseUnit>();
-        GameMaster.CPU_PlayersList = new bool[numPlayers + 1];
+        
     }
 
     public static void SetPlayerProgeny(int playerIndex, int progeny)

@@ -354,7 +354,7 @@ MonoBehaviour:
   attackRange: 1
   price: 1400
   movementRange: 5
-  playerControl: 0
+  playerControl: 1
   team: 0
   orientation: 3
   pos: {x: 0, y: 0}
@@ -479,7 +479,7 @@ SpriteRenderer:
   m_Size: {x: 0.64, y: 0.63}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!61 &6121652422580407347
@@ -976,7 +976,7 @@ RectTransform:
   m_GameObject: {fileID: 3017839183220648431}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.01, y: 0.01, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1013806168290200568}

@@ -826,7 +826,8 @@ public class MasterGrid : MonoBehaviour
         //List<Vector2Int> path = BidirectionalSearch(start, end, unit);
 
         //movement animation speed
-        float speed = 12.0f;
+        //float speed = 12.0f;
+        //float duration = GameMaster.globalAnimationDuration;
 
         if(path.Count == 0)
         {
@@ -836,43 +837,55 @@ public class MasterGrid : MonoBehaviour
             return;
         }
         
-        StartCoroutine(AnimateMovementVisual(unit, path, speed));
+        StartCoroutine(AnimateMovementVisual(unit, path));
+        //StartCoroutine(AnimateMovementVisual(unit, path, speed));
         //Debug.Log("Movement animation complete.");
     }
-    public IEnumerator AnimateMovementVisual(BaseUnit unit, List<Vector2Int> path, float speed)
+
+    public IEnumerator AnimateMovementVisual(BaseUnit unit, List<Vector2Int> path)
     {
-        //have the camera follow if it's a cpu player
+
+        float animationTimePerTile = GameMaster.globalAnimationDuration / (path.Count*2);
+        // Have the camera follow if it's a CPU player
         if (GameMaster.CPU_PlayersList[GameMaster.playerTurn])
         {
-            cameraManager.SetPosition(unit.pos);
             yield return new WaitForSeconds(0.2f);
             cameraManager.SetFollowTarget(unit.transform);
         }
         yield return new WaitForSeconds(0.2f);
+
         Vector2Int finalPos = path[path.Count - 1];
+
         if (!GameMaster.CPU_PlayersList[GameMaster.playerTurn])
-            cameraManager.SetPosition((finalPos+unit.pos)/2);
-        //Debug.Log($"Unit {unit.pos} has a path of length {path.Count}");
+            cameraManager.SetPosition((finalPos + unit.pos) / 2);
+
         foreach (var position in path)
         {
-            Vector3 targetPosition = new Vector3(position.x, position.y, unit.transform.position.z);
-            while (Vector3.Distance(unit.transform.position, targetPosition) > 0.01f)
+            Vector3 startPosition = unit.transform.position;
+            Vector3 targetPosition = new Vector3(position.x, position.y, startPosition.z);
+            float elapsedTime = 0f;
+
+            while (elapsedTime < animationTimePerTile)
             {
-                unit.transform.position = Vector3.MoveTowards(unit.transform.position, targetPosition, speed * Time.deltaTime);
-                yield return null; // Waits until next frame before continuing loop
                 if (unit == null)
                     yield break;
+
+                float t = elapsedTime / animationTimePerTile;
+                unit.transform.position = Vector3.Lerp(startPosition, targetPosition, t);
+                elapsedTime += Time.deltaTime;
+                yield return null;
             }
+
+            // Ensure we snap exactly to target position at the end
+            unit.transform.position = targetPosition;
         }
-        //if it's not a CPU, slide to target square
 
         cameraManager.ClearFollowTarget();
 
         if (unit.pos != new Vector2Int((int)Math.Round(unit.transform.position.x, 1), (int)Math.Round(unit.transform.position.y, 1)))
             Debug.LogError($"Selected unit {unit.pos} is at {unit.transform.position} after moving to {finalPos}");
-
-        //Debug.Log("Movement animation complete.");
     }
+
 
     /*//Manhattan distance/vector calculation for finding path between to squares. Uses bidirectional search to guarantee shortest path.
     public List<Vector2Int> BidirectionalSearch(

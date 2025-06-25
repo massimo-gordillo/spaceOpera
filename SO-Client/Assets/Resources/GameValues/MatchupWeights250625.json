@@ -1,9 +1,9 @@
 gamePieceId,unitName,progeny,ErtrianWeight,VirixWeight,SentusWeight
 0,Infantry,Ertrian,3,3,3
-1,GattlingTank,Ertrian,2,6,3
-2,LightTank,Ertrian,6,4,4
+1,GattlingTank,Ertrian,2,6,4
+2,LightTank,Ertrian,6,3,4
 3,Artillery,Ertrian,2,1,4
-4,Rockets,Ertrian,2,4,1
+4,Rockets,Ertrian,2,3,1
 5,APC,Ertrian,0,0,0
 6,Electos,Ertrian,0,0,0
 7,HeavyTank,Ertrian,5,3,5
@@ -15,12 +15,7 @@ gamePieceId,unitName,progeny,ErtrianWeight,VirixWeight,SentusWeight
 50,Spore,Virix,0,0,0
 51,Hornet,Virix,3,5,6
 52,Ghoul,Virix,3,2,2
-53,Venus,Virix,5,1,4
-54,Jumper,Virix,6,6,5
-55,Vampire,Virix,2,5,5
+53,Venus,Virix,6,1,4
 100,Blacksmith,Sentus,3,3,3
 101,Archer,Sentus,2,6,1
 102,Horsemen,Sentus,4,2,5
-103,Zeppelin,Sentus,3,5,2
-104,Catapult,Sentus,5,5,6
-105,Wizard,Sentus,6,3,6

@@ -210,7 +210,7 @@ public class CPUManager : MonoBehaviour
             cellsToCheck.Enqueue((new Vector2Int(unit.pos.x + 1, unit.pos.y + 1), unit.movementRange + unit.attackRange));
             squareQueuesList = masterGrid.FloodFillSearch(unit, unit.movementRange, unit.attackRange, cellsToCheck, checkedCells, new List<Queue<Vector2Int>> { new Queue<Vector2Int>(), new Queue<Vector2Int>(), new Queue<Vector2Int>() });
         }
-        if (unit.attackRange > 1) //notably this logic is the same in masterGrid.drawMovement. I suspect I should generalize drawMovement, it would be much better.
+        if (unit.attackRange > 1) //notably this logic is the same in masterGrid.drawMovement(). I suspect I should generalize drawMovement, it would be much better.
         {
             cellsToCheck.Enqueue((new Vector2Int(unit.pos.x + 1, unit.pos.y + 1), unit.movementRange));
             squareQueuesList = masterGrid.FloodFillSearch(unit, unit.movementRange, 0, cellsToCheck, checkedCells, new List<Queue<Vector2Int>> { new Queue<Vector2Int>(), new Queue<Vector2Int>(), new Queue<Vector2Int>() });
@@ -254,6 +254,7 @@ public class CPUManager : MonoBehaviour
         }*/
         foreach (Vector2Int attackSquare in attackQueue)
         {
+            
             /*if(isCurious)
                 Debug.Log($"unit {unit.pos} has attack location {attackSquare}");
             */
@@ -261,15 +262,21 @@ public class CPUManager : MonoBehaviour
             /* if (isCurious && attackSquare == new Vector2Int(12, 8))
                  Debug.Log($"BOOL: unit {unit.pos}, has found an attackable? {attackable} owned by player {attackable.playerControl}, can they attack it? {masterGrid.canUnitAttack(unit, attackable)}");
  */
+
             if (attackable != null)
             {
-/*                if (unit.attackRange > 1)
-                    Debug.Log($"unit found at location {attackSquare} by {unit.pos}, it is an {attackable.unitName} owned by player {attackable.playerControl}, can they attack it? {masterGrid.canUnitAttack(unit, attackable)}");
-*/
+
+                /*                if (unit.attackRange > 1)
+                                    Debug.Log($"unit found at location {attackSquare} by {unit.pos}, it is an {attackable.unitName} owned by player {attackable.playerControl}, can they attack it? {masterGrid.canUnitAttack(unit, attackable)}");
+                */
                 if (masterGrid.canUnitAttack(unit, attackable))
                 {
+                    /*if (attackable.unitName == "Spore")
+                        Debug.LogError($"Unit {unit.pos} is adding spore at {attackable.pos} to attack list");
+                    */
+
                     //check if squares adjacent to the attackable unit are also in the movement queue AND there's no unit in that square, add them to the attackable list.
-                    foreach(Vector2Int dir in masterGrid.DirectionList())
+                    foreach (Vector2Int dir in masterGrid.DirectionList())
                     {
                         Vector2Int adjacentSquare = attackSquare + dir;
                         if (unit.CPU_MoveSquaresList.Contains(adjacentSquare) && masterGrid.whatUnitIsInThisLocation(adjacentSquare) == null)
@@ -280,6 +287,9 @@ public class CPUManager : MonoBehaviour
            */
                             if (attackable.isResourceUnit)
                             {
+                                /*if (attackable.unitName == "Spore")
+                                    Debug.LogError($"Unit {unit.pos} adding spore to resourceAttackList {attackable.pos}");
+*/
                                 unit.CPU_AttackableResourceUnitList.Add(attackable);
                             }
                         }
@@ -342,10 +352,13 @@ public class CPUManager : MonoBehaviour
         {
             BaseUnit candidate = null;
             double mostDamageDelta = 0;
+            //bool isCurious = false;
 
             //prioritize capturing units before moving on to checking other nearby units.
             foreach (BaseUnit attackableResourceUnit in unit.CPU_AttackableResourceUnitList)
             {
+/*                if (attackableResourceUnit.unitName == "Spore")
+                    isCurious = true;*/
                 if (attackableResourceUnit != null && attackableResourceUnit.CPU_IsCapturing)
                 {
                     double damageDelta = GetDamageCostDelta(unit, attackableResourceUnit);
@@ -359,8 +372,11 @@ public class CPUManager : MonoBehaviour
             }
             foreach (BaseUnit attackableUnit in unit.CPU_AttackableUnitList)
             {
-                //Debug.Log($"Unit {unit.pos} is checking if it should attack {attackableUnit.pos}");
+                
                 double damageDelta = GetDamageCostDelta(unit, attackableUnit);
+                /*if (attackableUnit.unitName == "Spore")
+                    Debug.LogError($"Unit {unit.pos} checks damage delta attacking spore at {attackableUnit.pos}: {damageDelta}");
+*/
                 //Debug.LogError($"Unit {unit.pos} attacking {attackableUnit.pos} has damage delta {damageDelta}");
                 if (damageDelta > mostDamageDelta)
                 {
@@ -370,7 +386,9 @@ public class CPUManager : MonoBehaviour
             }
             if (candidate != null)
             {
-
+                /*if (candidate.unitName == "Spore")
+                    Debug.LogError($"Unit {unit.pos} has final attack candidate spore at {candidate.pos}");
+*/
                 //Vector2Int diffV = unit.pos - candidate.pos;
                 if (unit.canMoveAndAttack)
                 {
@@ -380,7 +398,7 @@ public class CPUManager : MonoBehaviour
                         List<Vector2Int> path = masterGrid.BidirectionalSearch(unit.pos, candidate.pos, unit, unit.movementRange + unit.attackRange);
                         masterGrid.selectedUnit = unit;
                         masterGrid.moveSelectedUnit(GetAdjacentPosFromBidirectionalSearch(path, candidate.pos)); //assumes attack range of 1 for now.
-                        if (Manhattan(unit.pos, candidate.pos) == 1)//for some reason this wasn't always true.
+                        if (Manhattan(unit.pos, candidate.pos) <= unit.attackRange)//for some reason this wasn't always true.
                         {
                             cameraManager.SetPosition(unit.pos);
                             yield return new WaitForSeconds(CPU_AnimationWaitTime * 2);
@@ -403,7 +421,8 @@ public class CPUManager : MonoBehaviour
                     {
                         masterGrid.deleteUnit(unit);
                     }
-                } else if (unit.attackRange > 1)
+                }
+                else if (unit.attackRange > 1)
                 {
                     cameraManager.SetPosition(unit.pos);
                     yield return new WaitForSeconds(CPU_AnimationWaitTime * 2);
@@ -415,7 +434,18 @@ public class CPUManager : MonoBehaviour
             }
             else
             {
-                Debug.LogWarning($"Unit {unit.pos} told to attack but unable to find a cadidate unit to attack even though attack list is not empty, defaulting to movement.");
+/*                if (isCurious) { 
+                    string unitList = "";
+                    foreach (BaseUnit attackableUnit in unit.CPU_AttackableUnitList)
+                    {
+                        unitList += $"unit: {attackableUnit.name} at pos {attackableUnit.pos}\n";
+                    }
+                    Debug.LogError($"Unit {unit.pos} told to attack but unable to find a candidate unit to attack even though attack list is not empty, defaulting to movement. Unit List:\n" + unitList);
+
+                }else*/
+                    Debug.LogWarning($"Unit {unit.pos} told to attack but unable to find a candidate unit to attack even though attack list is not empty, defaulting to movement.");
+
+
                 yield return StartCoroutine(CPU_MoveUnitTowardsTargetNode(unit));
             }
         }else
@@ -432,7 +462,11 @@ public class CPUManager : MonoBehaviour
         //Also reduces the value of the attack by the fireback cost, hopefully reducing the # of suicide attacks into larger units.
         //might be nice to prioritize full destroying units over just maxing out cost, but that's good enough for now.
 
-        double attackCost = Math.Min(masterGrid.getDamageBeforeLuck(attacker, defender, false), defender.healthCurrent) * defender.price / defender.healthMax;
+        int correctedPrice = defender.price;
+        if (defender.price == 0)
+            correctedPrice = 1;
+
+        double attackCost = Math.Min(masterGrid.getDamageBeforeLuck(attacker, defender, false), defender.healthCurrent) * correctedPrice / defender.healthMax;
         double firebackCost = 0;
         //if unit will fire back calculate that
         if (masterGrid.getDamageBeforeLuck(attacker, defender, false) < defender.healthCurrent)
@@ -784,8 +818,9 @@ public class CPUManager : MonoBehaviour
         {
             if (GameMaster.isGameComplete)
                 break;
-            unit.showSelectedCorners(true);
+            cameraManager.SetPosition(unit.pos);
             yield return new WaitForSeconds(CPU_AnimationWaitTime);
+            unit.showSelectedCorners(true);
             CollectPotentialGameActions(unit);
             NetworkNode targetNode = unit.CPU_TargetNode;
             if (targetNode == null)
@@ -868,6 +903,7 @@ public class CPUManager : MonoBehaviour
                         //Debug.Log($"Moving unit {unit.pos} to {target}");
                         masterGrid.selectedUnit = unit;
                         masterGrid.moveSelectedUnit(target);
+                        yield return new WaitForSeconds(CPU_AnimationWaitTime / 1.5f);
 
                     }
                     /*else
@@ -1029,6 +1065,7 @@ public class CPUManager : MonoBehaviour
             //Debug.Log($"Unit found final target square {target}");
             masterGrid.selectedUnit = unit;
             masterGrid.moveSelectedUnit(target);
+            yield return new WaitForSeconds(CPU_AnimationWaitTime / 1.5f);
 
 
         }
@@ -1134,7 +1171,7 @@ public class CPUManager : MonoBehaviour
             if (targetNode.playerControl != unit.playerControl)
             {
                 int oldPlayer = targetNode.playerControl;
-                cameraManager.SetPosition(targetNode.pos);
+                //cameraManager.SetPosition(targetNode.pos);
                 yield return new WaitForSeconds(CPU_AnimationWaitTime);
                 masterGrid.selectedUnit = unit;
                 yield return StartCoroutine(masterGrid.captureStructure(targetNode.structure));
@@ -1169,95 +1206,23 @@ public class CPUManager : MonoBehaviour
 
         List<(BaseUnit unit, BaseStructure structure)> bestBuildPlan = new ();
 
+        //Heatmap calculation. If player 1, invert heatmap values to get the opposite effect
+        int m = 1;
+        if (GameMaster.playerTurn % 2 == 1)
+            m = -1;
+        double[,] heatMap = SumHeatMaps(structHeatMaps[GameMaster.playerTurn - 1], heatMaps[GameMaster.playerTurn - 1]);
+
+
         if (progeny == 0)
         {
-            /*            int factoryCount = 0;
-                        int airportCount = 0;*/
-
             yield return GenerateSpendErtrian();
-
-            /*            foreach (BaseStructure structure in prods)
-                        {
-                            if (structure.playerControl == player && structure.structureType == 1)
-                            {
-                                //Debug.Log($"Creating base unit for {player} at {structure.pos}, they have progeny {gameMaster.getPlayerProgeny((byte)player)}");
-                                if (gameMaster.getPlayerProgeny((byte)player) != 1)
-                                    gameMaster.ProduceResourceUnit(structure, player);
-                            }
-                        }*/
-            //yield return null;
         }
         else if (progeny == 1)
             yield return GenerateSpendVirix();
         else if (progeny == 2)
             yield return GenerateSpendSentus();
 
-        IEnumerator GenerateSpendSentus()
-        {
-
-
-            //var sentusMatchupList = matchupWeights[0, getOpponentProgeny(GameMaster.playerTurn)];
-            //int totalSpend = cash;
-            List<(BaseUnit unit, int cost, int weight)> sentusMatchupList = matchupWeights[2, getOpponentProgeny(GameMaster.playerTurn)];
-            List<BaseStructure> sentusProds = prods;
-
-            // Random branch (unchanged)
-            float roll = UnityEngine.Random.value;
-            //remove the highest weight unit from factory and airport, to add unit creation variety.
-            if (roll < 0.2f)
-            {
-                int top = sentusMatchupList.Max(x => x.weight);
-                sentusMatchupList = sentusMatchupList.Where(x => x.weight < top).ToList();
-            }
-            //guarantee at least one blacksmith unit some % of the time.
-            else if (roll < 0.5f)
-            {
-                var blacksmith = sentusMatchupList.FirstOrDefault(x => x.unit.unitName == "blacksmith");
-                if (blacksmith.unit != null && sentusProds.Count > 0 && totalSpend >= blacksmith.cost)
-                {
-                    var prod = sentusProds[0];
-                    bestBuildPlan.Add((blacksmith.unit, prod));
-                    sentusProds.RemoveAt(0);
-                    totalSpend -= blacksmith.cost;
-                }
-            }
-
-            int remainingCash = totalSpend;
-
-            generateSpendForProdType(sentusProds, sentusMatchupList, ref remainingCash);
-
-
-
-            // Fire off production
-            foreach (var (unit, structure) in bestBuildPlan)
-                yield return createUnitAtStructure(unit, structure);
-
-
-
-            // Helper to fill slots
-            /*            void generateSpendForProdType(
-                            List<BaseStructure> slots,
-                            List<(BaseUnit unit, int cost, int weight)> options)
-                        {
-                            foreach (var slot in slots)
-                            {
-                                (BaseUnit u, int cost, float score)? best = null;
-                                foreach (var opt in options)
-                                {
-                                    if (opt.cost > remainingCash) continue;
-                                    float s = ProductionScoreUnit(opt.weight, opt.cost, remainingCash);
-                                    if (best == null || s > best.Value.score)
-                                        best = (opt.unit, opt.cost, s);
-                                }
-                                if (best != null)
-                                {
-                                    bestBuildPlan.Add((best.Value.u, slot));
-                                    remainingCash -= best.Value.cost;
-                                }
-                            }
-                        }*/
-            yield return null;
-        }
+        
 
 
         IEnumerator GenerateSpendErtrian()
@@ -1282,6 +1247,10 @@ public class CPUManager : MonoBehaviour
             var availableFactories = new List<BaseStructure>(factories);
             var availableAirports = new List<BaseStructure>(airports);
 
+            availableAirports = availableAirports.OrderByDescending(s => m * heatMap[s.pos.x, s.pos.y]).ToList();
+            availableFactories = availableFactories.OrderByDescending(s => m * heatMap[s.pos.x, s.pos.y]).ToList();
+
+
             // Determine opponent progeny
             /*            int opponentProgeny = 0;
                         for (int i = 0; i < GameMaster.numPlayers; i++)
@@ -1299,6 +1268,8 @@ public class CPUManager : MonoBehaviour
                 .Where(x => x.unit.unitTerrainType == UnitTerrainType.Air)
                 .ToList();
 
+            
+
             // Random branch (unchanged)
             float roll = UnityEngine.Random.value;
             //remove the highest weight unit from factory and airport, to add unit creation variety.
@@ -1308,26 +1279,26 @@ public class CPUManager : MonoBehaviour
                 landProductionList = landProductionList.Where(x => x.weight < top).ToList();
                 airProductionList = airProductionList.Where(x => x.weight < top).ToList();
             }
-            //guarantee at least one infantry unit some % of the time.
-            else if (roll < 0.5f)
+            //guarantee at least one infantry unit some % of the time, build at lowest heat value
+            else if (roll < 0.7f)
             {
                 var infantry = landProductionList.FirstOrDefault(x => x.unit.unitName == "Infantry");
                 if (infantry.unit != null && availableFactories.Count > 0 && totalSpend >= infantry.cost)
                 {
-                    var fac = availableFactories[0];
+                    var fac = availableFactories[availableFactories.Count-1];
                     bestBuildPlan.Add((infantry.unit, fac));
-                    availableFactories.RemoveAt(0);
+                    availableFactories.RemoveAt(availableFactories.Count - 1);
                     totalSpend -= infantry.cost;
                 }
             }
 
             int remainingCash = totalSpend;
 
-
+            
             float roll2 = UnityEngine.Random.value;
             // Randomize 
             //if (true)
-            if (roll2 < 0.4f)
+            if (roll2 < 0.6f)
             {
                 generateSpendForProdType(availableAirports, airProductionList, ref remainingCash);
                 generateSpendForProdType(availableFactories, landProductionList, ref remainingCash);
@@ -1371,6 +1342,16 @@ public class CPUManager : MonoBehaviour
             List<(BaseUnit unit, int cost, int weight)> unitsToBuild = new();
             int remainingCash = totalSpend;
             int remainingSlots = maxUnits;
+
+            // Random branch (unchanged)
+            float roll = UnityEngine.Random.value;
+            //remove the highest weight unit to add unit creation variety.
+            if (roll < 0.2f)
+            {
+                int top = virixMatchupList.Max(x => x.weight);
+                virixMatchupList = virixMatchupList.Where(x => x.weight < top).ToList();
+            }
+
             foreach (var (unit, cost, weight) in virixMatchupList)
             {
                 if(unit.unitName == "Spore")
@@ -1388,13 +1369,6 @@ public class CPUManager : MonoBehaviour
             if (unitsToBuild.Count == 0)
                 yield break;
 
-            int m = 1;
-            //if player 1, invert heatmap values to get the opposite effect
-            if (GameMaster.playerTurn % 2 == 1)
-                m = -1;
-
-            // 4. Sort resource structures by heatmap value (highest first)
-            double[,] heatMap = SumHeatMaps(structHeatMaps[GameMaster.playerTurn-1], heatMaps[GameMaster.playerTurn-1]);
             var sortedStructures = virixResources
                 .OrderByDescending(s => m*heatMap[s.pos.x, s.pos.y])
                 .ToList();
@@ -1406,6 +1380,78 @@ public class CPUManager : MonoBehaviour
                 var structure = sortedStructures[i];
                 yield return createUnitAtStructure(unit, structure);
             }
+        }
+
+        IEnumerator GenerateSpendSentus()
+        {
+
+
+            //var sentusMatchupList = matchupWeights[0, getOpponentProgeny(GameMaster.playerTurn)];
+            //int totalSpend = cash;
+            List<(BaseUnit unit, int cost, int weight)> sentusMatchupList = matchupWeights[2, getOpponentProgeny(GameMaster.playerTurn)];
+            List<BaseStructure> sentusProds = prods;
+
+            // Random branch (unchanged)
+            float roll = UnityEngine.Random.value;
+            //remove the highest weight unit from factory and airport, to add unit creation variety.
+            if (roll < 0.2f)
+            {
+                int top = sentusMatchupList.Max(x => x.weight);
+                sentusMatchupList = sentusMatchupList.Where(x => x.weight < top).ToList();
+            }
+            //guarantee at least one blacksmith unit some % of the time.
+            else if (roll < 0.7f)
+            {
+                var blacksmith = sentusMatchupList.FirstOrDefault(x => x.unit.unitName == "blacksmith");
+                if (blacksmith.unit != null && sentusProds.Count > 0 && totalSpend >= blacksmith.cost)
+                {
+                    var prod = sentusProds[0];
+                    bestBuildPlan.Add((blacksmith.unit, prod));
+                    sentusProds.RemoveAt(0);
+                    totalSpend -= blacksmith.cost;
+                }
+            }
+
+            int remainingCash = totalSpend;
+
+            //reorder sentusProds by heatmap value
+            sentusProds = sentusProds
+                .OrderByDescending(s => m * heatMap[s.pos.x, s.pos.y])
+                .ToList();
+
+            generateSpendForProdType(sentusProds, sentusMatchupList, ref remainingCash);
+
+
+
+            // Fire off production
+            foreach (var (unit, structure) in bestBuildPlan)
+                yield return createUnitAtStructure(unit, structure);
+
+
+
+            // Helper to fill slots
+            /*            void generateSpendForProdType(
+                            List<BaseStructure> slots,
+                            List<(BaseUnit unit, int cost, int weight)> options)
+                        {
+                            foreach (var slot in slots)
+                            {
+                                (BaseUnit u, int cost, float score)? best = null;
+                                foreach (var opt in options)
+                                {
+                                    if (opt.cost > remainingCash) continue;
+                                    float s = ProductionScoreUnit(opt.weight, opt.cost, remainingCash);
+                                    if (best == null || s > best.Value.score)
+                                        best = (opt.unit, opt.cost, s);
+                                }
+                                if (best != null)
+                                {
+                                    bestBuildPlan.Add((best.Value.u, slot));
+                                    remainingCash -= best.Value.cost;
+                                }
+                            }
+                        }*/
+            yield return null;
         }
 
         void generateSpendForProdType(
@@ -2030,7 +2076,7 @@ public class CPUManager : MonoBehaviour
             if (unit.movementNonExhausted && unit.unitName != "seed")
             {
                 Debug.Log($"Unit name is {unit.unitName} at {unit.pos}");
-                Debug.LogError($"Unit {unit.pos} is nonExhausted. It has target node {unit.CPU_TargetNode.pos} and attackable list count {unit.CPU_AttackableUnitList.Count}, but it didn't do anything. Moving to a random legal square.");
+                Debug.LogWarning($"Unit {unit.pos} is nonExhausted. It has target node {unit.CPU_TargetNode.pos} and attackable list count {unit.CPU_AttackableUnitList.Count}, but it didn't do anything. Moving to a random legal square.");
                 masterGrid.selectedUnit = unit;
                 masterGrid.moveSelectedUnit(GetRandomWalk(unit));
 
@@ -2239,6 +2285,12 @@ public class CPUManager : MonoBehaviour
 
         unit.setNonExhausted(false);
         return unit.pos;
+    }
+
+    public void SetCPUActionSpeed(float speed)
+    {
+        CPU_AnimationWaitTime = speed;
+        //GameMaster.globalAnimationDuration = 0.6f * speed; // Adjust global animation duration based on CPU speed
     }
 
 

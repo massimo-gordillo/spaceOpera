@@ -106,6 +106,7 @@ public class BaseUnit : MonoBehaviour
 
         //baseColor = spriteFillSR.color;
         //originalLightsColor = spriteLightsSR.color;
+        spriteContainer.SetColor(playerControl, false, false);
 
         //a good hack will probably want to fix later.
         if ((playerControl+1) % 2 == 1)
@@ -346,9 +347,20 @@ public class BaseUnit : MonoBehaviour
         //Debug.Log($"{this.unitName} is being set to non-exhausted {b}");
         movementNonExhausted = b;
         nonExhausted = b;
+        //spriteContainer.SetColor(playerControl, b, false);
+        /*        if (GameMaster.CPU_PlayersList[playerControl])
+                    delaySetColor(b);
+                else
+                    spriteContainer.SetColor(playerControl, b, false);*/
+        StartCoroutine(delaySetColor(b));
+    }
+
+    public IEnumerator delaySetColor(bool b)
+    {
+        yield return new WaitForSeconds(GameMaster.globalAnimationDuration);
         spriteContainer.SetColor(playerControl, b, false);
     }
-    
+
 
     public void flipSprites()
     {
