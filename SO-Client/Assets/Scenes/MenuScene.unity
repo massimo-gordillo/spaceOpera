@@ -9672,7 +9672,7 @@ PrefabInstance:
       propertyPath: m_text
       value: "\\u25E6 Ranged units can attack at a distance but can\u2019t move and
         shoot in one turn\n\\u25E6 <color=#ADD8E6>Blue Tiles</color> are movement
-        range\n\\u25E6 <color=#FF9999>Red Lines</color> outlines attack range\n"
+        range\n\\u25E6 <color=#FF9999>Red Lines</color> outline attack range\n"
       objectReference: {fileID: 0}
     - target: {fileID: 6258568407009221891, guid: a47d8d4e096a17848a0f741f038ece1f, type: 3}
       propertyPath: m_fontSize
@@ -18628,12 +18628,12 @@ PrefabInstance:
       value: '\u25E6 Units display health (out of 100%)
 
         \u25E6 Hurt units
-        do less damage and capture slower
+        do less damage and capture structures slower
 
-        \u25E6 Reduce to 0% to destroy
+        \u25E6 Reduce to 0%
+        to destroy
 
-        \u25E6
-        Most units fight back but much weaker'
+        \u25E6 Most units fight back but much weaker'
       objectReference: {fileID: 0}
     - target: {fileID: 6258568407009221891, guid: a47d8d4e096a17848a0f741f038ece1f, type: 3}
       propertyPath: m_fontSize
@@ -20432,8 +20432,8 @@ PrefabInstance:
     - target: {fileID: 6258568407009221891, guid: a47d8d4e096a17848a0f741f038ece1f, type: 3}
       propertyPath: m_text
       value: "\\u25E6 Each player has a <B>Command Structure</B>\n\\u25E6 Capture
-        the enemy\u2019s and protect your own\n\\u25E6 Use <B>BISMUTH</B> to build
-        your forces"
+        the enemy\u2019s <B>Command Structure</B> and protect your own\n\\u25E6 Use
+        <B>BISMUTH</B> to build your forces"
       objectReference: {fileID: 0}
     - target: {fileID: 6258568407009221891, guid: a47d8d4e096a17848a0f741f038ece1f, type: 3}
       propertyPath: m_fontSize
@@ -22542,11 +22542,11 @@ PrefabInstance:
       propertyPath: m_text
       value: "\\u25E6 Click a production structure to see which units you can create
         this turn\n\\u25E6 Click on a button to create it on the production structure\n\\u25E6
-        You can\u2019t build on a structure with a unit on it"
+        You can\u2019t build on a structure with a unit on top of it"
       objectReference: {fileID: 0}
     - target: {fileID: 6258568407009221891, guid: a47d8d4e096a17848a0f741f038ece1f, type: 3}
       propertyPath: m_fontSize
-      value: 91.35
+      value: 76.35
       objectReference: {fileID: 0}
     - target: {fileID: 6569832155290268996, guid: a47d8d4e096a17848a0f741f038ece1f, type: 3}
       propertyPath: m_IsActive
