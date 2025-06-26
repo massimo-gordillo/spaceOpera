@@ -37,7 +37,7 @@ public class CameraManager : MonoBehaviour
     private void Start()
     {
         cam = Camera.main;
-        gridMin = new Vector2(-1, -3);
+        gridMin = new Vector2(-1, -1);
         gridMax = new Vector2(gameMaster.gridX + 1, gameMaster.gridY + 1);
         menuWidth = gameMaster.choicePanel.GetComponent<RectTransform>().rect.width * cam.orthographicSize * 2 / Screen.height;
     }
@@ -218,19 +218,37 @@ public class CameraManager : MonoBehaviour
         cam.transform.position = clampedPosition;
     }
 
-    /*    private void StartSnapBack()
-        {
-            snapBackTarget = cam.transform.position;
-            float camHeight = cam.orthographicSize;
-            float camWidth = camHeight * cam.aspect;
-            isMenuDisplayed = gameMaster.choicePanel.gameObject.activeSelf;
-            float rightBoundaryOffset = isMenuDisplayed ? menuWidth : 0f;
+    /*[SerializeField] public float minVisiblePadding = 2f; // how much of the grid must always remain visible
 
-            snapBackTarget.x = Mathf.Clamp(snapBackTarget.x, gridMin.x + camWidth, gridMax.x - camWidth + rightBoundaryOffset);
-            snapBackTarget.y = Mathf.Clamp(snapBackTarget.y, gridMin.y + camHeight, gridMax.y - camHeight);
-            isSnappingBack = true;
-        }*/
-    private void StartSnapBack()
+    private void ApplyCameraBounds()
+    {
+        Vector3 clampedPosition = cam.transform.position;
+        float camHeight = cam.orthographicSize;
+        float camWidth = camHeight * cam.aspect;
+
+        isMenuDisplayed = gameMaster.choicePanel.gameObject.activeSelf;
+        float rightBoundaryOffset = isMenuDisplayed ? boundaryOffset + menuWidth : boundaryOffset;
+
+        // Center of the grid
+        float centerX = (gridMin.x + gridMax.x) / 2f;
+        float centerY = (gridMin.y + gridMax.y) / 2f;
+
+        // Half-size of the grid
+        float halfGridWidth = (gridMax.x - gridMin.x) / 2f;
+        float halfGridHeight = (gridMax.y - gridMin.y) / 2f;
+
+        // How far the camera can move away from the center
+        float maxXOffset = Mathf.Max(0, halfGridWidth - camWidth + minVisiblePadding);
+        float maxYOffset = Mathf.Max(0, halfGridHeight - camHeight + minVisiblePadding);
+
+        // Clamp camera within those bounds
+        clampedPosition.x = Mathf.Clamp(clampedPosition.x, centerX - maxXOffset, centerX + maxXOffset);
+        clampedPosition.y = Mathf.Clamp(clampedPosition.y, centerY - maxYOffset, centerY + maxYOffset);
+
+        cam.transform.position = clampedPosition;
+    }*/
+
+    /*private void StartSnapBack()
     {
         snapBackTarget = cam.transform.position;
         float camHeight = cam.orthographicSize;
@@ -250,7 +268,70 @@ public class CameraManager : MonoBehaviour
             gridMax.y - camHeight + snapBackRelaxFactor);
 
         isSnappingBack = true;
+    }*/
+
+    private void StartSnapBack()
+    {
+        float camHeight = cam.orthographicSize;
+        float camWidth = camHeight * cam.aspect;
+
+        isMenuDisplayed = gameMaster.choicePanel.gameObject.activeSelf;
+        float rawMenuWidth = gameMaster.choicePanel.GetComponent<RectTransform>().rect.width;
+        float screenUnitsPerPixel = cam.orthographicSize * 2 / Screen.height;
+        float menuWidthWorldUnits = rawMenuWidth * screenUnitsPerPixel;
+
+        // Cap the right offset to at most half the camera width
+        float maxRightOffset = camWidth;
+        float rightBoundaryOffset = isMenuDisplayed
+            ? Mathf.Min(menuWidthWorldUnits, maxRightOffset)
+            : 0f;
+
+        // Grid dimensions
+        float gridWidth = gridMax.x - gridMin.x;
+        float gridHeight = gridMax.y - gridMin.y;
+
+        // Safety margins to ensure a portion of the grid is always visible
+        float minVisibleY = 1f; // minimum grid height (in world units) to remain onscreen
+        //float minVisibleX = 1f;
+
+        // Relaxed overscroll values
+        float xRelax = Mathf.Clamp(snapBackRelaxFactor, 0f, gridWidth / 2f);
+        float yRelax = Mathf.Clamp(snapBackRelaxFactor, 0f, gridHeight / 2f);
+
+        // Compute clamped bounds
+        float minX = gridMin.x + camWidth + rightBoundaryOffset *2 - xRelax;
+        float maxX = gridMax.x - camWidth + rightBoundaryOffset /2  + xRelax;
+
+        // THIS IS THE KEY FIX:
+        float minY = gridMin.y + minVisibleY;
+        float maxY = gridMax.y - minVisibleY;
+
+        float centerY = Mathf.Clamp(cam.transform.position.y, minY, maxY);
+
+        // If camera is larger than the grid, allow small padding
+        if (gridHeight <= 2 * camHeight)
+        {
+            float buffer = Mathf.Clamp(yRelax, 0, camHeight - minVisibleY);
+            minY = gridMin.y - buffer;
+            maxY = gridMax.y + buffer;
+            centerY = Mathf.Clamp(cam.transform.position.y, minY, maxY);
+        }
+
+        snapBackTarget = new Vector3(
+            Mathf.Clamp(cam.transform.position.x, minX, maxX),
+            centerY,
+            cam.transform.position.z
+        );
+
+        isSnappingBack = true;
     }
+
+
+
+
+
+
+
 
 
     private bool IsPointerOverClickableObject(Vector2 position)
