@@ -143,7 +143,7 @@ public class GameMaster : MonoBehaviour
             {
                 Debug.LogWarning("Match settings says CPU is off but manual CPU is on, defaulting to hard values.");
                 CPU_PlayersList[1] = false;
-                CPU_PlayersList[2] = true;
+                CPU_PlayersList[2] = false;
             }
         }
 
@@ -1136,7 +1136,7 @@ public class GameMaster : MonoBehaviour
         Vector2 startPos = (player % 2 == 0) ? offScreenLeft : offScreenRight;
 
         string openText = "Player ";
-        if (CPU_PlayersList[player])
+        if (CPU_PlayersList != null && CPU_PlayersList[player])
             openText = "CPU P";
 
         announcementCardText.text = openText + $"{player}'s turn!";

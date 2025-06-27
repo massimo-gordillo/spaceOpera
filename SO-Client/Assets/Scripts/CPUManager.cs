@@ -158,6 +158,7 @@ public class CPUManager : MonoBehaviour
         {
             heatMaps.Add(new double[gameMaster.gridX, gameMaster.gridY]);
         }
+        //StartCoroutine(DrawNetworkEdges());
         //StartCoroutine(DrawStructureDebugLines());
     }
 
@@ -759,52 +760,7 @@ public class CPUManager : MonoBehaviour
             }
         }*/
 
-    public IEnumerator DrawStructureDebugLines()
-    {
-        GameObject prevLine = null;
-        foreach (NetworkNode node in priorityNetworkNodes)
-        {
-            yield return new WaitForSeconds(0.75f);
-            //if (structure == null) continue;
-
-            //Vector3 start = new Vector3(structure.xPos, structure.yPos, 0);
-            Vector2Int startV2 = node.pos;
-            Vector3 start = new Vector3(startV2.x, startV2.y, 0);
-            Vector2Int targetV2 = node.priorityNextNodeToTarget[2].pos;
-
-            Vector3 target = new Vector3(targetV2.x, targetV2.y, 0);
-
-
-            if (prevLine != null)
-            {
-                LineRenderer prevlr = prevLine.GetComponent<LineRenderer>();
-                if (prevlr != null)
-                {
-                    prevlr.startColor = new Color(Color.white.r, Color.white.g, Color.white.b, 0.7f);
-                    prevlr.endColor = new Color(Color.white.r, Color.white.g, Color.white.b, 0.7f);
-                }
-            }
-
-            if (startV2 != null && targetV2 != null)
-            {
-
-                GameObject line = Instantiate(debugLinePrefab);
-                LineRenderer lr = line.GetComponent<LineRenderer>();
-
-                lr.positionCount = 2;
-                lr.SetPosition(0, start);
-                lr.SetPosition(1, target);
-                lr.startColor = Color.white;
-                lr.endColor = Color.red;
-                prevLine = line;
-            }
-
-            /*                        DrawTo(structure.NEpair);
-                                    DrawTo(structure.NWpair);
-                                    DrawTo(structure.SEpair);
-                                    DrawTo(structure.SWpair);*/
-        }
-    }
+    
 
     public IEnumerator CommandUnits(int player)
     {
@@ -1181,7 +1137,8 @@ public class CPUManager : MonoBehaviour
                 {
                     unit.CPU_IsCapturing = false;
                     targetNode.SetCaptured(unit.playerControl, oldPlayer);
-                    GiveResourceUnitNodeAssignment(unit);
+                    if(unit.unitName != "Spore") //don't give spores a new assignment given they are destroyed upon capturing.
+                        GiveResourceUnitNodeAssignment(unit);
                 } else
                     yield return new WaitForSeconds(CPU_AnimationWaitTime / 4);
 
@@ -1521,13 +1478,23 @@ public class CPUManager : MonoBehaviour
     /*private void OnDrawGizmos()
     {
         Debug.Log("Drawing Gizmos for network edges.");
-        Gizmos.color = Color.cyan;
+        Gizmos.color = Color.red;
 
         if (networkEdges == null) return;
+        //yield return new WaitForSeconds(10f);
 
         foreach (NetworkEdge e in networkEdges)
         //foreach (NetworkEdge e in networkEdges)
         {
+            yield return new WaitForSeconds(0.2f);
+            if (e.isLandAccessible)
+            {
+                Gizmos.color = Color.cyan;
+            }
+            else
+            {
+                Gizmos.color = Color.red;
+            }
             Vector2Int from = e.vectorA;
             Vector2Int to = e.vectorB;
             Vector3 fromPos = new Vector3(from.x, from.y, 0);
@@ -2370,6 +2337,54 @@ public class CPUManager : MonoBehaviour
         }*/
     }
 
+    public IEnumerator DrawStructureDebugLines()
+    {
+        Debug.Log($"Drawing {priorityNetworkNodes.Count} priority network nodes with debug lines");
+        GameObject prevLine = null;
+        foreach (NetworkNode node in priorityNetworkNodes)
+        {
+            yield return new WaitForSeconds(0.75f);
+            //if (structure == null) continue;
+
+            //Vector3 start = new Vector3(structure.xPos, structure.yPos, 0);
+            Vector2Int startV2 = node.pos;
+            Vector3 start = new Vector3(startV2.x, startV2.y, 0);
+            Vector2Int targetV2 = node.priorityNextNodeToTarget[2].pos;
+
+            Vector3 target = new Vector3(targetV2.x, targetV2.y, 0);
+
+
+            if (prevLine != null)
+            {
+                LineRenderer prevlr = prevLine.GetComponent<LineRenderer>();
+                if (prevlr != null)
+                {
+                    prevlr.startColor = new Color(Color.white.r, Color.white.g, Color.white.b, 0.7f);
+                    prevlr.endColor = new Color(Color.white.r, Color.white.g, Color.white.b, 0.7f);
+                }
+            }
+
+            if (startV2 != null && targetV2 != null)
+            {
+
+                GameObject line = Instantiate(debugLinePrefab);
+                LineRenderer lr = line.GetComponent<LineRenderer>();
+
+                lr.positionCount = 2;
+                lr.SetPosition(0, start);
+                lr.SetPosition(1, target);
+                lr.startColor = Color.white;
+                lr.endColor = Color.red;
+                prevLine = line;
+            }
+
+            /*                        DrawTo(structure.NEpair);
+                                    DrawTo(structure.NWpair);
+                                    DrawTo(structure.SEpair);
+                                    DrawTo(structure.SWpair);*/
+        }
+    }
+
     public void DebugNodes()
     {
         Debug.Log($"Starting Debug Nodes. num nodes: {priorityNetworkNodes.Count}, num edges: {priorityNetworkEdgesAir.Count}");
@@ -2463,7 +2478,58 @@ public class CPUManager : MonoBehaviour
                 Debug.LogError($"No match in priorityNetworkNodes for nodeB at {nodeB.pos}");
         }
     }
+    public IEnumerator DrawNetworkEdges()
+    {
+        List<NetworkEdge> network = priorityNetworkEdgesAir;
+        if (network == null || debugLinePrefab == null)
+        {
+            Debug.LogWarning("network or debugLinePrefab is not set.");
+            yield break;
+        }
 
+        // Sort edges so that those with a node closest to (0,0) come first
+        Vector2Int origin = Vector2Int.zero;
+        var sortedNetwork = network
+            .OrderBy(edge =>
+                Mathf.Min(
+                    (edge.nodeA != null ? (edge.nodeA.pos - origin).sqrMagnitude : int.MaxValue),
+                    (edge.nodeB != null ? (edge.nodeB.pos - origin).sqrMagnitude : int.MaxValue)
+                )
+            )
+            .ToList();
+
+        float totalTime = 10f;
+        float waitTime = sortedNetwork.Count > 0 ? totalTime / sortedNetwork.Count : 0.1f;
+        yield return new WaitForSeconds(15f);
+
+        foreach (NetworkEdge edge in sortedNetwork)
+        {
+            yield return new WaitForSeconds(waitTime);
+            if (edge == null || edge.nodeA == null || edge.nodeB == null)
+                continue;
+
+            Vector2Int fromV2 = edge.nodeA.pos;
+            Vector2Int toV2 = edge.nodeB.pos;
+            Vector3 from = new Vector3(fromV2.x, fromV2.y, 0);
+            Vector3 to = new Vector3(toV2.x, toV2.y, 0);
+
+            GameObject line = Instantiate(debugLinePrefab);
+            LineRenderer lr = line.GetComponent<LineRenderer>();
+            Color c;
+            if (lr != null)
+            {
+                lr.positionCount = 2;
+                lr.SetPosition(0, from);
+                lr.SetPosition(1, to);
+                if (edge.isLandAccessible)
+                    c = Color.cyan;
+                else
+                    c = Color.red;
+                lr.startColor = c;
+                lr.endColor = c;
+            }
+        }
+    }
     /*public void InitClosestNeighbour()
     {
         for (int p = 1; p <= GameMaster.numPlayers; p++)

@@ -352,7 +352,13 @@ public class BaseUnit : MonoBehaviour
                     delaySetColor(b);
                 else
                     spriteContainer.SetColor(playerControl, b, false);*/
-        StartCoroutine(delaySetColor(b));
+        if(unitName.ToLower() != "seed")
+            StartCoroutine(delaySetColor(b));
+        else
+        {
+            spriteFillSR.color = GameMaster.playerColors[GameMaster.playerTurn - 1];
+            spriteLightsSR.color = Color.white;
+        }
     }
 
     public IEnumerator delaySetColor(bool b)

@@ -2226,7 +2226,9 @@ public class MasterGrid : MonoBehaviour
         BaseUnit seed = PrefabManager.getBaseUnitFromName("seed", 1);
         //seed.playerControl = GameMaster.playerTurn;
         seed.setNonExhausted(true);
+
         seed = gameMaster.GetInstantiateUnit(seed, pos, null);
+
     }
 
     public static Vector2Int GetEnemyCommand(int p)
