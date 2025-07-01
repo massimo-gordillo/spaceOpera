@@ -32,8 +32,8 @@ public class StaticSprite : ClickableObject
             parentComponentBaseStructure = parentGameObject.GetComponent<BaseStructure>();
             //baseColor = fillSR.color;
             //lightsColor = lightsSR.color;
-            baseColor = new Color(255, 255, 255, 255);
-            lightsColor = new Color(255, 255, 255, 255);
+            baseColor = new Color32(255, 255, 255, 255);
+            lightsColor = new Color32(255, 255, 255, 255);
             
         }
         /*        else
@@ -129,7 +129,7 @@ public class StaticSprite : ClickableObject
         yield return null; 
         //Debug.Log($"Setting Color for {this.name}");
         Color playerColor = GameMaster.playerColors[player];
-        Color white = new Color (255, 255, 255, 255);
+        //Color white = new Color32 (255, 255, 255, 255);
         /*        if(parentGameObject == null)
                 {
                     Debug.Log($"No parent object for sprite {this.name}");
@@ -147,13 +147,17 @@ public class StaticSprite : ClickableObject
                     amIColouredSpriteGuy = true;
                 }*/
 
+/*        if (parentComponentBaseUnit != null && parentComponentBaseUnit.unitName == "seed")
+            Debug.Log($"Setting lights color for unit {parentComponentBaseUnit.unitName}, is struc {isStructure}, controller {player}");
+*/
+
         if (isStructure && player != 0)
         {
             //Debug.Log($"Setting color for {this.name} to {playerColor}");
             float h, s, v;
             Color.RGBToHSV(playerColor, out h, out s, out v);
 
-            s *= 0.95f; // reduce saturation
+            s *=  0.95f; // reduce saturation
             fillSR.color = Color.HSVToRGB(h, Mathf.Clamp01(s), v);
         }
         else if (!isStructure && player != 0)
@@ -168,8 +172,8 @@ public class StaticSprite : ClickableObject
             float hue, saturation, value;
             Color.RGBToHSV(playerColor, out hue, out saturation, out value);
 
-            float oldSaturation = saturation;
-            float oldValue = value;
+            //float oldSaturation = saturation;
+            //float oldValue = value;
 
             // Adjust saturation and brightness for exhaustion
             saturation = nonExhausted ? 0.9f : 0.5f;
@@ -184,7 +188,7 @@ public class StaticSprite : ClickableObject
             float lightsHue, lightsSaturation, lightsValue;
             Color.RGBToHSV(lightsColor, out lightsHue, out lightsSaturation, out lightsValue);
 
-            float adjustedLightsValue = nonExhausted ? lightsValue : lightsValue * 0.3f;
+            float adjustedLightsValue = nonExhausted ? lightsValue : lightsValue * 0.9f;
             Color adjustedLightsColor = Color.HSVToRGB(lightsHue, lightsSaturation, adjustedLightsValue);
             SetLightsColor(adjustedLightsColor);
 
@@ -203,6 +207,10 @@ public class StaticSprite : ClickableObject
         {
             StartCoroutine(WaitedSetColor(player, nonExhausted, isStructure));
         }
+/*        else
+        {
+            Debug.LogWarning($"StaticSprite is not active, cannot set color.");
+        }*/
     }
 
     public void SetFillColor(Color c)
@@ -215,6 +223,9 @@ public class StaticSprite : ClickableObject
 
     public void SetLightsColor(Color c)
     {
+        /*if(parentComponentBaseUnit!=null)
+            Debug.Log($"Setting lights color for unit {parentComponentBaseUnit.unitName}: " + c);
+        */
         if (lightsSR != null)
             lightsSR.color = c;
         if (lightsImage != null)

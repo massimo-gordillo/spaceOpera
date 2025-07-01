@@ -1396,7 +1396,7 @@ SpriteRenderer:
   m_Size: {x: 0.64, y: 0.63}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!61 &4548533290679335243
@@ -1458,9 +1458,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0f3d2a09ca23d1947822607598e4e193, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  parentGameObject: {fileID: 0}
+  parentComponentBaseUnit: {fileID: 0}
+  parentComponentBaseStructure: {fileID: 0}
+  baseColor: {r: 0, g: 0, b: 0, a: 0}
+  lightsColor: {r: 0, g: 0, b: 0, a: 0}
   fillSR: {fileID: 0}
   trimSR: {fileID: 0}
   lightsSR: {fileID: 0}
+  fillImage: {fileID: 0}
+  trimImage: {fileID: 0}
+  lightsImage: {fileID: 0}
+  isUIVariant: 0
+  isFlyingUnit: 0
+  rt: {fileID: 0}
 --- !u!1 &4548533291501861214
 GameObject:
   m_ObjectHideFlags: 0
@@ -1493,8 +1504,8 @@ Transform:
   - {fileID: 4548533290679335253}
   - {fileID: 480454219139180204}
   - {fileID: 5959277192361299510}
-  - {fileID: 4903681118816913139}
   - {fileID: 1798495883849624493}
+  - {fileID: 2049156440278822995}
   - {fileID: 5998074681789259681}
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -1532,8 +1543,7 @@ MonoBehaviour:
   playerControl: 1
   team: 0
   orientation: 3
-  xPos: 0
-  yPos: 0
+  pos: {x: 0, y: 0}
   movementNonExhausted: 0
   nonExhausted: 0
   undoingMovement: 0
@@ -1547,6 +1557,8 @@ MonoBehaviour:
   cornerSpriteTR: {fileID: 1034141457318010520}
   cornerSpriteBL: {fileID: 3623117826492307070}
   cornerSpriteBR: {fileID: 8373034734110269364}
+  swordsSprite: {fileID: 0}
+  explosionAnimator: {fileID: 0}
   masterGrid: {fileID: 0}
   prefabPath: unitPrefabs/progeny1/InfantryPrefab
   spriteAtlasPath: 
@@ -1561,6 +1573,14 @@ MonoBehaviour:
   defenceValueTextContainer: {fileID: 6668325170006851103}
   damageRangeTextContainer: {fileID: 8268713290713665834}
   combatTooltip: {fileID: 6841449995665946663}
+  tooltipImage: {fileID: 0}
+  CPU_IsCapturing: 0
+  CPU_MoveSquaresList: []
+  CPU_StructureList: []
+  CPU_CapturableStructureList: []
+  CPU_CapturingUnitList: []
+  CPU_AttackableUnitList: []
+  CPU_AttackableResourceUnitList: []
 --- !u!1 &5701078533897096042
 GameObject:
   m_ObjectHideFlags: 0
@@ -1835,7 +1855,7 @@ Transform:
   m_Children:
   - {fileID: 4075927327848357223}
   m_Father: {fileID: 4548533291501861208}
-  m_RootOrder: 4
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &8373034734110269364
 GameObject:
@@ -1933,6 +1953,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 4548533291501861208}
     m_Modifications:
+    - target: {fileID: 2690641474368353305, guid: 88268c20a16956b4c9b0579543f1d861, type: 3}
+      propertyPath: m_RootOrder
+      value: 4
+      objectReference: {fileID: 0}
     - target: {fileID: 3640360671787781739, guid: 88268c20a16956b4c9b0579543f1d861, type: 3}
       propertyPath: m_Sprite
       value: 
@@ -1947,6 +1971,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3640360671787781739, guid: 88268c20a16956b4c9b0579543f1d861, type: 3}
       propertyPath: m_Color.r
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3640360671787781739, guid: 88268c20a16956b4c9b0579543f1d861, type: 3}
+      propertyPath: m_WasSpriteAssigned
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3662765650668672947, guid: 88268c20a16956b4c9b0579543f1d861, type: 3}
@@ -1964,6 +1992,10 @@ PrefabInstance:
     - target: {fileID: 3662765650668672947, guid: 88268c20a16956b4c9b0579543f1d861, type: 3}
       propertyPath: m_Color.r
       value: 0.75
+      objectReference: {fileID: 0}
+    - target: {fileID: 3662765650668672947, guid: 88268c20a16956b4c9b0579543f1d861, type: 3}
+      propertyPath: m_WasSpriteAssigned
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5309568537644243473, guid: 88268c20a16956b4c9b0579543f1d861, type: 3}
       propertyPath: m_RootOrder
@@ -2017,6 +2049,14 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 7642036437564108457, guid: 88268c20a16956b4c9b0579543f1d861, type: 3}
+      propertyPath: parentGameObject
+      value: 
+      objectReference: {fileID: 4548533291501861214}
+    - target: {fileID: 7642036437564108457, guid: 88268c20a16956b4c9b0579543f1d861, type: 3}
+      propertyPath: parentComponentBaseUnit
+      value: 
+      objectReference: {fileID: 7803690413202824681}
     - target: {fileID: 9019121506473607865, guid: 88268c20a16956b4c9b0579543f1d861, type: 3}
       propertyPath: m_RootOrder
       value: 3
@@ -2025,6 +2065,10 @@ PrefabInstance:
       propertyPath: m_Sprite
       value: 
       objectReference: {fileID: 625227183, guid: def22d00d99f6bc4d99fd5d0c0142d23, type: 3}
+    - target: {fileID: 9189135686034927351, guid: 88268c20a16956b4c9b0579543f1d861, type: 3}
+      propertyPath: m_WasSpriteAssigned
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 88268c20a16956b4c9b0579543f1d861, type: 3}
 --- !u!212 &838281378739767841 stripped
@@ -2037,9 +2081,9 @@ SpriteRenderer:
   m_CorrespondingSourceObject: {fileID: 3662765650668672947, guid: 88268c20a16956b4c9b0579543f1d861, type: 3}
   m_PrefabInstance: {fileID: 4118265635416130634}
   m_PrefabAsset: {fileID: 0}
---- !u!4 &4903681118816913139 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 9019121506473607865, guid: 88268c20a16956b4c9b0579543f1d861, type: 3}
+--- !u!224 &2049156440278822995 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 2690641474368353305, guid: 88268c20a16956b4c9b0579543f1d861, type: 3}
   m_PrefabInstance: {fileID: 4118265635416130634}
   m_PrefabAsset: {fileID: 0}
 --- !u!212 &5089449104217959101 stripped

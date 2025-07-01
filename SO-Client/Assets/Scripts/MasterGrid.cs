@@ -831,8 +831,10 @@ public class MasterGrid : MonoBehaviour
 
         if(path.Count == 0)
         {
-            Debug.LogWarning($"No valid path found for movement animation for unit {unit.pos}, staying still");
-            //unit.transform.position = new Vector3(end.x, end.y, unit.transform.position.z);
+            Debug.LogError($"No valid path found for movement animation for unit {unit.pos}, flashing to location");
+            unit.transform.position = new Vector3(end.x, end.y, unit.transform.position.z);
+/*            selectedUnit = unit;
+            moveSelectedUnit(end);*/
             unit.setNonExhausted(false);
             return;
         }
@@ -847,7 +849,7 @@ public class MasterGrid : MonoBehaviour
 
         float animationTimePerTile = GameMaster.globalAnimationDuration / (path.Count*2);
         // Have the camera follow if it's a CPU player
-        if (GameMaster.CPU_PlayersList[GameMaster.playerTurn])
+        if (GameMaster.CPU_isOn && GameMaster.CPU_PlayersList[GameMaster.playerTurn])
         {
             yield return new WaitForSeconds(0.2f);
             cameraManager.SetFollowTarget(unit.transform);
@@ -2225,9 +2227,10 @@ public class MasterGrid : MonoBehaviour
     {
         BaseUnit seed = PrefabManager.getBaseUnitFromName("seed", 1);
         //seed.playerControl = GameMaster.playerTurn;
+        seed = gameMaster.GetInstantiateUnit(seed, pos, null);
         seed.setNonExhausted(true);
 
-        seed = gameMaster.GetInstantiateUnit(seed, pos, null);
+        
 
     }
 

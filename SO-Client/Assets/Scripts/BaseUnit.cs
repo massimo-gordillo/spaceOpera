@@ -342,29 +342,39 @@ public class BaseUnit : MonoBehaviour
     }
 
 
-    public void setNonExhausted(bool b)
+    public void setNonExhausted(bool ready)
     {
         //Debug.Log($"{this.unitName} is being set to non-exhausted {b}");
-        movementNonExhausted = b;
-        nonExhausted = b;
+        movementNonExhausted = ready;
+        nonExhausted = ready;
         //spriteContainer.SetColor(playerControl, b, false);
         /*        if (GameMaster.CPU_PlayersList[playerControl])
                     delaySetColor(b);
                 else
                     spriteContainer.SetColor(playerControl, b, false);*/
-        if(unitName.ToLower() != "seed")
-            StartCoroutine(delaySetColor(b));
-        else
+        /*        if (unitName.ToLower() != "seed")
+                    StartCoroutine(delaySetColor(ready));
+                else
+                {
+                    spriteFillSR.color = GameMaster.playerColors[GameMaster.playerTurn - 1];
+                    spriteLightsSR.color = Color.white;
+                }*/
+        if (unitName.ToLower() == "seed")
         {
-            spriteFillSR.color = GameMaster.playerColors[GameMaster.playerTurn - 1];
-            spriteLightsSR.color = Color.white;
+            //debug print hglight colour
+            Debug.Log($"Seed highlight color: {spriteLightsSR.color}");
         }
+
+        StartCoroutine(delaySetColor(ready));
     }
 
-    public IEnumerator delaySetColor(bool b)
+    public IEnumerator delaySetColor(bool ready)
     {
-        yield return new WaitForSeconds(GameMaster.globalAnimationDuration);
-        spriteContainer.SetColor(playerControl, b, false);
+        if (ready)
+            yield return null;
+        else
+            yield return new WaitForSeconds(GameMaster.globalAnimationDuration);
+        spriteContainer.SetColor(playerControl, ready, false);
     }
 
 

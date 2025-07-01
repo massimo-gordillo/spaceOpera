@@ -79,6 +79,7 @@ public class GameMaster : MonoBehaviour
     public TMP_Text promptCardQuestionText;
     public TMP_Text promptCardButtonLeftText;
     public TMP_Text promptCardButtonRightText;
+    public TMP_Text concedeCardText;
     public Button concedeMenuButton;
     public Button backToMenuButton;
     public GameObject loadingScreen;
@@ -100,7 +101,7 @@ public class GameMaster : MonoBehaviour
 
     [Header("CPU")]
     public static bool CPU_isOn = false;
-    public static bool CPU_isOn_manual = true;
+    public static bool CPU_isOn_manual = false;
     private static bool CPU_isMasterDebugging = false;
     public static bool[] CPU_PlayersList;
     public int virixCheapestUnit;
@@ -125,12 +126,12 @@ public class GameMaster : MonoBehaviour
         match_id = Guid.Parse("aaaaaaaa-8761-4e77-a086-a7365ae9e0b4");
         turnNumber = 1;
         numPlayers = 2; //will set dynamically later
-
+        CPU_PlayersList = new bool[numPlayers + 1];
         //Turn on CPU if game is started through MenuScene, otherwise if I've set it manually.
         if (MatchSettings.CPU_isOn || (!MatchSettings.isInit && CPU_isOn_manual))
         {
             CPU_isOn = true;
-            CPU_PlayersList = new bool[numPlayers + 1];
+            //CPU_PlayersList = new bool[numPlayers + 1];
             if (MatchSettings.playerIsCPU.Length == numPlayers)
                 for (int i = 0; i < numPlayers; i++)
                 {
@@ -142,8 +143,8 @@ public class GameMaster : MonoBehaviour
             if (!MatchSettings.CPU_isOn)
             {
                 Debug.LogWarning("Match settings says CPU is off but manual CPU is on, defaulting to hard values.");
-                CPU_PlayersList[1] = false;
-                CPU_PlayersList[2] = false;
+                CPU_PlayersList[1] = true;
+                CPU_PlayersList[2] = true;
             }
         }
 
@@ -714,7 +715,7 @@ public class GameMaster : MonoBehaviour
 
     public void showUnitChoicePanel(bool attackableUnitsBool, bool capturableStructureBool, bool hasMoved)
     {
-        if (CPU_PlayersList[playerTurn]) //don't display player choices if it's a cpu player
+        if (CPU_isOn && CPU_PlayersList[playerTurn]) //don't display player choices if it's a cpu player
             return;
 
         if (attackableUnitsBool || capturableStructureBool)
@@ -809,7 +810,11 @@ public class GameMaster : MonoBehaviour
             concedeMenuButton.interactable = false;
             backToMenuButton.interactable = true;
             backToMenuButton.image.color = new Color32(255, 175, 0, 255);
+            backToMenuButton.GetComponentInChildren<TMP_Text>().color = new Color32(255, 175, 0, 255);
             endTurnButton.interactable = false;
+            //end all coroutines
+            StopAllCoroutines();
+
             displayWinnerCard(player);
         }
     }
@@ -1131,15 +1136,20 @@ public class GameMaster : MonoBehaviour
 
     public void AnimateStartTurnCard(int player)
     {
-        
+
         Vector2 endPos = (player % 2 == 0) ? offScreenRight : offScreenLeft;
         Vector2 startPos = (player % 2 == 0) ? offScreenLeft : offScreenRight;
-
+        Color playerColor = playerColors[player];
+        string hexColor = ColorUtility.ToHtmlStringRGBA(playerColor);
         string openText = "Player ";
         if (CPU_PlayersList != null && CPU_PlayersList[player])
             openText = "CPU P";
 
+        //openText += $"{player}'s ";
+        //openText = $"<color=#{hexColor}>" + openText + "</color>";
+
         announcementCardText.text = openText + $"{player}'s turn!";
+        announcementCardText.color = playerColor;
         announcementCardRT.anchoredPosition = startPos;
 
         StartCoroutine(SwoopInAndOutTurnCard(startPos, centerPosition, endPos));
@@ -1175,7 +1185,26 @@ public class GameMaster : MonoBehaviour
 
     public void ConcedeCurrentPlayer()
     {
-        ConcedePlayer(playerTurn);
+        if (CPU_isOn)
+        {
+            bool allCPU = true;
+            int humanPlayerNum = 0;
+            for (int i = 1; i <= numPlayers; i++)
+            {
+                allCPU = allCPU && CPU_PlayersList[i];
+                if (!CPU_PlayersList[i])
+                    humanPlayerNum = i;
+            }
+            if (allCPU)
+                ConcedePlayer(playerTurn);
+            else
+            {
+                if (numPlayers == 2)
+                    ConcedePlayer(humanPlayerNum);
+            }
+        }
+        else
+            ConcedePlayer(playerTurn);
     }
 
     public void ConcedePlayer(int p)
@@ -1219,7 +1248,7 @@ public class GameMaster : MonoBehaviour
 
     public void EndTurnButtonSwitch()
     {
-        if (CPU_isMasterDebugging || !(CPU_PlayersList[playerTurn] && CPU_isOn))
+        if (CPU_isMasterDebugging || !(CPU_isOn && CPU_PlayersList[playerTurn]))
             endTurnButton.interactable = true;
         else
             endTurnButton.interactable = false;
@@ -1278,6 +1307,37 @@ public class GameMaster : MonoBehaviour
             playerColors[1] = new Color32(63, 44, 255, 255);
             playerColors[2] = new Color32(230, 19, 53, 255);
         }
+    }
+
+    public void setConcedeText()
+    {
+        if (CPU_isOn)
+        {
+            bool allCPU = true;
+            int humanPlayerNum = 0;
+            for (int i = 1; i <= numPlayers; i++)
+            {
+                allCPU = allCPU && CPU_PlayersList[i];
+                if (!CPU_PlayersList[i])
+                    humanPlayerNum = i;
+            }
+            if (allCPU)
+                concedeCardText.text = $"End game?";
+            else
+            {
+                if (numPlayers == 2)
+                {
+                    concedeCardText.color = playerColors[humanPlayerNum];
+                    concedeCardText.text = $"Player {humanPlayerNum},";
+                }
+            }
+        }
+        else
+        {
+            concedeCardText.color = playerColors[playerTurn];
+            concedeCardText.text = $"Player {playerTurn},";
+        }
+
     }
     
     public void callMuteMusic()
