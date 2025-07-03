@@ -359,11 +359,11 @@ public class BaseUnit : MonoBehaviour
                     spriteFillSR.color = GameMaster.playerColors[GameMaster.playerTurn - 1];
                     spriteLightsSR.color = Color.white;
                 }*/
-        if (unitName.ToLower() == "seed")
+/*        if (unitName.ToLower() == "seed")
         {
             //debug print hglight colour
             Debug.Log($"Seed highlight color: {spriteLightsSR.color}");
-        }
+        }*/
 
         StartCoroutine(delaySetColor(ready));
     }
