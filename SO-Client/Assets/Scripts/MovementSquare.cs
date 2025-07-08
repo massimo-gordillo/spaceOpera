@@ -1,5 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
+
 //using System.Drawing;
 using UnityEngine;
 
@@ -12,6 +14,14 @@ public class MovementSquare : ClickableObject
     public GameObject shield1;
     public GameObject shield2;
     public GameObject shield3;
+    /*    public List<Vector2Int> pointingTo = new List<Vector2Int>();
+        public List<Vector2Int> pointedFrom = new List<Vector2Int>();
+        public List<Vector2Int> pathToOrigin = new List<Vector2Int>();*/
+    public Vector2Int parent;
+    public int distanceFromOrigin;
+    public TMP_Text distanceText;
+
+
 
 
     protected override void Start()

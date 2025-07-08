@@ -196,11 +196,12 @@ public class CPUManager : MonoBehaviour
         }
     }
 
-    public void CollectPotentialGameActions(BaseUnit unit)
+
+    /*public void CollectPotentialGameActions(BaseUnit unit)
     {
-        /*        bool isCurious = false;
+        *//*        bool isCurious = false;
                 if (!unit.isResourceUnit)
-                    isCurious = true;*/
+                    isCurious = true;*//*
 
         Queue<(Vector2Int cell, int range)> cellsToCheck = new Queue<(Vector2Int, int)>();
         bool[,] checkedCells = new bool[masterGrid.gridX + 2, masterGrid.gridY + 2];
@@ -245,36 +246,36 @@ public class CPUManager : MonoBehaviour
         {
             unit.CPU_MoveSquaresList.Add(tempMovementQueue.Dequeue());
         }
-        /*        if (isCurious)
+        *//*        if (isCurious)
                     foreach (Vector2Int m in movementQueue)
                         //attackQueue.Enqueue(m);
                         Debug.Log($"unit {unit.pos} has movement location {m}");*/
 /*        if (unit.attackRange > 1)
         {
             Debug.Log($"Ranged unit at {unit.pos} has attack queue of {attackQueue.Count}");
-        }*/
+        }*//*
         foreach (Vector2Int attackSquare in attackQueue)
         {
             
-            /*if(isCurious)
+            *//*if(isCurious)
                 Debug.Log($"unit {unit.pos} has attack location {attackSquare}");
-            */
+            *//*
             BaseUnit attackable = masterGrid.whatUnitIsInThisLocation(attackSquare);
-            /* if (isCurious && attackSquare == new Vector2Int(12, 8))
+            *//* if (isCurious && attackSquare == new Vector2Int(12, 8))
                  Debug.Log($"BOOL: unit {unit.pos}, has found an attackable? {attackable} owned by player {attackable.playerControl}, can they attack it? {masterGrid.canUnitAttack(unit, attackable)}");
- */
+ *//*
 
             if (attackable != null)
             {
 
-                /*                if (unit.attackRange > 1)
+                *//*                if (unit.attackRange > 1)
                                     Debug.Log($"unit found at location {attackSquare} by {unit.pos}, it is an {attackable.unitName} owned by player {attackable.playerControl}, can they attack it? {masterGrid.canUnitAttack(unit, attackable)}");
-                */
+                *//*
                 if (masterGrid.canUnitAttack(unit, attackable))
                 {
-                    /*if (attackable.unitName == "Spore")
+                    *//*if (attackable.unitName == "Spore")
                         Debug.LogError($"Unit {unit.pos} is adding spore at {attackable.pos} to attack list");
-                    */
+                    *//*
 
                     //check if squares adjacent to the attackable unit are also in the movement queue AND there's no unit in that square, add them to the attackable list.
                     foreach (Vector2Int dir in masterGrid.DirectionList())
@@ -283,14 +284,14 @@ public class CPUManager : MonoBehaviour
                         if (unit.CPU_MoveSquaresList.Contains(adjacentSquare) && masterGrid.whatUnitIsInThisLocation(adjacentSquare) == null)
                         {
                             unit.CPU_AttackableUnitList.Add(attackable);
-                            /*   if (isCurious)
+                            *//*   if (isCurious)
                                    Debug.Log($"counting: Unit {unit.pos} has an attack list of length {unit.CPU_AttackableUnitList.Count}");
-           */
+           *//*
                             if (attackable.isResourceUnit)
                             {
-                                /*if (attackable.unitName == "Spore")
+                                *//*if (attackable.unitName == "Spore")
                                     Debug.LogError($"Unit {unit.pos} adding spore to resourceAttackList {attackable.pos}");
-*/
+*//*
                                 unit.CPU_AttackableResourceUnitList.Add(attackable);
                             }
                         }
@@ -298,7 +299,7 @@ public class CPUManager : MonoBehaviour
                 }
             }
         }
-        /*
+        *//*
                 //debug for attack list gen.
                 foreach (Vector2Int attackSquare in movementQueue)
                 {
@@ -325,7 +326,7 @@ public class CPUManager : MonoBehaviour
         /*        foreach (BaseUnit attack in attackableUnitList)
                 {
                     Debug.Log($"Unit {unit.pos} can attack {attack.pos}");
-                }*/
+                }*//*
 
         //clear lists from last search
         unit.CPU_StructureList = new List<BaseStructure>();
@@ -346,7 +347,7 @@ public class CPUManager : MonoBehaviour
 
 
     }
-
+*/
     public IEnumerator CPU_GameActionAttack(BaseUnit unit)
     {
         if (unit.CPU_AttackableUnitList.Count > 0)
@@ -777,7 +778,7 @@ public class CPUManager : MonoBehaviour
             cameraManager.SetPosition(unit.pos);
             yield return new WaitForSeconds(CPU_AnimationWaitTime);
             unit.showSelectedCorners(true);
-            CollectPotentialGameActions(unit);
+            //CollectPotentialGameActions(unit);
             NetworkNode targetNode = unit.CPU_TargetNode;
             if (targetNode == null)
             {
