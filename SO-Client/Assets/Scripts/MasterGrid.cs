@@ -46,10 +46,13 @@ public class MasterGrid : MonoBehaviour
     private double attackLuckDomain;
     private bool luckOn =true;
 
+    public MovementSquare movementSquarePrefab;
     public Transform movementSquareList;
-    public MovementSquare moveSquare;
+    //public MovementSquare moveSquare;
     //public bool[,] checkedCells;
     public GameObject rangeOutlineSprite;
+    Dictionary<Vector2Int, List<Vector2Int>> movementParentsDictionary = new();
+    Dictionary<Vector2Int, int> movementDistanceMap = new();
 
     List<GameAction> gameActions = new List<GameAction>();
     public short turnActionCount = 0;
@@ -58,6 +61,7 @@ public class MasterGrid : MonoBehaviour
     public List<BaseStructure> prodStructuresList;
     public static Structure_Command[] commandStructures = new Structure_Command[3]; //assume 2 players for now
 
+    public Vector2Int selectedMovementSquare; //the square that is selected by the player to move to, if any.
 
 
 
@@ -113,7 +117,7 @@ public class MasterGrid : MonoBehaviour
 
     /*    public void printUnitGrid()
         {
-            //print("checkEnemiesInRange");
+            //print("checkEnemiesInRangeBeforeMoving");
             int k = 0;
             for (int i = 0; i < unitGrid.GetLength(0); i++)
             {
@@ -485,49 +489,55 @@ public class MasterGrid : MonoBehaviour
         Queue<Vector2Int> movementQueue = new Queue<Vector2Int>();
         Queue<Vector2Int> attackQueue = new Queue<Vector2Int>();
         Queue<Vector2Int> structureQueue = new Queue<Vector2Int>();
-        Dictionary<Vector2Int, List<Vector2Int>> parents = new Dictionary<Vector2Int, List<Vector2Int>>();
-        Dictionary<Vector2Int, int> distanceMap = new Dictionary<Vector2Int, int>();
+        this.movementDistanceMap.Clear();
+        this.movementParentsDictionary.Clear();
+
+        movementDistanceMap[mTarget.pos] = 0;
+        int newDistance = movementDistanceMap.TryGetValue(mTarget.pos, out var dist) ? dist + 1 : 1;
 
 
-        bool[,] checkedCells = new bool[gridX + 2, gridY + 2];
-        checkedCells[xpos + 1, ypos + 1] = true;
         if (mTarget.canMoveAndAttack)
         {
             //cellsToCheck.Enqueue((new Vector2Int(xpos + 1, ypos + 1), movementRange + 1));//assuming unit only has 1 attack range for the first vectorA* search.
             //List<Queue<Vector2Int>> squareQueuesList = FloodFillSearch(mTarget, movementRange, attackRange, cellsToCheck, checkedCells, new List<Queue<Vector2Int>> { new Queue<Vector2Int>(), new Queue<Vector2Int>(), new Queue<Vector2Int>() }, true);
             //List<Queue<Vector2Int>> squareQueuesList = null;
 
-            if (attackRange >= 1)
-                FloodFillSearch(mTarget, mTarget.movementRange, 1,
-                out movementQueue, out attackQueue, out structureQueue,
-                out parents, out distanceMap);
-            //squareQueuesList = FloodFillSearch(mTarget, movementRange, 1, cellsToCheck, checkedCells, new List<Queue<Vector2Int>> { new Queue<Vector2Int>(), new Queue<Vector2Int>(), new Queue<Vector2Int>() });
-            else
-                FloodFillSearch(mTarget, mTarget.movementRange, 0,
-                out movementQueue, out attackQueue, out structureQueue,
-                out parents, out distanceMap);
-            //squareQueuesList = FloodFillSearch(mTarget, movementRange, 0, cellsToCheck, checkedCells, new List<Queue<Vector2Int>> { new Queue<Vector2Int>(), new Queue<Vector2Int>(), new Queue<Vector2Int>() });
+            FloodFillSearch(mTarget, mTarget.movementRange, mTarget.attackRange,
+                out movementQueue, out attackQueue, out structureQueue);
+
+            /*            if (attackRange >= 1)
+                            FloodFillSearch(mTarget, mTarget.movementRange, mTarget.attackRange,
+                            out movementQueue, out attackQueue, out structureQueue);
+                        //squareQueuesList = FloodFillSearch(mTarget, movementRange, 1, cellsToCheck, checkedCells, new List<Queue<Vector2Int>> { new Queue<Vector2Int>(), new Queue<Vector2Int>(), new Queue<Vector2Int>() });
+                        else
+                            FloodFillSearch(mTarget, mTarget.movementRange, 0,
+                            out movementQueue, out _, out structureQueue);*/
+
+            /*//if the unit can move and attack and has a greater than 1 attack range, we need to do a second search for the additional attack range.
             if (attackRange > 1)
             {
-                //cellsToCheck.Clear();
+                //pass a new CellsToCheck queue with the attack locations discovered when range = 1.
                 Queue<(Vector2Int cell, int range)> cellsToCheck = new Queue<(Vector2Int, int)>();
                 if (attackQueue != null && attackQueue.Count > 0)
                 {
                     foreach (var cell in attackQueue)
                     {
-                        cellsToCheck.Enqueue((cell, attackRange - 1)); //make cellsToCheck the attack locations discovered when range = 1.
+                        //Have to counter the +1 offset from the flood fill search.
+                        cellsToCheck.Enqueue((cell+Vector2Int.one, attackRange-1)); 
                     }
                 }
 
-                //Queue<Vector2Int> rangedAttackQueue = new Queue<Vector2Int>();
-
-                //List<Queue<Vector2Int>> squareQueuesListRangedAttack = FloodFillSearch(mTarget, 0, attackRange - 1, cellsToCheck, checkedCells, new List<Queue<Vector2Int>> { new Queue<Vector2Int>(), new Queue<Vector2Int>(), new Queue<Vector2Int>() });
-                
                 //Include the attack range 1 search results in the cells to check for the range > 1.
                 //Include the movement queue so the ranged attack search doesn't check those squares again.
+                Queue <Vector2Int> combinedCheckedCells = new Queue<Vector2Int>(movementQueue);
+                foreach(Vector2Int cell in attackQueue)
+                {
+                    combinedCheckedCells.Enqueue(cell);
+                }
+
                 FloodFillSearch(mTarget, 0, attackRange - 1,
                 out _, out Queue<Vector2Int> rangedAttackQueue, out _,
-                out _, out _, cellsToCheck, movementQueue);
+                cellsToCheck, combinedCheckedCells);
 
                 //ManualTestAndPrintLogQueueSizes(squareQueuesListRangedAttack);
                 //DrawSquaresFromSearch(squareQueuesListRangedAttack);
@@ -536,9 +546,9 @@ public class MasterGrid : MonoBehaviour
                     {
                         attackQueue.Enqueue(item);
                     }
-            }
+            }*/
             //ManualTestAndPrintLogQueueSizes(squareQueuesList);
-            DrawSquaresFromSearch(parents, distanceMap, movementQueue, attackQueue, structureQueue);
+            DrawSquaresFromSearch(movementQueue, attackQueue, structureQueue);
 
 
 
@@ -549,8 +559,7 @@ public class MasterGrid : MonoBehaviour
             //List<Queue<Vector2Int>> movementSquareQueuesList = FloodFillSearch(mTarget, movementRange, 0, cellsToCheck, checkedCells, new List<Queue<Vector2Int>> { new Queue<Vector2Int>(), new Queue<Vector2Int>(), new Queue<Vector2Int>()});
 
             FloodFillSearch(mTarget, movementRange, 0,
-            out movementQueue, out _, out structureQueue,
-            out parents, out distanceMap);
+            out movementQueue, out _, out structureQueue);
 
 
             /*            
@@ -566,15 +575,14 @@ public class MasterGrid : MonoBehaviour
                             }
 
                         }*/
-            DrawSquaresFromSearch(parents, distanceMap, movementQueue, null, structureQueue);
+            DrawSquaresFromSearch(movementQueue, null, structureQueue);
 
 /*            cellsToCheck = new Queue<(Vector2Int, int)>();
             cellsToCheck.Enqueue((new Vector2Int(xpos + 1, ypos + 1), attackRange));
             checkedCells = new bool[gridX + 2, gridY + 2];
             checkedCells[xpos + 1, ypos + 1] = true;*/
             FloodFillSearch(mTarget, 0, attackRange,
-            out _, out attackQueue, out _,
-            out _, out _);
+            out _, out attackQueue, out _);
             //            List<Queue<Vector2Int>> attackOutlineLocationsQueuesList = FloodFillSearch(mTarget, 0, attackRange, cellsToCheck, checkedCells, new List<Queue<Vector2Int>> { new Queue<Vector2Int>(), new Queue<Vector2Int>(), new Queue<Vector2Int>()});
             //ManualTestAndPrintLogQueueSizes(attackOutlineLocationsQueuesList);
             DrawAttackOutline(attackQueue, mTarget);
@@ -588,23 +596,18 @@ public class MasterGrid : MonoBehaviour
     out Queue<Vector2Int> movementQueue,
     out Queue<Vector2Int> attackQueue,
     out Queue<Vector2Int> structureQueue,
-    out Dictionary<Vector2Int, List<Vector2Int>> parents,
-    out Dictionary<Vector2Int, int> distanceMap,
     Queue<(Vector2Int cell, int range)> cellsToCheck = null,
     Queue<Vector2Int> checkedCells = null)
     {
         movementQueue = new Queue<Vector2Int>();
         attackQueue = new Queue<Vector2Int>();
         structureQueue = new Queue<Vector2Int>();
-        parents = new Dictionary<Vector2Int, List<Vector2Int>>();
-        distanceMap = new Dictionary<Vector2Int, int>();
 
         Vector2Int origin = mTarget.pos;
         int width = gridX + 2;
         int height = gridY + 2;
 
         bool[,] visited = new bool[width, height];
-        cellsToCheck ??= new Queue<(Vector2Int, int)>();
 
         // Mark pre-visited cells if passed in
         if (checkedCells != null && checkedCells.Count > 0)
@@ -612,18 +615,26 @@ public class MasterGrid : MonoBehaviour
             foreach (Vector2Int cell in checkedCells)
             {
                 if (cell.x >= 0 && cell.x < width && cell.y >= 0 && cell.y < height)
-                    visited[cell.x, cell.y] = true;
+                    visited[cell.x+1, cell.y+1] = true;
             }
         }
+
+        cellsToCheck ??= new Queue<(Vector2Int, int)>();
+
 
         if (cellsToCheck.Count == 0)
         {
             Vector2Int startCell = origin + Vector2Int.one;
-            cellsToCheck.Enqueue((startCell, movementRange + attackRange));
+/*            if(attackRange >= 1) 
+                attackRange = 1; // Ensure attack range is maximum 1 for the first pass*/
+            cellsToCheck.Enqueue((startCell, movementRange+attackRange));
             visited[startCell.x, startCell.y] = true;
         }
+        else
+        {
+            Debug.Log("Importing cellsToCheck with " + cellsToCheck.Count + " items.");
+        }
 
-        distanceMap[origin] = 0;
 
         while (cellsToCheck.Count > 0)
         {
@@ -649,30 +660,50 @@ public class MasterGrid : MonoBehaviour
                     continue;
 
                 int legal = LegalMove(neighbor, mTarget);
-                //int parentDistance = distanceMap.TryGetValue(currentCellCorrected, out var dist) ? dist : 0;
+                //int parentDistance = movementDistanceMap.TryGetValue(currentCellCorrected, out var dist) ? dist : 0;
                 //int newDistance = parentDistance + 1;
-                int newDistance = distanceMap.TryGetValue(currentCellCorrected, out var dist) ? dist + 1 : 1;
+                int newDistance = movementDistanceMap.TryGetValue(currentCellCorrected, out var dist) ? dist + 1 : 1;
 
                 bool isNewVisit = !visited[x, y];
+                if (legal < 1 && movementRange==0 && !isNewVisit)
+                    Debug.Log($"Cell {neighbor} has been visited, ignoring");
+
 
                 // Only process if first time or this is another equally short path
-                if (isNewVisit || (distanceMap.ContainsKey(neighbor) && distanceMap[neighbor] == newDistance))
+                if (isNewVisit || (movementDistanceMap.ContainsKey(neighbor) && movementDistanceMap[neighbor] == newDistance))
                 {
-                    if (!distanceMap.ContainsKey(neighbor))
-                        distanceMap[neighbor] = newDistance;
+                    if (!movementDistanceMap.ContainsKey(neighbor))
+                        movementDistanceMap[neighbor] = newDistance;
 
-                    if (!parents.ContainsKey(neighbor))
-                        parents[neighbor] = new List<Vector2Int>();
+                    if (!movementParentsDictionary.ContainsKey(neighbor))
+                        movementParentsDictionary[neighbor] = new List<Vector2Int>();
 
-                    if (!parents[neighbor].Contains(currentCellCorrected))
-                        parents[neighbor].Add(currentCellCorrected);
+                    if (!movementParentsDictionary[neighbor].Contains(currentCellCorrected))
+                        movementParentsDictionary[neighbor].Add(currentCellCorrected);
 
                     if (isNewVisit)
                     {
                         visited[x, y] = true;
-                        if(legal >= 1 || movementRange == 0)
+                        if (movementRange > 0)
+                        {
+                            if (legal >= 1)
+                                cellsToCheck.Enqueue((neighborCell, rangeLeft - 1));
+                        }
+                        else
+                        {
+                            // In attack-only mode, always continue
                             cellsToCheck.Enqueue((neighborCell, rangeLeft - 1));
+                        }
+
+                        /* else if(rangeLeft > attackRange)
+                        {
+
+                            // If not legal, still enqueue to check for attack range
+                            cellsToCheck.Enqueue(neighborCell, attackRange - 1);
+                        }*/
                     }
+
+
                 }
 
                 // Sort squares into correct queues
@@ -694,7 +725,8 @@ public class MasterGrid : MonoBehaviour
                     if ((mTarget.playerControl != GameMaster.playerTurn || canUnitAttack(mTarget, unit) || unit == null) && mTarget.canMoveAndAttack)
                         attackQueue.Enqueue(neighbor);
 
-                    if (!mTarget.canMoveAndAttack && movementRange == 0)
+                    if (movementRange == 0)
+                    //if (!mTarget.canMoveAndAttack && movementRange == 0)
                         attackQueue.Enqueue(neighbor);
 
                     // Carefully add neighbors for continued attack-range search
@@ -702,14 +734,49 @@ public class MasterGrid : MonoBehaviour
                     {
                         visited[x, y] = true;
 
-                        if (rangeLeft > attackRange)
+                        if (legal>=1 || movementRange == 0)
                             cellsToCheck.Enqueue((neighborCell, attackRange));
-                        else
-                            cellsToCheck.Enqueue((neighborCell, rangeLeft - 1));
                     }
                 }
             }
         }
+
+        /*if (mTarget.attackRange > 1 && movementRange > 0)
+        {
+            // Copy the current attackQueue to use as the basis for further expansion
+            Queue<(Vector2Int cell, int range)> extraCellsToCheck = new Queue<(Vector2Int, int)>();
+            foreach (Vector2Int cell in attackQueue)
+            {
+                //if(LegalMove(cell, mTarget)<1)
+                    Debug.Log($"Adding cell {cell} to extraCellsToCheck, legal: {LegalMove(cell, mTarget)}, attackRange: {attackRange}");
+
+                // Offset by +1 to match internal coordinate system in FloodFill
+                extraCellsToCheck.Enqueue((cell, mTarget.attackRange - 1));
+            }
+
+            // Combine already explored movement and attack cells to skip during second pass
+            Queue<Vector2Int> combinedCheckedCells = new Queue<Vector2Int>();
+            foreach (Vector2Int cell in movementQueue)
+                combinedCheckedCells.Enqueue(cell);
+            foreach (Vector2Int cell in attackQueue)
+                combinedCheckedCells.Enqueue(cell);
+
+            // Do a second pass for extended attack range
+            FloodFillSearch(
+                mTarget,
+                0,
+                attackRange - 1,
+                out _,
+                out Queue<Vector2Int> rangedAttackQueue,
+                out _,
+                extraCellsToCheck,
+                combinedCheckedCells
+            );
+
+            // Add additional ranged results into the original attack queue
+            foreach (Vector2Int cell in rangedAttackQueue)
+                attackQueue.Enqueue(cell);
+        }*/
     }
 
 
@@ -1291,7 +1358,7 @@ public class MasterGrid : MonoBehaviour
 
     /*private bool ExpandFrontier(
         Queue<Vector2Int> queue,
-        Dictionary<Vector2Int, Vector2Int> parents,
+        Dictionary<Vector2Int, Vector2Int> movementParentsDictionary,
         Dictionary<Vector2Int, Vector2Int> otherParents,
         ref Vector2Int meetingPoint,
         BaseUnit unit)
@@ -1303,10 +1370,10 @@ public class MasterGrid : MonoBehaviour
         foreach (Vector2Int dir in DirectionList())
         {
             Vector2Int neighbor = currentCellCorrected + dir;
-            if (parents.ContainsKey(neighbor) || LegalMove(neighbor.x, neighbor.y, unit)<=0)
+            if (movementParentsDictionary.ContainsKey(neighbor) || LegalMove(neighbor.x, neighbor.y, unit)<=0)
                 continue;
 
-            parents[neighbor] = currentCellCorrected;
+            movementParentsDictionary[neighbor] = currentCellCorrected;
             queue.Enqueue(neighbor);
 
             if (otherParents.ContainsKey(neighbor))
@@ -1428,7 +1495,7 @@ public class MasterGrid : MonoBehaviour
 
     private bool ExpandFrontier(
     Queue<Vector2Int> queue,
-    Dictionary<Vector2Int, Vector2Int> parents,
+    Dictionary<Vector2Int, Vector2Int> movementParentsDictionary,
     Dictionary<Vector2Int, Vector2Int> otherParents,
     Dictionary<Vector2Int, int> depths,
     int depthLimit,
@@ -1451,7 +1518,7 @@ public class MasterGrid : MonoBehaviour
 
 
             depths[neighbor] = currentDepth + 1;
-            parents[neighbor] = currentCellCorrected;
+            movementParentsDictionary[neighbor] = currentCellCorrected;
             queue.Enqueue(neighbor);
 
             if (otherParents.ContainsKey(neighbor))
@@ -1652,7 +1719,8 @@ public class MasterGrid : MonoBehaviour
         //Debug.Log($"Structure Queue Size: {structureQueue.Count}");
     }
 
-    void DrawSquaresFromSearch(Dictionary<Vector2Int, List<Vector2Int>> parents, Dictionary<Vector2Int, int> distanceMap, Queue<Vector2Int> movementQueue = null, Queue<Vector2Int> attackQueue = null, Queue<Vector2Int> structureQueue = null)
+    void DrawSquaresFromSearch(Queue<Vector2Int> movementQueue = null, Queue<Vector2Int> attackQueue = null, Queue<Vector2Int> structureQueue = null)
+    //void DrawSquaresFromSearch(Dictionary<Vector2Int, List<Vector2Int>> parents, Dictionary<Vector2Int, int> distanceMap, Queue<Vector2Int> movementQueue = null, Queue<Vector2Int> attackQueue = null, Queue<Vector2Int> structureQueue = null)
     {
 
         // Deconstruct the list into individual queues
@@ -1664,11 +1732,12 @@ public class MasterGrid : MonoBehaviour
         // Draw movement squares
         if (movementQueue != null)
         {
+            Debug.Log($"Movement Queue Size: {movementQueue.Count}");
             while (movementQueue.Count > 0)
             {
                 Vector2Int cell = movementQueue.Dequeue();
-                List<Vector2Int> cellParents = parents.ContainsKey(cell) ? parents[cell] : new List<Vector2Int>();
-                int cellDistance = distanceMap.ContainsKey(cell) ? distanceMap[cell] : 0;
+                List<Vector2Int> cellParents = movementParentsDictionary.ContainsKey(cell) ? movementParentsDictionary[cell] : new List<Vector2Int>();
+                int cellDistance = movementDistanceMap.ContainsKey(cell) ? movementDistanceMap[cell] : 0;
                 drawMoveSquareInfo(cell, drawMovementUnit.playerControl == GameMaster.playerTurn, cellParents, cellDistance);
             }
         }
@@ -1676,10 +1745,16 @@ public class MasterGrid : MonoBehaviour
         // Draw attack squares
         if (attackQueue != null)
         {
+            Debug.Log($"Attack Queue Size: {attackQueue.Count}");
             while (attackQueue.Count > 0)
             {
+                Vector2Int cell = attackQueue.Dequeue();
+                List<Vector2Int> cellParents = movementParentsDictionary.ContainsKey(cell) ? movementParentsDictionary[cell] : new List<Vector2Int>();
+                                int cellDistance = movementDistanceMap.ContainsKey(cell) ? movementDistanceMap[cell] : 0;
+
                 //Vector2Int cell = attackQueue.Dequeue();
-                drawDamageSquare(attackQueue.Dequeue(), drawMovementUnit.playerControl == GameMaster.playerTurn);
+                drawDamageSquareInfo(cell, drawMovementUnit.playerControl == GameMaster.playerTurn, cellParents, cellDistance);
+                //drawDamageSquare(attackQueue.Dequeue(), drawMovementUnit.playerControl == GameMaster.playerTurn);
             }
         }
 
@@ -1909,7 +1984,10 @@ public class MasterGrid : MonoBehaviour
 
     public void drawMoveSquare(Vector2Int pos, bool isControllersTurn)
     {
-        MovementSquare blueSquare = moveSquare;
+        MovementSquare blueSquare = Instantiate(movementSquarePrefab, (Vector2)pos, Quaternion.identity, movementSquareList);
+        /*GameObject squareObj = Instantiate(movementSquarePrefab, (Vector2)pos, Quaternion.identity, movementSquareList);
+        MovementSquare blueSquare = squareObj.GetComponent<MovementSquare>();
+*/
         Color color = new Color(0.678f, 0.847f, 0.902f, 0.6f);
         blueSquare.setColor(color);
         blueSquare.boxCollider2D.enabled = isControllersTurn;
@@ -1919,11 +1997,13 @@ public class MasterGrid : MonoBehaviour
             //Debug.Log($"Showing shields at {x},{y}, is {defenceGridInt[x, y]}");
             blueSquare.showShields(defenceGridInt[pos.x, pos.y]);
         }
-        Instantiate(blueSquare, (Vector2)pos, Quaternion.identity, movementSquareList);
+        
     }
     public void drawMoveSquareInfo(Vector2Int pos, bool isControllersTurn, List<Vector2Int> parents, int distance)
     {
-        MovementSquare blueSquare = moveSquare;
+        //MovementSquare blueSquare = moveSquare;
+        MovementSquare blueSquare = Instantiate(movementSquarePrefab, (Vector2)pos, Quaternion.identity, movementSquareList);
+
         Color color = new Color(0.678f, 0.847f, 0.902f, 0.6f);
         blueSquare.setColor(color);
         blueSquare.boxCollider2D.enabled = isControllersTurn;
@@ -1933,29 +2013,49 @@ public class MasterGrid : MonoBehaviour
             //Debug.Log($"Showing shields at {x},{y}, is {defenceGridInt[x, y]}");
             blueSquare.showShields(defenceGridInt[pos.x, pos.y]);
         }
-        blueSquare.parent = parents [0];
-        blueSquare.distanceFromOrigin = distance;
-        blueSquare.distanceText.text = $"D: {distance}\nP: {parents[0]}";
-        Instantiate(blueSquare, (Vector2)pos, Quaternion.identity, movementSquareList);
+        if (parents != null && parents.Count > 0)
+        {
+            blueSquare.parent = parents[0];
+            blueSquare.distanceFromOrigin = distance;
+            blueSquare.distanceText.gameObject.SetActive(true);
+            blueSquare.distanceText.text = $"D: {distance}\nP: {parents[0]}";
+        }
+
+        //Instantiate(blueSquare, (Vector2)pos, Quaternion.identity, movementSquareList);
     }
 
     public void drawDamageSquare(Vector2Int pos, bool isControllersTurn)
     {
-        MovementSquare redSquare = moveSquare;
+        MovementSquare redSquare = Instantiate(movementSquarePrefab, (Vector2)pos, Quaternion.identity, movementSquareList);
+
         Color c = new Color(1.0f, 0.6f, 0.6f, 0.6f);
         redSquare.setColor(c);
         redSquare.boxCollider2D.enabled = false;
         redSquare.stripeSprite.gameObject.SetActive(!isControllersTurn);
         redSquare.showShields(0);
-        Instantiate(redSquare, (Vector2)pos, Quaternion.identity, movementSquareList);
+        //Instantiate(redSquare, (Vector2)pos, Quaternion.identity, movementSquareList);
+    }
+    public void drawDamageSquareInfo(Vector2Int pos, bool isControllersTurn, List<Vector2Int> parents, int distance)
+    {
+        MovementSquare redSquare = Instantiate(movementSquarePrefab, (Vector2)pos, Quaternion.identity, movementSquareList);
+
+        Color c = new Color(1.0f, 0.6f, 0.6f, 0.6f);
+        redSquare.setColor(c);
+        redSquare.boxCollider2D.enabled = false;
+        redSquare.stripeSprite.gameObject.SetActive(!isControllersTurn);
+        redSquare.showShields(0);
+        if (parents != null && parents.Count > 0)
+        {
+            redSquare.parent = parents[0];
+            redSquare.distanceFromOrigin = distance;
+            redSquare.distanceText.gameObject.SetActive(true);
+            redSquare.distanceText.text = $"D: {distance}\nP: {parents[0]}";
+        }
+        //Instantiate(redSquare, (Vector2)pos, Quaternion.identity, movementSquareList);
     }
 
-    public void checkEnemiesInRange(BaseUnit unit) 
+    public void checkEnemiesInRangeBeforeMoving(BaseUnit unit) 
     {
-        int xPos = (int)unit.pos.x;
-        int yPos = (int)unit.pos.y;
-        //int range = unit.attackRange;
-
 /*        Queue<(Vector2Int cell, int range)> cellsToCheck = new Queue<(Vector2Int, int)>();
         cellsToCheck.Enqueue((new Vector2Int(xPos + 1, yPos + 1), range));
 
@@ -1963,8 +2063,7 @@ public class MasterGrid : MonoBehaviour
         checkedCells[xPos + 1, yPos + 1] = true;*/
 
         FloodFillSearch(unit, 0, unit.attackRange,
-            out _, out Queue<Vector2Int> attackQueue, out _,
-            out _, out _);
+            out _, out Queue<Vector2Int> attackQueue, out _);
 
         //List<Queue<Vector2Int>> squareQueuesList = FloodFillSearch(unit, 0, range, cellsToCheck, checkedCells, new List<Queue<Vector2Int>> { new Queue<Vector2Int>(), new Queue<Vector2Int>(), new Queue<Vector2Int>() });
         //ManualTestAndPrintLogQueueSizes(squareQueuesList);
@@ -1993,7 +2092,7 @@ public class MasterGrid : MonoBehaviour
     }
 
     //June 2025 implementation
-    /*public void checkEnemiesInRange(BaseUnit unit) 
+    /*public void checkEnemiesInRangeBeforeMoving(BaseUnit unit) 
     {
         int xPos = (int)unit.pos.x;
         int yPos = (int)unit.pos.y;
@@ -2453,7 +2552,7 @@ public class MasterGrid : MonoBehaviour
     public void presentChoicesAtLocation(Vector2Int pos, BaseUnit unit)
     {
         if(unit.canMoveAndAttack || unit.movementNonExhausted)
-            checkEnemiesInRange(unit);
+            checkEnemiesInRangeBeforeMoving(unit);
         BaseStructure structure = manageStructureAtLocation(pos);
         bool canStructureBeCapturedHere = (structure != null && structure.isCapturableBy(unit));
         if (canStructureBeCapturedHere)

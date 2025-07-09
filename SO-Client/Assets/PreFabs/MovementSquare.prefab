@@ -17,7 +17,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &5893705912075392431
 RectTransform:
   m_ObjectHideFlags: 0
@@ -100,7 +100,9 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: hello world
+  m_text: 'D: 3
+
+    P: (1, 7)'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -793,7 +795,7 @@ SpriteRenderer:
   m_SortingLayer: 4
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: c13f228317ff2ea4fb747fcdf91e285b, type: 3}
-  m_Color: {r: 0.678, g: 0.847, b: 0.902, a: 0.6}
+  m_Color: {r: 1, g: 0.6, b: 0.6, a: 0.6}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -970,8 +972,8 @@ MonoBehaviour:
   shield1: {fileID: 1985195973628079507}
   shield2: {fileID: 469341554850701582}
   shield3: {fileID: 490304451218943405}
-  parent: {x: 2, y: 8}
-  distanceFromOrigin: 1
+  parent: {x: 1, y: 7}
+  distanceFromOrigin: 3
   distanceText: {fileID: 8141806156541909073}
 --- !u!61 &3278617936891467413
 BoxCollider2D:
@@ -980,7 +982,7 @@ BoxCollider2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4767315479213016531}
-  m_Enabled: 1
+  m_Enabled: 0
   m_Density: 1
   m_Material: {fileID: 0}
   m_IsTrigger: 0

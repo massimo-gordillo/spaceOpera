@@ -5892,11 +5892,12 @@ MonoBehaviour:
   gameMaster: {fileID: 1024135144}
   cameraManager: {fileID: 519420030}
   movementSquareList: {fileID: 1480701702}
-  moveSquare: {fileID: 6791101968882301709, guid: 45dd1bafd4332f345914066612cff201, type: 3}
+  movementSquarePrefab: {fileID: 6791101968882301709, guid: 45dd1bafd4332f345914066612cff201, type: 3}
   rangeOutlineSprite: {fileID: 4103190339462976243, guid: a83075add6286d147827284276d39395, type: 3}
   turnActionCount: 0
   structuresList: []
   prodStructuresList: []
+  selectedMovementSquare: {x: 0, y: 0}
 --- !u!1 &454932228
 GameObject:
   m_ObjectHideFlags: 0
