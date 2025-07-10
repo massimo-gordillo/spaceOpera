@@ -779,6 +779,19 @@ public class MasterGrid : MonoBehaviour
         }*/
     }
 
+    public void SetMovementParent(Vector2Int child, Vector2Int parent)
+    {
+        //replace existing parents, otherwise add the parent to the list of parents.
+/*        if (movementParentsDictionary.ContainsKey(child))
+        {
+            //if (!movementParentsDictionary[child].Contains(parent))
+            //    movementParentsDictionary[child].Add(parent);
+        }
+        else
+        {*/
+            movementParentsDictionary[child] = new List<Vector2Int> { parent };
+        //}
+    }
 
 
 
@@ -1243,15 +1256,14 @@ public class MasterGrid : MonoBehaviour
     {
         
         //Debug.Log($"Animating movement from {start} to {end}");
-        List<Vector2Int> path = BidirectionalSearch(start, end, unit, unit.movementRange);
         //List<Vector2Int> path = BidirectionalSearch(start, end, unit, unit.movementRange);
-        //List<Vector2Int> path = BidirectionalSearch(start, end, unit);
+        List<Vector2Int> path = GetMovementPath(start, end, unit);
 
         //movement animation speed
         //float speed = 12.0f;
         //float duration = GameMaster.globalAnimationDuration;
 
-        if(path.Count == 0)
+        if (path.Count == 0)
         {
             Debug.LogError($"No valid path found for movement animation for unit {unit.pos}, flashing to location");
             unit.transform.position = new Vector3(end.x, end.y, unit.transform.position.z);
@@ -1266,6 +1278,39 @@ public class MasterGrid : MonoBehaviour
         //Debug.Log("Movement animation complete.");
     }
 
+    public List<Vector2Int> GetMovementPath(Vector2Int start, Vector2Int end, BaseUnit unit)
+    {
+        List<Vector2Int> path = new();
+        Vector2Int current = end;
+        if (unit != selectedUnit)
+        {
+            Debug.LogError($"GetMovementPath called for unit at {unit.pos}, but selectedUnit is {selectedUnit?.unitName ?? "null"} at {selectedUnit?.pos}");
+        }
+        while(current != start)
+        {
+            path.Add(current);
+            Vector2Int parent = GetMovementParent(current);
+            if (parent == -Vector2Int.one)
+            {
+                Debug.LogError($"No parent found for {current} in movementParentsDictionary, breaking path search");
+                break;
+            }
+            current = parent;
+        }
+
+        path.Reverse();
+        return path;
+    }
+
+    public Vector2Int GetMovementParent(Vector2Int pos)
+    {
+        if (movementParentsDictionary.TryGetValue(pos, out List<Vector2Int> parents) && parents.Count > 0)
+        {
+            return parents[0]; // Return the first parent in the list
+        }
+        return -Vector2Int.one; // return negative one if no parent found
+    }
+    
     public IEnumerator AnimateMovementVisual(BaseUnit unit, List<Vector2Int> path)
     {
 
@@ -1732,7 +1777,7 @@ public class MasterGrid : MonoBehaviour
         // Draw movement squares
         if (movementQueue != null)
         {
-            Debug.Log($"Movement Queue Size: {movementQueue.Count}");
+            //Debug.Log($"Movement Queue Size: {movementQueue.Count}");
             while (movementQueue.Count > 0)
             {
                 Vector2Int cell = movementQueue.Dequeue();
@@ -1745,7 +1790,7 @@ public class MasterGrid : MonoBehaviour
         // Draw attack squares
         if (attackQueue != null)
         {
-            Debug.Log($"Attack Queue Size: {attackQueue.Count}");
+            //Debug.Log($"Attack Queue Size: {attackQueue.Count}");
             while (attackQueue.Count > 0)
             {
                 Vector2Int cell = attackQueue.Dequeue();

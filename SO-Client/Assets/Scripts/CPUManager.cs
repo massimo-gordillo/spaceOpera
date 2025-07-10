@@ -9,6 +9,7 @@ using System.Linq;
 
 using System.Runtime.CompilerServices;
 using Unity.Mathematics;
+using UnityEngine.UIElements;
 
 
 public class CPUManager : MonoBehaviour
@@ -199,9 +200,9 @@ public class CPUManager : MonoBehaviour
 
     public void CollectPotentialGameActions(BaseUnit unit)
     {
-        bool isCurious = false;
-        if (!unit.isResourceUnit)
-            isCurious = true;
+        bool isCurious = true;
+        //if (!unit.isResourceUnit)
+        //    isCurious = true;
 
         //Queue<(Vector2Int cell, int range)> cellsToCheck = new Queue<(Vector2Int, int)>();
         //bool[,] checkedCells = new bool[masterGrid.gridX + 2, masterGrid.gridY + 2];
@@ -209,10 +210,81 @@ public class CPUManager : MonoBehaviour
         Queue<Vector2Int> movementQueue = new Queue<Vector2Int>();
         Queue<Vector2Int> attackQueue = new Queue<Vector2Int>();
         Queue<Vector2Int> structureQueue = new Queue<Vector2Int>();
+
         //List<Queue<Vector2Int>> squareQueuesList = null;
         if (unit.attackRange <= 1)
         {
-            masterGrid.FloodFillSearch(unit, unit.movementRange, unit.attackRange, out movementQueue, out attackQueue, out structureQueue);
+            masterGrid.FloodFillSearch(unit, unit.movementRange, unit.attackRange, out movementQueue, out Queue<Vector2Int> tempAttackQueue, out structureQueue);
+            while (tempAttackQueue.Count > 0)
+            {
+                GameMaster.loopSafetyCounter++;
+                if (GameMaster.loopSafetyCounter >= gameMaster.loopSafetyLimit)
+                {
+                    Debug.LogError("CPU_CollectPotentialGameActions has tripped the loop safety counter");
+                }
+                Vector2Int attackSquare = tempAttackQueue.Dequeue();
+                attackQueue.Enqueue(attackSquare);
+                if (isCurious)
+                    Debug.Log($"unit {unit.pos} has attack location {attackSquare}");
+
+                BaseUnit attackable = masterGrid.whatUnitIsInThisLocation(attackSquare);
+                if (attackable!=null) 
+                { 
+                    if (isCurious && attackSquare == new Vector2Int(12, 8))
+                        Debug.Log($"BOOL: unit {unit.pos}, has found an attackable? {attackable} owned by player {attackable.playerControl}, can they attack it? {masterGrid.canUnitAttack(unit, attackable)}");
+
+                    if (unit.attackRange > 1)
+                        Debug.Log($"unit found at location {attackSquare} by {unit.pos}, it is an {attackable.unitName} owned by player {attackable.playerControl}, can they attack it? {masterGrid.canUnitAttack(unit, attackable)}");
+                }
+
+                if (attackable != null && masterGrid.canUnitAttack(unit, attackable))
+                {
+                    //if the parent is occupied, check if we can pick a different parent.
+                    if (masterGrid.whatUnitIsInThisLocation(masterGrid.GetMovementParent(attackSquare)) != null)
+                    {
+                        Debug.LogError($"Unit {unit.pos} has an attackable unit at {attackSquare} but the parent square is occupied, trying to find a new parent square.");
+                        List<Vector2Int> dirs = masterGrid.DirectionList();
+                        Vector2Int previousParentDelta = masterGrid.GetMovementParent(attackSquare) - attackSquare;
+                        dirs.Remove(previousParentDelta);
+                        int dirCount = 1;
+                        foreach(Vector2Int dir in dirs)
+                        {
+                            Vector2Int adjacentSquare = attackSquare + dir;
+                            if (movementQueue.Contains(adjacentSquare))
+                            {
+                                if (masterGrid.whatUnitIsInThisLocation(adjacentSquare) == null)
+                                {
+                                    //set new parent to adjacent square
+                                    masterGrid.SetMovementParent(attackSquare, adjacentSquare);
+                                    break;
+                                    /*                                        unit.CPU_AttackableUnitList.Add(attackable);
+                                                                        if (isCurious)
+                                                                            Debug.Log($"counting: Unit {unit.pos} has an attack list of length {unit.CPU_AttackableUnitList.Count}");
+
+                                                                        if (attackable.isResourceUnit)
+                                                                        {
+                                                                            *//*if (attackable.unitName == "Spore")
+                                                                                Debug.LogError($"Unit {unit.pos} adding spore to resourceAttackList {attackable.pos}");
+                                                                            *//*
+                                                                            unit.CPU_AttackableResourceUnitList.Add(attackable);
+                                                                        }*/
+                                }else
+                                    dirCount++;
+                            }
+                            else
+                                dirCount++;
+                        }
+
+                        if(dirCount == 4) //if we checked all 4 directions then remove it from the attackList.
+                        {
+                            Debug.LogError($"Unit {unit.pos} has an attackable unit at {attackSquare} but the parent square is occupied, and no adjacent squares are available, removing from attack list.");
+                            attackQueue.Dequeue();
+                        }
+                    }
+                    
+                }
+                
+            }
         }
         if (unit.attackRange > 1) //notably this logic is the same in masterGrid.drawMovement(). I suspect I should generalize drawMovement, it would be much better.
         {
@@ -239,63 +311,24 @@ public class CPUManager : MonoBehaviour
         {
             unit.CPU_MoveSquaresList.Add(tempMovementQueue.Dequeue());
         }
-        if (isCurious)
-            foreach (Vector2Int m in movementQueue)
-                //attackQueue.Enqueue(m);
-                Debug.Log($"unit {unit.pos} has movement location {m}");
-        if (unit.attackRange > 1)
-        {
-            Debug.Log($"Ranged unit at {unit.pos} has attack queue of {attackQueue.Count}");
-        }
-        foreach (Vector2Int attackSquare in attackQueue)
-        {
-
-            if (isCurious)
-                Debug.Log($"unit {unit.pos} has attack location {attackSquare}");
-
-            BaseUnit attackable = masterGrid.whatUnitIsInThisLocation(attackSquare);
-            if (isCurious && attackSquare == new Vector2Int(12, 8))
-                Debug.Log($"BOOL: unit {unit.pos}, has found an attackable? {attackable} owned by player {attackable.playerControl}, can they attack it? {masterGrid.canUnitAttack(unit, attackable)}");
-
-
-            if (attackable != null)
-            {
-
+        /*        if (isCurious)
+                    foreach (Vector2Int m in movementQueue)
+                        //attackQueue.Enqueue(m);
+                        Debug.Log($"unit {unit.pos} has movement location {m}");
                 if (unit.attackRange > 1)
-                    Debug.Log($"unit found at location {attackSquare} by {unit.pos}, it is an {attackable.unitName} owned by player {attackable.playerControl}, can they attack it? {masterGrid.canUnitAttack(unit, attackable)}");
-
-                if (masterGrid.canUnitAttack(unit, attackable))
                 {
-                    /*if (attackable.unitName == "Spore")
-                        Debug.LogError($"Unit {unit.pos} is adding spore at {attackable.pos} to attack list");
-                    */
+                    Debug.Log($"Ranged unit at {unit.pos} has attack queue of {attackQueue.Count}");
+                }*/
 
-                    //check if squares adjacent to the attackable unit are also in the movement queue AND there's no unit in that square, add them to the attackable list.
-                    foreach (Vector2Int dir in masterGrid.DirectionList())
-                    {
-                        Vector2Int adjacentSquare = attackSquare + dir;
-                        if (unit.CPU_MoveSquaresList.Contains(adjacentSquare) && masterGrid.whatUnitIsInThisLocation(adjacentSquare) == null)
-                        {
-                            unit.CPU_AttackableUnitList.Add(attackable);
-                            if (isCurious)
-                                Debug.Log($"counting: Unit {unit.pos} has an attack list of length {unit.CPU_AttackableUnitList.Count}");
-
-                            if (attackable.isResourceUnit)
-                            {
-                                if (attackable.unitName == "Spore")
-                                    Debug.LogError($"Unit {unit.pos} adding spore to resourceAttackList {attackable.pos}");
-
-                                unit.CPU_AttackableResourceUnitList.Add(attackable);
-                            }
-                        }
-                    }
-                }
-            }
+        if (isCurious)
+        {
+            Debug.Log($"Unit {unit.pos} has an attack queue of length {attackQueue.Count}");
         }
 
         //debug for attack list gen.
-        foreach (Vector2Int attackSquare in movementQueue)
+        while (attackQueue.Count > 0)
         {
+            Vector2Int attackSquare = attackQueue.Dequeue();
             BaseUnit attackable = masterGrid.whatUnitIsInThisLocation(attackSquare);
             if (attackable != null)
             {
@@ -310,16 +343,17 @@ public class CPUManager : MonoBehaviour
             }
         }
 
-        if (!unit.isResourceUnit && isCurious)
+        if (isCurious)
         {
-            Debug.Log($"Unit {unit.pos} has an attack queue of length {attackQueue.Count}");
             Debug.Log($"Unit {unit.pos} has an attack list of length {unit.CPU_AttackableUnitList.Count}");
         }
 
-/*        foreach (BaseUnit attack in unit.CPU_AttackableUnitList)
-        {
-            Debug.Log($"Unit {unit.pos} can attack {attack.pos}");
-        }*/
+
+
+        /*        foreach (BaseUnit attack in unit.CPU_AttackableUnitList)
+                {
+                    Debug.Log($"Unit {unit.pos} can attack {attack.pos}");
+                }*/
 
         //clear lists from last search
         unit.CPU_StructureList = new List<BaseStructure>();
@@ -391,6 +425,7 @@ public class CPUManager : MonoBehaviour
                     if (diff > 1 && diff <= unit.movementRange + unit.attackRange)
                     {
                         List<Vector2Int> path = masterGrid.BidirectionalSearch(unit.pos, candidate.pos, unit, unit.movementRange + unit.attackRange);
+                        //List<Vector2Int> path = masterGrid.GetMovementPath(unit.pos, candidate.pos, unit);
                         masterGrid.selectedUnit = unit;
                         masterGrid.moveSelectedUnit(GetAdjacentPosFromBidirectionalSearch(path, candidate.pos)); //assumes attack range of 1 for now.
                         if (Manhattan(unit.pos, candidate.pos) <= unit.attackRange)//for some reason this wasn't always true.

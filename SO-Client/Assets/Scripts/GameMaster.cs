@@ -101,7 +101,7 @@ public class GameMaster : MonoBehaviour
 
     [Header("CPU")]
     public static bool CPU_isOn = false;
-    public static bool CPU_isOn_manual = false;
+    public static bool CPU_isOn_manual = true;
     private static bool CPU_isMasterDebugging = false;
     public static bool[] CPU_PlayersList;
     public int virixCheapestUnit;
@@ -143,7 +143,7 @@ public class GameMaster : MonoBehaviour
             if (!MatchSettings.CPU_isOn)
             {
                 Debug.LogWarning("Match settings says CPU is off but manual CPU is on, defaulting to hard values.");
-                CPU_PlayersList[1] = false;
+                CPU_PlayersList[1] = true;
                 CPU_PlayersList[2] = true;
             }
         }
