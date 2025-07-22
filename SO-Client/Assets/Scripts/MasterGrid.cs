@@ -461,6 +461,9 @@ public class MasterGrid : MonoBehaviour
         }
         clearSelectedUnit();
     }
+
+
+
     public void drawMovement(BaseUnit mTarget)
     {
         drawing = true;
@@ -489,10 +492,9 @@ public class MasterGrid : MonoBehaviour
         Queue<Vector2Int> movementQueue = new Queue<Vector2Int>();
         Queue<Vector2Int> attackQueue = new Queue<Vector2Int>();
         Queue<Vector2Int> structureQueue = new Queue<Vector2Int>();
-        this.movementDistanceMap.Clear();
-        this.movementParentsDictionary.Clear();
 
-        movementDistanceMap[mTarget.pos] = 0;
+        clearParentMap(mTarget.pos);
+
         int newDistance = movementDistanceMap.TryGetValue(mTarget.pos, out var dist) ? dist + 1 : 1;
 
 
@@ -1584,11 +1586,7 @@ public class MasterGrid : MonoBehaviour
     int totalDistance)
     {
 
-        if (GameMaster.loopSafetyCounter++ > gameMaster.loopSafetyLimit)
-        {
-            Debug.LogError("DirectionalSearch has tripped the search limit counter");
-            return new List<Vector2Int>();
-        }
+        gameMaster.addToLoopSafetyCounter("BidirectionalSearch");
         int depthLimit = (totalDistance + 1) / 2;
         if (start == goal)
             return new List<Vector2Int> { start };
@@ -2957,5 +2955,13 @@ public class MasterGrid : MonoBehaviour
     {
         // Assumes each tile is 1 unit wide and tall, and origin is at (0, 0)
         return new Vector3(gridPos.x, gridPos.y, 0f);
+    }
+
+    public void clearParentMap(Vector2Int pos)
+    {
+        movementDistanceMap.Clear();
+        movementParentsDictionary.Clear();
+
+        movementDistanceMap[pos] = 0;
     }
 }

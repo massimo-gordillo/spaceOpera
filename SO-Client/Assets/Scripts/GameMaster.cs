@@ -1365,4 +1365,12 @@ public class GameMaster : MonoBehaviour
 
         musicAudio.volume = 0f;
     }
+
+    public void addToLoopSafetyCounter(string function)
+    {
+        if (loopSafetyCounter++ > loopSafetyLimit)
+        {
+            Debug.LogError(function + " has tripped the search limit counter");
+        }
+    }
 }

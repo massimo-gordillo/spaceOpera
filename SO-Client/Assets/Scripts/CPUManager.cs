@@ -200,7 +200,7 @@ public class CPUManager : MonoBehaviour
 
     public void CollectPotentialGameActions(BaseUnit unit)
     {
-        bool isCurious = true;
+        bool isCurious = false;
         //if (!unit.isResourceUnit)
         //    isCurious = true;
 
@@ -211,17 +211,14 @@ public class CPUManager : MonoBehaviour
         Queue<Vector2Int> attackQueue = new Queue<Vector2Int>();
         Queue<Vector2Int> structureQueue = new Queue<Vector2Int>();
 
+        masterGrid.clearParentMap(unit.pos); //clear the movement parent map for this unit, otherwise it will be stale from last turn.
+
         //List<Queue<Vector2Int>> squareQueuesList = null;
         if (unit.attackRange <= 1)
         {
             masterGrid.FloodFillSearch(unit, unit.movementRange, unit.attackRange, out movementQueue, out Queue<Vector2Int> tempAttackQueue, out structureQueue);
             while (tempAttackQueue.Count > 0)
             {
-                GameMaster.loopSafetyCounter++;
-                if (GameMaster.loopSafetyCounter >= gameMaster.loopSafetyLimit)
-                {
-                    Debug.LogError("CPU_CollectPotentialGameActions has tripped the loop safety counter");
-                }
                 Vector2Int attackSquare = tempAttackQueue.Dequeue();
                 attackQueue.Enqueue(attackSquare);
                 if (isCurious)
@@ -240,7 +237,8 @@ public class CPUManager : MonoBehaviour
                 if (attackable != null && masterGrid.canUnitAttack(unit, attackable))
                 {
                     //if the parent is occupied, check if we can pick a different parent.
-                    if (masterGrid.whatUnitIsInThisLocation(masterGrid.GetMovementParent(attackSquare)) != null)
+                    BaseUnit parentUnit = masterGrid.whatUnitIsInThisLocation(masterGrid.GetMovementParent(attackSquare));
+                    if (parentUnit != null && parentUnit != unit)
                     {
                         Debug.LogError($"Unit {unit.pos} has an attackable unit at {attackSquare} but the parent square is occupied, trying to find a new parent square.");
                         List<Vector2Int> dirs = masterGrid.DirectionList();
@@ -255,6 +253,7 @@ public class CPUManager : MonoBehaviour
                                 if (masterGrid.whatUnitIsInThisLocation(adjacentSquare) == null)
                                 {
                                     //set new parent to adjacent square
+                                    Debug.LogError($"Unit {unit.pos} has an attackable unit at {attackSquare} but the parent square was occupied, setting adjacent square {adjacentSquare} as new parent square.");
                                     masterGrid.SetMovementParent(attackSquare, adjacentSquare);
                                     break;
                                     /*                                        unit.CPU_AttackableUnitList.Add(attackable);
@@ -930,11 +929,6 @@ public class CPUManager : MonoBehaviour
 
             while (movementLeft > 0)
             {
-                GameMaster.loopSafetyCounter++;
-                if (GameMaster.loopSafetyCounter >= gameMaster.loopSafetyLimit)
-                {
-                    Debug.LogError("CPU_MoveUnitTowardsTargetNode has tripped the loop safety counter");
-                }
                 //search for a path to a cell within min distance from target
                 //Debug.Log($"Unit {unit.pos} has movement available {movementLeft}, searching");
                 foundPath = masterGrid.BidirectionalSearch(
@@ -1084,11 +1078,8 @@ public class CPUManager : MonoBehaviour
         };
         while (queue.Count > 0)
         {
-            GameMaster.loopSafetyCounter++;
-            if (GameMaster.loopSafetyCounter >= gameMaster.loopSafetyLimit)
-            {
-                Debug.LogError("FindBestReachableSquare has tripped the loop safety counter");
-            }
+            gameMaster.addToLoopSafetyCounter("FindBestReachableSquare");
+
             var (score, steps, current) = queue.Min;
             queue.Remove(queue.Min);
 
@@ -1578,11 +1569,7 @@ public class CPUManager : MonoBehaviour
 
             while (queue.Count > 0)
             {
-                GameMaster.loopSafetyCounter++;
-                if (GameMaster.loopSafetyCounter >= gameMaster.loopSafetyLimit)
-                {
-                    Debug.LogError("AssignPriorityHeadings has tripped the loop safety counter");
-                }
+                gameMaster.addToLoopSafetyCounter("AssignPriorityHeadingsToHQ");
                 NetworkNode current = queue.Dequeue();
                 //NetworkNode bestNeighbour = null;
                 int currentDist = current.priorityCostToTarget[player];
