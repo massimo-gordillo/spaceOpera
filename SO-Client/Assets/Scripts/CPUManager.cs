@@ -423,10 +423,12 @@ public class CPUManager : MonoBehaviour
                     int diff = Manhattan(unit.pos, candidate.pos); //Math.Abs(diffV.x) + Math.Abs(diffV.y);
                     if (diff > 1 && diff <= unit.movementRange + unit.attackRange)
                     {
-                        List<Vector2Int> path = masterGrid.BidirectionalSearch(unit.pos, candidate.pos, unit, unit.movementRange + unit.attackRange);
+                        //List<Vector2Int> path = masterGrid.BidirectionalSearch(unit.pos, candidate.pos, unit, unit.movementRange + unit.attackRange);
                         //List<Vector2Int> path = masterGrid.GetMovementPath(unit.pos, candidate.pos, unit);
                         masterGrid.selectedUnit = unit;
-                        masterGrid.moveSelectedUnit(GetAdjacentPosFromBidirectionalSearch(path, candidate.pos)); //assumes attack range of 1 for now.
+
+                        masterGrid.moveSelectedUnit(masterGrid.GetMovementParent(candidate.pos)); //assumes attack range of 1 for now.
+                        //masterGrid.moveSelectedUnit(GetAdjacentPosFromBidirectionalSearch(path, candidate.pos)); //assumes attack range of 1 for now.
                         if (Manhattan(unit.pos, candidate.pos) <= unit.attackRange)//for some reason this wasn't always true.
                         {
                             cameraManager.SetPosition(unit.pos);

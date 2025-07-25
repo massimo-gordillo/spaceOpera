@@ -5,21 +5,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="ba7fbd20-6d0a-4fc1-a853-ba9c048d2d45" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/SO-Client/Assets/PreFabs/SpritePrefab.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Assets/PreFabs/SpritePrefab.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SO-Client/Assets/PreFabs/baseStructure.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Assets/PreFabs/baseStructure.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SO-Client/Assets/Resources/UnitPrefabs/progeny1/AAJetPrefab.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Assets/Resources/UnitPrefabs/progeny1/AAJetPrefab.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SO-Client/Assets/Resources/UnitPrefabs/progeny1/APCPrefab.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Assets/Resources/UnitPrefabs/progeny1/APCPrefab.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SO-Client/Assets/Resources/UnitPrefabs/progeny1/ArtilleryPrefab.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Assets/Resources/UnitPrefabs/progeny1/ArtilleryPrefab.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SO-Client/Assets/Resources/UnitPrefabs/progeny1/BattleshipPrefab.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Assets/Resources/UnitPrefabs/progeny1/BattleshipPrefab.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SO-Client/Assets/Resources/UnitPrefabs/progeny1/BomberPrefab.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Assets/Resources/UnitPrefabs/progeny1/BomberPrefab.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SO-Client/Assets/Resources/UnitPrefabs/progeny1/EVAPrefab.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Assets/Resources/UnitPrefabs/progeny1/EVAPrefab.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SO-Client/Assets/Resources/UnitPrefabs/progeny1/ElectosPrefab.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Assets/Resources/UnitPrefabs/progeny1/ElectosPrefab.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SO-Client/Assets/Resources/UnitPrefabs/progeny1/GattlingTankPrefab.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Assets/Resources/UnitPrefabs/progeny1/GattlingTankPrefab.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SO-Client/Assets/Resources/UnitPrefabs/progeny1/HeavyTankPrefab.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Assets/Resources/UnitPrefabs/progeny1/HeavyTankPrefab.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SO-Client/Assets/Resources/UnitPrefabs/progeny1/HelicopterPrefab.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Assets/Resources/UnitPrefabs/progeny1/HelicopterPrefab.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SO-Client/Assets/Resources/UnitPrefabs/progeny1/InfantryPrefab.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Assets/Resources/UnitPrefabs/progeny1/InfantryPrefab.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SO-Client/Assets/Resources/UnitPrefabs/progeny1/LightTankPrefab.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Assets/Resources/UnitPrefabs/progeny1/LightTankPrefab.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SO-Client/Assets/Resources/UnitPrefabs/progeny1/RocketsPrefab.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Assets/Resources/UnitPrefabs/progeny1/RocketsPrefab.prefab" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AndroidAPK/GalaxyChess_BurstDebugInformation_DoNotShip/tempburstlibs/armeabi-v7a/lib_burst_generated.txt" beforeDir="false" afterPath="$PROJECT_DIR$/AndroidAPK/GalaxyChess_BurstDebugInformation_DoNotShip/tempburstlibs/armeabi-v7a/lib_burst_generated.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Assets/Plugins/Android/gradleTemplate.properties" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Assets/Plugins/Android/gradleTemplate.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Assets/Scripts/CPUManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Assets/Scripts/CPUManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Assets/TextMesh Pro/Resources/Fonts &amp; Materials/LiberationSans SDF - Fallback.asset" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Assets/TextMesh Pro/Resources/Fonts &amp; Materials/LiberationSans SDF - Fallback.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Packages/manifest.json" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Packages/manifest.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/Packages/packages-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/Packages/packages-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SO-Client/ProjectSettings/ProjectSettings.asset" beforeDir="false" afterPath="$PROJECT_DIR$/SO-Client/ProjectSettings/ProjectSettings.asset" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
