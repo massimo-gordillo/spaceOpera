@@ -23,6 +23,7 @@ public class GameMaster : MonoBehaviour
     public CPUManager CPUManager;
     public CameraManager cameraManager;
     public Canvas canvas;
+    
 
     [Header("Game Values")]
     public Guid match_id;
@@ -46,7 +47,7 @@ public class GameMaster : MonoBehaviour
 
     [Header("Game Prefab References")]
     public BaseUnit infantryUnitPrefab;
-    public BaseStructure commandStructurePrefab;
+    public Structure_Command commandStructurePrefab;
     public BaseStructure productionAirportStructurePrefab;
     public BaseStructure productionFactoryStructurePrefab;
     public BaseStructure resourceStructurePrefab;
@@ -101,7 +102,7 @@ public class GameMaster : MonoBehaviour
 
     [Header("CPU")]
     public static bool CPU_isOn = false;
-    public static bool CPU_isOn_manual = true;
+    public static bool CPU_isOn_manual = false;
     private static bool CPU_isMasterDebugging = false;
     public static bool[] CPU_PlayersList;
     public int virixCheapestUnit;
@@ -246,7 +247,12 @@ public class GameMaster : MonoBehaviour
         //productionPanel.Start();
 
         //unitCosts = new List<(BaseUnit, int)>[numPlayers];
-    }
+
+        //SaveGameStateToFile(7, 1);
+        //StartCoroutine(masterGrid.DeleteAllGamePieces());
+		//StartCoroutine(LoadGameStateFromFile(7, 1));
+		LoadGameStateFromFile(7, 1);
+	}
 
     void Start()
     {
@@ -302,9 +308,9 @@ public class GameMaster : MonoBehaviour
     {
         // Wait until the next frame to ensure all Start() methods are called
         yield return null;
-        // Now it is safe to call ConvertGameStateToList
-        //SaveGameStateListToFile(ConvertGameStateToList());
-        //ConvertListToGameState(gameState);
+        // Now it is safe to call ConvertGamePiecesToList
+        //SaveGameStateListToFile(ConvertGamePiecesToList());
+        //ConvertListToGamePieces(gameState);
     }
 
     private IEnumerator WaitForCPUFirstTurn()
@@ -331,7 +337,10 @@ public class GameMaster : MonoBehaviour
             {
                 if (prod.structureType != 1 && prod.structureType != 5)
                     continue;
-                if (progeny == 0)
+                //temporary fix for loading gamestate from file.
+                if(masterGrid.whatUnitIsInThisLocation(prod.pos) != null)
+                    continue;
+				if (progeny == 0)
                 {
                     //BaseUnit infantryUnitPrefab = Resources.Load<BaseUnit>("UnitPrefabs/progeny1/InfantryPrefab");
                     BaseUnit infantryUnitPrefab = PrefabManager.getBaseUnitFromName("Infantry", 0);
@@ -524,7 +533,7 @@ public class GameMaster : MonoBehaviour
                 BaseUnit coveringUnit = masterGrid.whatUnitIsInThisLocation(structure.pos);
                 if (coveringUnit != null && coveringUnit.unitName == "seed")
                 {
-                    masterGrid.deleteUnit(coveringUnit);
+                    masterGrid.deleteUnit(coveringUnit, false);
                 }
             }
         }
@@ -927,7 +936,166 @@ public class GameMaster : MonoBehaviour
         masterGrid.playerWins(player);
     }
 
-    public List<GamePieceInfo> ConvertGameStateToList()
+    public void SaveGameStateToFile(int mapNum, int versionNum)//List<GamePieceInfo> gamePieceList, TilemapData tilemapData)
+    {
+        List<GamePieceInfo> gamePieceList = ConvertGamePiecesToList();
+        TilemapData tilemapData = tilemapManager.ExportTilemapToBytes();
+        string mapFileLocation = "InitializationData/Maps/Map" + mapNum;
+
+        GameStateData gameStateData = new GameStateData(tilemapData, gamePieceList);
+
+
+        string directoryPath = Path.Combine(Application.dataPath, mapFileLocation);
+        if (!Directory.Exists(directoryPath))
+        {
+            Directory.CreateDirectory(directoryPath);
+        }
+
+        string fileName = $"Map{mapNum}_v{versionNum}" + ".gsdat";
+
+        string filePath = Path.Combine(directoryPath, fileName);
+        //byte[] byteData = MessagePackSerializer.Deserialize<byte[]>(ExportTilemapToBytes(new Vector2Int(gridWidth, gridHeight), Vector2Int.zero));
+
+        // Write the serialized data to a file
+        try 
+        { 
+            File.WriteAllBytes(filePath, GameStateData.Serialize(gameStateData));
+        }catch (Exception e)
+        {
+            Debug.LogError($"Failed to save game state to file: {e.Message}");
+            return;
+		}
+
+		//Messagepack implementation
+		//File.WriteAllBytes(filePath, TilemapData.SerializeMP(dataFile));
+		Debug.Log($"Gamestate saved to file: {filePath}");
+    }
+
+    public void LoadGameStateFromFile(int mapNum, int versionNum)//, out TilemapData tilemapData)
+    {
+        Debug.Log($"Loading game state for map {mapNum}, version {versionNum}...");
+		//yield return null;
+        //string mapFileLocation = $"InitializationData/Maps/Map{mapNum}/Map{mapNum}_v{versionNum}.gsdat"; //hardcoded map 7 for now
+		string mapFileLocation = "InitializationData/Maps/Map" + mapNum;
+
+		string directoryPath = Path.Combine(Application.dataPath, mapFileLocation);
+        if (!Directory.Exists(directoryPath))
+        {
+            Debug.LogError($"Directory does not exist: {directoryPath}");
+            return;
+        }
+		string fileName = $"Map{mapNum}_v{versionNum}" + ".gsdat";
+		string filePath = Path.Combine(directoryPath, fileName);
+        if (!File.Exists(filePath))
+        {
+            Debug.LogError($"File does not exist: {filePath}");
+			return;
+		}
+        byte[] fileData;
+        try
+        {
+            fileData = File.ReadAllBytes(filePath);
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"Failed to read game state from file: {e.Message}");
+			return;
+		}
+        GameStateData gameStateData;
+        try
+        {
+            gameStateData = GameStateData.Deserialize(fileData);
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"Failed to deserialize game state data: {e.Message}");
+			return;
+		}
+        if (gameStateData == null)
+        {
+            Debug.LogError("Deserialized game state data is null");
+			return;
+		}
+        //tilemapData = gameStateData.tilemapData;
+        Debug.Log($"Loaded game state from file: {filePath} with {gameStateData.GamePieceList.Count} game pieces.");
+		
+
+
+		tilemapManager.ImportTilemapFromBytes(gameStateData.TilemapData);
+        int debugStructureCount = 0;
+        int debugUnitCount = 0;
+		foreach (GamePieceInfo gp in gameStateData.GamePieceList)
+        {
+            if(gp.typeNum>=200)
+                debugStructureCount++;
+            if(gp.typeNum<200)
+				debugUnitCount++;
+
+		}
+        Debug.Log($"GamePieceList unit count: {debugUnitCount}, structure count {debugStructureCount}");
+
+		ConvertListToGamePieces(gameStateData.GamePieceList);
+	}
+    /*public IEnumerator LoadGameStateFromFile(int mapNum, int versionNum)//, out TilemapData tilemapData)
+    {
+        Debug.Log($"Loading game state for map {mapNum}, version {versionNum}...");
+		yield return null;
+        //string mapFileLocation = $"InitializationData/Maps/Map{mapNum}/Map{mapNum}_v{versionNum}.gsdat"; //hardcoded map 7 for now
+		string mapFileLocation = "InitializationData/Maps/Map" + mapNum;
+
+		string directoryPath = Path.Combine(Application.dataPath, mapFileLocation);
+        if (!Directory.Exists(directoryPath))
+        {
+            Debug.LogError($"Directory does not exist: {directoryPath}");
+            yield break;
+        }
+		string fileName = $"Map{mapNum}_v{versionNum}" + ".gsdat";
+		string filePath = Path.Combine(directoryPath, fileName);
+        if (!File.Exists(filePath))
+        {
+            Debug.LogError($"File does not exist: {filePath}");
+			yield break;
+        }
+        byte[] fileData;
+        try
+        {
+            fileData = File.ReadAllBytes(filePath);
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"Failed to read game state from file: {e.Message}");
+			yield break;
+        }
+        GameStateData gameStateData;
+        try
+        {
+            gameStateData = GameStateData.Deserialize(fileData);
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"Failed to deserialize game state data: {e.Message}");
+			yield break;
+        }
+        if (gameStateData == null)
+        {
+            Debug.LogError("Deserialized game state data is null");
+			yield break;
+        }
+        //tilemapData = gameStateData.tilemapData;
+        Debug.Log($"Loaded game state from file: {filePath} with {gameStateData.GamePieceList.Count} game pieces.");
+		
+
+
+		tilemapManager.ImportTilemapFromBytes(gameStateData.TilemapData);
+
+        Debug.Log($"GamePieceList count: {gameStateData.GamePieceList.Count}");
+
+		ConvertListToGamePieces(gameStateData.GamePieceList);
+	}*/
+
+
+
+	public List<GamePieceInfo> ConvertGamePiecesToList()
     {
         List<GamePieceInfo> gameStateList = new List<GamePieceInfo>();
 
@@ -969,7 +1137,7 @@ public class GameMaster : MonoBehaviour
         return gameStateList;
 
         //to print the game state to the console
-        /*List<GamePieceInfo> currentGameState = _gameMaster.ConvertGameStateToList();
+        /*List<GamePieceInfo> currentGameState = _gameMaster.ConvertGamePiecesToList();
         string itemString = "";
         foreach (var item in currentGameState)
         {
@@ -993,7 +1161,7 @@ public class GameMaster : MonoBehaviour
     //Structure can only be placed on grass
     //units must be placed on a legal square
     //units and structures must not be outside of boundaries
-    public void ConvertListToGameState(List<GamePieceInfo> gameStateList)
+    public void ConvertListToGamePieces(List<GamePieceInfo> gameStateList)
     {
         if (gameStateList != null && gameStateList.Count != 0)
         {
@@ -1004,7 +1172,14 @@ public class GameMaster : MonoBehaviour
                 //Debug.Log($"gameState item #{i}, x: {pieceInfo.x}, y: {pieceInfo.y}, bytenum: {pieceInfo.typeNum}, health: {pieceInfo.healthVal}");
                 if (pieceInfo.typeNum < 200)
                 {
-                    int x = pieceInfo.x;
+					//temporary fix for initial unit spawning conflict.
+					if (masterGrid.whatUnitIsInThisLocation(new Vector2Int(pieceInfo.x, pieceInfo.y)) != null)
+                    {
+                        Debug.LogError($"Cannot place unit at {pieceInfo.x}, {pieceInfo.y} as there is already a unit there.");
+                        continue;
+					}
+
+					int x = pieceInfo.x;
                     int y = pieceInfo.y;
                     AttributesBaseUnit data = gameValues.GetUnitDataByByte(pieceInfo.typeNum);
 
@@ -1019,7 +1194,7 @@ public class GameMaster : MonoBehaviour
                     unit.pos = new Vector2Int(x, y);
                     InstantiateUnit(unit, unit.pos);
                     //Instantiate(unit, new Vector2(x, y), Quaternion.identity, unitContainer);
-                    masterGrid.setUnitInGrid(unit.pos, unit);
+                    //masterGrid.setUnitInGrid(unit.pos, unit);
                 }
                 else if (pieceInfo.typeNum >= 200 && pieceInfo.typeNum < 255)
                 {
@@ -1033,14 +1208,21 @@ public class GameMaster : MonoBehaviour
                     else if (pieceInfo.typeNum == 202)
                         structure = productionAirportStructurePrefab.GetComponent<BaseStructure>();
                     else if (pieceInfo.typeNum == 205)
+                    {
                         structure = commandStructurePrefab.GetComponent<BaseStructure>();
+                        Structure_Command commandStructure = commandStructurePrefab;
+						commandStructure.playerControl = pieceInfo.playerID;
+						MasterGrid.commandStructures[pieceInfo.playerID] = commandStructure;
+					}
                     else
                         Debug.LogError($"No structure for byte value {pieceInfo.typeNum} found.");
                     structure.playerControl = pieceInfo.playerID;
                     structure.captureHealth = pieceInfo.healthVal;
                     structure.pos = new Vector2Int(x, y);
                     Instantiate(structure, new Vector2(x, y), Quaternion.identity, structureContainer);
-                    masterGrid.setStructureInGrid(structure.pos, structure);
+					//structure.Initialize();
+					masterGrid.setStructureInGrid(structure.pos, structure);
+
                 }
             }
 
@@ -1114,7 +1296,7 @@ public class GameMaster : MonoBehaviour
             {
                 byte[] bytes = File.ReadAllBytes(gameStateFilePath);
                 List<GamePieceInfo> gameStateList = MessagePackSerializer.Deserialize<List<GamePieceInfo>>(bytes);
-                ConvertListToGameState(gameStateList);
+                ConvertListToGamePieces(gameStateList);
             }
             else
             {

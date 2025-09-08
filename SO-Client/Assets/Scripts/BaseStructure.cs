@@ -30,12 +30,6 @@ public class BaseStructure : MonoBehaviour
     public StaticSprite progeny2ResourceCaptureSpriteContainer;
     public StaticSprite progeny2ProductionCaptureSpriteContainer;
 
-
-
-
-
-
-    // Start is called before the first frame update
     public virtual void Initialize()
     {
         gamePieceId = 200 + structureType; //structure ids start at 200.
@@ -438,4 +432,6 @@ public class BaseStructure : MonoBehaviour
         //Debug.Log($"Structure {pos} is covered by unit? {masterGrid.whatUnitIsInThisLocation(pos) != null}");
         return (masterGrid.whatUnitIsInThisLocation(pos) != null);
     }
+
+
 }

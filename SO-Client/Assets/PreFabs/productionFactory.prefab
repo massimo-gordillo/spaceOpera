@@ -91,13 +91,45 @@ PrefabInstance:
       propertyPath: m_WasSpriteAssigned
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 2724731784728969787, guid: b02aa9d5d64b2414abeba39fe8b377e8, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3397026737060665485, guid: b02aa9d5d64b2414abeba39fe8b377e8, type: 3}
+      propertyPath: pos.x
+      value: 17
+      objectReference: {fileID: 0}
+    - target: {fileID: 3397026737060665485, guid: b02aa9d5d64b2414abeba39fe8b377e8, type: 3}
+      propertyPath: pos.y
+      value: 11
+      objectReference: {fileID: 0}
+    - target: {fileID: 3397026737060665485, guid: b02aa9d5d64b2414abeba39fe8b377e8, type: 3}
+      propertyPath: gamePieceId
+      value: 201
+      objectReference: {fileID: 0}
+    - target: {fileID: 3397026737060665485, guid: b02aa9d5d64b2414abeba39fe8b377e8, type: 3}
+      propertyPath: captureHealth
+      value: 200
+      objectReference: {fileID: 0}
+    - target: {fileID: 3397026737060665485, guid: b02aa9d5d64b2414abeba39fe8b377e8, type: 3}
+      propertyPath: playerControl
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 3397026737060665485, guid: b02aa9d5d64b2414abeba39fe8b377e8, type: 3}
       propertyPath: structureType
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 3397026737060665485, guid: b02aa9d5d64b2414abeba39fe8b377e8, type: 3}
+      propertyPath: maxCaptureHealth
+      value: 200
+      objectReference: {fileID: 0}
     - target: {fileID: 4395657615616999347, guid: b02aa9d5d64b2414abeba39fe8b377e8, type: 3}
       propertyPath: m_IsActive
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4742863765887304150, guid: b02aa9d5d64b2414abeba39fe8b377e8, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0.4
       objectReference: {fileID: 0}
     - target: {fileID: 5242875994211370227, guid: b02aa9d5d64b2414abeba39fe8b377e8, type: 3}
       propertyPath: m_RootOrder

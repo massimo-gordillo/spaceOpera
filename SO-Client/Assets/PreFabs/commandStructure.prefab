@@ -174,7 +174,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 0.375, y: -0.15}
-  m_SizeDelta: {x: 0.7, y: 0.5}
+  m_SizeDelta: {x: 0.7, y: 0.4}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!23 &3088732311128046281
 MeshRenderer:
@@ -677,15 +677,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 99047c1f44e29f7449d895e2f756d616, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerControl: 0
+  playerControl: 2
   masterGrid: {fileID: 0}
-  pos: {x: 0, y: 0}
+  pos: {x: 15, y: 12}
   structureType: 5
   gamePieceId: 205
   spriteCollider: {fileID: 7809918559543456288}
   gameMaster: {fileID: 0}
-  captureHealth: 0
-  maxCaptureHealth: 0
+  captureHealth: 200
+  maxCaptureHealth: 200
   healthTextContainer: {fileID: 8475273557256230648}
   healthCanvas: {fileID: 478628979553984943}
   neutralSpriteContainer: {fileID: 0}
@@ -699,9 +699,9 @@ MonoBehaviour:
   progeny1ProductionCaptureSpriteContainer: {fileID: 0}
   progeny2ResourceCaptureSpriteContainer: {fileID: 0}
   progeny2ProductionCaptureSpriteContainer: {fileID: 0}
-  lowerSpriteContainer: {fileID: 0}
+  lowerSpriteContainer: {fileID: 117149164539349588}
   lowerSpriteSR: {fileID: 0}
-  upperSpriteContainer: {fileID: 0}
+  upperSpriteContainer: {fileID: 5362058736772821666}
   upperSpriteSR: {fileID: 0}
   progeny0LowerSpriteContainer: {fileID: 8754288639731015311}
   progeny0LowerSpriteSR: {fileID: 0}
@@ -1105,7 +1105,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6644371550061788981, guid: 88268c20a16956b4c9b0579543f1d861, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 9019121506473607865, guid: 88268c20a16956b4c9b0579543f1d861, type: 3}
       propertyPath: m_RootOrder
@@ -1287,7 +1287,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6644371550061788981, guid: 88268c20a16956b4c9b0579543f1d861, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 9019121506473607865, guid: 88268c20a16956b4c9b0579543f1d861, type: 3}
       propertyPath: m_RootOrder
@@ -1476,7 +1476,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6644371550061788981, guid: 88268c20a16956b4c9b0579543f1d861, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 9019121506473607865, guid: 88268c20a16956b4c9b0579543f1d861, type: 3}
       propertyPath: m_RootOrder
@@ -1991,7 +1991,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6644371550061788981, guid: 88268c20a16956b4c9b0579543f1d861, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 9019121506473607865, guid: 88268c20a16956b4c9b0579543f1d861, type: 3}
       propertyPath: m_RootOrder

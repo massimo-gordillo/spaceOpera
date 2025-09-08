@@ -97,7 +97,7 @@ public class MasterGrid : MonoBehaviour
             attackLuckDomain = 10;
         defenceMultiplier = 4.0;
         firebackMultiplier = 0.7;
-        //Dictionary<(byte, byte), GamePieceInfo> gameStateDict = ConvertGameStateToList();
+        //Dictionary<(byte, byte), GamePieceInfo> gameStateDict = ConvertGamePiecesToList();
         //printUnitGrid();
 
 
@@ -429,7 +429,7 @@ public class MasterGrid : MonoBehaviour
             if (structure.playerControl == selectedUnit.playerControl && selectedUnit.unitName == "Spore")
             {
                 selectedUnit.explosionAnimator.enabled = false;
-                deleteUnit(selectedUnit);
+                deleteUnit(selectedUnit, true);
                 createVirixSeed(structure.pos);
             }
             else
@@ -2328,7 +2328,7 @@ public class MasterGrid : MonoBehaviour
             else
                 return 0; //true as long as future conditions also return 0. Might become a headache if that's not the case.
         }
-        else if (drawMovementUnit == null || !drawing) //if we're simply doing a nearby search without drawing movement, legality doesn't matter.
+/*        else if (drawMovementUnit == null || !drawing) //if we're simply doing a nearby search without drawing movement, legality doesn't matter.
         {
             //Debug.Log($"DrawMovementUnit is null. Returning 0 for unit at location {x},{y}.");
             return 0;
@@ -2336,7 +2336,7 @@ public class MasterGrid : MonoBehaviour
         else {
             Debug.LogWarning($"LegalMove returned 0 as default, no accurate conditions were met.");
             return 0; 
-        }
+        }*/
         
     }
 
@@ -2462,9 +2462,12 @@ public class MasterGrid : MonoBehaviour
         {
             unitGrid[pos.x, pos.y] = unit;
             unit.pos = pos;
+        }else if (whatUnitIsInThisLocation(pos) == unit)
+        {
+            Debug.LogWarning($"Unit {unit.pos} is already at {pos} in the grid and attempting to place it again!");
         }
         else
-            Debug.LogError($"Setting unit {unit.pos} to {pos} but can't because there's a unit there");
+            Debug.LogError($"Setting unit {unit.pos} to {pos} but can't because there's a different unit there");
     }
 
     public void setStructureInGrid(Vector2Int pos, BaseStructure structure)
@@ -2474,7 +2477,7 @@ public class MasterGrid : MonoBehaviour
         structure.pos = pos;
     }
 
-    public void deleteUnit(BaseUnit deadUnit)
+    public void deleteUnit(BaseUnit deadUnit, bool animate)
     {
         if(selectedUnit != null && deadUnit == selectedUnit)
             clearSelectedUnit();
@@ -2488,8 +2491,22 @@ public class MasterGrid : MonoBehaviour
         else
             Debug.LogWarning($"Asking to delete unit {deadUnit.pos} from a list it's not in");
 
-        StartCoroutine(AnimateDeleteUnit(deadUnit));
+        if(animate)
+            StartCoroutine(AnimateDeleteUnit(deadUnit));
+        else
+            Destroy(deadUnit.gameObject);
         //Destroy(deadUnit.GetComponent<UnitSprite>());
+    }
+
+    public void deleteStructure(BaseStructure deadStructure)
+    {
+        if (whatStructureIsInThisLocation(deadStructure.pos) != deadStructure)
+            Debug.LogError($"Structure at {deadStructure.pos} in grid does not match the structure being deleted.");
+        else
+        {
+            structureGrid[deadStructure.pos.x, deadStructure.pos.y] = null;
+            Destroy(deadStructure.gameObject);
+        }
     }
 
     public IEnumerator AnimateDeleteUnit(BaseUnit deadUnit)
@@ -2588,7 +2605,26 @@ public class MasterGrid : MonoBehaviour
                 unit.oldPos = null;
             }
             else
-                unit.deleteMe();
+                unit.deleteMe(true);
+        }
+    }
+
+    public IEnumerator DeleteAllGamePieces()
+    //public IEnumerator DeleteAllGamePieces()
+    {
+        yield return null;
+        //StopAllCoroutines();
+        //yield return null;
+        allUnits = GameObject.FindGameObjectsWithTag("BaseUnitTag");
+        foreach (GameObject go in allUnits)
+        {
+            BaseUnit unit = go.GetComponent<BaseUnit>();
+            unit.deleteMe(false);
+        }
+        foreach (BaseStructure structure in GetStructures(null))
+        {
+            Debug.Log($"Deleting structure at {structure.pos}");
+            deleteStructure(structure);
         }
     }
 

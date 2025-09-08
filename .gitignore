@@ -32,7 +32,7 @@ ExportedObj/
 # Unity3D Generated File On Crash Reports
 sysinfo.txt
 
-# Android build files (revist)
+# Android build files (revisit)
 **/Assets/Plugins/Android/
 **/gradle-wrapper.jar
 **/gradle-wrapper.properties
@@ -51,6 +51,7 @@ sysinfo.txt
 # Ignore environment files
 .env
 .keystore
+pass.txt
 
 #Ignore future changes to prefabs
 SO-Client/Assets/Resources/UnitPrefabs/progeny1/*

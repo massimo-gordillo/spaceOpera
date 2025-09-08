@@ -450,7 +450,7 @@ public class CPUManager : MonoBehaviour
                     //failcase if the unit attacks while landing on the enemy HQ, remove CPU softlocking themselves.
                     if (unit.pos == defaultTargets[unit.playerControl].pos && unit.CPU_TargetNode == defaultTargets[unit.playerControl])
                     {
-                        masterGrid.deleteUnit(unit);
+                        masterGrid.deleteUnit(unit, false);
                     }
                 }
                 else if (unit.attackRange > 1)
@@ -514,7 +514,7 @@ public class CPUManager : MonoBehaviour
             return 0;
     }
 
-    public Vector2Int GetAdjacentPosFromBidirectionalSearch(List<Vector2Int> path, Vector2Int target)
+    /*public Vector2Int GetAdjacentPosFromBidirectionalSearch(List<Vector2Int> path, Vector2Int target)
     {
         if (path == null)
             return target;
@@ -531,7 +531,7 @@ public class CPUManager : MonoBehaviour
 
         Debug.LogWarning($"No adjacent tile found near {target} in path of length {path.Count}. Returning unit's current position as fallback.");
         return path.Count > 0 ? path[0] : target; // fallback to unit.pos if needed
-    }
+    }*/
 
 
     public void InitClosestNeighbour()
@@ -856,6 +856,9 @@ public class CPUManager : MonoBehaviour
 
     public IEnumerator CPU_MoveUnitTowardsTargetNode(BaseUnit unit)
     {
+        //in the future I'd like to have bidirectional search path to and from an item in the movesquares list, instead of raw.
+        //That way any items with parent distance from origin = unit.movementRange can be removed from the list before search begins. 
+
         if (unit == null) {
             Debug.LogWarning($"A null unit is being asked to move towards its target node");
             yield break;

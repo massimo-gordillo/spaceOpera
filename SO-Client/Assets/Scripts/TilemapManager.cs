@@ -54,11 +54,12 @@ public class TilemapManager : MonoBehaviour
 
         //uncomment the appropriate function for testing.
 
-        TilemapData byteData = ExportTilemapToBytes();
-        ImportTilemapFromBytes(byteData);
+        //TilemapData byteData = ExportTilemapToBytes();
+        //ImportTilemapFromBytes(byteData);
 
-        //SaveTilemapToFile("Map3Tilemap-v5.dat");
-        //LoadTilemapFromFile("Map3Tilemap-v5.dat");
+        //standard map: "Map3Tilemap-v6.dat"
+        //SaveTilemapToFile("Map3Tilemap-v7.dat");
+        LoadTilemapFromFile("Map3Tilemap-v6.dat");
 
 
 

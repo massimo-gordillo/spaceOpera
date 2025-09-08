@@ -326,7 +326,7 @@ public class SupabaseManager : MonoBehaviour
                         _tilemapManager.ImportTilemapFromBytes(mapObject);
 
                     if (gamePieceList != null)
-                        _gameMaster.ConvertListToGameState(gamePieceList);
+                        _gameMaster.ConvertListToGamePieces(gamePieceList);
                 }
                 else
                 {
@@ -353,7 +353,7 @@ public class SupabaseManager : MonoBehaviour
         Debug.Log($"debugging: Tiles JSON: {tilesJson}");
         Debug.Log($"debugging: Pieces JSON: {piecesJson}");
 
-        List<GamePieceInfo> currentGameState = _gameMaster.ConvertGameStateToList();
+        List<GamePieceInfo> currentGameState = _gameMaster.ConvertGamePiecesToList();
         string itemString = "";
         foreach (var item in currentGameState)
         {
@@ -433,7 +433,7 @@ public class SupabaseManager : MonoBehaviour
                         _tilemapManager.ImportTilemapFromBytes(mapObject);
 
                     if (gamePieceList != null)
-                        _gameMaster.ConvertListToGameState(gamePieceList.gamePieceInfos);
+                        _gameMaster.ConvertListToGamePieces(gamePieceList.gamePieceInfos);
                 }
                 else
                 {
@@ -833,7 +833,7 @@ public class SupabaseManager : MonoBehaviour
         {
             // Save the map to the server
             TilemapData tilemapData = _tilemapManager.ExportTilemapToBytes();
-            List<GamePieceInfo> initPieceInfo = _gameMaster.ConvertGameStateToList();
+            List<GamePieceInfo> initPieceInfo = _gameMaster.ConvertGamePiecesToList();
 
             // Directly await the SaveGameInitialStateToServer method
             await SaveGameInitialStateToServer(tilemapData, "testMap1.1", initPieceInfo);

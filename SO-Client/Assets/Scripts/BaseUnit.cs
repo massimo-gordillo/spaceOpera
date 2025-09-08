@@ -286,11 +286,11 @@ public class BaseUnit : MonoBehaviour
             setHealth(healthCurrent);
         else if (healthCurrent <= damage){
             setHealth(0);
-            deleteMe();
+            deleteMe(true);
         }else if ((healthCurrent - damage) < 0.05 * healthMax)
         {
             setHealth(0);
-            deleteMe();
+            deleteMe(true);
         }
         else
         {
@@ -391,9 +391,9 @@ public class BaseUnit : MonoBehaviour
         return playerControl;
     }*/
 
-    public void deleteMe()
+    public void deleteMe(bool animate)
     {
-        masterGrid.deleteUnit(this);
+        masterGrid.deleteUnit(this, animate);
     }
 
     public IEnumerator AnimateDestroy()
