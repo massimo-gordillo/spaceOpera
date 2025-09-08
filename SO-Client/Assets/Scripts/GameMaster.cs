@@ -211,8 +211,9 @@ public class GameMaster : MonoBehaviour
         //initializes the TilemapManager
         (gridX, gridY) = tilemapManager.initialize();
 
-        //initializes the masterGrid arrays etc with the map size
-        masterGrid.startup(gridX, gridY, tilemapManager.getTilemapByteArray(), gameValues.getAttributesTilesDictionary(), gameValues.getCombatMultiplierDictionary());
+		LoadGameStateFromFile(7, 1);
+		//initializes the masterGrid arrays etc with the map size
+		masterGrid.startup(gridX, gridY, tilemapManager.getTilemapByteArray(), gameValues.getAttributesTilesDictionary(), gameValues.getCombatMultiplierDictionary());
 
         hideChoicePanel();
         announcementCard.SetActive(false);
@@ -251,7 +252,7 @@ public class GameMaster : MonoBehaviour
         //SaveGameStateToFile(7, 1);
         //StartCoroutine(masterGrid.DeleteAllGamePieces());
 		//StartCoroutine(LoadGameStateFromFile(7, 1));
-		LoadGameStateFromFile(7, 1);
+
 	}
 
     void Start()
@@ -337,9 +338,7 @@ public class GameMaster : MonoBehaviour
             {
                 if (prod.structureType != 1 && prod.structureType != 5)
                     continue;
-                //temporary fix for loading gamestate from file.
-                if(masterGrid.whatUnitIsInThisLocation(prod.pos) != null)
-                    continue;
+
 				if (progeny == 0)
                 {
                     //BaseUnit infantryUnitPrefab = Resources.Load<BaseUnit>("UnitPrefabs/progeny1/InfantryPrefab");
@@ -1172,12 +1171,6 @@ public class GameMaster : MonoBehaviour
                 //Debug.Log($"gameState item #{i}, x: {pieceInfo.x}, y: {pieceInfo.y}, bytenum: {pieceInfo.typeNum}, health: {pieceInfo.healthVal}");
                 if (pieceInfo.typeNum < 200)
                 {
-					//temporary fix for initial unit spawning conflict.
-					if (masterGrid.whatUnitIsInThisLocation(new Vector2Int(pieceInfo.x, pieceInfo.y)) != null)
-                    {
-                        Debug.LogError($"Cannot place unit at {pieceInfo.x}, {pieceInfo.y} as there is already a unit there.");
-                        continue;
-					}
 
 					int x = pieceInfo.x;
                     int y = pieceInfo.y;
@@ -1221,7 +1214,7 @@ public class GameMaster : MonoBehaviour
                     structure.pos = new Vector2Int(x, y);
                     Instantiate(structure, new Vector2(x, y), Quaternion.identity, structureContainer);
 					//structure.Initialize();
-					masterGrid.setStructureInGrid(structure.pos, structure);
+					//masterGrid.setStructureInGrid(structure.pos, structure);
 
                 }
             }
