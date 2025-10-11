@@ -212,7 +212,7 @@ public class GameMaster : MonoBehaviour
         //initializes the TilemapManager
         (gridX, gridY) = tilemapManager.initialize();
 
-		//LoadGameStateFromFile("multi",8, 1);
+		LoadGameStateFromFile("multi",8, 3);
 		//initializes the masterGrid arrays etc with the map size
 		masterGrid.startup(gridX, gridY, tilemapManager.getTilemapByteArray(), gameValues.getAttributesTilesDictionary(), gameValues.getCombatMultiplierDictionary());
 
@@ -250,7 +250,7 @@ public class GameMaster : MonoBehaviour
 
         //unitCosts = new List<(BaseUnit, int)>[numPlayers];
 
-        //SaveGameStateToFile("multi", 8, 1);
+        //SaveGameStateToFile("multi", 8, 3);
         //StartCoroutine(masterGrid.DeleteAllGamePieces());
 	}
 
@@ -302,6 +302,8 @@ public class GameMaster : MonoBehaviour
         {
             StartCoroutine(WaitForCPUFirstTurn());
         }
+
+        //SaveGameStateToFile("multi", 8, 3);
     }
 
     private IEnumerator CallConvertGameStateToList()
@@ -937,11 +939,16 @@ public class GameMaster : MonoBehaviour
     public void SaveGameStateToFile(string mapType, int mapNum, int versionNum)//List<GamePieceInfo> gamePieceList, TilemapData tilemapData)
     {
         List<GamePieceInfo> gamePieceList = ConvertGamePiecesToList();
+        if(gamePieceList.Count == 0)
+        {
+            Debug.LogWarning("No game pieces to save in game state.");
+        }
         TilemapData tilemapData = tilemapManager.ExportTilemapToBytes();
         string mapFileLocation = $"InitializationData/Maps/";
 
+        
         GameStateData gameStateData = new GameStateData(tilemapData, gamePieceList);
-
+        Debug.Log($"Saved {gameStateData.GamePieceList.Count} game pieces to gameStateData");
 
         string directoryPath = Path.Combine(Application.dataPath, mapFileLocation);
         if (!Directory.Exists(directoryPath))
@@ -1056,7 +1063,7 @@ public class GameMaster : MonoBehaviour
                         (byte)unit.playerControl,
                         (byte)((double)unit.healthCurrent / (double)unit.healthMax * 100)
                     );
-                    Debug.Log($"Added baseUnit to GameStateList x: {info.x}, y: {info.y}, bytenum: {info.typeNum}, health: {info.healthVal}");
+                    //Debug.Log($"Added baseUnit to GameStateList x: {info.x}, y: {info.y}, bytenum: {info.typeNum}, health: {info.healthVal}");
                     gameStateList.Add(info);
                 }
 
