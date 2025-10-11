@@ -2472,7 +2472,6 @@ public class MasterGrid : MonoBehaviour
 
     public void setStructureInGrid(Vector2Int pos, BaseStructure structure)
     {
-        //unitGrid[gridX-x, gridY-y] = unit;
         structureGrid[pos.x, pos.y] = structure;
         structure.pos = pos;
     }

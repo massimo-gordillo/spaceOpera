@@ -56,6 +56,7 @@ public class GameMaster : MonoBehaviour
     [Header("Transform Containers")]
     public Transform unitContainer;
     public Transform structureContainer;
+    public Transform toggleGamePiecesContainer;
 
     [Header("UI Items")]
     public GameObject choicePanel;
@@ -102,7 +103,7 @@ public class GameMaster : MonoBehaviour
 
     [Header("CPU")]
     public static bool CPU_isOn = false;
-    public static bool CPU_isOn_manual = false;
+    public static bool CPU_isOn_manual = true;
     private static bool CPU_isMasterDebugging = false;
     public static bool[] CPU_PlayersList;
     public int virixCheapestUnit;
@@ -144,7 +145,7 @@ public class GameMaster : MonoBehaviour
             if (!MatchSettings.CPU_isOn)
             {
                 Debug.LogWarning("Match settings says CPU is off but manual CPU is on, defaulting to hard values.");
-                CPU_PlayersList[1] = true;
+                CPU_PlayersList[1] = false;
                 CPU_PlayersList[2] = true;
             }
         }
@@ -211,7 +212,7 @@ public class GameMaster : MonoBehaviour
         //initializes the TilemapManager
         (gridX, gridY) = tilemapManager.initialize();
 
-		LoadGameStateFromFile(7, 1);
+		//LoadGameStateFromFile("multi",8, 1);
 		//initializes the masterGrid arrays etc with the map size
 		masterGrid.startup(gridX, gridY, tilemapManager.getTilemapByteArray(), gameValues.getAttributesTilesDictionary(), gameValues.getCombatMultiplierDictionary());
 
@@ -249,10 +250,8 @@ public class GameMaster : MonoBehaviour
 
         //unitCosts = new List<(BaseUnit, int)>[numPlayers];
 
-        //SaveGameStateToFile(7, 1);
+        //SaveGameStateToFile("multi", 8, 1);
         //StartCoroutine(masterGrid.DeleteAllGamePieces());
-		//StartCoroutine(LoadGameStateFromFile(7, 1));
-
 	}
 
     void Start()
@@ -935,11 +934,11 @@ public class GameMaster : MonoBehaviour
         masterGrid.playerWins(player);
     }
 
-    public void SaveGameStateToFile(int mapNum, int versionNum)//List<GamePieceInfo> gamePieceList, TilemapData tilemapData)
+    public void SaveGameStateToFile(string mapType, int mapNum, int versionNum)//List<GamePieceInfo> gamePieceList, TilemapData tilemapData)
     {
         List<GamePieceInfo> gamePieceList = ConvertGamePiecesToList();
         TilemapData tilemapData = tilemapManager.ExportTilemapToBytes();
-        string mapFileLocation = "InitializationData/Maps/Map" + mapNum;
+        string mapFileLocation = $"InitializationData/Maps/";
 
         GameStateData gameStateData = new GameStateData(tilemapData, gamePieceList);
 
@@ -950,7 +949,7 @@ public class GameMaster : MonoBehaviour
             Directory.CreateDirectory(directoryPath);
         }
 
-        string fileName = $"Map{mapNum}_v{versionNum}" + ".gsdat";
+        string fileName = $"{mapType}_Map{mapNum}_v{versionNum}.gsdat";
 
         string filePath = Path.Combine(directoryPath, fileName);
         //byte[] byteData = MessagePackSerializer.Deserialize<byte[]>(ExportTilemapToBytes(new Vector2Int(gridWidth, gridHeight), Vector2Int.zero));
@@ -970,12 +969,13 @@ public class GameMaster : MonoBehaviour
 		Debug.Log($"Gamestate saved to file: {filePath}");
     }
 
-    public void LoadGameStateFromFile(int mapNum, int versionNum)//, out TilemapData tilemapData)
+    public void LoadGameStateFromFile(string mapType, int mapNum, int versionNum)//, out TilemapData tilemapData)
     {
+        toggleGamePiecesContainer.gameObject.SetActive(false);
         Debug.Log($"Loading game state for map {mapNum}, version {versionNum}...");
 		//yield return null;
         //string mapFileLocation = $"InitializationData/Maps/Map{mapNum}/Map{mapNum}_v{versionNum}.gsdat"; //hardcoded map 7 for now
-		string mapFileLocation = "InitializationData/Maps/Map" + mapNum;
+		string mapFileLocation = "InitializationData/Maps/";
 
 		string directoryPath = Path.Combine(Application.dataPath, mapFileLocation);
         if (!Directory.Exists(directoryPath))
@@ -983,7 +983,7 @@ public class GameMaster : MonoBehaviour
             Debug.LogError($"Directory does not exist: {directoryPath}");
             return;
         }
-		string fileName = $"Map{mapNum}_v{versionNum}" + ".gsdat";
+		string fileName = $"{mapType}_Map{mapNum}_v{versionNum}.gsdat";
 		string filePath = Path.Combine(directoryPath, fileName);
         if (!File.Exists(filePath))
         {
@@ -1035,64 +1035,6 @@ public class GameMaster : MonoBehaviour
 
 		ConvertListToGamePieces(gameStateData.GamePieceList);
 	}
-    /*public IEnumerator LoadGameStateFromFile(int mapNum, int versionNum)//, out TilemapData tilemapData)
-    {
-        Debug.Log($"Loading game state for map {mapNum}, version {versionNum}...");
-		yield return null;
-        //string mapFileLocation = $"InitializationData/Maps/Map{mapNum}/Map{mapNum}_v{versionNum}.gsdat"; //hardcoded map 7 for now
-		string mapFileLocation = "InitializationData/Maps/Map" + mapNum;
-
-		string directoryPath = Path.Combine(Application.dataPath, mapFileLocation);
-        if (!Directory.Exists(directoryPath))
-        {
-            Debug.LogError($"Directory does not exist: {directoryPath}");
-            yield break;
-        }
-		string fileName = $"Map{mapNum}_v{versionNum}" + ".gsdat";
-		string filePath = Path.Combine(directoryPath, fileName);
-        if (!File.Exists(filePath))
-        {
-            Debug.LogError($"File does not exist: {filePath}");
-			yield break;
-        }
-        byte[] fileData;
-        try
-        {
-            fileData = File.ReadAllBytes(filePath);
-        }
-        catch (Exception e)
-        {
-            Debug.LogError($"Failed to read game state from file: {e.Message}");
-			yield break;
-        }
-        GameStateData gameStateData;
-        try
-        {
-            gameStateData = GameStateData.Deserialize(fileData);
-        }
-        catch (Exception e)
-        {
-            Debug.LogError($"Failed to deserialize game state data: {e.Message}");
-			yield break;
-        }
-        if (gameStateData == null)
-        {
-            Debug.LogError("Deserialized game state data is null");
-			yield break;
-        }
-        //tilemapData = gameStateData.tilemapData;
-        Debug.Log($"Loaded game state from file: {filePath} with {gameStateData.GamePieceList.Count} game pieces.");
-		
-
-
-		tilemapManager.ImportTilemapFromBytes(gameStateData.TilemapData);
-
-        Debug.Log($"GamePieceList count: {gameStateData.GamePieceList.Count}");
-
-		ConvertListToGamePieces(gameStateData.GamePieceList);
-	}*/
-
-
 
 	public List<GamePieceInfo> ConvertGamePiecesToList()
     {

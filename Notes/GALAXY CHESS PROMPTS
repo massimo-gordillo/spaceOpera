@@ -224,12 +224,5 @@ Ok I like what your implementation is getting at, but it's important to do the h
 
 Ok great let's move onto asynchronous gameplay. Do not make any implementations yet, just explain to me the architecture and methodology you'd suggest. 
 I want two users on different devices to send their game actions back and forth, with the server as the middleman. Essentially, after a turn is submitted by player A, once confirmed the turn is legal it'll pass those game actions to player B. The client will animate those game actions taken by player A to player B. It then becomes player B's turn and the process repeats.
-How would the server implementation for this work? Ideally player B doesn't need to have an open subscription to be notified that it's now their turn. Thoughts?
-
-
-
-Hi Chat! I'm building a 2D unity strategy game and I'm building a CPU player with (hopefully) a simple algorithm. In this game there are resource units and combat units and I need them to behave differently because resource units can capture resource locations. 
-
-The game is played on a grid and players take turn moving all their game pieces. Resource locations exist at specific squares on the grid. 
-
-I'm imagining a naive cpu implementation where there the coordinates of resource locations can be used to create a network and the CPU can use this network to make decisions about how to move their resource units. 
+How would the server implementation for this work? Ideally player B doesn't need to have an open subscription to be notified that it's now their turn
+.

@@ -59,7 +59,7 @@ public class TilemapManager : MonoBehaviour
 
         //standard map: "Map3Tilemap-v6.dat"
         //SaveTilemapToFile("Map3Tilemap-v7.dat");
-        LoadTilemapFromFile("Map3Tilemap-v6.dat");
+        //LoadTilemapFromFile("Map3Tilemap-v6.dat");
 
 
 
