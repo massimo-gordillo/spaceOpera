@@ -97,3 +97,8 @@ Path: \spaceOpera\SO-ServerBolt\project-bolt-sb1-q3y2zz\project
 Created by: Massimo Gordillo.
 This project is a solo-built demo of scalable, systems-driven game design and development.
 
+=======================
+PRIVACY POLICY
+=======================
+The developer has not included any data collection in this app.
+
