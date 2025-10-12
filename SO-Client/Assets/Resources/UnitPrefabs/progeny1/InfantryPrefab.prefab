@@ -540,7 +540,7 @@ MonoBehaviour:
   isResourceUnit: 1
   isInfantry: 1
   healthMax: 100
-  healthCurrent: 0
+  healthCurrent: 100
   baseDamage: 60
   attackRange: 1
   price: 100
@@ -548,7 +548,7 @@ MonoBehaviour:
   playerControl: 2
   team: 0
   orientation: 3
-  pos: {x: 0, y: 0}
+  pos: {x: 17, y: 3}
   movementNonExhausted: 0
   nonExhausted: 0
   undoingMovement: 0
@@ -1598,7 +1598,7 @@ RectTransform:
   m_GameObject: {fileID: 5327092180590302273}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 0}
+  m_LocalScale: {x: 0.01, y: 0.01, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 7943322754158724317}

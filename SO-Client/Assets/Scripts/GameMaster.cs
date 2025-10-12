@@ -208,13 +208,30 @@ public class GameMaster : MonoBehaviour
         //initializes all Tilebases for tilemap
         //only does anything if it hasn't already been initialized.
         gameValues.initialize();
+        bool manualLoadGameStateFromFile = true;
+        
 
-        //initializes the TilemapManager
-        (gridX, gridY) = tilemapManager.initialize();
+        if (manualLoadGameStateFromFile)
+        {
+            //(string mapType, int mapNum, int varNum) = ("multi", 7, 1);
+            tilemapManager.initialize(false);
+            LoadGameStateFromFile("multi",8, 3);
+            //LoadGameStateFromFile("multi", 7, 1);
 
-		LoadGameStateFromFile("multi",8, 3);
-		//initializes the masterGrid arrays etc with the map size
-		masterGrid.startup(gridX, gridY, tilemapManager.getTilemapByteArray(), gameValues.getAttributesTilesDictionary(), gameValues.getCombatMultiplierDictionary());
+        }
+        else
+        {
+            //initializes the dimensions through TilemapManager if loading from the Game Scene.
+            (gridX, gridY) = tilemapManager.initialize(true);
+        }
+            
+
+
+
+
+
+            //initializes the masterGrid arrays etc with the map size
+            masterGrid.startup(gridX, gridY, tilemapManager.getTilemapByteArray(), gameValues.getAttributesTilesDictionary(), gameValues.getCombatMultiplierDictionary());
 
         hideChoicePanel();
         announcementCard.SetActive(false);
@@ -1028,6 +1045,8 @@ public class GameMaster : MonoBehaviour
 
 
 		tilemapManager.ImportTilemapFromBytes(gameStateData.TilemapData);
+        gridX = gameStateData.TilemapData.Width;
+        gridY = gameStateData.TilemapData.Height;
         int debugStructureCount = 0;
         int debugUnitCount = 0;
 		foreach (GamePieceInfo gp in gameStateData.GamePieceList)

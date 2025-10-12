@@ -31,41 +31,39 @@ public class TilemapManager : MonoBehaviour
     //private string tilemapFilePath;
 
     //receives a list of all the attributesTile each of which contain the rules for each tile type (defined as a byte)
-    public (int, int) initialize()
+    public (int, int) initialize(bool getRawBounds)
     {
         //tilemapFilePath = "Assets/InitializationData/Maps/Map2";
         //byteToAttributesTileDictionary = inputAttributesTilesDictionary;
         // Log the tilemap reference
         //Debug.Log($"Initializing TilemapManager with tilemap: {tilemap.name}");
 
-        (Vector2Int bounds, Vector2Int deltaFromZero) = GetTilemapBounds();
-        gridWidth = bounds.x;// + deltaFromZero.x;
-        gridHeight = bounds.y;// + deltaFromZero.y;
-
-        gridTrimOffset = 0;
-        gridWidthWithTrim = gridWidth + gridTrimOffset * 2;
-        gridHeightWithTrim = gridHeight + gridTrimOffset * 2;
-        mapFileLocation = "InitializationData/Maps/Map3";
-        //ColorPalette palette = tilemap.ColorPalette;
-
         InitializeTileDictionaries();
 
+        if (getRawBounds)
+        {
+            (Vector2Int bounds, Vector2Int deltaFromZero) = GetTilemapBounds();
+            gridWidth = bounds.x;// + deltaFromZero.x;
+            gridHeight = bounds.y;// + deltaFromZero.y;
+
+            gridTrimOffset = 0;
+            gridWidthWithTrim = gridWidth + gridTrimOffset * 2;
+            gridHeightWithTrim = gridHeight + gridTrimOffset * 2;
 
 
-        //uncomment the appropriate function for testing.
+            //uncomment the appropriate function for testing.
 
-        //TilemapData byteData = ExportTilemapToBytes();
-        //ImportTilemapFromBytes(byteData);
+            //TilemapData byteData = ExportTilemapToBytes();
+            //ImportTilemapFromBytes(byteData);
 
-        //standard map: "Map3Tilemap-v6.dat"
-        //SaveTilemapToFile("Map3Tilemap-v7.dat");
-        //LoadTilemapFromFile("Map3Tilemap-v6.dat");
+            //standard map: "Map3Tilemap-v6.dat"
+            //SaveTilemapToFile("Map3Tilemap-v7.dat");
+            //LoadTilemapFromFile("Map3Tilemap-v6.dat");
 
+            return (gridWidth, gridHeight);
+        }
 
-
-
-
-        return (gridWidth, gridHeight);
+        return (0, 0);
     }
 
     private void InitializeTileDictionaries()
