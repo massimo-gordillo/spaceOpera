@@ -11,7 +11,7 @@ gamePieceId,unitName,progeny,isResourceUnit,unitTerrainType,isInfantry,price,hea
 9,Helicopter,Ertrian,FALSE,air,FALSE,900,200,450,light,heavy,projectile,heavy projectile,TRUE,TRUE,TRUE,TRUE,1,5,TRUE,0,TRUE
 10,AAJet,Ertrian,FALSE,air,FALSE,1800,400,1000,light,light,projectile,light projectile,FALSE,TRUE,FALSE,TRUE,1,7,TRUE,0,TRUE
 11,Bomber,Ertrian,FALSE,air,FALSE,2000,500,1400,light,heavy,projectile,heavy projectile,TRUE,FALSE,TRUE,FALSE,1,5,TRUE,0,TRUE
-12,Battleship,Ertrian,FALSE,air,FALSE,2500,1300,1500,heavy,heavy,projectile,heavy projectile,TRUE,TRUE,TRUE,TRUE,2,4,TRUE,0,TRUE
+12,Battleship,Ertrian,FALSE,air,FALSE,2500,1300,1500,heavy,heavy,projectile,heavy projectile,TRUE,TRUE,TRUE,TRUE,1,4,TRUE,0,TRUE
 50,Spore,Virix,TRUE,air,TRUE,0,50,0,light,light,melee,light melee,FALSE,FALSE,FALSE,FALSE,0,3,FALSE,0,TRUE
 51,Hornet,Virix,FALSE,air,FALSE,700,200,200,light,light,melee,light melee,TRUE,TRUE,TRUE,TRUE,1,5,TRUE,0,TRUE
 52,Ghoul,Virix,FALSE,land,FALSE,800,400,200,light,heavy,melee,heavy melee,TRUE,FALSE,TRUE,TRUE,1,5,TRUE,0,TRUE

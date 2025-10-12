@@ -145,7 +145,7 @@ public class GameMaster : MonoBehaviour
             if (!MatchSettings.CPU_isOn)
             {
                 Debug.LogWarning("Match settings says CPU is off but manual CPU is on, defaulting to hard values.");
-                CPU_PlayersList[1] = false;
+                CPU_PlayersList[1] = true;
                 CPU_PlayersList[2] = true;
             }
         }
@@ -215,8 +215,8 @@ public class GameMaster : MonoBehaviour
         {
             //(string mapType, int mapNum, int varNum) = ("multi", 7, 1);
             tilemapManager.initialize(false);
-            LoadGameStateFromFile("multi",8, 3);
-            //LoadGameStateFromFile("multi", 7, 1);
+            //LoadGameStateFromFile("multi",8, 3);
+            LoadGameStateFromFile("multi", 7, 1);
 
         }
         else

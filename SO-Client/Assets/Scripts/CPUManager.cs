@@ -210,24 +210,25 @@ public class CPUManager : MonoBehaviour
         Queue<Vector2Int> movementQueue = new Queue<Vector2Int>();
         Queue<Vector2Int> attackQueue = new Queue<Vector2Int>();
         Queue<Vector2Int> structureQueue = new Queue<Vector2Int>();
+        Queue<Vector2Int> tempAttackUnitQueue = new Queue<Vector2Int>();
 
         masterGrid.clearParentMap(unit.pos); //clear the movement parent map for this unit, otherwise it will be stale from last turn.
 
         //List<Queue<Vector2Int>> squareQueuesList = null;
         if (unit.attackRange <= 1)
         {
-            masterGrid.FloodFillSearch(unit, unit.movementRange, unit.attackRange, out movementQueue, out Queue<Vector2Int> tempAttackQueue, out structureQueue);
-            while (tempAttackQueue.Count > 0)
+            masterGrid.FloodFillSearch(unit, unit.movementRange, unit.attackRange, out movementQueue, out Queue<Vector2Int> tempAttackSquareQueue, out structureQueue);
+            while (tempAttackSquareQueue.Count > 0)
             {
-                Vector2Int attackSquare = tempAttackQueue.Dequeue();
-                attackQueue.Enqueue(attackSquare);
+                Vector2Int attackSquare = tempAttackSquareQueue.Dequeue();
+                //attackQueue.Enqueue(attackSquare);
                 if (isCurious)
                     Debug.Log($"unit {unit.pos} has attack location {attackSquare}");
 
                 BaseUnit attackable = masterGrid.whatUnitIsInThisLocation(attackSquare);
-                if (attackable!=null) 
-                { 
-                    if (isCurious && attackSquare == new Vector2Int(12, 8))
+                if (attackable != null)
+                {
+                    if (isCurious)
                         Debug.Log($"BOOL: unit {unit.pos}, has found an attackable? {attackable} owned by player {attackable.playerControl}, can they attack it? {masterGrid.canUnitAttack(unit, attackable)}");
 
                     if (unit.attackRange > 1)
@@ -236,53 +237,69 @@ public class CPUManager : MonoBehaviour
 
                 if (attackable != null && masterGrid.canUnitAttack(unit, attackable))
                 {
-                    //if the parent is occupied, check if we can pick a different parent.
-                    BaseUnit parentUnit = masterGrid.whatUnitIsInThisLocation(masterGrid.GetMovementParent(attackSquare));
-                    if (parentUnit != null && parentUnit != unit)
-                    {
-                        Debug.LogError($"Unit {unit.pos} has an attackable unit at {attackSquare} but the parent square is occupied, trying to find a new parent square.");
-                        List<Vector2Int> dirs = masterGrid.DirectionList();
-                        Vector2Int previousParentDelta = masterGrid.GetMovementParent(attackSquare) - attackSquare;
-                        dirs.Remove(previousParentDelta);
-                        int dirCount = 1;
-                        foreach(Vector2Int dir in dirs)
-                        {
-                            Vector2Int adjacentSquare = attackSquare + dir;
-                            if (movementQueue.Contains(adjacentSquare))
-                            {
-                                if (masterGrid.whatUnitIsInThisLocation(adjacentSquare) == null)
-                                {
-                                    //set new parent to adjacent square
-                                    Debug.LogError($"Unit {unit.pos} has an attackable unit at {attackSquare} but the parent square was occupied, setting adjacent square {adjacentSquare} as new parent square.");
-                                    masterGrid.SetMovementParent(attackSquare, adjacentSquare);
-                                    break;
-                                    /*                                        unit.CPU_AttackableUnitList.Add(attackable);
-                                                                        if (isCurious)
-                                                                            Debug.Log($"counting: Unit {unit.pos} has an attack list of length {unit.CPU_AttackableUnitList.Count}");
+                    //add unit to attack queue.
+                    tempAttackUnitQueue.Enqueue(attackSquare);
+                }
+            }
 
-                                                                        if (attackable.isResourceUnit)
-                                                                        {
-                                                                            *//*if (attackable.unitName == "Spore")
-                                                                                Debug.LogError($"Unit {unit.pos} adding spore to resourceAttackList {attackable.pos}");
-                                                                            *//*
-                                                                            unit.CPU_AttackableResourceUnitList.Add(attackable);
-                                                                        }*/
-                                }else
-                                    dirCount++;
+            
+            while (tempAttackUnitQueue.Count > 0)
+            {
+                Vector2Int attackSquare = tempAttackUnitQueue.Dequeue();
+                //if the parent is occupied, check if we can pick a different parent.
+                BaseUnit parentUnit = masterGrid.whatUnitIsInThisLocation(masterGrid.GetMovementParent(attackSquare));
+                if (parentUnit != null && parentUnit != unit)
+                {
+                    Debug.LogWarning($"Unit {unit.pos} has an attackable unit at {attackSquare} but the parent square is occupied, trying to find a new parent square.");
+                    List<Vector2Int> dirs = masterGrid.DirectionList();
+                    Vector2Int previousParentDelta = masterGrid.GetMovementParent(attackSquare) - attackSquare;
+                    dirs.Remove(previousParentDelta);
+                    int dirCount = 1;
+                    foreach (Vector2Int dir in dirs)
+                    {
+                        Vector2Int adjacentSquare = attackSquare + dir;
+                        if (movementQueue.Contains(adjacentSquare))
+                        {
+                            if (masterGrid.whatUnitIsInThisLocation(adjacentSquare) == null)
+                            {
+                                //set new parent to adjacent square
+                                Debug.LogWarning($"Unit {unit.pos} has an attackable unit at {attackSquare} but the parent square was occupied, setting adjacent square {adjacentSquare} as new parent square.");
+                                masterGrid.SetMovementParent(attackSquare, adjacentSquare);
+                                break;
+                                /*  unit.CPU_AttackableUnitList.Add(attackable);
+                                if (isCurious)
+                                    Debug.Log($"counting: Unit {unit.pos} has an attack list of length {unit.CPU_AttackableUnitList.Count}");
+
+                                if (attackable.isResourceUnit)
+                                {
+                                    *//*if (attackable.unitName == "Spore")
+                                        Debug.LogError($"Unit {unit.pos} adding spore to resourceAttackList {attackable.pos}");
+                                    *//*
+                                    unit.CPU_AttackableResourceUnitList.Add(attackable);
+                                }*/
                             }
                             else
                                 dirCount++;
                         }
-
-                        if(dirCount == 4) //if we checked all 4 directions then remove it from the attackList.
-                        {
-                            Debug.LogError($"Unit {unit.pos} has an attackable unit at {attackSquare} but the parent square is occupied, and no adjacent squares are available, removing from attack list.");
-                            attackQueue.Dequeue();
-                        }
+                        else
+                            dirCount++;
                     }
-                    
+
+                    if (dirCount == 4) //if we checked all 4 directions then remove it from the attackList.
+                    {
+                        Debug.LogWarning($"Unit {unit.pos} has an attackable unit at {attackSquare} but the parent square is occupied, and no adjacent squares are available, removing from attack list.");
+                    }
+                    else
+                    {
+                        attackQueue.Enqueue(attackSquare); //add it to the attack queue if we found a new parent square.
+                        Debug.Log($"Unit {unit.pos} has an attackable unit at {attackSquare} but the parent square is occupied, but new square was found, adding unit to attack list.");
+                    }
                 }
-                
+                else
+                {
+                    //Debug.Log($"Unit {unit.pos} added {attackSquare} to attack list.");
+                    attackQueue.Enqueue(attackSquare);
+                }
             }
         }
         if (unit.attackRange > 1) //notably this logic is the same in masterGrid.drawMovement(). I suspect I should generalize drawMovement, it would be much better.
@@ -502,7 +519,8 @@ public class CPUManager : MonoBehaviour
         //if unit will fire back calculate that
         if (masterGrid.getDamageBeforeLuck(attacker, defender, false) < defender.healthCurrent)
             firebackCost = Math.Min(masterGrid.getDamageBeforeLuck(defender, attacker, true), attacker.healthCurrent) * attacker.price / attacker.healthMax;
-        if (defender.isResourceUnit || !defender.canFireBack)//|| (attacker.unitName == "Blacksmith" && defender.unitName == "LightTank"))
+        
+        if (defender.isResourceUnit || !defender.canFireBack || !masterGrid.canUnitAttack(defender,attacker))//|| (attacker.unitName == "Blacksmith" && defender.unitName == "LightTank"))
             firebackCost = 0;
         double delta = attackCost - firebackCost;
         //Debug.Log($"DELTA: {attacker.pos} checking {defender.pos}, attack cost: {attackCost}, fireback cost: {firebackCost}, delta is {delta}");
