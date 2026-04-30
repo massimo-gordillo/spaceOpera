@@ -176,8 +176,9 @@ public class BaseStructure : MonoBehaviour
 
     }
 
-    public IEnumerator captureByPercentage(int percentCapturing, int playerCapturing)
+    public IEnumerator captureByPercentage(int percentCapturing, BaseUnit capturingUnit)
     {
+        int playerCapturing = capturingUnit.playerControl;
         //int prevCaptureHealth = captureHealth;
         if (playerCapturing != playerControl)
         {
@@ -185,7 +186,11 @@ public class BaseStructure : MonoBehaviour
             if (percentCapturing < captureHealth)
                 SetCaptureHealth(captureHealth - percentCapturing);
             else
+            {
+                if(GameMaster.CPU_isOn && capturingUnit.CPU_IsCapturing)
+                    capturingUnit.CPU_IsCapturing = false;
                 yield return StartCoroutine(switchAlliance(playerCapturing));
+            }
             //Debug.Log("capture newHealth: " + captureHealth + "selectedUnithealth " + percentCapturing);
         }else
             Debug.LogError("Player " + playerCapturing + " tried to capture their own structure");

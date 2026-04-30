@@ -82,8 +82,8 @@ public class NetworkNode
                     
                     if (neighbour.closestUnclaimedDistance[playerControl] > edge.distance || neighbour.closestUnclaimed[playerUnclaiming] == null) 
                     {
-                        //neighbour.CalculateClosestUnclaimedNeighbour(playerControl);
-                        neighbour.UpdateClosestUnclaimedNeighbourDueToUnclaim(this, playerUnclaiming);
+                        //neighbour.FindNearestUnclaimedNeighbourNaive(playerControl);
+                        neighbour.UpdateClosestUnclaimedNeighbourDueToUnclaim(this, playerUnclaiming, edge.distance);
                     }
                 }
                 else
@@ -98,22 +98,28 @@ public class NetworkNode
         }
     }
 
-    public void UpdateClosestUnclaimedNeighbourDueToUnclaim(NetworkNode unclaimedNode, int playerControl)
+    public void UpdateClosestUnclaimedNeighbourDueToUnclaim(NetworkNode unclaimedNode, int playerControl, int distance)
     {
-        //2026-04-07: something about previously claimed... If we shared a closest unclaimed, then we should accept this new unclaimedNode instead.
 
-        if(closestUnclaimed[playerControl] != unclaimedNode)
+        /*
+         //It's possible that this safety check is necessary, but will assume things work correctly for now.
+        if(distance < closestUnclaimedDistance[playerControl])
+            FindNearestUnclaimedNeighbourDijkstra(this, playerControl, distance+1,6);
+        */
+        if (distance < closestUnclaimedDistance[playerControl])
         {
-            return;
+            closestUnclaimed[playerControl] = unclaimedNode;
+            closestUnclaimedDistance[playerControl] = distance;
         }
 
-        closestUnclaimed[playerControl] = unclaimedNode;
-        foreach (NetworkNode neighbour in localNodes)
+
+        foreach (NetworkEdge edge in localEdges)
         {
+            NetworkNode neighbour = edge.GetOtherNode(this);
             //if this node and its neighbour previously had the same closest unclaimed, then it too should update its closest unclaimed neighbour
             if (neighbour.closestUnclaimed[playerControl] == unclaimedNode)
             {
-                neighbour.UpdateClosestUnclaimedNeighbourDueToUnclaim(unclaimedNode, playerControl);
+                neighbour.UpdateClosestUnclaimedNeighbourDueToUnclaim(unclaimedNode, playerControl, distance + edge.distance);
             }
         }
         
@@ -123,12 +129,12 @@ public class NetworkNode
     {
         if (closestUnclaimed[playerControl] == neighbour)
         {
-            CalculateClosestUnclaimedNeighbour(playerControl);
+            closestUnclaimed[playerControl] = FindNearestUnclaimedNeighbourDijkstra(this, playerControl);
         }
         else //If this wasn't your closest unclaimed, do nothing.
         {
             //in theory we could have a dict of nodes, edge, and raw vector distance but this shorthand is ok for now.
-            //CalculateClosestUnclaimedNeighbour(playerControl);
+            //FindNearestUnclaimedNeighbourNaive(playerControl);
         }
     }
 
@@ -174,7 +180,7 @@ public class NetworkNode
 
 
 
-    public void CalculateClosestUnclaimedNeighbour(int playerControl)
+    public void FindNearestUnclaimedNeighbourNaive(int playerControl)
     {
         //bool isCurious = false;
 /*        if (this.pos == new Vector2Int(1, 1))
@@ -212,12 +218,7 @@ public class NetworkNode
         }
         if (shortest == null || shortestNeighbour == null)
         {
-            // if all its neighbours are claimed, ask its neighbours (recursively) to give their target node.
-
-            //closestUnclaimed[playerControl]  = GetClosestUnclaimedNotMe(playerControl, this);
-
-            if(closestUnclaimed[playerControl] == null)
-                DefaultClosestNeighbour(playerControl);
+            Debug.LogWarning($"Node {pos} unable to find closest unclaimed for {playerControl} in naive search");
         }
         else
         {
@@ -227,18 +228,11 @@ public class NetworkNode
         }
     }
 
-    public void DefaultClosestNeighbour(int player)
+    public NetworkNode DefaultClosestNeighbour(int player, int steps)
     {
-        //some DFS
-        //closestUnclaimed[player] = this;
-        closestUnclaimed[player] = FindNearestUnclaimedBFS(this, player);
-        if (closestUnclaimed[player] == null)
-        {
-
-            Debug.LogWarning($"Node {this.pos} unable to find closest unclaimed in DFS 3 steps");
-            closestUnclaimed[player] = CPUManager.nodeVectorMap[MasterGrid.GetEnemyCommand(player)];
-            closestUnclaimedDistance[player] = arbLargeNumberForClosestUnclaimedDistance; //arb large number
-        }
+        Debug.LogWarning($"Node {this.pos} unable to find closest unclaimed in DFS {steps} steps");
+        closestUnclaimedDistance[player] = arbLargeNumberForClosestUnclaimedDistance; //arb large number
+        return CPUManager.defaultTargets[player];
     }
 
     /*public NetworkNode FindNearestUnclaimedDFS(NetworkNode current, int player, int remainingSteps, HashSet<NetworkNode> visited)
@@ -270,14 +264,11 @@ public class NetworkNode
         return null;
     }*/
 
-    public NetworkNode FindNearestUnclaimedBFS(NetworkNode start, int player)
+    public NetworkNode FindNearestUnclaimedNeighbourDijkstra(NetworkNode start, int player, int maxSteps = 4)
     {
         if (start == null) return null;
-
-        int maxSteps = 4; // override for now
         int shortestDistance = int.MaxValue;
         NetworkNode bestNode = null;
-
 
         Queue<(NetworkNode node, int distance, int steps)> queue = new Queue<(NetworkNode, int, int)>();
         HashSet<NetworkNode> visited = new HashSet<NetworkNode>();
@@ -287,6 +278,7 @@ public class NetworkNode
 
         while (queue.Count > 0)
         {
+
             var (current, distance, steps) = queue.Dequeue();
 
             if (current != start && !current.hasPlayerClaimed[player] && current.IsClaimableBy(player))
@@ -331,10 +323,8 @@ public class NetworkNode
         }
         else
         {
-            Debug.LogWarning($"No unclaimed node found in {maxSteps} for node {start.pos}, defaulting to {CPUManager.defaultTargets[player].pos}");
-            closestUnclaimedDistance[player] = arbLargeNumberForClosestUnclaimedDistance;
-            return CPUManager.defaultTargets[player]; // No unclaimed node found within maxSteps
-
+            Debug.LogWarning($"No unclaimed node found in {maxSteps} steps for node {start.pos}, defaulting to {CPUManager.defaultTargets[player].pos}");
+            return DefaultClosestNeighbour(player, maxSteps);
         }
     }
 

@@ -552,36 +552,39 @@ public class CPUManager : MonoBehaviour
 
         for (int p = 1; p <= GameMaster.numPlayers; p++)
         {
-            List<NetworkNode> nodesWithNoNeighbours = new List<NetworkNode>();
+            List<NetworkNode> nodesWithNoUnclaimedNeighboursAfterNaive = new List<NetworkNode>();
             foreach (NetworkNode n in resourceNetworkNodes)
             {
-                n.CalculateClosestUnclaimedNeighbour(p);
-                if (n.closestUnclaimed[p] == null)
-                    nodesWithNoNeighbours.Add(n);
-            }
-
-            foreach (NetworkNode n in nodesWithNoNeighbours)
-            {
-                n.FindNearestUnclaimedBFS(n, p);
+                n.FindNearestUnclaimedNeighbourNaive(p);
                 if (n.closestUnclaimed[p] == null)
                 {
-                    Debug.LogWarning($"Node {n.pos} for player {p} has no unclaimed neighbor!");
+                    nodesWithNoUnclaimedNeighboursAfterNaive.Add(n);
+                    Debug.Log($"Node {n.pos} for player {p} unable to find a NUN on naive local search, defaulting to n=4 dijkstra's");
                 }
             }
-            /*                while (nodesWithNoNeighbours.Count > 0)
+
+            foreach (NetworkNode n in nodesWithNoUnclaimedNeighboursAfterNaive)
+            {
+                n.closestUnclaimed[p] = n.FindNearestUnclaimedNeighbourDijkstra(n, p, 6);
+                if (n.closestUnclaimed[p] == null)
+                {
+                    Debug.LogWarning($"Node {n.pos} for player {p} has no unclaimed neighbor after Dijkstra's");
+                }
+            }
+            /*                while (nodesWithNoUnclaimedNeighboursAfterNaive.Count > 0)
                             {
-                                NetworkNode n = nodesWithNoNeighbours[0];
+                                NetworkNode n = nodesWithNoUnclaimedNeighboursAfterNaive[0];
                                 var closest = n.GetClosestUnclaimedNotMe(p, n);
                                 n.closestUnclaimed[p] = closest;
 
                                 if (closest == null)
                                 {
                                     Debug.LogWarning($"Node {n.pos} does not have any closest unclaimed after recursion");
-                                    nodesWithNoNeighbours.RemoveAt(0); // Remove anyway to prevent infinite loop
+                                    nodesWithNoUnclaimedNeighboursAfterNaive.RemoveAt(0); // Remove anyway to prevent infinite loop
                                 }
                                 else
                                 {
-                                    nodesWithNoNeighbours.RemoveAt(0);
+                                    nodesWithNoUnclaimedNeighboursAfterNaive.RemoveAt(0);
                                 }
                             }*/
 
@@ -1747,7 +1750,7 @@ public class CPUManager : MonoBehaviour
         {
             //Debug.LogWarning($"Current node {currentNode.pos} does not have a closest unclaimed, trying to set");//{currentNode.closestUnclaimed[unit.playerControl].pos} ");
             //currentNode.closestUnclaimed[unit.playerControl] = currentNode.GetClosestUnclaimedNotMe(unit.playerControl, currentNode);
-            currentNode.closestUnclaimed[unit.playerControl] = currentNode.FindNearestUnclaimedBFS(currentNode, unit.playerControl);
+            currentNode.closestUnclaimed[unit.playerControl] = currentNode.FindNearestUnclaimedNeighbourDijkstra(currentNode, unit.playerControl);
             //Debug.LogWarning($"Node {currentNode.pos} assigned new unclaimed {currentNode.closestUnclaimed[unit.playerControl].pos}");
         }
 
@@ -1765,10 +1768,14 @@ public class CPUManager : MonoBehaviour
         }
         else
         {
-            NetworkNode newTarget = currentNode.FindNearestUnclaimedBFS(currentNode, unit.playerControl);
-            if (newTarget.IsClaimableBy(unit.playerControl))
+            NetworkNode newTarget = currentNode.FindNearestUnclaimedNeighbourDijkstra(currentNode, unit.playerControl,6);
+            if(newTarget == null)
             {
-
+                Debug.LogError($"Unit {unit.pos} could not find a target node in 6 steps. Last attempted target was: {targetNode?.pos}");
+                targetNode = defaultTargets[unit.playerControl];
+            }
+            else if (newTarget.IsClaimableBy(unit.playerControl))
+            {
                 newTarget.ClaimByUnit(unit);
             }/*else
                 Debug.LogWarning($"Unit {unit.pos} is being given assignment by {targetNode.pos} where a 1 step recursive call is still illegal");
@@ -1785,7 +1792,7 @@ public class CPUManager : MonoBehaviour
 
 
 
-    public void GiveCombatUnitNextNodeAssignment(BaseUnit unit)
+    public static void GiveCombatUnitNextNodeAssignment(BaseUnit unit)
     {
         if (unit.CPU_TargetNode == null)
         {
@@ -2580,7 +2587,7 @@ public class CPUManager : MonoBehaviour
             // First pass: assign closestUnclaimed to direct neighbors
             foreach (NetworkNode n in resourceNetworkNodes)
             {
-                n.CalculateClosestUnclaimedNeighbour(p);
+                n.FindNearestUnclaimedNeighbourNaive(p);
                 if (n.closestUnclaimed[p] != null)
                 {
                     bfsQueue.Enqueue(n);

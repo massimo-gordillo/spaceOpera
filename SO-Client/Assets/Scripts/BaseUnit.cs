@@ -84,7 +84,7 @@ public class BaseUnit : MonoBehaviour
     public List<BaseUnit> CPU_CapturingUnitList = new();
     public List<BaseUnit> CPU_AttackableUnitList = new();
     public List<BaseUnit> CPU_AttackableResourceUnitList = new();
-
+    public LineRenderer CPUDebugLine;
 
 
 
@@ -143,6 +143,10 @@ public class BaseUnit : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if(CPU_TargetNode!=null)
+            UpdateLine(CPU_TargetNode.pos);
+
+
         /*if (healthText != null)
         {
             Vector2 newPosition = healthText.transform.parent.position;
@@ -156,26 +160,43 @@ public class BaseUnit : MonoBehaviour
         }*/
     }
 
-/*    public void startupPopulateValues(AttributesBaseUnit data)
+    void UpdateLine(Vector2 targetPos)
     {
-        if (data != null)
+        CPUDebugLine.positionCount = 2;
+        CPUDebugLine.SetPosition(0, transform.position); // Start at unit
+        CPUDebugLine.SetPosition(1, targetPos);          // End at target square
+        CPUDebugLine.startColor = GameMaster.playerColors[playerControl];
+        if (isResourceUnit)
         {
-            unitName = data.unitName;
-            unitTerrainType = data.unitTerrainType;
-            healthMax = data.healthMax;
-            healthType = data.healthType;
-            damageType = data.damageType;
-            weaponType = data.weaponType;
-            baseDamage = data.baseDamage;
-            attackRange = data.attackRange;
-            movementRange = data.movementRange;
-            spriteFillSR.sprite = data.sprite;
-            progeny = data.progeny;
-            price = data.price;
+            CPUDebugLine.endColor = Color.white;
         }
         else
-            print("nodata found");
-    }*/
+        {
+            CPUDebugLine.endColor = Color.black;
+        }
+    }
+
+    /*    public void startupPopulateValues(AttributesBaseUnit data)
+        {
+            if (data != null)
+            {
+                unitName = data.unitName;
+                unitTerrainType = data.unitTerrainType;
+                healthMax = data.healthMax;
+                healthType = data.healthType;
+                damageType = data.damageType;
+                weaponType = data.weaponType;
+                baseDamage = data.baseDamage;
+                attackRange = data.attackRange;
+                movementRange = data.movementRange;
+                spriteFillSR.sprite = data.sprite;
+                progeny = data.progeny;
+                price = data.price;
+            }
+            else
+                print("nodata found");
+        }*/
+
 
     public void staticSpriteHasBeenClicked()
     {
@@ -258,6 +279,17 @@ public class BaseUnit : MonoBehaviour
             int healthStep = Math.Max(1, healthMax / 100); // Ensure healthStep is at least 1
             healthCurrent = (int)(health - (health % healthStep));
             updateHealthUI();
+        }
+        //if CPU resource unit, unclaim target node if below ratio threshold.  
+        if(isResourceUnit && GameMaster.CPU_isOn && health/healthMax < 0.65)
+        {
+            if (!CPU_IsCapturing && CPU_TargetNode != null)
+            {
+                CPU_TargetNode.UnclaimedByPlayer(playerControl);
+                isResourceUnit = false;
+                CPU_TargetNode = null;
+                CPUManager.GiveCombatUnitNextNodeAssignment(this);
+            }
         }
     }
 

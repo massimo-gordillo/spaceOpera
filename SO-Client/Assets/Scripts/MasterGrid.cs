@@ -415,7 +415,7 @@ public class MasterGrid : MonoBehaviour
             clearMovement();
             if (structure != null)
             {
-                yield return structure.captureByPercentage(selectedUnit.getHealthPercentage(), selectedUnit.playerControl);
+                yield return structure.captureByPercentage(selectedUnit.getHealthPercentage(), selectedUnit);
             }
 /*            //print("capture health: " + structure.captureHealth + "selectedUnithealth " + selectedUnit.healthCurrent);
             if (selectedUnit.getHealthPercentage() < structure.captureHealth) //do we want to do this math within BaseStructure?
