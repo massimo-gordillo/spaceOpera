@@ -39,9 +39,6 @@ public class CPUManager : MonoBehaviour
     public MasterGrid masterGrid;
     public CameraManager cameraManager;
 
-
-
-
     public bool[] playersAsCPU = new bool[GameMaster.numPlayers + 1];
 
     List<(BaseUnit unit, int cost, int weight)>[,] matchupWeights;
@@ -51,9 +48,6 @@ public class CPUManager : MonoBehaviour
     public GameObject debugLinePrefab;
     //private float CPU_AnimationWaitTime = GameMaster.globalAnimationDuration;
     public float CPU_AnimationWaitTime; //set in inspector
-
-
-
 
     /*  
         Let's precompute a network between structures for movemenet of units.
@@ -75,8 +69,6 @@ public class CPUManager : MonoBehaviour
      * Right now the solution isn't symmetrical but it's close. I could add a rendundancy check for symmetry by repeating at each corner and adding new edges found.
      * 
  */
-
-
 
     public void naiveV1Start()
     {
@@ -141,9 +133,8 @@ public class CPUManager : MonoBehaviour
         CorrectManhattanDistances(priorityNetworkEdgesAir);
 
         AssignPriorityHeadingsToHQ();
-        SetGroundPriorityNetwork(); //not implemented properly rn.
-                                    //DebugEdges();
-                                    //DebugNodes();
+        SetGroundPriorityNetwork();
+        //DebugNodes();
 
 
 
@@ -554,6 +545,11 @@ public class CPUManager : MonoBehaviour
 
     public void InitClosestNeighbour()
     {
+        foreach(NetworkNode node in resourceNetworkNodes)
+        {
+            node.SortEdges();
+        }
+
         for (int p = 1; p <= GameMaster.numPlayers; p++)
         {
             List<NetworkNode> nodesWithNoNeighbours = new List<NetworkNode>();
@@ -1065,10 +1061,16 @@ public class CPUManager : MonoBehaviour
             Vector2Int target = GetLegalMovementSquareFromPath(finalPath, unit);
             //target = GetAdjacentPosFromBidirectionalSearch(finalPath, target);
             //Debug.Log($"Unit found final target square {target}");
-            masterGrid.selectedUnit = unit;
-            masterGrid.moveSelectedUnit(target);
+            if (target != unit.pos)
+            {
+                masterGrid.selectedUnit = unit;
+                masterGrid.moveSelectedUnit(target);
+                
+            }else 
+            { 
+                Debug.LogWarning($"Unit {unit.pos} unable to move towards target node at {nodePos}, final target square is its current position."); 
+            }
             yield return new WaitForSeconds(CPU_AnimationWaitTime / 1.5f);
-
 
         }
         yield return null;
@@ -1759,7 +1761,6 @@ public class CPUManager : MonoBehaviour
         //Debug.LogWarning($"Unit {unit.pos} has been given assignment {targetNode.pos} by node {currentNode.pos}, its closest unclaimed is {currentNode.closestUnclaimed[unit.playerControl].pos} ");
         if (targetNode.IsClaimableBy(unit.playerControl))
         {
-
             targetNode.ClaimByUnit(unit);
         }
         else

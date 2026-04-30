@@ -400,7 +400,8 @@ public class BaseUnit : MonoBehaviour
     {
         healthTextContainer.text = "0";
         yield return new WaitForSeconds(GameMaster.globalAnimationDuration);
-        healthTextContainer.gameObject.SetActive(false);
+        if(healthTextContainer.isActiveAndEnabled)
+            healthTextContainer.gameObject.SetActive(false);
         StartCoroutine(AnimateCollapseAndBlacken());
         if (unitName != "seed")
         {

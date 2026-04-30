@@ -545,7 +545,7 @@ MonoBehaviour:
   attackRange: 1
   price: 100
   movementRange: 3
-  playerControl: 2
+  playerControl: 1
   team: 0
   orientation: 3
   pos: {x: 17, y: 3}

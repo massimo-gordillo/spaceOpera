@@ -21,6 +21,7 @@ public class NetworkNode
     public bool[] hasPlayerClaimed = new bool[GameMaster.numPlayers + 1];
     //public List<NetworkNode>[] pointingNodes = new List<NetworkNode>[GameMaster.numPlayers]; //list of nodes which see me as their closest unclaimed neighbour
 
+    public int arbLargeNumberForClosestUnclaimedDistance = 10000;
 
     public NetworkNode Npair;
     public NetworkNode Spair;
@@ -56,29 +57,79 @@ public class NetworkNode
             hasPlayerClaimed[playerClaiming] = true;
             foreach (NetworkNode neighbour in localNodes)
             {
-                NeighbourHasSetThemselvesClaimed(this, playerClaiming, true);
+                NeighbourHasSetThemselvesClaimed(this, playerClaiming);
                 if (neighbour.closestUnclaimed[playerClaiming] == null)
                     neighbour.closestUnclaimed[playerClaiming] = this.closestUnclaimed[playerClaiming];
             }
         }
         else
         {
-            Debug.LogWarning($"Node {this.pos} trying to be claimed by unit {unit.pos} but not legal to be claimed, recomputing");
+            Debug.LogError($"Node {this.pos} trying to be claimed by unit {unit.pos} but not legal to be claimed.");
         }
     }
 
-    public void NeighbourHasSetThemselvesClaimed(NetworkNode neighbour, int playerControl, bool captured)
+    public void UnclaimedByPlayer(int playerUnclaiming)
     {
-        if (captured)
-            if (closestUnclaimed[playerControl] == neighbour)
+        if (hasPlayerClaimed[playerUnclaiming])
+        {
+            claimingUnits[playerUnclaiming] = null;
+            hasPlayerClaimed[playerUnclaiming] = false;
+            foreach (NetworkEdge edge in localEdges)
             {
-                CalculateClosestUnclaimedNeighbour(playerControl);
+                NetworkNode neighbour = edge.GetOtherNode(this);
+                if (neighbour != null)
+                {
+                    
+                    if (neighbour.closestUnclaimedDistance[playerControl] > edge.distance || neighbour.closestUnclaimed[playerUnclaiming] == null) 
+                    {
+                        //neighbour.CalculateClosestUnclaimedNeighbour(playerControl);
+                        neighbour.UpdateClosestUnclaimedNeighbourDueToUnclaim(this, playerUnclaiming);
+                    }
+                }
+                else
+                {
+                    Debug.LogError($"Node {this.pos} has an edge to a null neighbour");
+                }
             }
-            else //losing control
+        }
+        else
+        {
+            Debug.LogWarning($"Node {this.pos} trying to be unclaimed by a unit but was not previously claimed by player {playerUnclaiming}");
+        }
+    }
+
+    public void UpdateClosestUnclaimedNeighbourDueToUnclaim(NetworkNode unclaimedNode, int playerControl)
+    {
+        //2026-04-07: something about previously claimed... If we shared a closest unclaimed, then we should accept this new unclaimedNode instead.
+
+        if(closestUnclaimed[playerControl] != unclaimedNode)
+        {
+            return;
+        }
+
+        closestUnclaimed[playerControl] = unclaimedNode;
+        foreach (NetworkNode neighbour in localNodes)
+        {
+            //if this node and its neighbour previously had the same closest unclaimed, then it too should update its closest unclaimed neighbour
+            if (neighbour.closestUnclaimed[playerControl] == unclaimedNode)
             {
-                //in theory we could have a dict of nodes, edge, and raw vector distance but this shorthand is ok for now.
-                CalculateClosestUnclaimedNeighbour(playerControl);
+                neighbour.UpdateClosestUnclaimedNeighbourDueToUnclaim(unclaimedNode, playerControl);
             }
+        }
+        
+    }
+
+    public void NeighbourHasSetThemselvesClaimed(NetworkNode neighbour, int playerControl)
+    {
+        if (closestUnclaimed[playerControl] == neighbour)
+        {
+            CalculateClosestUnclaimedNeighbour(playerControl);
+        }
+        else //If this wasn't your closest unclaimed, do nothing.
+        {
+            //in theory we could have a dict of nodes, edge, and raw vector distance but this shorthand is ok for now.
+            //CalculateClosestUnclaimedNeighbour(playerControl);
+        }
     }
 
     //this implementation had an issue where nodes down the chain didn't know if a non-naitive node swaped from claimed to unclaimed. I would need to also track which nodes are pointing to me.
@@ -150,10 +201,11 @@ public class NetworkNode
 
                     shortest = neighbourEdge.distance;
                     shortestNeighbour = neighbourNode;
-/*                    if (isCurious)
-                    {
-                        Debug.Log($"Node {this.pos} is adding a closest neighbour {shortestNeighbour.pos}");
-                    }*/
+
+                    /*                    if (isCurious)
+                                        {
+                                            Debug.Log($"Node {this.pos} is adding a closest neighbour {shortestNeighbour.pos}");
+                                        }*/
                 }
             }
 
@@ -164,7 +216,8 @@ public class NetworkNode
 
             //closestUnclaimed[playerControl]  = GetClosestUnclaimedNotMe(playerControl, this);
 
-            DefaultClosestNeighbour(playerControl);
+            if(closestUnclaimed[playerControl] == null)
+                DefaultClosestNeighbour(playerControl);
         }
         else
         {
@@ -184,6 +237,7 @@ public class NetworkNode
 
             Debug.LogWarning($"Node {this.pos} unable to find closest unclaimed in DFS 3 steps");
             closestUnclaimed[player] = CPUManager.nodeVectorMap[MasterGrid.GetEnemyCommand(player)];
+            closestUnclaimedDistance[player] = arbLargeNumberForClosestUnclaimedDistance; //arb large number
         }
     }
 
@@ -218,24 +272,42 @@ public class NetworkNode
 
     public NetworkNode FindNearestUnclaimedBFS(NetworkNode start, int player)
     {
-        int maxSteps = 4; // override for now
         if (start == null) return null;
 
-        Queue<(NetworkNode node, int steps)> queue = new Queue<(NetworkNode, int)>();
+        int maxSteps = 4; // override for now
+        int shortestDistance = int.MaxValue;
+        NetworkNode bestNode = null;
+
+
+        Queue<(NetworkNode node, int distance, int steps)> queue = new Queue<(NetworkNode, int, int)>();
         HashSet<NetworkNode> visited = new HashSet<NetworkNode>();
 
-        queue.Enqueue((start, 0));
+        queue.Enqueue((start, 0, 0));
         visited.Add(start);
 
         while (queue.Count > 0)
         {
-            var (current, steps) = queue.Dequeue();
+            var (current, distance, steps) = queue.Dequeue();
 
-            if (!current.hasPlayerClaimed[player] && current.IsClaimableBy(player))
-                return current;
+            if (current != start && !current.hasPlayerClaimed[player] && current.IsClaimableBy(player))
+            {
+                if (distance < shortestDistance)
+                {
+                    shortestDistance = distance;
+                    bestNode = current;
+                }
+                // CRITICAL: We found a target on this branch. 
+                // We don't need to explore its neighbors (they are further away).
+                continue;
+            }
 
             if (steps >= maxSteps)
                 continue;
+
+            if (distance >= shortestDistance)
+            {
+                continue; // We've already found a closer unclaimed node, so skip further exploration
+            }
 
             foreach (var edge in current.localEdges)
             {
@@ -246,15 +318,25 @@ public class NetworkNode
                 if (neighbor != null && !visited.Contains(neighbor))
                 {
                     visited.Add(neighbor);
-                    queue.Enqueue((neighbor, steps + 1));
+                    queue.Enqueue((neighbor, distance + edge.distance, steps + 1));
                 }
             }
         }
 
-        //Debug.Log($"No unclaimed node found in {maxSteps} for node {start.pos}, defaulting to {CPUManager.defaultTargets[player].pos}");
-        return CPUManager.defaultTargets[player]; // No unclaimed node found within maxSteps
-    }
+        if (bestNode != null)
+        {
+            //Debug.Log($"Node {start.pos} found nearest unclaimed node {bestNode.pos} at distance {shortestDistance} in BFS");
+            closestUnclaimedDistance[player] = shortestDistance;
+            return bestNode;
+        }
+        else
+        {
+            Debug.LogWarning($"No unclaimed node found in {maxSteps} for node {start.pos}, defaulting to {CPUManager.defaultTargets[player].pos}");
+            closestUnclaimedDistance[player] = arbLargeNumberForClosestUnclaimedDistance;
+            return CPUManager.defaultTargets[player]; // No unclaimed node found within maxSteps
 
+        }
+    }
 
     /*    public NetworkNode FindNearestUnclaimedBFS(NetworkNode start, int player, int maxSteps)
         {
@@ -298,10 +380,11 @@ public class NetworkNode
     public void SetCaptured(int newPlayer, int oldPlayer)
     {
         playerControl = newPlayer;
+        UnclaimedByPlayer(oldPlayer);
         foreach (NetworkNode neighbourNode in localNodes)
         {
-            neighbourNode.NeighbourHasSetThemselvesClaimed(this, playerControl, true);
-            neighbourNode.NeighbourHasSetThemselvesClaimed(this, oldPlayer, false);
+            neighbourNode.NeighbourHasSetThemselvesClaimed(this, playerControl);
+            //neighbourNode.NeighbourHasSetThemselvesClaimed(this, oldPlayer, false);
         }
     }
 
@@ -311,6 +394,11 @@ public class NetworkNode
             return true;
         else
             return false;
+    }
+
+    public void SortEdges()
+    {
+        localEdges.Sort((a, b) => a.distance.CompareTo(b.distance));
     }
 
     public override bool Equals(object obj)
@@ -330,68 +418,3 @@ public class NetworkNode
 }
 
 
-public class NetworkEdge
-{
-    public NetworkNode nodeA { get; private set; }
-    public NetworkNode nodeB { get; private set; }
-    public Vector2Int vectorA { get; private set; }
-    public Vector2Int vectorB { get; private set; }
-
-    public Vector2Int relativeVector;
-    public int distance { get; set; }
-
-    public bool isLandAccessible = true;
-
-    public bool isPriorityAir = false;
-
-    public bool isPriorityGround = false;
-
-    // Constructor to initialize the NetworkEdge
-    public NetworkEdge(NetworkNode A, NetworkNode B)
-    {
-        nodeA = A;
-        nodeB = B;
-        vectorA = A.pos;
-        vectorB = B.pos;
-        relativeVector = vectorA - vectorB;
-        distance = Mathf.Abs(relativeVector.x) + Mathf.Abs(relativeVector.y);
-        //distance = CalculateManhattanDistance(vectorA, vectorB);
-    }
-
-    // Method to calculate Manhattan distance
-    /*    private int CalculateManhattanDistance(Vector2Int a, Vector2Int b)
-        {
-            return Mathf.Abs(a.x - b.x) + Mathf.Abs(a.y - b.y);
-        }
-    */
-    // Override Equals to ensure that edges are treated the same regardless of order
-    public override bool Equals(object obj)
-    {
-        if (obj is NetworkEdge edge)
-        {
-            return (vectorA == edge.vectorA && vectorB == edge.vectorB) || (vectorA == edge.vectorB && vectorB == edge.vectorA);
-        }
-        return false;
-    }
-
-    // Override GetHashCode to ensure consistent hashing for equal edges
-    public override int GetHashCode()
-    {
-        // Combine the hash codes of vectorA and vectorB, ensuring order doesn't matter
-        return vectorA.GetHashCode() ^ vectorB.GetHashCode();
-    }
-
-    public NetworkNode GetOtherNode(NetworkNode notMe)
-    {
-        //Debug.Log($"Edge {vectorA} to {vectorB} is being asked to provide NOT {lonelyNode.pos} between {nodeA.pos} and {nodeB.pos}");
-        if (notMe.Equals(nodeA)) //using the overridden equals function. I should /maybe/ double check I'm not making a bunch of duplicates, maybe I should pull them from the node list.
-            return nodeB;
-        else if (notMe.Equals(nodeB))
-            return nodeA;
-        else
-        {
-            Debug.LogError($"Edge {vectorA},{vectorB} being asked to return a pair node but foreign node provided");
-            return null;
-        }
-    }
-}
