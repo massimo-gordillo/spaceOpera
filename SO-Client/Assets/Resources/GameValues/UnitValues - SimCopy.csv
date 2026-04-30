@@ -1,0 +1,26 @@
+gamePieceId,unitName,progeny,isResourceUnit,unitTerrainType,isInfantry,price,healthMax,baseDamage,healthType,damageType,weaponType,damageCombined,canAttackLand,canAttackAir,canAttackSea,canFireBack,attackRange,movementRange,canMoveAndAttack,minimumAttackRangeDistance,isNotPrototype
+0,Infantry,Ertrian,TRUE,land,TRUE,100,100,60,light,light,projectile,light projectile,TRUE,TRUE,TRUE,TRUE,1,3,TRUE,0,TRUE
+1,GattlingTank,Ertrian,FALSE,land,FALSE,800,500,300,medium,light,projectile,light projectile,TRUE,TRUE,TRUE,TRUE,1,6,TRUE,0,TRUE
+2,LightTank,Ertrian,FALSE,land,FALSE,700,700,300,medium,heavy,projectile,heavy projectile,TRUE,FALSE,TRUE,TRUE,1,6,TRUE,0,TRUE
+3,Artillery,Ertrian,FALSE,land,FALSE,600,300,400,medium,heavy,projectile,heavy projectile,TRUE,FALSE,TRUE,FALSE,3,4,FALSE,1,TRUE
+4,Rockets,Ertrian,FALSE,land,FALSE,1100,200,400,medium,light,projectile,light projectile,TRUE,TRUE,TRUE,FALSE,5,4,FALSE,1,TRUE
+5,APC,Ertrian,FALSE,land,FALSE,500,500,0,heavy,none,none,none,FALSE,FALSE,FALSE,FALSE,0,7,FALSE,0,FALSE
+6,Electos,Ertrian,FALSE,land,FALSE,600,350,300,light,light,melee,light melee,TRUE,FALSE,FALSE,TRUE,1,4,TRUE,0,FALSE
+7,HeavyTank,Ertrian,FALSE,land,FALSE,1500,1000,800,heavy,heavy,projectile,heavy projectile,TRUE,FALSE,TRUE,TRUE,1,6,TRUE,0,TRUE
+8,EVA,Ertrian,FALSE,land,FALSE,2200,1400,1200,light,heavy,melee,heavy melee,TRUE,FALSE,FALSE,TRUE,1,3,TRUE,0,TRUE
+9,Helicopter,Ertrian,FALSE,air,FALSE,900,200,450,light,heavy,projectile,heavy projectile,TRUE,TRUE,TRUE,TRUE,1,5,TRUE,0,TRUE
+10,AAJet,Ertrian,FALSE,air,FALSE,1800,400,1000,light,light,projectile,light projectile,FALSE,TRUE,FALSE,TRUE,1,7,TRUE,0,TRUE
+11,Bomber,Ertrian,FALSE,air,FALSE,2000,500,1400,light,heavy,projectile,heavy projectile,TRUE,FALSE,TRUE,FALSE,1,5,TRUE,0,TRUE
+12,Battleship,Ertrian,FALSE,air,FALSE,2500,1300,1500,heavy,heavy,projectile,heavy projectile,TRUE,TRUE,TRUE,TRUE,1,4,TRUE,0,TRUE
+50,Spore,Virix,TRUE,air,TRUE,0,50,0,light,light,melee,light melee,FALSE,FALSE,FALSE,FALSE,0,3,FALSE,0,TRUE
+51,Hornet,Virix,FALSE,air,FALSE,500,200,200,light,light,melee,light melee,TRUE,TRUE,TRUE,TRUE,1,5,TRUE,0,TRUE
+52,Ghoul,Virix,FALSE,land,FALSE,600,400,200,light,heavy,melee,heavy melee,TRUE,FALSE,TRUE,TRUE,1,5,TRUE,0,TRUE
+53,Venus,Virix,FALSE,land,FALSE,1000,800,500,medium,heavy,melee,heavy melee,TRUE,FALSE,TRUE,TRUE,1,3,TRUE,0,TRUE
+54,Jumper,Virix,FALSE,land,FALSE,2000,1500,1300,light,heavy,melee,heavy melee,TRUE,TRUE,TRUE,TRUE,1,4,TRUE,0,TRUE
+55,Vampire,Virix,FALSE,air,FALSE,1600,700,400,light,light,melee,light melee,TRUE,TRUE,TRUE,TRUE,1,5,TRUE,0,TRUE
+100,Blacksmith,Sentus,TRUE,land,TRUE,100,200,100,heavy,heavy,melee,heavy melee,TRUE,FALSE,FALSE,FALSE,1,3,TRUE,0,TRUE
+101,Archer,Sentus,FALSE,land,FALSE,600,400,250,light,light,projectile,light projectile,TRUE,TRUE,TRUE,TRUE,1,4,TRUE,0,TRUE
+102,Horsemen,Sentus,FALSE,land,FALSE,900,1000,350,medium,heavy,melee,heavy melee,TRUE,FALSE,FALSE,TRUE,1,6,TRUE,0,TRUE
+103,Zeppelin,Sentus,FALSE,air,FALSE,1600,2000,200,light,light,projectile,light projectile,TRUE,TRUE,TRUE,FALSE,1,4,TRUE,0,FALSE
+104,Catapult,Sentus,FALSE,land,FALSE,1700,1600,900,medium,heavy,projectile,heavy projectile,TRUE,FALSE,FALSE,TRUE,1,5,TRUE,0,TRUE
+105,Wizard,Sentus,FALSE,land,FALSE,2100,1200,1400,heavy,heavy,projectile,heavy projectile,TRUE,TRUE,FALSE,TRUE,1,6,TRUE,0,TRUE
