@@ -48,18 +48,25 @@ public class NetworkNode
 
     public void ClaimByUnit(BaseUnit unit)
     {
+        //Debug.Log($"Node {this.pos} is being claimed by unit {unit.pos} of player {unit.playerControl}");
         if (IsClaimableBy(unit.playerControl))
         {
+            //Debug.Log($"Node {this.pos} is claimable by player {unit.playerControl}, claiming now.");
             unit.CPU_TargetNode = this;
             //unit.CPU_Heading = this.pos;
             int playerClaiming = unit.playerControl;
             claimingUnits[playerClaiming] = unit;
             hasPlayerClaimed[playerClaiming] = true;
-            foreach (NetworkNode neighbour in localNodes)
+            foreach (NetworkEdge edge in localEdges)
             {
+                if(edge.isPriorityAir)
+                    continue;
+                Debug.Log($"Node {this.pos} is telling neighbour {edge.GetOtherNode(this).pos} that player {playerClaiming} has claimed it");
+                NetworkNode neighbour = edge.GetOtherNode(this);
                 NeighbourHasSetThemselvesClaimed(this, playerClaiming);
                 if (neighbour.closestUnclaimed[playerClaiming] == null)
-                    neighbour.closestUnclaimed[playerClaiming] = this.closestUnclaimed[playerClaiming];
+                    Debug.LogError($"Node {this.pos} is claiming for player {playerClaiming} but neighbour {neighbour.pos} has no closest unclaimed for that player");
+                //SetClosestUnclaimedForPlayer(playerClaiming, this.closestUnclaimed[playerClaiming], edge.distance);
             }
         }
         else
@@ -70,27 +77,25 @@ public class NetworkNode
 
     public void UnclaimedByPlayer(int playerUnclaiming)
     {
+        if(playerUnclaiming == 0) return;
         if (hasPlayerClaimed[playerUnclaiming])
         {
             claimingUnits[playerUnclaiming] = null;
             hasPlayerClaimed[playerUnclaiming] = false;
-            foreach (NetworkEdge edge in localEdges)
-            {
-                NetworkNode neighbour = edge.GetOtherNode(this);
-                if (neighbour != null)
-                {
-                    
-                    if (neighbour.closestUnclaimedDistance[playerControl] > edge.distance || neighbour.closestUnclaimed[playerUnclaiming] == null) 
-                    {
-                        //neighbour.FindNearestUnclaimedNeighbourNaive(playerControl);
-                        neighbour.UpdateClosestUnclaimedNeighbourDueToUnclaim(this, playerUnclaiming, edge.distance);
-                    }
-                }
-                else
-                {
-                    Debug.LogError($"Node {this.pos} has an edge to a null neighbour");
-                }
-            }
+            UpdateClosestUnclaimedNeighbourDueToUnclaim(this, playerUnclaiming, 0);
+
+            /*            foreach (NetworkEdge edge in localEdges)
+                        {
+                            NetworkNode neighbour = edge.GetOtherNode(this);
+                            if (neighbour != null)
+                            {
+                               neighbour.UpdateClosestUnclaimedNeighbourDueToUnclaim(this, playerUnclaiming, edge.distance);
+                            }
+                            else
+                            {
+                                Debug.LogError($"Node {this.pos} has an edge to a null neighbour");
+                            }
+                        }*/
         }
         else
         {
@@ -100,28 +105,35 @@ public class NetworkNode
 
     public void UpdateClosestUnclaimedNeighbourDueToUnclaim(NetworkNode unclaimedNode, int playerControl, int distance)
     {
-
         /*
          //It's possible that this safety check is necessary, but will assume things work correctly for now.
         if(distance < closestUnclaimedDistance[playerControl])
             FindNearestUnclaimedNeighbourDijkstra(this, playerControl, distance+1,6);
         */
+        Debug.Log($"DTU: Node {this.pos} is checking if unclaimed node {unclaimedNode.pos} at distance {distance} is closer than current closest unclaimed {closestUnclaimed[playerControl]?.pos} at distance {closestUnclaimedDistance[playerControl]} for player {playerControl}");
         if (distance < closestUnclaimedDistance[playerControl])
         {
-            closestUnclaimed[playerControl] = unclaimedNode;
-            closestUnclaimedDistance[playerControl] = distance;
-        }
-
-
-        foreach (NetworkEdge edge in localEdges)
-        {
-            NetworkNode neighbour = edge.GetOtherNode(this);
-            //if this node and its neighbour previously had the same closest unclaimed, then it too should update its closest unclaimed neighbour
-            if (neighbour.closestUnclaimed[playerControl] == unclaimedNode)
+            if (unclaimedNode != this)
             {
-                neighbour.UpdateClosestUnclaimedNeighbourDueToUnclaim(unclaimedNode, playerControl, distance + edge.distance);
+                SetClosestUnclaimedForPlayer(playerControl, unclaimedNode, distance);
+            }
+
+            foreach (NetworkEdge edge in localEdges)
+            {
+                if(edge.isPriorityAir)
+                    continue;
+                NetworkNode neighbour = edge.GetOtherNode(this);
+                if (neighbour != unclaimedNode)
+                {
+                    Debug.Log($"TRUE! Node {this.pos} is telling neighbour {neighbour.pos} to update closest unclaimed with node {unclaimedNode.pos} at distance {distance + edge.distance} for player {playerControl}");
+                    neighbour.UpdateClosestUnclaimedNeighbourDueToUnclaim(unclaimedNode, playerControl, distance + edge.distance);
+                }
             }
         }
+
+
+
+
         
     }
 
@@ -129,7 +141,10 @@ public class NetworkNode
     {
         if (closestUnclaimed[playerControl] == neighbour)
         {
-            closestUnclaimed[playerControl] = FindNearestUnclaimedNeighbourDijkstra(this, playerControl);
+            Debug.Log($"Node {this.pos} is updating closest unclaimed for player {playerControl} because neighbour {neighbour.pos} has set themselves claimed");
+            (NetworkNode closestNode, int distance) = FindNearestUnclaimedNeighbourDijkstra(this, playerControl);
+            SetClosestUnclaimedForPlayer(playerControl, closestNode, distance);
+            Debug.Log($"Node {this.pos} has updated closest unclaimed for player {playerControl} to {closestNode?.pos} at distance {distance}");
         }
         else //If this wasn't your closest unclaimed, do nothing.
         {
@@ -193,6 +208,8 @@ public class NetworkNode
         NetworkNode shortestNeighbour = null;
         foreach (NetworkEdge neighbourEdge in localEdges)
         {
+            if (neighbourEdge.isPriorityAir)
+                continue;
             NetworkNode neighbourNode = neighbourEdge.GetOtherNode(this);
             //Debug.Log($"Node {pos} says its neighbour is {neighbourNode.pos}, which player {playerControl} controls? {playerControl == neighbourNode.playerControl}. Has this player claimed it? {neighbourNode.hasPlayerClaimed[playerControl]}");
 /*            if (isCurious)
@@ -222,8 +239,7 @@ public class NetworkNode
         }
         else
         {
-            closestUnclaimed[playerControl] = shortestNeighbour;
-            closestUnclaimedDistance[playerControl] = (int)shortest;
+            SetClosestUnclaimedForPlayer(playerControl, shortestNeighbour, (int)shortest);
             //Debug.Log($"Node {pos} says its closest unclaimed neighbour for player {playerControl} is {shortestNeighbour.pos}");
         }
     }
@@ -264,9 +280,13 @@ public class NetworkNode
         return null;
     }*/
 
-    public NetworkNode FindNearestUnclaimedNeighbourDijkstra(NetworkNode start, int player, int maxSteps = 4)
+    public (NetworkNode,int) FindNearestUnclaimedNeighbourDijkstra(NetworkNode start, int player, int maxSteps = 4)
     {
-        if (start == null) return null;
+        if (start == null)
+        {
+            Debug.LogError($"FindNearestUnclaimedNeighbourDijkstra called with null start node for player {player}");
+            return (null, 0);
+        }
         int shortestDistance = int.MaxValue;
         NetworkNode bestNode = null;
 
@@ -318,13 +338,13 @@ public class NetworkNode
         if (bestNode != null)
         {
             //Debug.Log($"Node {start.pos} found nearest unclaimed node {bestNode.pos} at distance {shortestDistance} in BFS");
-            closestUnclaimedDistance[player] = shortestDistance;
-            return bestNode;
+            
+            return (bestNode, shortestDistance);
         }
         else
         {
             Debug.LogWarning($"No unclaimed node found in {maxSteps} steps for node {start.pos}, defaulting to {CPUManager.defaultTargets[player].pos}");
-            return DefaultClosestNeighbour(player, maxSteps);
+            return (DefaultClosestNeighbour(player, maxSteps), int.MaxValue);
         }
     }
 
@@ -365,7 +385,15 @@ public class NetworkNode
             return null; // No unclaimed node found within maxSteps
         }*/
 
-
+    public void SetClosestUnclaimedForPlayer(int player, NetworkNode unclaimedNode, int distance)
+    {
+        closestUnclaimed[player] = unclaimedNode;
+        closestUnclaimedDistance[player] = distance;
+        if(unclaimedNode != null)
+            structure.DrawClosestUnclaimedLine(unclaimedNode.pos);
+        else
+            Debug.LogWarning($"Node {this.pos} is setting closest unclaimed for player {player} to null");
+    }
 
     public void SetCaptured(int newPlayer, int oldPlayer)
     {

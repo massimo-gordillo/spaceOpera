@@ -699,6 +699,7 @@ MonoBehaviour:
   progeny1ProductionCaptureSpriteContainer: {fileID: 0}
   progeny2ResourceCaptureSpriteContainer: {fileID: 0}
   progeny2ProductionCaptureSpriteContainer: {fileID: 0}
+  CPUDebugLine: {fileID: 0}
   lowerSpriteContainer: {fileID: 117149164539349588}
   lowerSpriteSR: {fileID: 0}
   upperSpriteContainer: {fileID: 5362058736772821666}

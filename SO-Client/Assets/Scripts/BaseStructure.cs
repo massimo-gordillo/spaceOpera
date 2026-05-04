@@ -30,6 +30,8 @@ public class BaseStructure : MonoBehaviour
     public StaticSprite progeny2ResourceCaptureSpriteContainer;
     public StaticSprite progeny2ProductionCaptureSpriteContainer;
 
+    public LineRenderer CPUDebugLine;
+
     public virtual void Initialize()
     {
         gamePieceId = 200 + structureType; //structure ids start at 200.
@@ -68,6 +70,27 @@ public class BaseStructure : MonoBehaviour
 
         StartCoroutine(WaitedSetColour());
         
+    }
+
+
+    public void DrawClosestUnclaimedLine(Vector2 targetPos)
+    {
+        if(structureType == 5)
+        {
+            return;
+        }
+        //CPUDebugLine.positionCount = 2;
+        CPUDebugLine.SetPosition(0, transform.position); // Start at unit
+        CPUDebugLine.SetPosition(1, targetPos);          // End at target square
+/*        CPUDebugLine.startColor = GameMaster.playerColors[playerControl];
+        if (isResourceUnit)
+        {
+            CPUDebugLine.endColor = Color.white;
+        }
+        else
+        {
+            CPUDebugLine.endColor = Color.black;
+        }*/
     }
 
     public IEnumerator WaitedSetColour()

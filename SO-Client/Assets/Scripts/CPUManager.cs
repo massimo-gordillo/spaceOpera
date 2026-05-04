@@ -565,7 +565,8 @@ public class CPUManager : MonoBehaviour
 
             foreach (NetworkNode n in nodesWithNoUnclaimedNeighboursAfterNaive)
             {
-                n.closestUnclaimed[p] = n.FindNearestUnclaimedNeighbourDijkstra(n, p, 6);
+                (NetworkNode closestNode, int distance) = n.FindNearestUnclaimedNeighbourDijkstra(n, p, 6);
+                n.SetClosestUnclaimedForPlayer(p, closestNode, distance);
                 if (n.closestUnclaimed[p] == null)
                 {
                     Debug.LogWarning($"Node {n.pos} for player {p} has no unclaimed neighbor after Dijkstra's");
@@ -1518,7 +1519,10 @@ public class CPUManager : MonoBehaviour
         gameMaster.selectedStructure = prod;
         gameMaster.ProduceUnit(unit, prod.playerControl, false);
         priorityNodeVectorMap.TryGetValue(prod.pos, out unit.CPU_TargetNode);
-        GiveCombatUnitNextNodeAssignment(unit);
+        if(unit.isResourceUnit)
+            GiveResourceUnitNodeAssignment(unit);
+        else
+            GiveCombatUnitNextNodeAssignment(unit);
         yield return new WaitForSeconds(CPU_AnimationWaitTime);
     }
 
@@ -1750,7 +1754,9 @@ public class CPUManager : MonoBehaviour
         {
             //Debug.LogWarning($"Current node {currentNode.pos} does not have a closest unclaimed, trying to set");//{currentNode.closestUnclaimed[unit.playerControl].pos} ");
             //currentNode.closestUnclaimed[unit.playerControl] = currentNode.GetClosestUnclaimedNotMe(unit.playerControl, currentNode);
-            currentNode.closestUnclaimed[unit.playerControl] = currentNode.FindNearestUnclaimedNeighbourDijkstra(currentNode, unit.playerControl);
+            (NetworkNode closest, int d) = currentNode.FindNearestUnclaimedNeighbourDijkstra(currentNode, unit.playerControl);
+            currentNode.SetClosestUnclaimedForPlayer(unit.playerControl, closest, d);
+            //currentNode.closestUnclaimed[unit.playerControl] = closest;
             //Debug.LogWarning($"Node {currentNode.pos} assigned new unclaimed {currentNode.closestUnclaimed[unit.playerControl].pos}");
         }
 
@@ -1768,7 +1774,7 @@ public class CPUManager : MonoBehaviour
         }
         else
         {
-            NetworkNode newTarget = currentNode.FindNearestUnclaimedNeighbourDijkstra(currentNode, unit.playerControl,6);
+            (NetworkNode newTarget, int d) = currentNode.FindNearestUnclaimedNeighbourDijkstra(currentNode, unit.playerControl,6);
             if(newTarget == null)
             {
                 Debug.LogError($"Unit {unit.pos} could not find a target node in 6 steps. Last attempted target was: {targetNode?.pos}");
