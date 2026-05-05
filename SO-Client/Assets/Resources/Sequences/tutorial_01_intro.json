@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "sequenceId": "tutorial_01_intro",
+  "missionId": "tutorial_01",
+  "description": "Example sequence for JSON-driven tutorial flow.",
+  "steps": [
+    {
+      "id": "lock_input_start",
+      "type": "setInputLock",
+      "locked": true,
+      "reason": "tutorial_intro"
+    },
+    {
+      "id": "dialogue_1",
+      "type": "dialogue",
+      "speaker": "Command",
+      "text": "Welcome commander. Let's learn movement.",
+      "waitForContinue": true
+    },
+    {
+      "id": "focus_hq",
+      "type": "cameraFocus",
+      "target": { "x": 8, "y": 5 },
+      "durationMs": 500
+    },
+    {
+      "id": "highlight_end_turn",
+      "type": "highlightTarget",
+      "target": { "uiTarget": "endTurnButton" }
+    },
+    {
+      "id": "unlock_input",
+      "type": "setInputLock",
+      "locked": false
+    }
+  ]
+}

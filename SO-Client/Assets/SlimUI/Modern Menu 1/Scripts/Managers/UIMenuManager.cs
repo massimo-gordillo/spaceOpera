@@ -100,6 +100,9 @@ namespace SlimUI.ModernMenu{
         public GameObject progenySelectMenu;
         public TutorialManager tutorialManager;
 
+        [Tooltip("Must match a key in MatchSettings scenario table (e.g. tutorial_01_intro).")]
+        public string playableTutorialScenarioId = "tutorial_01_intro";
+
 
         void Awake()
         {
@@ -507,7 +510,18 @@ namespace SlimUI.ModernMenu{
             yield return null;
         }
 
+        public void StartPlayableTutorialFromMenu()
+        {
 
+            if (!MatchSettings.ApplyTutorialScenario(playableTutorialScenarioId))
+            {
+                return;
+            }
+
+            LoadScene("GameScene");
+        }
 
     }
+
+
 }

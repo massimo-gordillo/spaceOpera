@@ -35,6 +35,7 @@ public class UIProgenySelectManager : MonoBehaviour
 
     void Start()
     {
+        MatchSettings.PrepareSkirmishFromMenu();
         //playerProgenys = new int[numPlayers];
         MatchSettings.SetNumPlayers(numPlayers);
         MatchSettings.SetPlayerColours();

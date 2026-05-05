@@ -22,6 +22,7 @@ public class GameMaster : MonoBehaviour
     public SupabaseManager supabaseManager;
     public CPUManager CPUManager;
     public CameraManager cameraManager;
+    public SequenceManager sequenceManager;
     public Canvas canvas;
     
 
@@ -213,11 +214,9 @@ public class GameMaster : MonoBehaviour
 
         if (manualLoadGameStateFromFile)
         {
-            //(string mapType, int mapNum, int varNum) = ("multi", 7, 1);
             tilemapManager.initialize(false);
-            //LoadGameStateFromFile("multi",8, 3);
-            LoadGameStateFromFile("multi", 7, 1);
-
+            MatchSettings.GetMapLoadParameters(out string mapType, out int mapNum, out int mapVersion);
+            LoadGameStateFromFile(mapType, mapNum, mapVersion);
         }
         else
         {
@@ -318,6 +317,21 @@ public class GameMaster : MonoBehaviour
         if (CPU_isOn)
         {
             StartCoroutine(WaitForCPUFirstTurn());
+        }
+
+        if (sequenceManager != null)
+        {
+            if (MatchSettings.gameMode == MatchSettings.MatchGameMode.Tutorial)
+            {
+                string introPath = MatchSettings.GetIntroSequenceResourcePath();
+                if (!string.IsNullOrWhiteSpace(introPath))
+                {
+                    sequenceManager.runIntroOnStart = true;
+                    sequenceManager.introSequenceResourcePath = introPath;
+                }
+            }
+
+            sequenceManager.TryRunIntroSequence();
         }
 
         //SaveGameStateToFile("multi", 8, 3);
@@ -840,12 +854,19 @@ public class GameMaster : MonoBehaviour
             endTurnButton.interactable = false;
             //end all coroutines
             StopAllCoroutines();
-
-            displayWinnerCard(player);
+            if (sequenceManager != null && sequenceManager.HasOutroSequence())
+            {
+                StartCoroutine(sequenceManager.RunOutroThen(() => displayWinnerCard(player)));
+            }
+            else
+            {
+                displayWinnerCard(player);
+            }
         }
     }
     public void LoadMainMenuScreen()
     {
+        MatchSettings.PrepareSkirmishFromMenu();
         StartCoroutine(LoadAsynchronously("MenuScene"));
     }
 

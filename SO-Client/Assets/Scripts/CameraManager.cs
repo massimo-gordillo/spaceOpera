@@ -46,6 +46,11 @@ public class CameraManager : MonoBehaviour
 
     void Update()
     {
+        if (gameMaster != null && gameMaster.sequenceManager != null && gameMaster.sequenceManager.IsInputLocked())
+        {
+            return;
+        }
+
         if((GameMaster.CPU_isOn && GameMaster.CPU_PlayersList[GameMaster.playerTurn] && !GameMaster.isGameComplete))
         {
             return; // Do not allow camera movement during CPU turns unless game is over.
@@ -352,6 +357,12 @@ public class CameraManager : MonoBehaviour
     private void HandleObjectClick(ClickableObject clickableObject)
     {
         clickableObject.HandleClick();
+        if (gameMaster != null && gameMaster.sequenceManager != null)
+        {
+            Vector3 worldPos = clickableObject.transform.position;
+            Vector2Int gridPos = new Vector2Int(Mathf.RoundToInt(worldPos.x), Mathf.RoundToInt(worldPos.y));
+            gameMaster.sequenceManager.NotifyWorldObjectClicked(gridPos, clickableObject);
+        }
         Vector3 objectPosition = clickableObject.transform.position;
         float menuWidthInWorldUnits = gameMaster.choicePanel.GetComponent<RectTransform>().rect.width * cam.orthographicSize * 2 / Screen.height;
         float camHeight = cam.orthographicSize;

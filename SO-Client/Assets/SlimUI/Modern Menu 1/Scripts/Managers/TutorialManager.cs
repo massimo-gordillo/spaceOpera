@@ -325,6 +325,8 @@ public class TutorialManager : MonoBehaviour
 
     }
 
+
+
     public void DisableOutsideButtons()
     {
         tutorialCards[0].backButton.onClick.RemoveAllListeners(); // Remove any existing listeners
