@@ -75,10 +75,6 @@ public class BaseStructure : MonoBehaviour
 
     public void DrawClosestUnclaimedLine(Vector2 targetPos)
     {
-        if(structureType == 5)
-        {
-            return;
-        }
         //CPUDebugLine.positionCount = 2;
         CPUDebugLine.SetPosition(0, transform.position); // Start at unit
         CPUDebugLine.SetPosition(1, targetPos);          // End at target square

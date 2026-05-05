@@ -140,25 +140,12 @@ public class BaseUnit : MonoBehaviour
         }
 
     }
-    // Update is called once per frame
-    void Update()
+    
+/*    void Update()
     {
         if(CPU_TargetNode!=null)
             UpdateLine(CPU_TargetNode.pos);
-
-
-        /*if (healthText != null)
-        {
-            Vector2 newPosition = healthText.transform.parent.position;
-            newPosition.x = (float)(xPos - 0.5);
-            newPosition.y = (float)(yPos - 0.5);
-            healthText.transform.parent.position = newPosition;
-            print(healthText.transform.parent.position.x);
-            print(healthText.transform.parent.position.y);
-            //healthText.transform.parent.position.x = healthText.parent.transform.position.x - 0.5;
-            //healthText.transform.parent.position.y = healthText.parent.transform.position.y - 0.5;
-        }*/
-    }
+    }*/
 
     void UpdateLine(Vector2 targetPos)
     {
