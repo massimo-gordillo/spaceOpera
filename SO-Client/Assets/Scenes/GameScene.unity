@@ -20643,9 +20643,9 @@ MonoBehaviour:
   gameMaster: {fileID: 1024135144}
   masterGrid: {fileID: 450342577}
   cameraManager: {fileID: 519420030}
-  uiBindings: {fileID: 0}
+  uiBindings: {fileID: 1036341368}
   runIntroOnStart: 1
-  introSequenceResourcePath: Assets/Resources/Sequences/tutorial_01_intro.json
+  introSequenceResourcePath: Sequences/tutorial_01_intro
   outroSequenceResourcePath: 
 --- !u!1 &1333106502
 GameObject:
