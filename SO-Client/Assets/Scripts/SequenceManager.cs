@@ -169,7 +169,7 @@ public class SequenceManager : MonoBehaviour
                 yield return WaitForDurationMs(step.durationMs);
                 break;
 
-            case "captureStructure":
+            case "CaptureStructure":
                 yield return ExecuteCapture(stepIndex, step);
                 break;
 
@@ -239,8 +239,8 @@ public class SequenceManager : MonoBehaviour
         }
 
         int owner = step.owner <= 0 ? GameMaster.playerTurn : step.owner;
-        int ownerProgeny = gameMaster.getPlayerProgeny((byte)owner);
-        BaseUnit prefab = PrefabManager.getBaseUnitFromName(step.unitType, ownerProgeny);
+        int ownerProgeny = gameMaster.GetPlayerProgeny((byte)owner);
+        BaseUnit prefab = PrefabManager.GetBaseUnitFromName(step.unitType, ownerProgeny);
         if (prefab == null)
         {
             LogStepError(stepIndex, $"spawnUnit could not resolve prefab for unitType='{step.unitType}'.");
@@ -248,7 +248,7 @@ public class SequenceManager : MonoBehaviour
         }
 
         BaseUnit unit = gameMaster.GetInstantiateUnit(prefab, spawnPos, owner);
-        unit.setNonExhausted(true);
+        unit.SetNonExhausted(true);
 
         if (!string.IsNullOrWhiteSpace(step.unitId))
         {
@@ -271,8 +271,8 @@ public class SequenceManager : MonoBehaviour
             return;
         }
 
-        masterGrid.setSelectedUnit(unit);
-        masterGrid.moveSelectedUnit(destination);
+        masterGrid.SetSelectedUnit(unit);
+        masterGrid.MoveSelectedUnit(destination);
     }
 
     private IEnumerator ExecuteCapture(int stepIndex, SequenceStepDto step)
@@ -280,29 +280,29 @@ public class SequenceManager : MonoBehaviour
         BaseUnit unit = ResolveUnit(step);
         if (unit == null)
         {
-            LogStepError(stepIndex, "captureStructure could not resolve unit.");
+            LogStepError(stepIndex, "CaptureStructure could not resolve unit.");
             yield break;
         }
 
         BaseStructure structure = null;
         if (!string.IsNullOrWhiteSpace(step.structureId))
         {
-            LogStepError(stepIndex, "captureStructure currently supports coordinate targeting; structureId lookup is not implemented yet.");
+            LogStepError(stepIndex, "CaptureStructure currently supports coordinate targeting; structureId lookup is not implemented yet.");
         }
 
         if (structure == null && TryResolveTargetPosition(step.at, out Vector2Int atPos))
         {
-            structure = masterGrid.whatStructureIsInThisLocation(atPos);
+            structure = masterGrid.WhatStructureIsInThisLocation(atPos);
         }
 
         if (structure == null)
         {
-            LogStepError(stepIndex, "captureStructure target structure not found.");
+            LogStepError(stepIndex, "CaptureStructure target structure not found.");
             yield break;
         }
 
-        masterGrid.setSelectedUnit(unit);
-        yield return masterGrid.captureStructure(structure);
+        masterGrid.SetSelectedUnit(unit);
+        yield return masterGrid.CaptureStructure(structure);
     }
 
     private void SetInputLock(bool locked, string reason)
@@ -453,7 +453,7 @@ public class SequenceManager : MonoBehaviour
 
         if (step.from != null && TryResolveTargetPosition(step.from, out Vector2Int sourcePos))
         {
-            return masterGrid.whatUnitIsInThisLocation(sourcePos);
+            return masterGrid.WhatUnitIsInThisLocation(sourcePos);
         }
 
         return null;

@@ -10,7 +10,7 @@ public class GamePieceInfo
     public byte playerID; // Player ID (0 for neutral, 1 for player 1, etc.)
     public byte healthVal; // % health the unit has, number 1-200 for structure health
 
-    // Constructor to initialize GamePieceInfo
+    // Constructor to Initialize GamePieceInfo
     public GamePieceInfo(byte x, byte y, byte typeNum, byte playerID, byte healthVal)
     {
         this.x = x;

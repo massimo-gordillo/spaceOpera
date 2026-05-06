@@ -41,19 +41,19 @@ public class BaseStructure : MonoBehaviour
         maxCaptureHealth = 200;
         captureHealth = maxCaptureHealth;
         masterGrid = GameObject.FindGameObjectWithTag("MasterGridTag").GetComponent<MasterGrid>();
-        masterGrid.setStructureInGrid(pos, this);
+        masterGrid.SetStructureInGrid(pos, this);
 
 
         //baseColor = neutralSpriteFill.color;
-        //turnOffCaptureSprites();
+        //TurnOffCaptureSprites();
 /*        if (structureType != 200)
-                setColor(neutralSpriteFill);
+                SetColor(neutralSpriteFill);
         if (playerControl != 0)*/
         
 
 
         if (IsCoveredByUnit())
-            turnOffCollider();
+            TurnOffCollider();
 
         //healthTextContainer = GetComponentInChildren<TextMeshProUGUI>();
 
@@ -92,19 +92,19 @@ public class BaseStructure : MonoBehaviour
     public IEnumerator WaitedSetColour()
     {
         yield return null;
-        setCaptureSpritesAndColor();
+        SetCaptureSpritesAndColor();
     }
 
 
 
-    public bool isCapturableBy(BaseUnit unit)
+    public bool IsCapturableBy(BaseUnit unit)
     {
         //"resource" probably shouldn't be hardcoded here. Should it instead reference the 1st item in the GameValuesSO unitTypes array?
         //What if I want to change the unitTypes array? Should I just have a "is resource unit" flag?
         return (unit.playerControl != playerControl && unit.isResourceUnit);  
     }
 
-    public IEnumerator switchAlliance(int capturePlayerInt)
+    public IEnumerator SwitchAlliance(int capturePlayerInt)
     {
         yield return StartCoroutine(AnimateCaptureHealth(captureHealth, 0));
         yield return new WaitForSeconds(GameMaster.globalAnimationDuration / 3);
@@ -112,21 +112,21 @@ public class BaseStructure : MonoBehaviour
             gameMaster.ConcedePlayer(playerControl);
 
         playerControl = (byte)capturePlayerInt;
-        resetCaptureHealth();
-        setCaptureSpritesAndColor();
+        ResetCaptureHealth();
+        SetCaptureSpritesAndColor();
     }
 
 
-    public void setCaptureSpritesAndColor()
+    public void SetCaptureSpritesAndColor()
     {
-        byte progeny = gameMaster.getPlayerProgeny((byte)playerControl);
+        byte progeny = gameMaster.GetPlayerProgeny((byte)playerControl);
 /*        if (structureType == 0 && playerControl != 0)
         {
-            Debug.Log($"Setting capture sprite for player {playerControl}, progeny: {progeny}, master grid says: {gameMaster.getPlayerProgeny(playerControl)}");
+            Debug.Log($"Setting capture sprite for player {playerControl}, progeny: {progeny}, master grid says: {gameMaster.GetPlayerProgeny(playerControl)}");
         }*/
-        turnOffCaptureSprites();
+        TurnOffCaptureSprites();
         /*        if (structureType == 0)
-                    setColor(neutralSpriteFill);*/
+                    SetColor(neutralSpriteFill);*/
         if (playerControl != 0)
         {
             if (structureType != 5) {
@@ -176,10 +176,10 @@ public class BaseStructure : MonoBehaviour
                         progeny2ResourceCaptureSpriteContainer.gameObject.SetActive(true);
                         progeny2ResourceCaptureSpriteContainer.SetColor(playerControl, true, true);
 
-                        //setColor(neutralSpriteFill);
+                        //SetColor(neutralSpriteFill);
                     }
                 }
-                /*else if (gameMaster.getPlayerProgeny(playerControl) == 2)
+                /*else if (gameMaster.GetPlayerProgeny(playerControl) == 2)
                     Debug.LogError("Structure: Progeny 2 not yet implemented");
                 */
                 else
@@ -195,7 +195,7 @@ public class BaseStructure : MonoBehaviour
 
     }
 
-    public IEnumerator captureByPercentage(int percentCapturing, BaseUnit capturingUnit)
+    public IEnumerator CaptureByPercentage(int percentCapturing, BaseUnit capturingUnit)
     {
         int playerCapturing = capturingUnit.playerControl;
         //int prevCaptureHealth = captureHealth;
@@ -208,7 +208,7 @@ public class BaseStructure : MonoBehaviour
             {
                 if(GameMaster.CPU_isOn && capturingUnit.CPU_IsCapturing)
                     capturingUnit.CPU_IsCapturing = false;
-                yield return StartCoroutine(switchAlliance(playerCapturing));
+                yield return StartCoroutine(SwitchAlliance(playerCapturing));
             }
             //Debug.Log("capture newHealth: " + captureHealth + "selectedUnithealth " + percentCapturing);
         }else
@@ -376,7 +376,7 @@ public class BaseStructure : MonoBehaviour
 
     }
 
-    public void turnOffCaptureSprites()
+    public void TurnOffCaptureSprites()
     {
         if(neutralSpriteContainer != null)
             neutralSpriteContainer.ToggleSprites(true);
@@ -398,23 +398,23 @@ public class BaseStructure : MonoBehaviour
             progeny2ProductionCaptureSpriteContainer.gameObject.SetActive(false);
     }
 
-    public void staticSpriteHasBeenClicked()
+    public void StaticSpriteHasBeenClicked()
     {
-        gameMaster.structureHasBeenClicked(this);
+        gameMaster.StructureHasBeenClicked(this);
     }
 
-    public void turnOnCollider()
+    public void TurnOnCollider()
     {
         spriteCollider.enabled = true;
     }
 
-    public void turnOffCollider()
+    public void TurnOffCollider()
     {
         spriteCollider.enabled = false;
         //print("turned off collider for: " + this);
     }
 
-    public void resetCaptureHealth()
+    public void ResetCaptureHealth()
     {
         //StartCoroutine(AnimateResetCaptureHealth());
         healthCanvas.SetActive(false);
@@ -453,8 +453,8 @@ public class BaseStructure : MonoBehaviour
 
     public bool IsCoveredByUnit()
     {
-        //Debug.Log($"Structure {pos} is covered by unit? {masterGrid.whatUnitIsInThisLocation(pos) != null}");
-        return (masterGrid.whatUnitIsInThisLocation(pos) != null);
+        //Debug.Log($"Structure {pos} is covered by unit? {masterGrid.WhatUnitIsInThisLocation(pos) != null}");
+        return (masterGrid.WhatUnitIsInThisLocation(pos) != null);
     }
 
 

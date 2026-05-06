@@ -208,20 +208,20 @@ public class GameMaster : MonoBehaviour
         //initializes all unit values, modifies their prefab and sprites.
         //initializes all Tilebases for tilemap
         //only does anything if it hasn't already been initialized.
-        gameValues.initialize();
+        gameValues.Initialize();
         bool manualLoadGameStateFromFile = true;
         
 
         if (manualLoadGameStateFromFile)
         {
-            tilemapManager.initialize(false);
+            tilemapManager.Initialize(false);
             MatchSettings.GetMapLoadParameters(out string mapType, out int mapNum, out int mapVersion);
             LoadGameStateFromFile(mapType, mapNum, mapVersion);
         }
         else
         {
             //initializes the dimensions through TilemapManager if loading from the Game Scene.
-            (gridX, gridY) = tilemapManager.initialize(true);
+            (gridX, gridY) = tilemapManager.Initialize(true);
         }
             
 
@@ -230,9 +230,9 @@ public class GameMaster : MonoBehaviour
 
 
             //initializes the masterGrid arrays etc with the map size
-            masterGrid.startup(gridX, gridY, tilemapManager.getTilemapByteArray(), gameValues.getAttributesTilesDictionary(), gameValues.getCombatMultiplierDictionary());
+            masterGrid.Startup(gridX, gridY, tilemapManager.GetTilemapByteArray(), gameValues.GetAttributesTilesDictionary(), gameValues.GetCombatMultiplierDictionary());
 
-        hideChoicePanel();
+        HideChoicePanel();
         announcementCard.SetActive(false);
         playerTurn = 1; //player 0 is neutral
 
@@ -246,7 +246,7 @@ public class GameMaster : MonoBehaviour
             playersNotLost[i] = true;
         }
         
-        setPlayerTurnText(playerTurn);
+        SetPlayerTurnText(playerTurn);
         
 
 
@@ -261,7 +261,7 @@ public class GameMaster : MonoBehaviour
 
 
 
-        //startupInstantiateUnits();
+        //StartupInstantiateUnits();
         //productionPanel.Start();
 
         //unitCosts = new List<(BaseUnit, int)>[numPlayers];
@@ -274,7 +274,7 @@ public class GameMaster : MonoBehaviour
     {
         isGameComplete = false;
         //have to wait until start to isInit the production panel because it needs to wait for GameValuesSO.
-        productionPanel.init();
+        productionPanel.Init();
 
         //animation
         isAnimating = true;
@@ -312,7 +312,7 @@ public class GameMaster : MonoBehaviour
             AnimateStartTurnCard(1);
         cameraManager.SetPosition(MasterGrid.commandStructures[1].pos);
 
-        startupInstantiateUnits();
+        StartupInstantiateUnits();
 
         if (CPU_isOn)
         {
@@ -349,7 +349,7 @@ public class GameMaster : MonoBehaviour
     private IEnumerator WaitForCPUFirstTurn()
     {
         yield return null;
-        CPUManager.naiveV1Start();
+        CPUManager.NaiveV1Start();
         if (CPU_isOn && CPU_PlayersList[playerTurn] && !isGameComplete)
         {
             Debug.Log($"Running player 1 CPU actions");
@@ -357,12 +357,12 @@ public class GameMaster : MonoBehaviour
         }
     }
 
-    public void startupInstantiateUnits()
+    public void StartupInstantiateUnits()
     {
 
         for (int player = 1; player <= numPlayers; player++)
         {
-            byte progeny = getPlayerProgeny((byte)player);
+            byte progeny = GetPlayerProgeny((byte)player);
             List <BaseStructure> initProdStructures = masterGrid.GetProductionStructures(player);
             if (player != 1)
                 initProdStructures.Add(MasterGrid.commandStructures[player]);
@@ -374,28 +374,28 @@ public class GameMaster : MonoBehaviour
 				if (progeny == 0)
                 {
                     //BaseUnit infantryUnitPrefab = Resources.Load<BaseUnit>("UnitPrefabs/progeny1/InfantryPrefab");
-                    BaseUnit infantryUnitPrefab = PrefabManager.getBaseUnitFromName("Infantry", 0);
+                    BaseUnit infantryUnitPrefab = PrefabManager.GetBaseUnitFromName("Infantry", 0);
                     infantryUnitPrefab.playerControl = player;
                     BaseUnit unit = GetInstantiateUnit(infantryUnitPrefab, prod.pos, player);
-                    unit.setNonExhausted(true);
+                    unit.SetNonExhausted(true);
                     //BaseUnit unit = Instantiate(infantryUnitPrefab, new Vector2(x, y), Quaternion.identity, unitContainer);
 
                 }
                 else if (progeny == 1)
                 {
-                    BaseUnit sporeUnitPrefab = PrefabManager.getBaseUnitFromName("Spore", 1);
+                    BaseUnit sporeUnitPrefab = PrefabManager.GetBaseUnitFromName("Spore", 1);
                     sporeUnitPrefab.playerControl = player;
                     BaseUnit unit = GetInstantiateUnit(sporeUnitPrefab, prod.pos, player);
-                    unit.setNonExhausted(true);
+                    unit.SetNonExhausted(true);
                     //BaseUnit unit = Instantiate(sporeUnitPrefab, new Vector2(x, y), Quaternion.identity, unitContainer);
 
                 }
                 else if (progeny == 2)
                 {
-                    BaseUnit blacksmithUnitPrefab = PrefabManager.getBaseUnitFromName("Blacksmith", 2);
+                    BaseUnit blacksmithUnitPrefab = PrefabManager.GetBaseUnitFromName("Blacksmith", 2);
                     blacksmithUnitPrefab.playerControl = player;
                     BaseUnit unit = GetInstantiateUnit(blacksmithUnitPrefab, prod.pos, player);
-                    unit.setNonExhausted(true);
+                    unit.SetNonExhausted(true);
                     //BaseUnit unit = Instantiate(blacksmithUnitPrefab, new Vector2(x, y), Quaternion.identity, unitContainer);
 
                 }
@@ -412,56 +412,56 @@ public class GameMaster : MonoBehaviour
 
     }
 
-    public int getIncomeForPlayer(int player)
+    public int GetIncomeForPlayer(int player)
     {
         return 0;
     }
 
-    public void structureHasBeenClicked(BaseStructure structure)
+    public void StructureHasBeenClicked(BaseStructure structure)
     {
         //Debug.Log("Structure at pos " + structure.xPos + ", " + structure.yPos + " has been clicked.");
         //should probably try/catch if structure is null
-        if (structure!=null && structure.playerControl == playerTurn && structure.structureType != 5 && ((getPlayerProgeny((byte)playerTurn) != 1 && structure.structureType != 0) || (getPlayerProgeny((byte)playerTurn)== 1 && structure.structureType== 0)))// && playerTurn == structure.playerControl) )
+        if (structure!=null && structure.playerControl == playerTurn && structure.structureType != 5 && ((GetPlayerProgeny((byte)playerTurn) != 1 && structure.structureType != 0) || (GetPlayerProgeny((byte)playerTurn)== 1 && structure.structureType== 0)))// && playerTurn == structure.playerControl) )
         {
             choicePanel.SetActive(true);
 
-            productionPanel.presentProdList(structure.structureType, getPlayerProgeny((byte)playerTurn), playerResources[playerTurn]);
+            productionPanel.PresentProdList(structure.structureType, GetPlayerProgeny((byte)playerTurn), playerResources[playerTurn]);
             productionPanel.gameObject.SetActive(true);
             bottomButtonText.text = "Exit";
             selectedStructure = structure;
         }
     }
 
-    public void captureButtonPressed()
+    public void CaptureButtonPressed()
     {
         if (selectedStructure != null)
         {
-            StartCoroutine(masterGrid.captureStructure(selectedStructure));
-            hideChoicePanel();
+            StartCoroutine(masterGrid.CaptureStructure(selectedStructure));
+            HideChoicePanel();
         }
     }
 
-    public void attackButtonPressed()
+    public void AttackButtonPressed()
     {
         //MG 24-06-11 this currently doesn't do anything.
-        masterGrid.attackButtonPressed();
-        hideChoicePanel();
+        masterGrid.AttackButtonPressed();
+        HideChoicePanel();
     }
 
-    public void undoMovementButtonPressed()
+    public void UndoMovementButtonPressed()
     {
-        masterGrid.undoMovementButtonPressed();
-        hideChoicePanel();
+        masterGrid.UndoMovementButtonPressed();
+        HideChoicePanel();
     }
 
-    public void unitProductionButtonPressed(BaseUnit unit)
+    public void UnitProductionButtonPressed(BaseUnit unit)
     {
 /*        int price = unit.price;
         print(price);*/
         if (playerResources[playerTurn] >= unit.price)
         {
             ProduceUnit(unit, playerTurn, false);
-            hideChoicePanel();
+            HideChoicePanel();
         }
         else
             print("You must mine more minerals!");
@@ -469,28 +469,28 @@ public class GameMaster : MonoBehaviour
 
     public BaseUnit ProduceResourceUnit(BaseStructure prod, int player)
     {
-        if (masterGrid.whatUnitIsInThisLocation(prod.pos) != null)
+        if (masterGrid.WhatUnitIsInThisLocation(prod.pos) != null)
             return null;
 
         if (playerResources[player] >= 100) //assumes base unit cost 100
         {
             selectedStructure = prod;
-            int progeny = getPlayerProgeny((byte)player);
+            int progeny = GetPlayerProgeny((byte)player);
             if (progeny == 0)
             {
-                BaseUnit infantry = PrefabManager.getBaseUnitFromName("Infantry", 0);
+                BaseUnit infantry = PrefabManager.GetBaseUnitFromName("Infantry", 0);
                 ProduceUnit(infantry, player, false);
                 return infantry;
             }
             if (progeny == 1)
             {
-                BaseUnit spore = PrefabManager.getBaseUnitFromName("Spore", 1);
+                BaseUnit spore = PrefabManager.GetBaseUnitFromName("Spore", 1);
                 ProduceUnit(spore, player, true); //true for virix in current implementation
                 return spore;
             }
             if (progeny == 2)
             {
-                BaseUnit blacksmith = PrefabManager.getBaseUnitFromName("Blacksmith", 2);
+                BaseUnit blacksmith = PrefabManager.GetBaseUnitFromName("Blacksmith", 2);
                 ProduceUnit(blacksmith, player, false);
                 return blacksmith;
             }
@@ -506,7 +506,7 @@ public class GameMaster : MonoBehaviour
             return;
         }
 
-        if (masterGrid.whatUnitIsInThisLocation(selectedStructure.pos) != null)
+        if (masterGrid.WhatUnitIsInThisLocation(selectedStructure.pos) != null)
         {
             Debug.LogWarning($"Trying to produce a unit at {selectedStructure.pos} but it is covered by a unit");
             selectedStructure = null;
@@ -520,51 +520,51 @@ public class GameMaster : MonoBehaviour
         //need a way to set to exhausted from here so the units don't have to start exhausted on the 1st turn.
         BaseUnit tempUnit = GetInstantiateUnit(unit, selectedStructure.pos, null);
         //BaseUnit tempUnit = Instantiate(unit, new Vector2(selectedStructure.xPos, selectedStructure.yPos), Quaternion.identity, unitContainer);
-        tempUnit.setNonExhausted(isNonExhausted);
+        tempUnit.SetNonExhausted(isNonExhausted);
 
         //GameObject tempInstance = Object.Instantiate(unit, new Vector2(selectedStructure.xPos, selectedStructure.yPos), Quaternion.identity, unitContainer);
         //BaseUnit tempUnit = tempInstance.GetComponent<BaseUnit>();
 
         //3 is produce a unit
         //not sure why the unit x and y coordiantes aren't available here but this works.
-        masterGrid.addGameAction(3, (byte)tempUnit.gamePieceId, (byte)selectedStructure.pos.x, (byte)selectedStructure.pos.y, (byte)selectedStructure.pos.x, (byte)selectedStructure.pos.y);
+        masterGrid.AddGameAction(3, (byte)tempUnit.gamePieceId, (byte)selectedStructure.pos.x, (byte)selectedStructure.pos.y, (byte)selectedStructure.pos.x, (byte)selectedStructure.pos.y);
         playerResourceText.text = "" + playerResources[playerTurn];
-        selectedStructure.turnOffCollider();
+        selectedStructure.TurnOffCollider();
     }
 
-    public void exitButtonPressed()
+    public void ExitButtonPressed()
     {
         if (masterGrid.selectedUnit != null && masterGrid.selectedUnit.movementNonExhausted == false)
         {
-            masterGrid.exhaustSelectedUnit(masterGrid.selectedUnit, true);
+            masterGrid.ExhaustSelectedUnit(masterGrid.selectedUnit, true);
         }
-        hideChoicePanel();
+        HideChoicePanel();
         if (masterGrid.selectedUnit != null)
-            masterGrid.clearSelectedUnit();
+            masterGrid.ClearSelectedUnit();
     }
 
-    public void endTurnButtonPressed()
+    public void EndTurnButtonPressed()
     {
-        hideChoicePanel();
+        HideChoicePanel();
         endTurnButton.interactable = false;
         if(!isGameComplete)
             CheckNoAvailableActions(playerTurn);
     }
 
-    public void initiateEndTurn()
+    public void InitiateEndTurn()
     {
-        var (gameActions, preTurnHash, postTurnHash) = masterGrid.endTurn(playerTurn);
+        var (gameActions, preTurnHash, postTurnHash) = masterGrid.EndTurn(playerTurn);
         SubmitTurnToServer(gameActions, preTurnHash, postTurnHash);
-        masterGrid.refreshUnits(playerTurn);
+        masterGrid.RefreshUnits(playerTurn);
 
-        if (getPlayerProgeny((byte)playerTurn) == 1)
+        if (GetPlayerProgeny((byte)playerTurn) == 1)
         {
             foreach (BaseStructure structure in masterGrid.GetStructures(playerTurn))
             {
-                BaseUnit coveringUnit = masterGrid.whatUnitIsInThisLocation(structure.pos);
+                BaseUnit coveringUnit = masterGrid.WhatUnitIsInThisLocation(structure.pos);
                 if (coveringUnit != null && coveringUnit.unitName == "seed")
                 {
-                    masterGrid.deleteUnit(coveringUnit, false);
+                    masterGrid.DeleteUnit(coveringUnit, false);
                 }
             }
         }
@@ -575,10 +575,10 @@ public class GameMaster : MonoBehaviour
     {
         if (CPU_isOn && CPU_PlayersList[player] && !CPU_isMasterDebugging)
         {
-            initiateEndTurn();
+            InitiateEndTurn();
             return;
         }
-        int playerProgeny = getPlayerProgeny((byte)player);
+        int playerProgeny = GetPlayerProgeny((byte)player);
         BaseUnit unitFocus = null;
         int unitCount = 0;
         foreach (BaseUnit unit in MasterGrid.playerUnits[player])
@@ -624,14 +624,14 @@ public class GameMaster : MonoBehaviour
                 else
                     message += $"You have {unitCount} units which you can still move!\n";
             }
-            if (prodCount > 0 && playerResources[player] >= 100 && getPlayerProgeny((byte)player) != 1)
+            if (prodCount > 0 && playerResources[player] >= 100 && GetPlayerProgeny((byte)player) != 1)
             {
                 if(prodCount == 1)
                     message += $"You have {prodCount} production location which hasn't produced!\n";
                 else
                     message += $"You have {prodCount} production locations which haven't produced!\n";
             }
-            if (getPlayerProgeny((byte)player) == 1 && playerResources[player] >= virixCheapestUnit)
+            if (GetPlayerProgeny((byte)player) == 1 && playerResources[player] >= virixCheapestUnit)
             {
                 message += $"You have {playerResources[player]} unspent bismuth!";
                 if (unitCount == 0)
@@ -658,7 +658,7 @@ public class GameMaster : MonoBehaviour
                 Debug.LogWarning("Confirmation card triggered but neither unit nor prod found.");
         }
         else
-            initiateEndTurn();
+            InitiateEndTurn();
         
     }
 
@@ -679,7 +679,7 @@ public class GameMaster : MonoBehaviour
         } while (!playersNotLost[playerTurn] && i < numPlayers);
 
         if (i >= numPlayers)
-            playerWins(-1); //error case
+            PlayerWins(-1); //error case
         turnNumber++;
 
         if (isAnimating)
@@ -687,13 +687,13 @@ public class GameMaster : MonoBehaviour
         cameraManager.SnapCameraToUnitCluster(playerTurn);
 
 
-        setPlayerTurnText(playerTurn);
-        setPlayerResources(playerTurn);
+        SetPlayerTurnText(playerTurn);
+        SetPlayerResources(playerTurn);
 
-        //Debug.Log("Player " + playerTurn + " turn, progeny:" + getPlayerProgeny((byte)playerTurn));
+        //Debug.Log("Player " + playerTurn + " turn, progeny:" + GetPlayerProgeny((byte)playerTurn));
 
         //special virix handling
-        if (getPlayerProgeny((byte)playerTurn) == 1)
+        if (GetPlayerProgeny((byte)playerTurn) == 1)
         {
             foreach (BaseStructure structure in masterGrid.GetProductionStructures(playerTurn))
             {
@@ -704,7 +704,7 @@ public class GameMaster : MonoBehaviour
                 }
             }
         }
-        masterGrid.refreshUnits(playerTurn);
+        masterGrid.RefreshUnits(playerTurn);
 
         //EndTurnButtonSwitch();
 
@@ -733,7 +733,7 @@ public class GameMaster : MonoBehaviour
         yield return CPUManager.LogicCheckUnits(playerTurn);
 /*        if(CPU_isMasterDebugging)
             endTurnButton.interactable = true;*/
-        endTurnButtonPressed();
+        EndTurnButtonPressed();
     }
 
 
@@ -742,7 +742,7 @@ public class GameMaster : MonoBehaviour
         bool success = await supabaseManager.SendSubmitTurn(gameActions, preTurnHash, postTurnHash);
     }
 
-    public void setPlayerTurnText(int playerTurn) //this should probably be combined with BaseUnit.setColor
+    public void SetPlayerTurnText(int playerTurn) //this should probably be combined with BaseUnit.SetColor
     {
         playerTurnText.text = "Player Turn: " + (playerTurn);
 
@@ -753,7 +753,7 @@ public class GameMaster : MonoBehaviour
         playerTurnText.color = playerColors[playerTurn];
     }
 
-    public void showUnitChoicePanel(bool attackableUnitsBool, bool capturableStructureBool, bool hasMoved)
+    public void ShowUnitChoicePanel(bool attackableUnitsBool, bool capturableStructureBool, bool hasMoved)
     {
         if (CPU_isOn && CPU_PlayersList[playerTurn]) //don't display player choices if it's a cpu player
             return;
@@ -789,14 +789,14 @@ public class GameMaster : MonoBehaviour
         }
     }
 
-    public void hideChoicePanel()
+    public void HideChoicePanel()
     {
         selectedStructure = null;
         choicePanel.SetActive(false);
-        hideAllSubPanels();
+        HideAllSubPanels();
     }
 
-    public void hideAllSubPanels()
+    public void HideAllSubPanels()
     {
         unitChoicePanel.SetActive(false);
         productionPanel.gameObject.SetActive(false);
@@ -807,11 +807,11 @@ public class GameMaster : MonoBehaviour
         return playerTurn;
     }*/
 
-    private void setPlayerResources(int playerTurn)
+    private void SetPlayerResources(int playerTurn)
     {
         playerResourceText.text = playerResources[playerTurn].ToString();
         double incomeWithMultiplier = structureResourcePerTurn;
-        if (getPlayerProgeny((byte)playerTurn) == 0)
+        if (GetPlayerProgeny((byte)playerTurn) == 0)
             incomeWithMultiplier = structureResourcePerTurn * 1.1;
         int num = 0;
         foreach (BaseStructure s in masterGrid.GetStructures(playerTurn)){
@@ -824,7 +824,7 @@ public class GameMaster : MonoBehaviour
         StartCoroutine(AnimateResourceText(startResources, playerResources[playerTurn],true));
     }
 
-/*    public void playerLoses (int player)
+/*    public void PlayerLoses (int player)
     {
         playersNotLost[player] = false;
         int count=0;
@@ -837,10 +837,10 @@ public class GameMaster : MonoBehaviour
                 count++;
         }
         if (numPlayers - count <= 1)
-            playerWins(playerWinner);
+            PlayerWins(playerWinner);
     }*/
 
-    private void playerWins (int player)
+    private void PlayerWins (int player)
     {
         if (player == -1)
             Debug.LogError($"Player {player} has won the game, this is a failcase");
@@ -856,11 +856,11 @@ public class GameMaster : MonoBehaviour
             StopAllCoroutines();
             if (sequenceManager != null && sequenceManager.HasOutroSequence())
             {
-                StartCoroutine(sequenceManager.RunOutroThen(() => displayWinnerCard(player)));
+                StartCoroutine(sequenceManager.RunOutroThen(() => DisplayWinnerCard(player)));
             }
             else
             {
-                displayWinnerCard(player);
+                DisplayWinnerCard(player);
             }
         }
     }
@@ -875,7 +875,7 @@ public class GameMaster : MonoBehaviour
         canvas.gameObject.SetActive(false);
         choicePanel.SetActive(false);
         loadingScreen.SetActive(true);
-        StartCoroutine(muteMusic(1.5f));
+        StartCoroutine(MuteMusic(1.5f));
         loadPromptText.text = "Loading... Main Menu";
 
         float displayedProgress = 0.05f;
@@ -949,7 +949,7 @@ public class GameMaster : MonoBehaviour
 
 
 
-    private void displayWinnerCard(int player)
+    private void DisplayWinnerCard(int player)
     {
         promptCard.SetActive(true);
         endTurnButton.interactable = false;
@@ -971,7 +971,7 @@ public class GameMaster : MonoBehaviour
         }
 
 
-        masterGrid.playerWins(player);
+        masterGrid.PlayerWins(player);
     }
 
     public void SaveGameStateToFile(string mapType, int mapNum, int versionNum)//List<GamePieceInfo> gamePieceList, TilemapData tilemapData)
@@ -1092,7 +1092,7 @@ public class GameMaster : MonoBehaviour
         {
             for (int y = 0; y < gridY; y++)
             {
-                BaseUnit unit = masterGrid.whatUnitIsInThisLocation(new Vector2Int(x, y));
+                BaseUnit unit = masterGrid.WhatUnitIsInThisLocation(new Vector2Int(x, y));
                 if (unit != null)
                 {
                     GamePieceInfo info = new GamePieceInfo
@@ -1107,7 +1107,7 @@ public class GameMaster : MonoBehaviour
                     gameStateList.Add(info);
                 }
 
-                BaseStructure structure = masterGrid.whatStructureIsInThisLocation(new Vector2Int(x, y));
+                BaseStructure structure = masterGrid.WhatStructureIsInThisLocation(new Vector2Int(x, y));
                 if (structure != null)
                 {
                     GamePieceInfo info = new GamePieceInfo(
@@ -1165,18 +1165,18 @@ public class GameMaster : MonoBehaviour
                     int y = pieceInfo.y;
                     AttributesBaseUnit data = gameValues.GetUnitDataByByte(pieceInfo.typeNum);
 
-                    BaseUnit unit = PrefabManager.getBaseUnitFromPath(data.prefabPath);
+                    BaseUnit unit = PrefabManager.GetBaseUnitFromPath(data.prefabPath);
                     if (unit == null)
                     {
                         Debug.LogError($"No unit prefab found for byte value {pieceInfo.typeNum}");
                         continue;
                     }
                     unit.playerControl = pieceInfo.playerID;
-                    unit.setHealth((int)((double)(pieceInfo.healthVal * unit.healthMax) / 100));
+                    unit.SetHealth((int)((double)(pieceInfo.healthVal * unit.healthMax) / 100));
                     unit.pos = new Vector2Int(x, y);
                     InstantiateUnit(unit, unit.pos);
                     //Instantiate(unit, new Vector2(x, y), Quaternion.identity, unitContainer);
-                    //masterGrid.setUnitInGrid(unit.pos, unit);
+                    //masterGrid.SetUnitInGrid(unit.pos, unit);
                 }
                 else if (pieceInfo.typeNum >= 200 && pieceInfo.typeNum < 255)
                 {
@@ -1203,12 +1203,12 @@ public class GameMaster : MonoBehaviour
                     structure.pos = new Vector2Int(x, y);
                     Instantiate(structure, new Vector2(x, y), Quaternion.identity, structureContainer);
 					//structure.Initialize();
-					//masterGrid.setStructureInGrid(structure.pos, structure);
+					//masterGrid.SetStructureInGrid(structure.pos, structure);
 
                 }
             }
 
-            masterGrid.generateInitHash();
+            masterGrid.GenerateInitHash();
         }
         else
             Debug.LogError("gameStateList is empty!");
@@ -1286,13 +1286,13 @@ public class GameMaster : MonoBehaviour
             }
         }*/
 
-    public void setMatchId(Guid matchId)
+    public void SetMatchId(Guid matchId)
     {
         Debug.Log("Setting match id to: " + matchId);
         match_id = matchId;
-        masterGrid.setMatchId(matchId);
+        masterGrid.SetMatchId(matchId);
     }
-    public byte getPlayerProgeny(byte b)
+    public byte GetPlayerProgeny(byte b)
     {
         playerProgeny.TryGetValue(b, out byte p);
         return p;
@@ -1322,9 +1322,9 @@ public class GameMaster : MonoBehaviour
     private IEnumerator SwoopInAndOutTurnCard(Vector2 startPos, Vector2 centerPos, Vector2 endPos)
     {
         endTurnButton.interactable = false; 
-        yield return SwoopTurnCard(startPos, centerPos, swoopCardAnimationDuration/2f, easeOutCubic);
+        yield return SwoopTurnCard(startPos, centerPos, swoopCardAnimationDuration/2f, EaseOutCubic);
         yield return new WaitForSeconds(swoopCardAnimationDuration / 7f);
-        yield return SwoopTurnCard(centerPos, endPos, swoopCardAnimationDuration/3f, easeInCubic); // * 3 / 8
+        yield return SwoopTurnCard(centerPos, endPos, swoopCardAnimationDuration/3f, EaseInCubic); // * 3 / 8
         //I don't like this being here but I need to wait.
         //endTurnButton.GetComponent<Button>().interactable = !CPU_PlayersList[playerTurn];
         EndTurnButtonSwitch();
@@ -1344,8 +1344,8 @@ public class GameMaster : MonoBehaviour
     }
 
     // Easing functions for smoother animation
-    private float easeOutCubic(float t) => 1 - Mathf.Pow(1 - t, 3);
-    private float easeInCubic(float t) => Mathf.Pow(t, 3);
+    private float EaseOutCubic(float t) => 1 - Mathf.Pow(1 - t, 3);
+    private float EaseInCubic(float t) => Mathf.Pow(t, 3);
 
     public void ConcedeCurrentPlayer()
     {
@@ -1377,7 +1377,7 @@ public class GameMaster : MonoBehaviour
         CheckIfWinner();
         if (p == playerTurn)
         {
-            endTurnButtonPressed();
+            EndTurnButtonPressed();
         }
     }
 
@@ -1398,7 +1398,7 @@ public class GameMaster : MonoBehaviour
 
         if (winner!=null && playerNotLostCount == GameMaster.numPlayers - 1)
         {
-            playerWins((int)winner);
+            PlayerWins((int)winner);
         }else if(playerNotLostCount > 1)
         {
             Debug.Log("More than 1 player remains");
@@ -1473,7 +1473,7 @@ public class GameMaster : MonoBehaviour
         }
     }
 
-    public void setConcedeText()
+    public void SetConcedeText()
     {
         if (CPU_isOn)
         {
@@ -1504,12 +1504,12 @@ public class GameMaster : MonoBehaviour
 
     }
     
-    public void callMuteMusic()
+    public void CallMuteMusic()
     {
-        StartCoroutine(muteMusic(0.25f));
+        StartCoroutine(MuteMusic(0.25f));
     }
 
-    public IEnumerator muteMusic(float duration)
+    public IEnumerator MuteMusic(float duration)
     {
         
         float startVolume = musicAudio.volume;
@@ -1530,7 +1530,7 @@ public class GameMaster : MonoBehaviour
         musicAudio.volume = 0f;
     }
 
-    public void addToLoopSafetyCounter(string function)
+    public void AddToLoopSafetyCounter(string function)
     {
         if (loopSafetyCounter++ > loopSafetyLimit)
         {

@@ -8,18 +8,18 @@ public class PrefabManager
     private GameValuesSO gameValuesSO;
 
     //public static List<(BaseUnit, int)>[] unitCosts;
-    /*    public void setGameValues(GameValuesSO setGameValuesSO)
+    /*    public void SetGameValues(GameValuesSO setGameValuesSO)
         {
             gameValuesSO = setGameValuesSO;
         }*/
 
-    public void managePrefabOnStartUp(AttributesBaseUnit unitAttributes)
+    public void ManagePrefabOnStartUp(AttributesBaseUnit unitAttributes)
     {
         //manual check if I want to mass update all prefabs if I've done work on the BaseUnitBasePrefab.
         bool updateAllPrefabsFlag = false;
 
         string prefabPath = unitAttributes.prefabPath;
-        BaseUnit prefab = getBaseUnitFromPath(prefabPath);
+        BaseUnit prefab = GetBaseUnitFromPath(prefabPath);
 
         if (prefab == null || prefab.attributesHash != unitAttributes.attributesHash || updateAllPrefabsFlag)
         {
@@ -30,8 +30,8 @@ public class PrefabManager
             //Assets/Resources/UnitPrefabs/progeny1/BasePrefab.prefab
             string basePrefabPath = "UnitPrefabs/BaseUnitBasePrefab";
             ClonePrefab(basePrefabPath, prefabPath);
-            modifyPrefab(prefabPath, unitAttributes);
-            prefab = getBaseUnitFromPath(prefabPath);
+            ModifyPrefab(prefabPath, unitAttributes);
+            prefab = GetBaseUnitFromPath(prefabPath);
         }
 
         if (unitAttributes.isNotPrototype)
@@ -52,7 +52,7 @@ public class PrefabManager
                 }*/
     }
 
-    public GameObject getPrefabFromPath(string prefabPath)
+    public GameObject GetPrefabFromPath(string prefabPath)
     {
         GameObject prefab = Resources.Load<GameObject>(prefabPath.Replace("Assets/Resources/", "").Replace(".prefab", ""));
         if (prefab == null)
@@ -62,7 +62,7 @@ public class PrefabManager
         return prefab;
     }
 
-    public static BaseUnit getBaseUnitFromPath(string prefabPath)
+    public static BaseUnit GetBaseUnitFromPath(string prefabPath)
     {
         BaseUnit prefab = Resources.Load<BaseUnit>(prefabPath.Replace("Assets/Resources/", "").Replace(".prefab", ""));
         if (prefab == null)
@@ -72,7 +72,7 @@ public class PrefabManager
         return prefab;
     }
 
-    static public BaseUnit getBaseUnitFromName(string name, int progeny)
+    static public BaseUnit GetBaseUnitFromName(string name, int progeny)
     {
         string prefabPath = $"UnitPrefabs/progeny{progeny+1}/{name}Prefab";
         BaseUnit prefab = Resources.Load<BaseUnit>(prefabPath);
@@ -86,11 +86,11 @@ public class PrefabManager
 
 
 
-    public void modifyPrefab(string prefabPath, AttributesBaseUnit unitData)
+    public void ModifyPrefab(string prefabPath, AttributesBaseUnit unitData)
     {
         //UnityEngine.Debug.Log($"Attempting to modify prefab at path: {prefabPath}");
 
-        GameObject prefab = getPrefabFromPath(prefabPath);
+        GameObject prefab = GetPrefabFromPath(prefabPath);
 
         if (prefab == null)
         {
@@ -136,7 +136,7 @@ public class PrefabManager
                     {
                         //setSpritesFromSpriteAtlas(unitScript.unitName, (string)value, unitScript.spriteContainer);
                         //UnityEngine.Debug.Log($"For unit {unitData.unitName}, value is {value} as sprite {(Sprite)value} .");
-                        setSprites(unitData, unitScript.spriteContainer);
+                        SetSprites(unitData, unitScript.spriteContainer);
                     }
                 }
                 // Optional: UnityEngine.Debug log to verify properties
@@ -167,7 +167,7 @@ public class PrefabManager
 
     public void ClonePrefab(string basePrefabPath, string newPrefabPath)
     {
-        GameObject basePrefab = getPrefabFromPath(basePrefabPath);
+        GameObject basePrefab = GetPrefabFromPath(basePrefabPath);
 
         if (basePrefab == null)
         {
@@ -186,7 +186,7 @@ public class PrefabManager
         UnityEngine.Object.DestroyImmediate(newPrefabInstance);
     }
 
-    /*public void setSpritesFromSpriteAtlas(string unitName, string atlasPath, StaticSprite spritePrefab)
+    /*public void SetSpritesFromSpriteAtlas(string unitName, string atlasPath, StaticSprite spritePrefab)
     {
         SpriteAtlas spriteAtlas = Resources.Load<SpriteAtlas>(atlasPath);
         string name = unitName.ToLower().Replace(" ", "");
@@ -237,7 +237,7 @@ public class PrefabManager
 
 
     //need to separate StaticSprite from AttributesBaseUnit because MenuProductionPanel passes a different sprite.
-    public void setSprites(AttributesBaseUnit attributes, StaticSprite spritePrefab)
+    public void SetSprites(AttributesBaseUnit attributes, StaticSprite spritePrefab)
     {
 
 

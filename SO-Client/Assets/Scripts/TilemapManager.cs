@@ -31,7 +31,7 @@ public class TilemapManager : MonoBehaviour
     //private string tilemapFilePath;
 
     //receives a list of all the attributesTile each of which contain the rules for each tile type (defined as a byte)
-    public (int, int) initialize(bool getRawBounds)
+    public (int, int) Initialize(bool getRawBounds)
     {
         //tilemapFilePath = "Assets/InitializationData/Maps/Map2";
         //byteToAttributesTileDictionary = inputAttributesTilesDictionary;
@@ -286,7 +286,7 @@ public class TilemapManager : MonoBehaviour
                     else
                     {
                         byte tileByte = tilemapByteArray[y * gridWidth + x];
-                        TileBase tile = getTile(tileByte, null);
+                        TileBase tile = GetTile(tileByte, null);
                         if (tileByte != 255 && tile != null)
                         {
                             Vector3Int pos = new Vector3Int(x, y, 0);
@@ -309,7 +309,7 @@ public class TilemapManager : MonoBehaviour
     }
 
         //if index is null return a random tile from Tilelist with byte b
-        public TileBase getTile(byte b, int? index = null)
+        public TileBase GetTile(byte b, int? index = null)
     {
         if (byteToTilesListDictionary.TryGetValue(b, out List<TileBase> tiles))
         {
@@ -342,7 +342,7 @@ public class TilemapManager : MonoBehaviour
         }
     }
 
-    public byte[] getTilemapByteArray()
+    public byte[] GetTilemapByteArray()
     {
         if (tilemapByteArray == null || tilemapByteArray.Length == 0)
         {
@@ -485,7 +485,7 @@ public class TilemapManager : MonoBehaviour
     }
 
 
-    //initialize is too early to draw Gizmos
+    //Initialize is too early to draw Gizmos
     /*private Vector2Int cachedTilemapBounds = Vector2Int.zero;
     // Method to draw the Gizmos
     void OnDrawGizmos()

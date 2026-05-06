@@ -24,7 +24,7 @@ public class GameValuesSO : ScriptableObject
         isInit = false;
     }
 
-    public void initialize()
+    public void Initialize()
     {
         //Debug.Log("GameValuesSO OnEnable called.");
         //attributesBaseUnits = new Dictionary<byte, AttributesBaseUnit>();
@@ -193,19 +193,19 @@ public class GameValuesSO : ScriptableObject
 
 
 
-            unitAttributes.prefabPath = generatePrefabLocationString(unitAttributes.unitName, unitAttributes.progeny);
+            unitAttributes.prefabPath = GeneratePrefabLocationString(unitAttributes.unitName, unitAttributes.progeny);
             //unitAttributes.gamePieceId = (byte)(i - 1);
             unitAttributes.attributesHash = ComputeUnitHash(unitAttributes);
             //add unit attributes to list of attributesBaseUnit.
             attributesBaseUnits.Add((byte)unitAttributes.gamePieceId, unitAttributes);
 
-            prefabManager.managePrefabOnStartUp(unitAttributes);
+            prefabManager.ManagePrefabOnStartUp(unitAttributes);
 /*            if (Resources.Load(unitAttributes.prefabPath) == null)// || Resources.Load(unitAttributes.prefabPath) != )
             {
                 //Assets/Resources/UnitPrefabs/progeny1/BasePrefab.prefab
                 string basePrefabPath = "UnitPrefabs/BaseUnitBasePrefab";
                 prefabManager.ClonePrefab(basePrefabPath, unitAttributes.prefabPath);
-                prefabManager.modifyPrefab(unitAttributes.prefabPath, unitAttributes);
+                prefabManager.ModifyPrefab(unitAttributes.prefabPath, unitAttributes);
             }
             else
             {
@@ -431,7 +431,7 @@ public class GameValuesSO : ScriptableObject
             if (unitData.unitName == unitName)
             {
                 // Log and return the matching unit
-                printToLogs(unitData);
+                PrintToLogs(unitData);
                 //Debug.Log($"Found unit: {unitData.unitName} it has prefabPath data : **{unitData.prefabPath}**");
                 return unitData;
             }
@@ -457,23 +457,23 @@ public class GameValuesSO : ScriptableObject
         }
     }
 
-    public Dictionary<byte, AttributesBaseUnit> getAttributesBaseUnits()
+    public Dictionary<byte, AttributesBaseUnit> GetAttributesBaseUnits()
     {
         return attributesBaseUnits;
     }    
     
-    public Dictionary<byte, AttributesTile> getAttributesTilesDictionary()
+    public Dictionary<byte, AttributesTile> GetAttributesTilesDictionary()
     {
         return byteToAttributesTileDictionary;
     }
 
-    public Dictionary<string, Dictionary<string, double>>  getCombatMultiplierDictionary()
+    public Dictionary<string, Dictionary<string, double>>  GetCombatMultiplierDictionary()
     {
         return combatMultipliersDictionary;
     }
 
     //debugging function
-    private void printToLogs(AttributesBaseUnit unitData)
+    private void PrintToLogs(AttributesBaseUnit unitData)
     {
         Debug.Log($"unitName: {unitData.unitName}");
         Debug.Log($".progeny: {unitData.progeny}");
@@ -490,7 +490,7 @@ public class GameValuesSO : ScriptableObject
         Debug.Log($"prefabPath: {unitData.prefabPath}");
     }
 
-    private string generatePrefabLocationString(string unitName, Progeny progeny)
+    private string GeneratePrefabLocationString(string unitName, Progeny progeny)
     {
         string prefabPath = "unitPrefabs/";
         int progenyIndex = (int)progeny + 1;
@@ -502,7 +502,7 @@ public class GameValuesSO : ScriptableObject
         return prefabPath;
     }
 
-/*    private void finalizePopulateGameValues(AttributesBaseUnit unit)
+/*    private void FinalizePopulateGameValues(AttributesBaseUnit unit)
     {
         //requires the sprite in the inspector to be in Resources/Sprites and named aaaaSprite
 
@@ -510,9 +510,9 @@ public class GameValuesSO : ScriptableObject
         unit.sprite = Resources.Load<Sprite>(spritePath);*//*
         unit.sprite = Resources.Load<Sprite>($"sprites/{unit.unitName.ToLower().Replace(" ", "")}Sprite");
 
-        unit.prefabPath = generatePrefabLocationString(unit.unitName, unit.progeny);
+        unit.prefabPath = GeneratePrefabLocationString(unit.unitName, unit.progeny);
         attributesBaseUnits.Add(unit.baseUnitVariantIdentifier, unit);
-        prefabManager.modifyPrefab(unit.prefabPath, unit);
+        prefabManager.ModifyPrefab(unit.prefabPath, unit);
     }*/
 
     public static int GetEnumIndex<TEnum>(TEnum value) where TEnum : Enum

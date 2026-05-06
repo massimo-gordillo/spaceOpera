@@ -24,20 +24,20 @@ public class Structure_Command : BaseStructure
     public override void Initialize()
     {
         base.Initialize(); 
-        //Debug.Log($"[CommandStructure] Start called. pos is {pos} and playerControl is {playerControl}, with progeny {gameMaster.getPlayerProgeny((byte)playerControl)}");
+        //Debug.Log($"[CommandStructure] Start called. pos is {pos} and playerControl is {playerControl}, with progeny {gameMaster.GetPlayerProgeny((byte)playerControl)}");
         MasterGrid.commandStructures[playerControl] = this;
         TurnOffCommandSprites();
-        if (gameMaster.getPlayerProgeny((byte)playerControl) == 0)
+        if (gameMaster.GetPlayerProgeny((byte)playerControl) == 0)
         {
             lowerSpriteContainer = progeny0LowerSpriteContainer;
             upperSpriteContainer = progeny0UpperSpriteContainer;
         }
-        else if (gameMaster.getPlayerProgeny((byte)playerControl) == 1)
+        else if (gameMaster.GetPlayerProgeny((byte)playerControl) == 1)
         {
             lowerSpriteContainer = progeny1LowerSpriteContainer;
             upperSpriteContainer = progeny1UpperSpriteContainer;
         }
-        else if (gameMaster.getPlayerProgeny((byte)playerControl) == 2)
+        else if (gameMaster.GetPlayerProgeny((byte)playerControl) == 2)
         {
             lowerSpriteContainer = progeny2LowerSpriteContainer;
             upperSpriteContainer = progeny2UpperSpriteContainer;

@@ -20,8 +20,8 @@ public class MenuProductionPanel : MonoBehaviour
     public StaticSprite spritePrefabTemplate;
     //private bool startComplete = false;
     // Start is called before the first frame update
-    //chatgpt implementation. Also modified the prefabManager setSprites class.
-    public void init()
+    //chatgpt implementation. Also modified the prefabManager SetSprites class.
+    public void Init()
     {
         /*if(!startComplete)
             Debug.Log("Start() MenuProductionPanel");
@@ -29,7 +29,7 @@ public class MenuProductionPanel : MonoBehaviour
             Debug.Log("Start MenuProductionPanel already complete! Ran twice!");
         //spritePrefabTemplate = Resources.Load<StaticSprite>("StaticSpriteTemplate");*/
 
-        attributesBaseUnits = gameValuesSO.getAttributesBaseUnits();
+        attributesBaseUnits = gameValuesSO.GetAttributesBaseUnits();
 
         //throw warning if empty
         if (attributesBaseUnits == null || attributesBaseUnits.Count ==0)
@@ -62,8 +62,8 @@ public class MenuProductionPanel : MonoBehaviour
             // Set the button properties
             newButton.nameText.text = $"{InsertSpacesBeforeCapitals(attributesBaseUnit.unitName)}";
             newButton.priceText.text = $"{attributesBaseUnit.price}";
-            prefabManager.setSprites(attributesBaseUnit, spritePrefabInstance);
-            newButton.unitPrefab = prefabManager.getPrefabFromPath(attributesBaseUnit.prefabPath);
+            prefabManager.SetSprites(attributesBaseUnit, spritePrefabInstance);
+            newButton.unitPrefab = prefabManager.GetPrefabFromPath(attributesBaseUnit.prefabPath);
 
             // Set the parent
             //Debug.Log($"for unit {attributesBaseUnit.unitName}, type {attributesBaseUnit.unitTerrainType} ");
@@ -94,9 +94,9 @@ public class MenuProductionPanel : MonoBehaviour
     }
 
 
-    public void presentProdList(int structNum, byte playerProgeny, int playerResources)
+    public void PresentProdList(int structNum, byte playerProgeny, int playerResources)
     {
-        //Debug.Log("presentProdList: " + structNum + "/" + playerProgeny + "/" + playerResources);
+        //Debug.Log("PresentProdList: " + structNum + "/" + playerProgeny + "/" + playerResources);
         Transform presentedList = null;
         prodListProgeny0Land.gameObject.SetActive(false);
         prodListProgeny0Air.gameObject.SetActive(false);
@@ -128,7 +128,7 @@ public class MenuProductionPanel : MonoBehaviour
         }
 
         presentedList.gameObject.SetActive(true);
-        //Debug.Log("presentProdList: " + presentedList.gameObject.name + "player resources: " + playerResources);
+        //Debug.Log("PresentProdList: " + presentedList.gameObject.name + "player resources: " + playerResources);
         //Player can't select to produce units they cannot afford
         /*        foreach (MenuProductionButton button in presentedList.GetComponentsInChildren<MenuProductionButton>())
                 {

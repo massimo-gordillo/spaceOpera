@@ -682,7 +682,7 @@ public class SupabaseManager : MonoBehaviour
 
                 if (Guid.TryParse(matchIdString, out Guid matchId))
                 {
-                    _gameMaster.setMatchId(matchId);
+                    _gameMaster.SetMatchId(matchId);
                 }
                 else
                 {

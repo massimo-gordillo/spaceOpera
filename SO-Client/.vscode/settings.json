@@ -55,12 +55,10 @@
         "UserSettings/": true,
         "temp/": true,
         "Temp/": true,
-        "**/*.csproj": true,
-        "**/*.sln": true,
         "**/WebGLBuild*.zip": true,
         "**/webGLBuild*.zip": true
     },
-"search.exclude": {
+    "search.exclude": {
         "**/*.meta": true,
         "**/*.csproj": true,
         "**/*.sln": true,
@@ -78,6 +76,5 @@
         "**/Logs/**": true,
         "**/Build/**": true
     },
-
     "dotnet.defaultSolution": "SO-Client.sln"
 }

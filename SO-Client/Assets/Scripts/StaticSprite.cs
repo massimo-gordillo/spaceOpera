@@ -104,14 +104,14 @@ public class StaticSprite : ClickableObject
             return;
         //Debug.Log("Clicked on: " + gameObject.name);
         if (parentComponentBaseUnit != null)
-            parentComponentBaseUnit.staticSpriteHasBeenClicked();
+            parentComponentBaseUnit.StaticSpriteHasBeenClicked();
         else if (parentComponentBaseStructure != null)
-            parentComponentBaseStructure.staticSpriteHasBeenClicked();
+            parentComponentBaseStructure.StaticSpriteHasBeenClicked();
         else
             Debug.Log("No parent of StaticSprite " + this.GetInstanceID()+" found");
     }
 
-/*    public void destroyMe()
+/*    public void DestroyMe()
     {
         Destroy(this);
     }*/
@@ -231,7 +231,7 @@ public class StaticSprite : ClickableObject
         if (lightsImage != null)
             lightsImage.color = c;
     }
-    /*public void setColorStructure(SpriteRenderer sprite) //Should this be combined with baseUnit.setColor? Maybe Mastergrid does this modification.
+    /*public void SetColorStructure(SpriteRenderer sprite) //Should this be combined with baseUnit.SetColor? Maybe Mastergrid does this modification.
     {
         int player = playerControl;
         if (player != 0)
@@ -254,7 +254,7 @@ public class StaticSprite : ClickableObject
 
     }
 
-    public void setColorBaseUnit(int player, bool nonExhausted)
+    public void SetColorBaseUnit(int player, bool nonExhausted)
     {
         if (!originalLightsColorSet)
         {

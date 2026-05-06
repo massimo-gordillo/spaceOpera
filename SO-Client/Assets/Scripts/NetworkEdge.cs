@@ -17,7 +17,7 @@ public class NetworkEdge
 
     public bool isPriorityGround = false;
 
-    // Constructor to initialize the NetworkEdge
+    // Constructor to Initialize the NetworkEdge
     public NetworkEdge(NetworkNode A, NetworkNode B)
     {
         nodeA = A;

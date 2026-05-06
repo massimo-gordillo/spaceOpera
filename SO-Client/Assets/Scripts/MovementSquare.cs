@@ -30,7 +30,7 @@ public class MovementSquare : ClickableObject
         //set opacity
         //SpriteRenderer sr = gameObject.GetComponent<SpriteRenderer>();
         Color color = sr.color;
-        setColor(new Color(color.r, color.b, color.g, 0.8f));
+        SetColor(new Color(color.r, color.b, color.g, 0.8f));
         sr.sortingLayerID = SortingLayer.NameToID("Drawing");
         //stripeSprite.gameObject.SetActive(false);
     }
@@ -39,10 +39,10 @@ public class MovementSquare : ClickableObject
     {
         mg = GameObject.FindGameObjectWithTag("MasterGridTag").GetComponent<MasterGrid>();
         //print("Movement square moves you to: "+(int)transform.position.x +", "+ (int)transform.position.y);
-        mg.moveSelectedUnit(new Vector2Int((int)transform.position.x, (int)transform.position.y));
+        mg.MoveSelectedUnit(new Vector2Int((int)transform.position.x, (int)transform.position.y));
     }
 
-    public void setColor(Color c)
+    public void SetColor(Color c)
     {
         sr.color = c;
         Color shieldColor = new Color(c.r, c.b, c.g, 1.0f);
@@ -51,7 +51,7 @@ public class MovementSquare : ClickableObject
         //shield3.GetComponent<SpriteRenderer>().color = shieldColor;
     }
 
-    public void showShields(int s)
+    public void ShowShields(int s)
     {
         shield1.SetActive(false);
         shield2.SetActive(false);

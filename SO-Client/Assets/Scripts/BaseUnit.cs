@@ -94,14 +94,14 @@ public class BaseUnit : MonoBehaviour
         pos.y = (int)transform.position.y;
         //print("BaseUnit initiated. xPos: " + transform.position.x + "ypos: " + transform.position.y +"instanceID: "+this.GetInstanceID());
         masterGrid = GameObject.FindGameObjectWithTag("MasterGridTag").GetComponent<MasterGrid>();
-        masterGrid.setUnitInGrid(pos, this);
+        masterGrid.SetUnitInGrid(pos, this);
         MasterGrid.playerUnits[playerControl].Add(this);
 
         //if the unit is created after the structure on start, turn off the collider. BaseStructure has a similar check on start.
-        BaseStructure onLocation = masterGrid.whatStructureIsInThisLocation(pos);
+        BaseStructure onLocation = masterGrid.WhatStructureIsInThisLocation(pos);
         if (onLocation != null)
         {
-            onLocation.turnOffCollider();
+            onLocation.TurnOffCollider();
         }
 
         //baseColor = spriteFillSR.color;
@@ -110,11 +110,11 @@ public class BaseUnit : MonoBehaviour
 
         //a good hack will probably want to fix later.
         if ((playerControl+1) % 2 == 1)
-            flipSprites();
+            FlipSprites();
 
         //Debug.Log($"Setting health {healthCurrent} to health max {healthMax}");
         healthCurrent = healthMax; //set current health to max health on start
-        setHealth(healthMax);
+        SetHealth(healthMax);
         if (unitNameTextContainer != null)
         {
             unitNameTextContainer.text = $"P{playerControl}'s {unitName}";
@@ -123,12 +123,12 @@ public class BaseUnit : MonoBehaviour
             Debug.LogError("No unitNameTextContainerFound");
 
 
-        initializeColors();
+        InitializeColors();
 
-        hideCrosshairs();
-        hideCombatTooltip();
+        HideCrosshairs();
+        HideCombatTooltip();
         //spriteContainer.SetColor(playerControl, true, false);
-        showSelectedCorners(false);
+        ShowSelectedCorners(false);
 
         
 
@@ -163,7 +163,7 @@ public class BaseUnit : MonoBehaviour
         }
     }
 
-    /*    public void startupPopulateValues(AttributesBaseUnit data)
+    /*    public void StartupPopulateValues(AttributesBaseUnit data)
         {
             if (data != null)
             {
@@ -185,13 +185,13 @@ public class BaseUnit : MonoBehaviour
         }*/
 
 
-    public void staticSpriteHasBeenClicked()
+    public void StaticSpriteHasBeenClicked()
     {
         if(unitName != "seed")
-            masterGrid.unitHasBeenClicked(this);
+            masterGrid.UnitHasBeenClicked(this);
     }
 
-    public void drawCrosshairs()
+    public void DrawCrosshairs()
     {
         if (crosshairSpriteRenderer != null)
         {
@@ -199,14 +199,14 @@ public class BaseUnit : MonoBehaviour
         }
     }
 
-    public void hideCrosshairs()
+    public void HideCrosshairs()
     {
         if (crosshairSpriteRenderer != null)
         {
             crosshairSpriteRenderer.enabled = false;
         }
     }
-    public void hideCombatTooltip()
+    public void HideCombatTooltip()
     {
         if (combatTooltip != null)
         {
@@ -214,7 +214,7 @@ public class BaseUnit : MonoBehaviour
         }
     }
 
-    public void showSelectedCorners(bool b)
+    public void ShowSelectedCorners(bool b)
     {
         cornerSpriteTL.SetActive(b);
         cornerSpriteTR.SetActive(b);
@@ -222,7 +222,7 @@ public class BaseUnit : MonoBehaviour
         cornerSpriteBR.SetActive(b);
     }
 
-    public void initializeColors()
+    public void InitializeColors()
     {
         Color playerColor = MatchSettings.playerColors[playerControl];
         cornerSpriteTL.GetComponent<SpriteRenderer>().color = playerColor;  
@@ -234,7 +234,7 @@ public class BaseUnit : MonoBehaviour
         //damageRangeTextContainer.color = playerColor;
     }
 
-    public void showCombatTooltip(int defence, int sentusDefence, double floor, double ceiling)
+    public void ShowCombatTooltip(int defence, int sentusDefence, double floor, double ceiling)
     {
         combatTooltip.SetActive(true);
         if (floor > 1)
@@ -258,14 +258,14 @@ public class BaseUnit : MonoBehaviour
         tooltipImage.color = transparentColor;
     }
 
-    public void setHealth(double health)
+    public void SetHealth(double health)
     {
         if (health != healthCurrent)
         {
             //round down to the nearest 1% of max health
             int healthStep = Math.Max(1, healthMax / 100); // Ensure healthStep is at least 1
             healthCurrent = (int)(health - (health % healthStep));
-            updateHealthUI();
+            UpdateHealthUI();
         }
         //if CPU resource unit, unclaim target node if below ratio threshold.  
         if(isResourceUnit && GameMaster.CPU_isOn && health/healthMax < 0.65)
@@ -280,15 +280,15 @@ public class BaseUnit : MonoBehaviour
         }
     }
 
-    public int getHealthPercentage()
+    public int GetHealthPercentage()
     {
         //Debug.Log($"Calculating health percentage for {unitName}: Current Health = {healthCurrent} vs {(double)healthCurrent}, Max Health = {(double)healthMax}");
         return (int)(((double)healthCurrent / (double)healthMax) * 100);
     }
 
-    public void updateHealthUI()
+    public void UpdateHealthUI()
     {
-        int healthPercentage = getHealthPercentage();
+        int healthPercentage = GetHealthPercentage();
         if (healthPercentage == 100){
             healthCanvas.SetActive(false);
         }else
@@ -298,22 +298,22 @@ public class BaseUnit : MonoBehaviour
         healthTextContainer.text = healthPercentage.ToString();
     }
 
-    public void takeDamage(double damage)
+    public void TakeDamage(double damage)
     {
         StartCoroutine(AnimateTakeDamage());
         if (damage <= 0)
-            setHealth(healthCurrent);
+            SetHealth(healthCurrent);
         else if (healthCurrent <= damage){
-            setHealth(0);
-            deleteMe(true);
+            SetHealth(0);
+            DeleteMe(true);
         }else if ((healthCurrent - damage) < 0.05 * healthMax)
         {
-            setHealth(0);
-            deleteMe(true);
+            SetHealth(0);
+            DeleteMe(true);
         }
         else
         {
-            setHealth(healthCurrent - damage);
+            SetHealth(healthCurrent - damage);
         }
     }
 
@@ -361,18 +361,18 @@ public class BaseUnit : MonoBehaviour
     }
 
 
-    public void setNonExhausted(bool ready)
+    public void SetNonExhausted(bool ready)
     {
         //Debug.Log($"{this.unitName} is being set to non-exhausted {b}");
         movementNonExhausted = ready;
         nonExhausted = ready;
         //spriteContainer.SetColor(playerControl, b, false);
         /*        if (GameMaster.CPU_PlayersList[playerControl])
-                    delaySetColor(b);
+                    DelaySetColor(b);
                 else
                     spriteContainer.SetColor(playerControl, b, false);*/
         /*        if (unitName.ToLower() != "seed")
-                    StartCoroutine(delaySetColor(ready));
+                    StartCoroutine(DelaySetColor(ready));
                 else
                 {
                     spriteFillSR.color = GameMaster.playerColors[GameMaster.playerTurn - 1];
@@ -384,10 +384,10 @@ public class BaseUnit : MonoBehaviour
             Debug.Log($"Seed highlight color: {spriteLightsSR.color}");
         }*/
 
-        StartCoroutine(delaySetColor(ready));
+        StartCoroutine(DelaySetColor(ready));
     }
 
-    public IEnumerator delaySetColor(bool ready)
+    public IEnumerator DelaySetColor(bool ready)
     {
         if (ready)
             yield return null;
@@ -397,7 +397,7 @@ public class BaseUnit : MonoBehaviour
     }
 
 
-    public void flipSprites()
+    public void FlipSprites()
     {
         spriteFillSR.flipX = true;
         spriteTrimSR.flipX = true;
@@ -405,14 +405,14 @@ public class BaseUnit : MonoBehaviour
     }
 
 
-/*    public int getPlayerControl()
+/*    public int GetPlayerControl()
     {
         return playerControl;
     }*/
 
-    public void deleteMe(bool animate)
+    public void DeleteMe(bool animate)
     {
-        masterGrid.deleteUnit(this, animate);
+        masterGrid.DeleteUnit(this, animate);
     }
 
     public IEnumerator AnimateDestroy()

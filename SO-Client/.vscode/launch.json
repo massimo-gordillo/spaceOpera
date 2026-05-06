@@ -5,6 +5,11 @@
             "name": "Unity Debugger",
             "type": "unity",
             "request": "attach"
+        },
+        {
+            "name": "Attach to Unity",
+            "type": "vstuc",
+            "request": "attach"
         }
     ]
 }
