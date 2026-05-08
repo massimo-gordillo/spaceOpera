@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "sequenceId": "tutorial_universal_intro",
+  "missionId": "tutorial_curriculum",
+  "description": "Introduction — welcome, battlefield grid, and the three Progeny.",
+  "steps": [
+    {
+      "id": "lock",
+      "type": "setInputLock",
+      "locked": true,
+      "reason": "tutorial_universal_intro"
+    },
+    {
+      "id": "dlg_welcome",
+      "type": "dialogue",
+      "speaker": "Tutorial",
+      "text": "<b>Introduction</b>\n\nCommander, welcome to <i>Tactica: a Space Opera</i>.<page/>Your goal is to conquer this frontier sector for its <b>BISMUTH</b>.<page/>Build an army, defend your structures, and conquer the sector.",
+      "waitForContinue": true
+    },
+    {
+      "id": "dlg_grid",
+      "type": "dialogue",
+      "speaker": "Tutorial",
+      "text": "<b>Battlefield</b>\n\nThe battle is fought on a grid of squares. Positioning, terrain, and reach all matter.",
+      "waitForContinue": true
+    },
+    {
+      "id": "dlg_progeny",
+      "type": "dialogue",
+      "speaker": "Tutorial",
+      "text": "<b>Choose your Progeny</b>\n\nThree <b>PROGENY</b> fight for control of the <b>BISMUTH</b>:<page/>◦ <b>Ertrians</b> — mine it for trade\n◦ <b>Virix</b> — grow from it\n◦ <b>Sentus</b> — draw power from it<page/>Each faction has its own production rules and bonuses.<page/>You will learn universal tactics first, then faction specifics.",
+      "waitForContinue": true
+    },
+    {
+      "id": "unlock",
+      "type": "setInputLock",
+      "locked": false
+    }
+  ]
+}

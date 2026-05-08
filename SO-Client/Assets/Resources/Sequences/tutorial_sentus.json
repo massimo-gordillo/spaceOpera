@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "sequenceId": "tutorial_sentus",
+  "missionId": "tutorial_curriculum",
+  "description": "Sentus faction — portals and defensive power near BISMUTH.",
+  "steps": [
+    {
+      "id": "lock",
+      "type": "setInputLock",
+      "locked": true,
+      "reason": "tutorial_sentus"
+    },
+    {
+      "id": "dlg_portals",
+      "type": "dialogue",
+      "speaker": "Tutorial",
+      "text": "<b>Portals</b>\n\n◦ Sentus armies emerge from <b>Portals</b> instead of traditional factories.<page/>◦ Treat portals as forward bases: secure them early, then project power toward contested <b>BISMUTH</b>.",
+      "waitForContinue": true
+    },
+    {
+      "id": "dlg_defense",
+      "type": "dialogue",
+      "speaker": "Tutorial",
+      "text": "<b>Defense near BISMUTH</b>\n\n◦ Sentus units gain <b>bonus defense</b> while fighting near friendly <b>BISMUTH</b>.<page/>◦ Anchor your line on income nodes — enemies pay full price to uproot you.",
+      "waitForContinue": true
+    },
+    {
+      "id": "dlg_summary",
+      "type": "dialogue",
+      "speaker": "Tutorial",
+      "text": "<b>Summary</b>\n\n<b>Sentus</b> excel at entrenched play: <b>Portals</b> for production and stubborn defenders bolstered by proximity to <b>BISMUTH</b>.",
+      "waitForContinue": true
+    },
+    {
+      "id": "unlock",
+      "type": "setInputLock",
+      "locked": false
+    }
+  ]
+}

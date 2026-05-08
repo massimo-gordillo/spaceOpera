@@ -46,7 +46,7 @@ public class CameraManager : MonoBehaviour
 
     void Update()
     {
-        if (gameMaster != null && gameMaster.sequenceManager != null && gameMaster.sequenceManager.IsInputLocked())
+        if (gameMaster != null && gameMaster.sequenceManager != null && gameMaster.sequenceManager.SuppressNonDialogueGameplayInput())
         {
             return;
         }

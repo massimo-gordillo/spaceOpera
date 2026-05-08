@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "sequenceId": "tutorial_ertrian",
+  "missionId": "tutorial_curriculum",
+  "description": "Ertrian faction — economy bonus, factories vs airports, ranged doctrine.",
+  "steps": [
+    {
+      "id": "lock",
+      "type": "setInputLock",
+      "locked": true,
+      "reason": "tutorial_ertrian"
+    },
+    {
+      "id": "dlg_income_bonus",
+      "type": "dialogue",
+      "speaker": "Tutorial",
+      "text": "<b>Ertrian economy</b>\n\nErtrians thrive on trade routes secured by <b>BISMUTH</b>.<page/>◦ You earn a <b>10% bonus</b> on structure income compared to the baseline — snowball map control into a stronger wallet.",
+      "waitForContinue": true
+    },
+    {
+      "id": "dlg_factories_airports",
+      "type": "dialogue",
+      "speaker": "Tutorial",
+      "text": "<b>Factories and airports</b>\n\n◦ <b>Factories</b> train ground forces — your core capture and front-line toolkit.\n◦ <b>Airports</b> recruit flyers that bypass terrain and threaten exposed targets.<page/>Choose production buildings to match the map: chokepoints vs open flanks.",
+      "waitForContinue": true
+    },
+    {
+      "id": "dlg_ranged",
+      "type": "dialogue",
+      "speaker": "Tutorial",
+      "text": "<b>Ranged units (Ertrian specialty)</b>\n\n◦ Ranged units strike from a distance but <b>cannot move and shoot in the same turn</b> — plan the tempo of your turns.<page/>◦ <color=#ADD8E6>Blue tiles</color> show movement; <color=#FF9999>red outlines</color> show attack range.<page/>◦ Screen fragile capture units, then delete defenders before they reach your line.",
+      "waitForContinue": true
+    },
+    {
+      "id": "dlg_progeny_bonus",
+      "type": "dialogue",
+      "speaker": "Tutorial",
+      "text": "<b>Summary</b>\n\n<b>Ertrians</b> reward aggressive map control: <b>ranged firepower</b> plus <b>bonus income</b> from every secured <b>BISMUTH</b> node.",
+      "waitForContinue": true
+    },
+    {
+      "id": "unlock",
+      "type": "setInputLock",
+      "locked": false
+    }
+  ]
+}

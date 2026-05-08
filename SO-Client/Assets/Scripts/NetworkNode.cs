@@ -234,7 +234,7 @@ public class NetworkNode
         }
         if (shortest == null || shortestNeighbour == null)
         {
-            Debug.LogWarning($"Node {pos} unable to find closest unclaimed for {playerControl} in naive search");
+            //Debug.LogWarning($"Node {pos} unable to find closest unclaimed for {playerControl} in naive search");
         }
         else
         {

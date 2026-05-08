@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "sequenceId": "tutorial_outro",
+  "missionId": "tutorial_curriculum",
+  "description": "Closing encouragement after curriculum.",
+  "steps": [
+    {
+      "id": "lock",
+      "type": "setInputLock",
+      "locked": true,
+      "reason": "tutorial_outro"
+    },
+    {
+      "id": "dlg_ready",
+      "type": "dialogue",
+      "speaker": "Tutorial",
+      "text": "<b>Ready for combat</b>\n\n◦ You have the universal toolkit and each Progeny's identity.\n◦ Capture <b>BISMUTH</b>, outthink your opponent, and claim the sector.<page/>Go forth — the frontier waits.",
+      "waitForContinue": true
+    },
+    {
+      "id": "unlock",
+      "type": "setInputLock",
+      "locked": false
+    }
+  ]
+}

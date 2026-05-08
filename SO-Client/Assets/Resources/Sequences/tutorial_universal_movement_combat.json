@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "sequenceId": "tutorial_universal_movement_combat",
+  "missionId": "tutorial_curriculum",
+  "description": "1.1 — Movement, attacking, damage, and flying vs terrain.",
+  "steps": [
+    {
+      "id": "lock",
+      "type": "setInputLock",
+      "locked": true,
+      "reason": "tutorial_universal_movement_combat"
+    },
+    {
+      "id": "dlg_movement",
+      "type": "dialogue",
+      "speaker": "Tutorial",
+      "text": "<b>Moving units</b>\n\n◦ Select a unit to see its movement range (<color=#ADD8E6>blue tiles</color>).\n◦ Click a <color=#ADD8E6>blue tile</color> to move.\n◦ Terrain and enemies block paths.<page/><b>Flying</b>\n\nFlying units ignore terrain blocking — they still interact with enemies and objectives according to their rules.",
+      "waitForContinue": true
+    },
+    {
+      "id": "dlg_attacking",
+      "type": "dialogue",
+      "speaker": "Tutorial",
+      "text": "<b>Attacking enemies</b>\n\n◦ Enemy units in <color=#FF9999>red tiles</color> are in attack range.\n◦ Move adjacent using a <color=#ADD8E6>blue tile</color>, then choose <b>Attack</b>.<page/>◦ Preview damage before you commit — no surprises.",
+      "waitForContinue": true
+    },
+    {
+      "id": "dlg_damage",
+      "type": "dialogue",
+      "speaker": "Tutorial",
+      "text": "<b>Health and damage</b>\n\n◦ Units show health as a percentage out of 100%.\n◦ Injured units deal less damage and capture structures more slowly.<page/>◦ At 0% health a unit is destroyed.\n◦ Most units fight back when attacked, but retaliation is much weaker than a deliberate strike.",
+      "waitForContinue": true
+    },
+    {
+      "id": "unlock",
+      "type": "setInputLock",
+      "locked": false
+    }
+  ]
+}

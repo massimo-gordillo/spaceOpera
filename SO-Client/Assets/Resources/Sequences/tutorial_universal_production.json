@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "sequenceId": "tutorial_universal_production",
+  "missionId": "tutorial_curriculum",
+  "description": "1.3 — Economy loop, where armies come from (overview), and building units.",
+  "steps": [
+    {
+      "id": "lock",
+      "type": "setInputLock",
+      "locked": true,
+      "reason": "tutorial_universal_production"
+    },
+    {
+      "id": "dlg_income",
+      "type": "dialogue",
+      "speaker": "Tutorial",
+      "text": "<b>Income</b>\n\n◦ At the start of your turn, every structure you control pays <b>+100 BISMUTH</b>.\n◦ Spend <b>BISMUTH</b> to recruit units and react to threats.<page/>Faction bonuses change how fast you earn — those details come in the Ertrian, Virix, and Sentus lessons.",
+      "waitForContinue": true
+    },
+    {
+      "id": "dlg_production_where",
+      "type": "dialogue",
+      "speaker": "Tutorial",
+      "text": "<b>Where units are produced</b>\n\nEach Progeny builds from different structures:\n\n◦ <b>Ertrians</b> — <b>Factories</b> and <b>Airports</b>\n◦ <b>Virix</b> — any <b>BISMUTH</b> tile you own\n◦ <b>Sentus</b> — <b>Portals</b><page/>The next tutorials dive into what makes each faction tick.",
+      "waitForContinue": true
+    },
+    {
+      "id": "dlg_producing",
+      "type": "dialogue",
+      "speaker": "Tutorial",
+      "text": "<b>Producing units</b>\n\n◦ Select a production structure to see which units are available this turn.\n◦ Press the unit button to build it <i>on</i> that structure.<page/>◦ You cannot build on a structure while another unit is standing on it — clear the pad first.",
+      "waitForContinue": true
+    },
+    {
+      "id": "unlock",
+      "type": "setInputLock",
+      "locked": false
+    }
+  ]
+}

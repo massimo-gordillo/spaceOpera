@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "sequenceId": "tutorial_universal_capture_victory",
+  "missionId": "tutorial_curriculum",
+  "description": "1.2 — Victory, capture units, and capturing structures.",
+  "steps": [
+    {
+      "id": "lock",
+      "type": "setInputLock",
+      "locked": true,
+      "reason": "tutorial_universal_capture_victory"
+    },
+    {
+      "id": "dlg_winning",
+      "type": "dialogue",
+      "speaker": "Tutorial",
+      "text": "<b>How to win</b>\n\n◦ Each player has a <b>Command Structure</b>.\n◦ Capture the enemy's <b>Command Structure</b> while protecting your own.<page/>◦ Use <b>BISMUTH</b> income to grow an army that can contest the map.",
+      "waitForContinue": true
+    },
+    {
+      "id": "dlg_capture_units",
+      "type": "dialogue",
+      "speaker": "Tutorial",
+      "text": "<b>Capture units</b>\n\nOnly certain units — <b>capture units</b> — can seize <b>BISMUTH</b> sites and other structures:\n\n◦ <b>Ertrian</b> Infantry\n◦ <b>Virix</b> Spore\n◦ <b>Sentus</b> Blacksmith<page/>Bring the right unit to the objective.",
+      "waitForContinue": true
+    },
+    {
+      "id": "dlg_capturing",
+      "type": "dialogue",
+      "speaker": "Tutorial",
+      "text": "<b>Capturing structures</b>\n\n◦ Move a <b>capture unit</b> onto a structure and start capture.\n◦ Structures have <b>200 HP</b> while contested.<page/>◦ At full health, completing a capture takes <b>two turns</b> — pressure your opponent before they stabilize the line.",
+      "waitForContinue": true
+    },
+    {
+      "id": "unlock",
+      "type": "setInputLock",
+      "locked": false
+    }
+  ]
+}

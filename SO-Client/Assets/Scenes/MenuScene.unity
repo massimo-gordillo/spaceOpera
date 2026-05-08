@@ -2478,7 +2478,6 @@ MonoBehaviour:
   tutorialPanDuration: 0.75
   canvasGroup: {fileID: 152065527}
   fadeDuration: 0.5
-  playableTutorialScenarioId: tutorial_01_intro
 --- !u!224 &152065526
 RectTransform:
   m_ObjectHideFlags: 0

@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "description": "Ordered tutorial tracks derived from menu slideshow export. Resources paths omit extension.",
+  "tracks": [
+    {
+      "group": "1 · Universal rules",
+      "sequenceResourcePath": "Sequences/tutorial_universal_intro",
+      "title": "Introduction",
+      "notes": "Welcome, grid, three Progeny overview"
+    },
+    {
+      "group": "1 · Universal rules",
+      "sequenceResourcePath": "Sequences/tutorial_universal_movement_combat",
+      "title": "1.1 Movement, attacking, and damage",
+      "notes": "Tiles, combat preview, health — plus flying vs terrain"
+    },
+    {
+      "group": "1 · Universal rules",
+      "sequenceResourcePath": "Sequences/tutorial_universal_capture_victory",
+      "title": "1.2 Capturing and winning",
+      "notes": "Victory condition, capture units, capture flow"
+    },
+    {
+      "group": "1 · Universal rules",
+      "sequenceResourcePath": "Sequences/tutorial_universal_production",
+      "title": "1.3 Producing units",
+      "notes": "Income loop, where production happens (overview), build actions"
+    },
+    {
+      "group": "2 · Ertrian rules",
+      "sequenceResourcePath": "Sequences/tutorial_ertrian",
+      "title": "Ertrian faction",
+      "notes": "Income bonus, factories vs airports, ranged units"
+    },
+    {
+      "group": "3 · Virix rules",
+      "sequenceResourcePath": "Sequences/tutorial_virix",
+      "title": "Virix faction",
+      "notes": "Spores, production on BISMUTH, growth mechanics"
+    },
+    {
+      "group": "4 · Sentus rules",
+      "sequenceResourcePath": "Sequences/tutorial_sentus",
+      "title": "Sentus faction",
+      "notes": "Portals, defense near BISMUTH"
+    },
+    {
+      "group": "Wrap-up",
+      "sequenceResourcePath": "Sequences/tutorial_outro",
+      "title": "Ready for combat",
+      "notes": "Closing encouragement — run last or standalone"
+    }
+  ]
+}

@@ -2,15 +2,28 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using TMPro;
 
 public class SequenceManager : MonoBehaviour
 {
+    const int DialogueCanvasElevatedSortingOrder = 200;
+
     [Header("Manager References")]
     public GameMaster gameMaster;
     public MasterGrid masterGrid;
     public CameraManager cameraManager;
     public SequenceUIBindings uiBindings;
+    public GameObject sequenceGlobalCanvas;
+    public TMP_Text sequenceDialogText;
+    public Image sequenceDialogImage;
+
+    [Header("Sequence dialog controls (inspector)")]
+    [Tooltip("Optional. Assign the UI Button that skips the rest of the current sequence.")]
+    public Button skipDialogButton;
+    [Tooltip("Optional. Canvases that should remain clickable while dialogue waits for continue (for example in-game menu UI).")]
+    public List<Canvas> dialogAlwaysClickableCanvases = new List<Canvas>();
 
     [Header("Sequence Sources (Resources Paths)")]
     public bool runIntroOnStart = true;
@@ -27,9 +40,60 @@ public class SequenceManager : MonoBehaviour
     private Vector2Int lastWorldClickPos;
     private bool hasLastWorldClickPos;
 
+    private Canvas sequenceCanvasOverride;
+    private int sequenceCanvasStoredSortingOrder;
+    private bool sequenceCanvasStoredOverrideSortingFlag;
+    private bool dialogAlwaysClickableCanvasesAutoDiscovered;
+    private readonly List<CanvasSortingState> dialogAlwaysClickableCanvasStates = new List<CanvasSortingState>();
+
+    private GameObject dialogFullscreenTapBlocker;
+    private Graphic dialogArrowGraphicOptional;
+    private bool dialogUiInfrastructureReady;
+    private bool savedTmpRaycast;
+    private bool savedPortraitRaycast;
+    private bool dialogArrowStoredRaycast;
+    private Action dialogAdvanceSignalRaise;
+
+    private struct CanvasSortingState
+    {
+        public Canvas canvas;
+        public bool overrideSorting;
+        public int sortingOrder;
+    }
+
+    /// <summary>When true: block camera/world taps and non-sequence HUD; only sequence dialog taps and Skip proceed.</summary>
+    private bool waitingForDialogContinue;
+    /// <summary>Player chose Skip dialog — exits the remainder of the current sequence cleanly.</summary>
+    private bool sequenceSkippedRequested;
+
+    /// <remarks>Includes tutorial input lock plus dialogue Continue lock.</remarks>
+    public bool SuppressNonDialogueGameplayInput()
+    {
+        return inputLocked || waitingForDialogContinue;
+    }
+
     public bool IsInputLocked()
     {
         return inputLocked;
+    }
+
+    void Awake()
+    {
+        PrepareDialogInfrastructure();
+        BindSkipDialogButtonInspector();
+    }
+
+    void OnDestroy()
+    {
+        if (skipDialogButton != null)
+        {
+            skipDialogButton.onClick.RemoveListener(OnSkipDialogClicked);
+        }
+    }
+
+    internal void NotifyDialogAdvanceFromSequenceDialogPanelTap()
+    {
+        TryRaiseDialogFullscreenTapAdvance();
     }
 
     public bool HasOutroSequence()
@@ -95,17 +159,24 @@ public class SequenceManager : MonoBehaviour
             yield break;
         }
 
+        sequenceSkippedRequested = false;
         isRunningSequence = true;
         Debug.Log($"[SequenceManager] Running sequence '{sequence.sequenceId}' ({sequence.steps.Count} steps).");
 
-        for (int i = 0; i < sequence.steps.Count; i++)
+        try
         {
-            SequenceStepDto step = sequence.steps[i];
-            yield return ExecuteStep(sequence.sequenceId, i, step);
+            for (int i = 0; i < sequence.steps.Count && !sequenceSkippedRequested; i++)
+            {
+                SequenceStepDto step = sequence.steps[i];
+                yield return ExecuteStep(sequence.sequenceId, i, step);
+            }
         }
-
-        isRunningSequence = false;
-        onComplete?.Invoke();
+        finally
+        {
+            TearDownSequencePresentation();
+            isRunningSequence = false;
+            onComplete?.Invoke();
+        }
     }
 
     private IEnumerator ExecuteStep(string sequenceId, int stepIndex, SequenceStepDto step)
@@ -116,17 +187,7 @@ public class SequenceManager : MonoBehaviour
         switch (stepType)
         {
             case "dialogue":
-                if (!string.IsNullOrWhiteSpace(step.text))
-                {
-                    gameMaster.promptCardMainText.text = string.IsNullOrWhiteSpace(step.speaker) ? "Tutorial" : step.speaker;
-                    gameMaster.promptCardQuestionText.text = step.text;
-                    gameMaster.promptCard.SetActive(true);
-                }
-
-                if (step.waitForContinue)
-                {
-                    yield return new WaitForSeconds(0.25f);
-                }
+                yield return PresentDialogueStep(sequenceId, stepIndex, step);
                 break;
 
             case "cameraFocus":
@@ -228,6 +289,101 @@ public class SequenceManager : MonoBehaviour
         }
 
         yield return new WaitForSeconds(durationMs / 1000f);
+    }
+
+    /// <summary>
+    /// Presents a dialogue step's text, paginating it through the dialog panel.
+    /// Authors can insert <c>&lt;page/&gt;</c> (or the JSON form-feed escape <c>\f</c>)
+    /// for deliberate page breaks; the engine also auto-paginates anything that
+    /// overflows the dialog rect so text is never silently truncated.
+    /// </summary>
+    private IEnumerator PresentDialogueStep(string sequenceId, int stepIndex, SequenceStepDto step)
+    {
+        bool hasText = !string.IsNullOrWhiteSpace(step.text);
+
+        if (hasText && sequenceDialogText != null)
+        {
+            if (sequenceGlobalCanvas != null)
+            {
+                sequenceGlobalCanvas.SetActive(true);
+            }
+
+            EnsureDialogTextPaged();
+
+            string normalized = NormalizeDialogueText(step.text);
+            bool hasExplicitBreak = normalized.IndexOf('\f') >= 0;
+
+            sequenceDialogText.text = normalized;
+            sequenceDialogText.pageToDisplay = 1;
+            sequenceDialogText.ForceMeshUpdate();
+
+            EnsureSkipButtonForeground();
+
+            int pageCount = 1;
+            if (sequenceDialogText.textInfo != null)
+            {
+                pageCount = Mathf.Max(1, sequenceDialogText.textInfo.pageCount);
+            }
+
+            if (pageCount > 1 && !hasExplicitBreak)
+            {
+                Debug.LogWarning(
+                    $"[SequenceManager] sequence={sequenceId} step={stepIndex} dialogue auto-paginated into {pageCount} pages without explicit <page/> markers. Consider adding deliberate breaks for pacing.");
+            }
+
+            for (int page = 1; page <= pageCount; page++)
+            {
+                if (sequenceSkippedRequested)
+                {
+                    yield break;
+                }
+
+                sequenceDialogText.pageToDisplay = page;
+                sequenceDialogText.ForceMeshUpdate();
+
+                bool isLastPage = page == pageCount;
+                bool waitThisPage = !isLastPage || step.waitForContinue;
+
+                if (waitThisPage)
+                {
+                    yield return WaitForDialogueContinue();
+                }
+            }
+        }
+        else if (step.waitForContinue)
+        {
+            yield return WaitForDialogueContinue();
+        }
+    }
+
+    /// <summary>Authoring sugar: convert friendly <c>&lt;page/&gt;</c> markers to the form-feed (<c>\f</c>) page break that TMP page-mode understands.</summary>
+    private static string NormalizeDialogueText(string raw)
+    {
+        if (string.IsNullOrEmpty(raw))
+        {
+            return raw;
+        }
+
+        return raw
+            .Replace("<page/>", "\f")
+            .Replace("<page />", "\f");
+    }
+
+    /// <summary>
+    /// Force the dialog TMP component into Page overflow mode so <see cref="TMP_Text.pageToDisplay"/>
+    /// and <c>textInfo.pageCount</c> are meaningful. Idempotent.
+    /// </summary>
+    private void EnsureDialogTextPaged()
+    {
+        if (sequenceDialogText == null)
+        {
+            return;
+        }
+
+        if (sequenceDialogText.overflowMode != TextOverflowModes.Page)
+        {
+            sequenceDialogText.overflowMode = TextOverflowModes.Page;
+        }
     }
 
     private void ExecuteSpawnUnit(int stepIndex, SequenceStepDto step)
@@ -487,8 +643,342 @@ public class SequenceManager : MonoBehaviour
         return expectedPos == pos;
     }
 
+    /// <summary>Blocks until tap-to-continue anywhere on-screen (or dialog panel / portrait area) or Skip.</summary>
+    private IEnumerator WaitForDialogueContinue()
+    {
+        if (sequenceGlobalCanvas == null)
+        {
+            LogStepError(-1, "waitForContinue failed: sequenceGlobalCanvas is not assigned.");
+            yield break;
+        }
+
+        bool dialogAdvanceSignal = false;
+
+        BeginDialogContinueMode(() => dialogAdvanceSignal = true);
+
+        try
+        {
+            while (!dialogAdvanceSignal && !sequenceSkippedRequested)
+            {
+                yield return null;
+            }
+        }
+        finally
+        {
+            EndDialogContinueMode();
+        }
+    }
+
+    private void PrepareDialogInfrastructure()
+    {
+        if (dialogUiInfrastructureReady || sequenceGlobalCanvas == null)
+        {
+            return;
+        }
+
+        dialogUiInfrastructureReady = true;
+
+        sequenceCanvasOverride = sequenceGlobalCanvas.GetComponent<Canvas>();
+
+        Transform dialogArrow = sequenceGlobalCanvas.transform.Find("Dialog Arrow");
+        if (dialogArrow != null)
+        {
+            dialogArrowGraphicOptional = dialogArrow.GetComponent<Graphic>();
+        }
+
+        Transform dialogPanel = sequenceDialogText != null
+            ? sequenceDialogText.transform.parent
+            : null;
+
+        dialogFullscreenTapBlocker = CreateFullscreenTapReceiver();
+
+        DialoguePanelAdvanceHandler panelHandler =
+            dialogPanel != null ? dialogPanel.GetComponent<DialoguePanelAdvanceHandler>() : null;
+        if (dialogPanel != null && panelHandler == null)
+        {
+            panelHandler = dialogPanel.gameObject.AddComponent<DialoguePanelAdvanceHandler>();
+        }
+
+        if (panelHandler != null)
+        {
+            panelHandler.Assign(this);
+        }
+    }
+
+    private GameObject CreateFullscreenTapReceiver()
+    {
+        var go = new GameObject("SequenceDialogFullscreenTapReceiver", typeof(RectTransform));
+        Transform parent = sequenceGlobalCanvas.transform;
+        go.transform.SetParent(parent, false);
+        go.transform.SetAsFirstSibling();
+
+        var rt = go.GetComponent<RectTransform>();
+        rt.anchorMin = Vector2.zero;
+        rt.anchorMax = Vector2.one;
+        rt.offsetMin = Vector2.zero;
+        rt.offsetMax = Vector2.zero;
+        rt.pivot = new Vector2(0.5f, 0.5f);
+
+        var img = go.AddComponent<Image>();
+        img.color = new Color(0f, 0f, 0f, 0f);
+        img.raycastTarget = true;
+
+        var btn = go.AddComponent<Button>();
+        btn.transition = Selectable.Transition.None;
+        btn.navigation = new Navigation { mode = Navigation.Mode.None };
+        btn.targetGraphic = img;
+        btn.onClick.AddListener(TryRaiseDialogFullscreenTapAdvance);
+
+        go.SetActive(false);
+        dialogFullscreenTapBlocker = go;
+        return go;
+    }
+
+    private void TryRaiseDialogFullscreenTapAdvance()
+    {
+        if (!waitingForDialogContinue || sequenceSkippedRequested)
+        {
+            return;
+        }
+
+        Debug.Log("[SequenceManager] Dialogue continue (tap).");
+        dialogAdvanceSignalRaise?.Invoke();
+    }
+
+    private void BeginDialogContinueMode(Action raiseAdvanceSignal)
+    {
+        PrepareDialogInfrastructure();
+        dialogAdvanceSignalRaise = raiseAdvanceSignal;
+
+        EnsureSkipButtonForeground();
+
+        sequenceCanvasStoredSortingOrder = sequenceCanvasOverride != null ? sequenceCanvasOverride.sortingOrder : 0;
+        if (sequenceCanvasOverride != null)
+        {
+            sequenceCanvasStoredOverrideSortingFlag = sequenceCanvasOverride.overrideSorting;
+            sequenceCanvasOverride.overrideSorting = true;
+            sequenceCanvasOverride.sortingOrder = DialogueCanvasElevatedSortingOrder;
+        }
+
+        if (sequenceDialogText != null)
+        {
+            savedTmpRaycast = sequenceDialogText.raycastTarget;
+            sequenceDialogText.raycastTarget = false;
+        }
+
+        if (sequenceDialogImage != null)
+        {
+            savedPortraitRaycast = sequenceDialogImage.raycastTarget;
+            sequenceDialogImage.raycastTarget = false;
+        }
+
+        if (dialogArrowGraphicOptional != null)
+        {
+            dialogArrowStoredRaycast = dialogArrowGraphicOptional.raycastTarget;
+            dialogArrowGraphicOptional.raycastTarget = false;
+        }
+
+        if (dialogFullscreenTapBlocker != null)
+        {
+            dialogFullscreenTapBlocker.transform.SetAsFirstSibling();
+            dialogFullscreenTapBlocker.SetActive(true);
+            EnsureSkipButtonForeground();
+        }
+
+        ElevateAlwaysClickableCanvasesForDialogue();
+        waitingForDialogContinue = true;
+    }
+
+    private void EndDialogContinueMode()
+    {
+        dialogAdvanceSignalRaise = null;
+
+        if (sequenceCanvasOverride != null)
+        {
+            sequenceCanvasOverride.overrideSorting = sequenceCanvasStoredOverrideSortingFlag;
+            sequenceCanvasOverride.sortingOrder = sequenceCanvasStoredSortingOrder;
+        }
+
+        if (dialogFullscreenTapBlocker != null)
+        {
+            dialogFullscreenTapBlocker.SetActive(false);
+        }
+
+        RestoreAlwaysClickableCanvasesAfterDialogue();
+        waitingForDialogContinue = false;
+
+        if (sequenceDialogText != null)
+        {
+            sequenceDialogText.raycastTarget = savedTmpRaycast;
+        }
+
+        if (sequenceDialogImage != null)
+        {
+            sequenceDialogImage.raycastTarget = savedPortraitRaycast;
+        }
+
+        if (dialogArrowGraphicOptional != null)
+        {
+            dialogArrowGraphicOptional.raycastTarget = dialogArrowStoredRaycast;
+        }
+    }
+
+    private void ElevateAlwaysClickableCanvasesForDialogue()
+    {
+        EnsureAlwaysClickableCanvasesConfigured();
+
+        dialogAlwaysClickableCanvasStates.Clear();
+        int elevatedSortingOrder = DialogueCanvasElevatedSortingOrder + 1;
+
+        for (int i = 0; i < dialogAlwaysClickableCanvases.Count; i++)
+        {
+            Canvas canvas = dialogAlwaysClickableCanvases[i];
+            if (canvas == null)
+            {
+                continue;
+            }
+
+            if (sequenceGlobalCanvas != null && canvas.transform.IsChildOf(sequenceGlobalCanvas.transform))
+            {
+                continue;
+            }
+
+            dialogAlwaysClickableCanvasStates.Add(new CanvasSortingState
+            {
+                canvas = canvas,
+                overrideSorting = canvas.overrideSorting,
+                sortingOrder = canvas.sortingOrder
+            });
+
+            canvas.overrideSorting = true;
+            canvas.sortingOrder = elevatedSortingOrder++;
+        }
+    }
+
+    private void RestoreAlwaysClickableCanvasesAfterDialogue()
+    {
+        for (int i = 0; i < dialogAlwaysClickableCanvasStates.Count; i++)
+        {
+            CanvasSortingState state = dialogAlwaysClickableCanvasStates[i];
+            if (state.canvas == null)
+            {
+                continue;
+            }
+
+            state.canvas.overrideSorting = state.overrideSorting;
+            state.canvas.sortingOrder = state.sortingOrder;
+        }
+
+        dialogAlwaysClickableCanvasStates.Clear();
+    }
+
+    private void EnsureAlwaysClickableCanvasesConfigured()
+    {
+        if (dialogAlwaysClickableCanvases.Count > 0 || dialogAlwaysClickableCanvasesAutoDiscovered)
+        {
+            return;
+        }
+
+        dialogAlwaysClickableCanvasesAutoDiscovered = true;
+        if (sequenceGlobalCanvas == null)
+        {
+            return;
+        }
+
+        Transform sharedCanvasRoot = sequenceGlobalCanvas.transform.parent;
+        if (sharedCanvasRoot == null)
+        {
+            return;
+        }
+
+        Transform menuCanvasTransform = sharedCanvasRoot.Find("MenuGlobalCanvas");
+        if (menuCanvasTransform == null)
+        {
+            return;
+        }
+
+        Canvas[] menuCanvases = menuCanvasTransform.GetComponentsInChildren<Canvas>(true);
+        for (int i = 0; i < menuCanvases.Length; i++)
+        {
+            Canvas canvas = menuCanvases[i];
+            if (canvas == null)
+            {
+                continue;
+            }
+
+            if (!dialogAlwaysClickableCanvases.Contains(canvas))
+            {
+                dialogAlwaysClickableCanvases.Add(canvas);
+            }
+        }
+    }
+
+    private void TearDownSequencePresentation()
+    {
+        EndDialogContinueMode();
+
+        sequenceSkippedRequested = false;
+
+        if (inputLocked)
+        {
+            SetInputLock(false, "sequence_finished");
+        }
+
+        if (sequenceGlobalCanvas != null && sequenceGlobalCanvas.activeSelf)
+        {
+            sequenceGlobalCanvas.SetActive(false);
+        }
+    }
+
+    private void BindSkipDialogButtonInspector()
+    {
+        if (skipDialogButton == null)
+        {
+            return;
+        }
+
+        skipDialogButton.onClick.RemoveListener(OnSkipDialogClicked);
+        skipDialogButton.onClick.AddListener(OnSkipDialogClicked);
+    }
+
+    private void EnsureSkipButtonForeground()
+    {
+        if (skipDialogButton != null)
+        {
+            skipDialogButton.transform.SetAsLastSibling();
+        }
+    }
+
+    private void OnSkipDialogClicked()
+    {
+        Debug.Log("[SequenceManager] Skip dialog — terminating current sequence.");
+        sequenceSkippedRequested = true;
+        dialogAdvanceSignalRaise?.Invoke();
+    }
+
     private void LogStepError(int stepIndex, string message)
     {
         Debug.LogError($"[SequenceManager] Step {stepIndex}: {message}");
+    }
+}
+
+/// <summary>Pointer clicks on the sequence dialog chrome advance <see cref="SequenceManager.WaitForDialogueContinue"/>.</summary>
+public class DialoguePanelAdvanceHandler : MonoBehaviour, IPointerClickHandler
+{
+    SequenceManager sequenceManager;
+
+    public void Assign(SequenceManager mgr)
+    {
+        sequenceManager = mgr;
+    }
+
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        if (sequenceManager == null)
+        {
+            return;
+        }
+
+        sequenceManager.NotifyDialogAdvanceFromSequenceDialogPanelTap();
     }
 }

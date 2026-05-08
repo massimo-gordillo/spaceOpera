@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "sequenceId": "tutorial_virix",
+  "missionId": "tutorial_curriculum",
+  "description": "Virix faction — growth on BISMUTH, spores, and swarm tactics.",
+  "steps": [
+    {
+      "id": "lock",
+      "type": "setInputLock",
+      "locked": true,
+      "reason": "tutorial_virix"
+    },
+    {
+      "id": "dlg_production_bismuth",
+      "type": "dialogue",
+      "speaker": "Tutorial",
+      "text": "<b>Production on BISMUTH</b>\n\n◦ Virix do not rely on a separate factory line like Ertrians.<page/>◦ You may create units on <b>any owned BISMUTH tile</b> — income nodes double as incubators.<page/>Spread across the lattice and strike from unexpected angles.",
+      "waitForContinue": true
+    },
+    {
+      "id": "dlg_spores",
+      "type": "dialogue",
+      "speaker": "Tutorial",
+      "text": "<b>Virix Spores</b>\n\n◦ Spores are <b>flying</b> capture units — terrain does not slow them.\n◦ They <b>cannot attack</b>; they exist to slip past defenders.<page/>◦ To seize a structure, a Spore <b>sacrifices itself</b> — commit only when the capture is worth the trade.",
+      "waitForContinue": true
+    },
+    {
+      "id": "dlg_growth_economy",
+      "type": "dialogue",
+      "speaker": "Tutorial",
+      "text": "<b>Growth and economy</b>\n\n◦ Virix receive <b>free Spores</b> each turn — your swarm replenishes without spending <b>BISMUTH</b> on every body.<page/>◦ Pair endless bodies with patient timing: sacrifice Spores for high-value structures, not chip damage.",
+      "waitForContinue": true
+    },
+    {
+      "id": "dlg_summary",
+      "type": "dialogue",
+      "speaker": "Tutorial",
+      "text": "<b>Summary</b>\n\n<b>Virix</b> weaponize growth: <b>free Spores</b>, production straight from <b>BISMUTH</b>, and relentless pressure through sacrifice captures.",
+      "waitForContinue": true
+    },
+    {
+      "id": "unlock",
+      "type": "setInputLock",
+      "locked": false
+    }
+  ]
+}

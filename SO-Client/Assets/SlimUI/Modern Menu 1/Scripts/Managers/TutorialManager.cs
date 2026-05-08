@@ -35,17 +35,6 @@ public class TutorialManager : MonoBehaviour
     public CanvasGroup canvasGroup; // Assign in inspector or via script
     public float fadeDuration = 0.5f; // Fade speed
 
-    string[] videoNames = new string[]
-    {
-        "Tutorial-Capture",
-        "Tutorial-Produce",
-        "Tutorial-Movement",
-        "Tutorial-Attack",
-        "Tutorial-Attack-2",
-        "Tutorial-Flying",
-        "Tutorial-Ranged"
-    };
-
     Dictionary<int, string> videoPaths = new Dictionary<int, string>();
 
     void Start()
@@ -171,7 +160,7 @@ public class TutorialManager : MonoBehaviour
         {
             if (card.videoPlayer != null)
             {
-                string videoPath = System.IO.Path.Combine(Application.streamingAssetsPath, "TutorialVideos/" + videoNames[videoCount] + ".mp4");
+                string videoPath = System.IO.Path.Combine(Application.streamingAssetsPath, "TutorialVideos/" + TutorialVideoCatalog.StreamingClipBaseNames[videoCount] + ".mp4");
                 videoPaths.Add(i, videoPath);
                 card.videoPlayer.url = videoPath;
                 
