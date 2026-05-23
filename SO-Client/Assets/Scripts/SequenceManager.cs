@@ -2,14 +2,11 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using TMPro;
 
 public class SequenceManager : MonoBehaviour
 {
-    const int DialogueCanvasElevatedSortingOrder = 200;
-
     [Header("Manager References")]
     public GameMaster gameMaster;
     public MasterGrid masterGrid;
@@ -20,10 +17,18 @@ public class SequenceManager : MonoBehaviour
     public Image sequenceDialogImage;
 
     [Header("Sequence dialog controls (inspector)")]
+    [Tooltip("Full-screen invisible tap catcher on SequenceGlobalCanvas. Leave disabled in the scene; enabled while dialogue waits for continue.")]
+    public GameObject dialogFullscreenTapBlocker;
     [Tooltip("Optional. Assign the UI Button that skips the rest of the current sequence.")]
     public Button skipDialogButton;
-    [Tooltip("Optional. Canvases that should remain clickable while dialogue waits for continue (for example in-game menu UI).")]
-    public List<Canvas> dialogAlwaysClickableCanvases = new List<Canvas>();
+
+    [Header("Dialogue typing")]
+    [Tooltip("Reveal dialogue one character at a time before waiting for continue.")]
+    public bool enableDialogueTyping = true;
+    [Tooltip("Seconds between ordinary character reveals.")]
+    public float dialogueTypingSpeed = 0.03f;
+    [Tooltip("Extra pause after sentence punctuation and single line breaks.")]
+    public float dialoguePauseSpeed = 0.35f;
 
     [Header("Sequence Sources (Resources Paths)")]
     public bool runIntroOnStart = true;
@@ -40,26 +45,12 @@ public class SequenceManager : MonoBehaviour
     private Vector2Int lastWorldClickPos;
     private bool hasLastWorldClickPos;
 
-    private Canvas sequenceCanvasOverride;
-    private int sequenceCanvasStoredSortingOrder;
-    private bool sequenceCanvasStoredOverrideSortingFlag;
-    private bool dialogAlwaysClickableCanvasesAutoDiscovered;
-    private readonly List<CanvasSortingState> dialogAlwaysClickableCanvasStates = new List<CanvasSortingState>();
-
-    private GameObject dialogFullscreenTapBlocker;
     private Graphic dialogArrowGraphicOptional;
     private bool dialogUiInfrastructureReady;
     private bool savedTmpRaycast;
     private bool savedPortraitRaycast;
     private bool dialogArrowStoredRaycast;
     private Action dialogAdvanceSignalRaise;
-
-    private struct CanvasSortingState
-    {
-        public Canvas canvas;
-        public bool overrideSorting;
-        public int sortingOrder;
-    }
 
     /// <summary>When true: block camera/world taps and non-sequence HUD; only sequence dialog taps and Skip proceed.</summary>
     private bool waitingForDialogContinue;
@@ -80,18 +71,21 @@ public class SequenceManager : MonoBehaviour
     void Awake()
     {
         PrepareDialogInfrastructure();
+        BindDialogFullscreenTapBlocker();
         BindSkipDialogButtonInspector();
     }
 
     void OnDestroy()
     {
+        UnbindDialogFullscreenTapBlocker();
         if (skipDialogButton != null)
         {
             skipDialogButton.onClick.RemoveListener(OnSkipDialogClicked);
         }
     }
 
-    internal void NotifyDialogAdvanceFromSequenceDialogPanelTap()
+    /// <summary>Wire from the sequence dialog panel Button On Click in the Inspector.</summary>
+    public void NotifyDialogAdvanceFromSequenceDialogPanelTap()
     {
         TryRaiseDialogFullscreenTapAdvance();
     }
@@ -311,10 +305,11 @@ public class SequenceManager : MonoBehaviour
             EnsureDialogTextPaged();
 
             string normalized = NormalizeDialogueText(step.text);
-            bool hasExplicitBreak = normalized.IndexOf('\f') >= 0;
+            bool hasExplicitBreak = normalized.IndexOf("<page>", StringComparison.Ordinal) >= 0;
 
             sequenceDialogText.text = normalized;
             sequenceDialogText.pageToDisplay = 1;
+            sequenceDialogText.maxVisibleCharacters = int.MaxValue;
             sequenceDialogText.ForceMeshUpdate();
 
             EnsureSkipButtonForeground();
@@ -338,8 +333,19 @@ public class SequenceManager : MonoBehaviour
                     yield break;
                 }
 
-                sequenceDialogText.pageToDisplay = page;
-                sequenceDialogText.ForceMeshUpdate();
+                if (enableDialogueTyping)
+                {
+                    yield return TypeRevealDialoguePage(page);
+                }
+                else
+                {
+                    ShowDialoguePageInstant(page);
+                }
+
+                if (sequenceSkippedRequested)
+                {
+                    yield break;
+                }
 
                 bool isLastPage = page == pageCount;
                 bool waitThisPage = !isLastPage || step.waitForContinue;
@@ -349,6 +355,9 @@ public class SequenceManager : MonoBehaviour
                     yield return WaitForDialogueContinue();
                 }
             }
+
+            sequenceDialogText.maxVisibleCharacters = int.MaxValue;
+            sequenceDialogText.ForceMeshUpdate();
         }
         else if (step.waitForContinue)
         {
@@ -356,7 +365,10 @@ public class SequenceManager : MonoBehaviour
         }
     }
 
-    /// <summary>Authoring sugar: convert friendly <c>&lt;page/&gt;</c> markers to the form-feed (<c>\f</c>) page break that TMP page-mode understands.</summary>
+    /// <summary>
+    /// Authoring sugar: normalize supported page-break authoring styles to TMP's native <c>&lt;page&gt;</c> rich-text tag.
+    /// This avoids relying on a literal form-feed glyph being present in the active font asset.
+    /// </summary>
     private static string NormalizeDialogueText(string raw)
     {
         if (string.IsNullOrEmpty(raw))
@@ -365,8 +377,142 @@ public class SequenceManager : MonoBehaviour
         }
 
         return raw
-            .Replace("<page/>", "\f")
-            .Replace("<page />", "\f");
+            .Replace("\f", "<page>")
+            .Replace("<page/>", "<page>")
+            .Replace("<page />", "<page>");
+    }
+
+    private void ShowDialoguePageInstant(int page)
+    {
+        if (sequenceDialogText == null)
+        {
+            return;
+        }
+
+        sequenceDialogText.pageToDisplay = page;
+        sequenceDialogText.maxVisibleCharacters = int.MaxValue;
+        sequenceDialogText.ForceMeshUpdate();
+    }
+
+    /// <summary>
+    /// Reveals the requested dialogue page character-by-character. A tap during typing completes
+    /// the current page immediately; a separate tap is still required to advance afterward.
+    /// </summary>
+    private IEnumerator TypeRevealDialoguePage(int page)
+    {
+        if (sequenceDialogText == null)
+        {
+            yield break;
+        }
+
+        sequenceDialogText.pageToDisplay = page;
+        sequenceDialogText.ForceMeshUpdate();
+
+        TMP_TextInfo textInfo = sequenceDialogText.textInfo;
+        if (textInfo == null || textInfo.pageCount <= 0)
+        {
+            yield break;
+        }
+
+        int pageIndex = page - 1;
+        if (pageIndex < 0 || pageIndex >= textInfo.pageCount)
+        {
+            yield break;
+        }
+
+        TMP_PageInfo pageInfo = textInfo.pageInfo[pageIndex];
+        int pageStart = pageInfo.firstCharacterIndex;
+        int pageEnd = pageInfo.lastCharacterIndex;
+
+        if (pageEnd < pageStart)
+        {
+            yield break;
+        }
+
+        sequenceDialogText.maxVisibleCharacters = pageStart;
+        sequenceDialogText.ForceMeshUpdate();
+
+        bool skipTypingRequested = false;
+
+        BeginDialogContinueMode(() => skipTypingRequested = true);
+
+        try
+        {
+            for (int visibleCount = pageStart + 1; visibleCount <= pageEnd + 1; visibleCount++)
+            {
+                if (sequenceSkippedRequested || skipTypingRequested)
+                {
+                    sequenceDialogText.maxVisibleCharacters = pageEnd + 1;
+                    sequenceDialogText.ForceMeshUpdate();
+                    yield break;
+                }
+
+                sequenceDialogText.maxVisibleCharacters = visibleCount;
+
+                int charIndex = visibleCount - 1;
+                char currentChar = textInfo.characterInfo[charIndex].character;
+                char? nextChar = charIndex < pageEnd
+                    ? textInfo.characterInfo[charIndex + 1].character
+                    : (char?)null;
+
+                float delay = GetDialogueTypingDelay(currentChar, nextChar);
+                if (delay > 0f)
+                {
+                    float elapsed = 0f;
+                    while (elapsed < delay)
+                    {
+                        if (sequenceSkippedRequested || skipTypingRequested)
+                        {
+                            sequenceDialogText.maxVisibleCharacters = pageEnd + 1;
+                            sequenceDialogText.ForceMeshUpdate();
+                            yield break;
+                        }
+
+                        elapsed += Time.deltaTime;
+                        yield return null;
+                    }
+                }
+            }
+        }
+        finally
+        {
+            EndDialogContinueMode();
+        }
+    }
+
+    private float GetDialogueTypingDelay(char currentChar, char? nextChar)
+    {
+        if (currentChar == '.')
+        {
+            return dialoguePauseSpeed;
+        }
+
+        if (currentChar == ',')
+        {
+            return dialoguePauseSpeed * 0.25f;
+        }
+
+        if (currentChar == ';')
+        {
+            return dialoguePauseSpeed;
+        }
+
+        if (nextChar.HasValue && currentChar == '\n' && nextChar.Value != '\n')
+        {
+            return dialoguePauseSpeed;
+        }
+
+        if (nextChar.HasValue && currentChar == '\n' && nextChar.Value == '\n')
+        {
+            return 0f;
+        }
+
+        if (nextChar.HasValue && currentChar == ' ' && nextChar.Value == '.')
+        {
+            return 0f;
+        }
+
+        return dialogueTypingSpeed;
     }
 
     /// <summary>
@@ -678,60 +824,11 @@ public class SequenceManager : MonoBehaviour
 
         dialogUiInfrastructureReady = true;
 
-        sequenceCanvasOverride = sequenceGlobalCanvas.GetComponent<Canvas>();
-
         Transform dialogArrow = sequenceGlobalCanvas.transform.Find("Dialog Arrow");
         if (dialogArrow != null)
         {
             dialogArrowGraphicOptional = dialogArrow.GetComponent<Graphic>();
         }
-
-        Transform dialogPanel = sequenceDialogText != null
-            ? sequenceDialogText.transform.parent
-            : null;
-
-        dialogFullscreenTapBlocker = CreateFullscreenTapReceiver();
-
-        DialoguePanelAdvanceHandler panelHandler =
-            dialogPanel != null ? dialogPanel.GetComponent<DialoguePanelAdvanceHandler>() : null;
-        if (dialogPanel != null && panelHandler == null)
-        {
-            panelHandler = dialogPanel.gameObject.AddComponent<DialoguePanelAdvanceHandler>();
-        }
-
-        if (panelHandler != null)
-        {
-            panelHandler.Assign(this);
-        }
-    }
-
-    private GameObject CreateFullscreenTapReceiver()
-    {
-        var go = new GameObject("SequenceDialogFullscreenTapReceiver", typeof(RectTransform));
-        Transform parent = sequenceGlobalCanvas.transform;
-        go.transform.SetParent(parent, false);
-        go.transform.SetAsFirstSibling();
-
-        var rt = go.GetComponent<RectTransform>();
-        rt.anchorMin = Vector2.zero;
-        rt.anchorMax = Vector2.one;
-        rt.offsetMin = Vector2.zero;
-        rt.offsetMax = Vector2.zero;
-        rt.pivot = new Vector2(0.5f, 0.5f);
-
-        var img = go.AddComponent<Image>();
-        img.color = new Color(0f, 0f, 0f, 0f);
-        img.raycastTarget = true;
-
-        var btn = go.AddComponent<Button>();
-        btn.transition = Selectable.Transition.None;
-        btn.navigation = new Navigation { mode = Navigation.Mode.None };
-        btn.targetGraphic = img;
-        btn.onClick.AddListener(TryRaiseDialogFullscreenTapAdvance);
-
-        go.SetActive(false);
-        dialogFullscreenTapBlocker = go;
-        return go;
     }
 
     private void TryRaiseDialogFullscreenTapAdvance()
@@ -751,14 +848,6 @@ public class SequenceManager : MonoBehaviour
         dialogAdvanceSignalRaise = raiseAdvanceSignal;
 
         EnsureSkipButtonForeground();
-
-        sequenceCanvasStoredSortingOrder = sequenceCanvasOverride != null ? sequenceCanvasOverride.sortingOrder : 0;
-        if (sequenceCanvasOverride != null)
-        {
-            sequenceCanvasStoredOverrideSortingFlag = sequenceCanvasOverride.overrideSorting;
-            sequenceCanvasOverride.overrideSorting = true;
-            sequenceCanvasOverride.sortingOrder = DialogueCanvasElevatedSortingOrder;
-        }
 
         if (sequenceDialogText != null)
         {
@@ -784,8 +873,11 @@ public class SequenceManager : MonoBehaviour
             dialogFullscreenTapBlocker.SetActive(true);
             EnsureSkipButtonForeground();
         }
+        else
+        {
+            Debug.LogWarning("[SequenceManager] dialogFullscreenTapBlocker is not assigned. Full-screen tap-to-continue will not work.");
+        }
 
-        ElevateAlwaysClickableCanvasesForDialogue();
         waitingForDialogContinue = true;
     }
 
@@ -793,18 +885,11 @@ public class SequenceManager : MonoBehaviour
     {
         dialogAdvanceSignalRaise = null;
 
-        if (sequenceCanvasOverride != null)
-        {
-            sequenceCanvasOverride.overrideSorting = sequenceCanvasStoredOverrideSortingFlag;
-            sequenceCanvasOverride.sortingOrder = sequenceCanvasStoredSortingOrder;
-        }
-
         if (dialogFullscreenTapBlocker != null)
         {
             dialogFullscreenTapBlocker.SetActive(false);
         }
 
-        RestoreAlwaysClickableCanvasesAfterDialogue();
         waitingForDialogContinue = false;
 
         if (sequenceDialogText != null)
@@ -823,96 +908,6 @@ public class SequenceManager : MonoBehaviour
         }
     }
 
-    private void ElevateAlwaysClickableCanvasesForDialogue()
-    {
-        EnsureAlwaysClickableCanvasesConfigured();
-
-        dialogAlwaysClickableCanvasStates.Clear();
-        int elevatedSortingOrder = DialogueCanvasElevatedSortingOrder + 1;
-
-        for (int i = 0; i < dialogAlwaysClickableCanvases.Count; i++)
-        {
-            Canvas canvas = dialogAlwaysClickableCanvases[i];
-            if (canvas == null)
-            {
-                continue;
-            }
-
-            if (sequenceGlobalCanvas != null && canvas.transform.IsChildOf(sequenceGlobalCanvas.transform))
-            {
-                continue;
-            }
-
-            dialogAlwaysClickableCanvasStates.Add(new CanvasSortingState
-            {
-                canvas = canvas,
-                overrideSorting = canvas.overrideSorting,
-                sortingOrder = canvas.sortingOrder
-            });
-
-            canvas.overrideSorting = true;
-            canvas.sortingOrder = elevatedSortingOrder++;
-        }
-    }
-
-    private void RestoreAlwaysClickableCanvasesAfterDialogue()
-    {
-        for (int i = 0; i < dialogAlwaysClickableCanvasStates.Count; i++)
-        {
-            CanvasSortingState state = dialogAlwaysClickableCanvasStates[i];
-            if (state.canvas == null)
-            {
-                continue;
-            }
-
-            state.canvas.overrideSorting = state.overrideSorting;
-            state.canvas.sortingOrder = state.sortingOrder;
-        }
-
-        dialogAlwaysClickableCanvasStates.Clear();
-    }
-
-    private void EnsureAlwaysClickableCanvasesConfigured()
-    {
-        if (dialogAlwaysClickableCanvases.Count > 0 || dialogAlwaysClickableCanvasesAutoDiscovered)
-        {
-            return;
-        }
-
-        dialogAlwaysClickableCanvasesAutoDiscovered = true;
-        if (sequenceGlobalCanvas == null)
-        {
-            return;
-        }
-
-        Transform sharedCanvasRoot = sequenceGlobalCanvas.transform.parent;
-        if (sharedCanvasRoot == null)
-        {
-            return;
-        }
-
-        Transform menuCanvasTransform = sharedCanvasRoot.Find("MenuGlobalCanvas");
-        if (menuCanvasTransform == null)
-        {
-            return;
-        }
-
-        Canvas[] menuCanvases = menuCanvasTransform.GetComponentsInChildren<Canvas>(true);
-        for (int i = 0; i < menuCanvases.Length; i++)
-        {
-            Canvas canvas = menuCanvases[i];
-            if (canvas == null)
-            {
-                continue;
-            }
-
-            if (!dialogAlwaysClickableCanvases.Contains(canvas))
-            {
-                dialogAlwaysClickableCanvases.Add(canvas);
-            }
-        }
-    }
-
     private void TearDownSequencePresentation()
     {
         EndDialogContinueMode();
@@ -927,6 +922,38 @@ public class SequenceManager : MonoBehaviour
         if (sequenceGlobalCanvas != null && sequenceGlobalCanvas.activeSelf)
         {
             sequenceGlobalCanvas.SetActive(false);
+        }
+    }
+
+    private void BindDialogFullscreenTapBlocker()
+    {
+        if (dialogFullscreenTapBlocker == null)
+        {
+            return;
+        }
+
+        Button button = dialogFullscreenTapBlocker.GetComponent<Button>();
+        if (button == null)
+        {
+            Debug.LogWarning("[SequenceManager] dialogFullscreenTapBlocker is assigned but has no Button component.");
+            return;
+        }
+
+        button.onClick.RemoveListener(TryRaiseDialogFullscreenTapAdvance);
+        button.onClick.AddListener(TryRaiseDialogFullscreenTapAdvance);
+    }
+
+    private void UnbindDialogFullscreenTapBlocker()
+    {
+        if (dialogFullscreenTapBlocker == null)
+        {
+            return;
+        }
+
+        Button button = dialogFullscreenTapBlocker.GetComponent<Button>();
+        if (button != null)
+        {
+            button.onClick.RemoveListener(TryRaiseDialogFullscreenTapAdvance);
         }
     }
 
@@ -959,26 +986,5 @@ public class SequenceManager : MonoBehaviour
     private void LogStepError(int stepIndex, string message)
     {
         Debug.LogError($"[SequenceManager] Step {stepIndex}: {message}");
-    }
-}
-
-/// <summary>Pointer clicks on the sequence dialog chrome advance <see cref="SequenceManager.WaitForDialogueContinue"/>.</summary>
-public class DialoguePanelAdvanceHandler : MonoBehaviour, IPointerClickHandler
-{
-    SequenceManager sequenceManager;
-
-    public void Assign(SequenceManager mgr)
-    {
-        sequenceManager = mgr;
-    }
-
-    public void OnPointerClick(PointerEventData eventData)
-    {
-        if (sequenceManager == null)
-        {
-            return;
-        }
-
-        sequenceManager.NotifyDialogAdvanceFromSequenceDialogPanelTap();
     }
 }

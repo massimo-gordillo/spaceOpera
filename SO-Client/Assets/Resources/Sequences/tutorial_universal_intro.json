@@ -14,21 +14,21 @@
       "id": "dlg_welcome",
       "type": "dialogue",
       "speaker": "Tutorial",
-      "text": "<b>Introduction</b>\n\nCommander, welcome to <i>Tactica: a Space Opera</i>.<page/>Your goal is to conquer this frontier sector for its <b>BISMUTH</b>.<page/>Build an army, defend your structures, and conquer the sector.",
+      "text": "Welcome Commander, to Tactica: a Space Opera.<page/>Your goal is to conquer this frontier space sector for control of its BISMUTH.<page/>Your task is to build an army, defend your structures, and crush any opposition.",
       "waitForContinue": true
     },
     {
       "id": "dlg_grid",
       "type": "dialogue",
       "speaker": "Tutorial",
-      "text": "<b>Battlefield</b>\n\nThe battle is fought on a grid of squares. Positioning, terrain, and reach all matter.",
+      "text": "The battlefield is made of a grid of squares. Cleverly mastering positioning, attack ranges, terrain, and units all matter. ",
       "waitForContinue": true
     },
     {
       "id": "dlg_progeny",
       "type": "dialogue",
       "speaker": "Tutorial",
-      "text": "<b>Choose your Progeny</b>\n\nThree <b>PROGENY</b> fight for control of the <b>BISMUTH</b>:<page/>◦ <b>Ertrians</b> — mine it for trade\n◦ <b>Virix</b> — grow from it\n◦ <b>Sentus</b> — draw power from it<page/>Each faction has its own production rules and bonuses.<page/>You will learn universal tactics first, then faction specifics.",
+      "text": "Three <b>PROGENY</b> fight for control of the <b>BISMUTH</b>:<page/><b>The Ertrians</b> \n Bismuth is the most valuable metal in the galaxy.<page/> <b>The Virix</b> \n Heat provided by Bismuth supports their reproduction and allows for growth on hostile planets. <page/> <b>The Sentus</b> \n A religious monarchy. Proximity to Bismuth provides them their strength.<page/>Each faction has its own production rules and bonuses.<page/>You will learn universal tactics first, then faction specifics.",
       "waitForContinue": true
     },
     {

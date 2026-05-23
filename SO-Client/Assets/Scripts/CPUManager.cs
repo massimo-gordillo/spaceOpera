@@ -559,7 +559,7 @@ public class CPUManager : MonoBehaviour
                 if (n.closestUnclaimed[p] == null)
                 {
                     nodesWithNoUnclaimedNeighboursAfterNaive.Add(n);
-                    Debug.Log($"Node {n.pos} for player {p} unable to find a NUN on naive local search, defaulting to n=4 dijkstra's");
+                    //Debug.Log($"Node {n.pos} for player {p} unable to find a NUN on naive local search, defaulting to n=4 dijkstra's");
                 }
             }
 

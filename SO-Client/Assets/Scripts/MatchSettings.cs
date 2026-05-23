@@ -35,12 +35,12 @@ public static class MatchSettings {
             //     progenys = new[] { 0, 0 },
             //     playerIsCpu = new[] { false, true }
             // }
-            ["tutorial_universal_intro"] = new ScenarioDefinition
+            ["tutorial_01_intro"] = new ScenarioDefinition
             {
                 mapType = "multi",
                 mapNum = 7,
                 mapVersion = 1,
-                introSequenceResourcePath = "Sequences/tutorial_universal_intro",
+                introSequenceResourcePath = "Sequences/tutorial_01_intro",
                 progenys = new[] { 0, 0 },
                 playerIsCpu = new[] { false, true }
             }
