@@ -17,9 +17,9 @@ public class SequenceManager : MonoBehaviour
     public Image sequenceDialogImage;
 
     [Header("Sequence dialog controls (inspector)")]
-    [Tooltip("Full-screen invisible tap catcher on SequenceGlobalCanvas. Leave disabled in the scene; enabled while dialogue waits for continue.")]
+    [Tooltip("Full-screen invisible tap catcher on SequenceGlobalCanvas. Leave disabled in the scene; enabled while dialogue waits for continue. Wire its Button On Click to NotifyDialogAdvanceFromSequenceDialogPanelTap.")]
     public GameObject dialogFullscreenTapBlocker;
-    [Tooltip("Optional. Assign the UI Button that skips the rest of the current sequence.")]
+    [Tooltip("Optional. Wire its Button On Click to SkipDialogSequence. Used at runtime to keep the skip control above the tap blocker.")]
     public Button skipDialogButton;
 
     [Header("Dialogue typing")]
@@ -71,20 +71,9 @@ public class SequenceManager : MonoBehaviour
     void Awake()
     {
         PrepareDialogInfrastructure();
-        BindDialogFullscreenTapBlocker();
-        BindSkipDialogButtonInspector();
     }
 
-    void OnDestroy()
-    {
-        UnbindDialogFullscreenTapBlocker();
-        if (skipDialogButton != null)
-        {
-            skipDialogButton.onClick.RemoveListener(OnSkipDialogClicked);
-        }
-    }
-
-    /// <summary>Wire from the sequence dialog panel Button On Click in the Inspector.</summary>
+    /// <summary>Wire from SequenceDialogFullscreenTapReceiver Button On Click in the Inspector.</summary>
     public void NotifyDialogAdvanceFromSequenceDialogPanelTap()
     {
         TryRaiseDialogFullscreenTapAdvance();
@@ -925,49 +914,6 @@ public class SequenceManager : MonoBehaviour
         }
     }
 
-    private void BindDialogFullscreenTapBlocker()
-    {
-        if (dialogFullscreenTapBlocker == null)
-        {
-            return;
-        }
-
-        Button button = dialogFullscreenTapBlocker.GetComponent<Button>();
-        if (button == null)
-        {
-            Debug.LogWarning("[SequenceManager] dialogFullscreenTapBlocker is assigned but has no Button component.");
-            return;
-        }
-
-        button.onClick.RemoveListener(TryRaiseDialogFullscreenTapAdvance);
-        button.onClick.AddListener(TryRaiseDialogFullscreenTapAdvance);
-    }
-
-    private void UnbindDialogFullscreenTapBlocker()
-    {
-        if (dialogFullscreenTapBlocker == null)
-        {
-            return;
-        }
-
-        Button button = dialogFullscreenTapBlocker.GetComponent<Button>();
-        if (button != null)
-        {
-            button.onClick.RemoveListener(TryRaiseDialogFullscreenTapAdvance);
-        }
-    }
-
-    private void BindSkipDialogButtonInspector()
-    {
-        if (skipDialogButton == null)
-        {
-            return;
-        }
-
-        skipDialogButton.onClick.RemoveListener(OnSkipDialogClicked);
-        skipDialogButton.onClick.AddListener(OnSkipDialogClicked);
-    }
-
     private void EnsureSkipButtonForeground()
     {
         if (skipDialogButton != null)
@@ -976,7 +922,8 @@ public class SequenceManager : MonoBehaviour
         }
     }
 
-    private void OnSkipDialogClicked()
+    /// <summary>Wire from SkipDialogButton On Click in the Inspector.</summary>
+    public void SkipDialogSequence()
     {
         Debug.Log("[SequenceManager] Skip dialog — terminating current sequence.");
         sequenceSkippedRequested = true;

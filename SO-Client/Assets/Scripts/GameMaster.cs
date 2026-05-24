@@ -59,6 +59,15 @@ public class GameMaster : MonoBehaviour
     public Transform structureContainer;
     public Transform toggleGamePiecesContainer;
 
+    [Header("Game State Export")]
+    [Tooltip("When true, loads a .gsdat on startup. Turn off while laying out a new map in the scene.")]
+    public bool loadGameStateOnStartup = true;
+    [Tooltip("When true, writes a .gsdat at the end of Start(). Replaces uncommenting SaveGameStateToFile in code.")]
+    public bool saveGameStateOnPlayStart;
+    public string exportMapType = "multi";
+    public int exportMapNum = 8;
+    public int exportMapVersion = 1;
+
     [Header("UI Items")]
     public GameObject choicePanel;
     public MenuProductionPanel productionPanel;
@@ -209,10 +218,8 @@ public class GameMaster : MonoBehaviour
         //initializes all Tilebases for tilemap
         //only does anything if it hasn't already been initialized.
         gameValues.Initialize();
-        bool manualLoadGameStateFromFile = true;
-        
 
-        if (manualLoadGameStateFromFile)
+        if (loadGameStateOnStartup)
         {
             tilemapManager.Initialize(false);
             MatchSettings.GetMapLoadParameters(out string mapType, out int mapNum, out int mapVersion);
@@ -220,7 +227,6 @@ public class GameMaster : MonoBehaviour
         }
         else
         {
-            //initializes the dimensions through TilemapManager if loading from the Game Scene.
             (gridX, gridY) = tilemapManager.Initialize(true);
         }
             
@@ -334,7 +340,10 @@ public class GameMaster : MonoBehaviour
             sequenceManager.TryRunIntroSequence();
         }
 
-        //SaveGameStateToFile("multi", 8, 3);
+        if (saveGameStateOnPlayStart)
+        {
+            SaveGameStateToFile(exportMapType, exportMapNum, exportMapVersion);
+        }
     }
 
     private IEnumerator CallConvertGameStateToList()
@@ -1016,7 +1025,10 @@ public class GameMaster : MonoBehaviour
 
     public void LoadGameStateFromFile(string mapType, int mapNum, int versionNum)//, out TilemapData tilemapData)
     {
-        toggleGamePiecesContainer.gameObject.SetActive(false);
+        if (toggleGamePiecesContainer != null)
+        {
+            toggleGamePiecesContainer.gameObject.SetActive(false);
+        }
         Debug.Log($"Loading game state for map {mapNum}, version {versionNum}...");
 		//yield return null;
         //string mapFileLocation = $"InitializationData/Maps/Map{mapNum}/Map{mapNum}_v{versionNum}.gsdat"; //hardcoded map 7 for now

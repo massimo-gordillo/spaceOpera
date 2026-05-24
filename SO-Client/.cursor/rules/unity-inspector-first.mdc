@@ -30,6 +30,7 @@ alwaysApply: true
 - Prefer serialized references assigned in the Inspector over `Find`, `Transform.Find`, `GameObject.Find`, or `GetComponent` discovery at runtime — unless lookup must be dynamic or the user asks otherwise.
 - When manual wiring is required, state the **exact GameObject path** and **field name** the user must assign.
 - Prefer **Unity built-ins** (e.g. `Button` On Click, `UnityEvent`) over new helper classes when they cover the behavior.
+- Wire **Button.onClick in the Inspector** — do not use `AddListener` / `RemoveListener` in script for fixed scene UI unless the user asks otherwise.
 
 ## Avoid new classes unless necessary
 
