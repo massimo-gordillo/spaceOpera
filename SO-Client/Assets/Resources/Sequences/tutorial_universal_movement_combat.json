@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "sequenceId": "tutorial_universal_movement_combat",
   "missionId": "tutorial_curriculum",
-  "description": "1.1 — Movement, attacking, damage, and flying vs terrain.",
+  "description": "1.1 — Movement, attacking, and damage.",
   "steps": [
     {
       "id": "lock",
@@ -11,25 +11,130 @@
       "reason": "tutorial_universal_movement_combat"
     },
     {
-      "id": "dlg_movement",
+      "id": "focus_map",
+      "type": "cameraFocus",
+      "target": { "unitId": "p1_unit" },
+      "durationMs": 400
+    },
+    {
+      "id": "dlg_select_unit",
       "type": "dialogue",
       "speaker": "Tutorial",
-      "text": "<b>Moving units</b>\n\n◦ Select a unit to see its movement range (<color=#ADD8E6>blue tiles</color>).\n◦ Click a <color=#ADD8E6>blue tile</color> to move.\n◦ Terrain and enemies block paths.<page/><b>Flying</b>\n\nFlying units ignore terrain blocking — they still interact with enemies and objectives according to their rules.",
+      "text": "Select your unit to see where it can move this turn.",
+      "waitForContinue": false
+    },
+    {
+      "id": "guide_unit",
+      "type": "guideClick",
+      "target": { "unitId": "p1_unit" }
+    },
+    {
+      "id": "dlg_move_attack",
+      "type": "dialogue",
+      "speaker": "Tutorial",
+      "text": "<color=#ADD8E6>Blue tiles</color> show movement. <color=#FF9999>Red tiles</color> show enemies in attack range.<page/>Most units move once and attack once per turn, and must be adjacent to melee targets.",
+      "waitForContinue": false
+    },
+    {
+      "id": "guide_move",
+      "type": "guideClick",
+      "speaker": "Tutorial",
+      "text": "Move onto a blue tile.",
+      "target": { "x": 6, "y": 4 }
+    },
+    {
+      "id": "dlg_attack_btn",
+      "type": "dialogue",
+      "speaker": "Tutorial",
+      "text": "With an enemy in range, open the <b>Attack</b> action.",
       "waitForContinue": true
     },
     {
-      "id": "dlg_attacking",
+      "id": "guide_attack_btn",
+      "type": "guideClick",
+      "target": { "uiTarget": "attackButton" }
+    },
+    {
+      "id": "dlg_strike",
       "type": "dialogue",
       "speaker": "Tutorial",
-      "text": "<b>Attacking enemies</b>\n\n◦ Enemy units in <color=#FF9999>red tiles</color> are in attack range.\n◦ Move adjacent using a <color=#ADD8E6>blue tile</color>, then choose <b>Attack</b>.<page/>◦ Preview damage before you commit — no surprises.",
+      "text": "Choose the highlighted enemy to strike.",
       "waitForContinue": true
     },
     {
-      "id": "dlg_damage",
+      "id": "guide_enemy",
+      "type": "guideClick",
+      "target": { "unitId": "p2_enemy" }
+    },
+    {
+      "id": "dlg_end_turn",
       "type": "dialogue",
       "speaker": "Tutorial",
-      "text": "<b>Health and damage</b>\n\n◦ Units show health as a percentage out of 100%.\n◦ Injured units deal less damage and capture structures more slowly.<page/>◦ At 0% health a unit is destroyed.\n◦ Most units fight back when attacked, but retaliation is much weaker than a deliberate strike.",
+      "text": "End your turn when you are finished issuing orders.",
       "waitForContinue": true
+    },
+    {
+      "id": "handoff_1",
+      "type": "turnHandoff",
+      "endTurnUiTarget": "endTurnButton",
+      "waitMs": 700,
+      "resumePlayer": 1,
+      "scriptedSteps": {
+        "steps": [
+          {
+            "type": "moveUnit",
+            "unitId": "p2_enemy",
+            "to": { "x": 7, "y": 3 }
+          }
+        ]
+      }
+    },
+    {
+      "id": "dlg_second_strike",
+      "type": "dialogue",
+      "speaker": "Tutorial",
+      "text": "The enemy repositioned. Let's finish them.",
+      "waitForContinue": true
+    },
+    {
+      "id": "guide_unit_2",
+      "type": "guideClick",
+      "target": { "unitId": "p1_unit" }
+    },
+    {
+      "id": "guide_move_2",
+      "type": "guideClick",
+      "speaker": "Tutorial",
+      "text": "Close the distance.",
+      "target": { "x": 5, "y": 4 }
+    },
+    {
+      "id": "dlg_defense_preview",
+      "type": "dialogue",
+      "speaker": "Tutorial",
+      "text": "The combat preview shows damage and any extra defense from terrain.",
+      "waitForContinue": true
+    },
+    {
+      "id": "guide_attack_2",
+      "type": "guideClick",
+      "target": { "uiTarget": "attackButton" }
+    },
+    {
+      "id": "guide_enemy_2",
+      "type": "guideClick",
+      "target": { "unitId": "p2_enemy" }
+    },
+    {
+      "id": "dlg_done",
+      "type": "dialogue",
+      "speaker": "Tutorial",
+      "text": "The enemy unit is destroyed.<page/>Those are the basics of movement and combat.",
+      "waitForContinue": true
+    },
+    {
+      "id": "complete",
+      "type": "showTutorialComplete"
     },
     {
       "id": "unlock",

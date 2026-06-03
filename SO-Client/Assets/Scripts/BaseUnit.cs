@@ -35,6 +35,7 @@ public class BaseUnit : MonoBehaviour
     public int playerControl;
     public int team;
     public int orientation;
+    public string sequenceId;
     public Vector2Int pos;
     public bool movementNonExhausted;
     public bool nonExhausted;
@@ -187,6 +188,14 @@ public class BaseUnit : MonoBehaviour
 
     public void StaticSpriteHasBeenClicked()
     {
+        if (masterGrid != null
+            && masterGrid.gameMaster != null
+            && masterGrid.gameMaster.sequenceManager != null
+            && !masterGrid.gameMaster.sequenceManager.TryAcceptGuidedUnitClick(this))
+        {
+            return;
+        }
+
         if(unitName != "seed")
             masterGrid.UnitHasBeenClicked(this);
     }
@@ -482,11 +491,68 @@ public class BaseUnit : MonoBehaviour
         spriteContainer.gameObject.SetActive(false);
     }
 
+    Coroutine tutorialHighlightCoroutine;
+    const int TutorialHighlightFlashCount = 3;
+    const float TutorialHighlightFlashStepSeconds = 0.2f;
+    const float TutorialHighlightLoopPauseSeconds = 1.5f;
 
+    /// <summary>Tutorial sequence: pulse fill between current colour and white (no scale change).</summary>
+    public void SetTutorialHighlight(bool enabled)
+    {
+        if (enabled)
+        {
+            if (tutorialHighlightCoroutine != null)
+            {
+                return;
+            }
 
+            tutorialHighlightCoroutine = StartCoroutine(TutorialHighlightFillFlashCoroutine());
+        }
+        else
+        {
+            if (tutorialHighlightCoroutine != null)
+            {
+                StopCoroutine(tutorialHighlightCoroutine);
+                tutorialHighlightCoroutine = null;
+            }
 
+            if (spriteContainer != null)
+            {
+                spriteContainer.SetColor(playerControl, nonExhausted, false);
+            }
+        }
+    }
 
+    IEnumerator TutorialHighlightFillFlashCoroutine()
+    {
+        SpriteRenderer fill = spriteFillSR != null ? spriteFillSR : spriteContainer?.fillSR;
+        if (fill == null)
+        {
+            tutorialHighlightCoroutine = null;
+            yield break;
+        }
 
+        while (true)
+        {
+            Color baseFill = fill.color;
+            for (int flash = 0; flash < TutorialHighlightFlashCount; flash++)
+            {
+                fill.color = Color.white;
+                yield return new WaitForSeconds(TutorialHighlightFlashStepSeconds);
+                fill.color = baseFill;
+                yield return new WaitForSeconds(TutorialHighlightFlashStepSeconds);
+            }
 
+            if (spriteContainer != null)
+            {
+                spriteContainer.SetColor(playerControl, nonExhausted, false);
+            }
+            else
+            {
+                fill.color = baseFill;
+            }
 
+            yield return new WaitForSeconds(TutorialHighlightLoopPauseSeconds);
+        }
+    }
 }

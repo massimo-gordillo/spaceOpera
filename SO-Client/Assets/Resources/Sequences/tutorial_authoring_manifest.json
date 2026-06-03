@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "description": "Human labels from TutorialTyped.txt mapped to unitId / uiTarget / coordinates.",
+  "targets": {
+    "p1_unit": { "unitId": "p1_unit" },
+    "p1_infantry": { "unitId": "p1_infantry" },
+    "p2_enemy": { "unitId": "p2_enemy" },
+    "p2_enemy_tank": { "unitId": "p2_enemy_tank" },
+    "p1_tank": { "unitId": "p1_tank" },
+    "p1_spore": { "unitId": "p1_spore" },
+    "p1_blacksmith": { "unitId": "p1_blacksmith" },
+    "move_tile_1": { "x": 4, "y": 4 },
+    "move_tile_2": { "x": 5, "y": 4 },
+    "bismuth": { "unitId": "bismuth", "x": 5, "y": 5 },
+    "factory": { "structureId": "factory" },
+    "airport": { "structureId": "airport" },
+    "portal": { "structureId": "portal" },
+    "endTurnButton": { "uiTarget": "endTurnButton" },
+    "attackButton": { "uiTarget": "attackButton" },
+    "captureButton": { "uiTarget": "captureButton" }
+  }
+}

@@ -38,7 +38,14 @@ public class MovementSquare : ClickableObject
     public override void HandleClick()
     {
         mg = GameObject.FindGameObjectWithTag("MasterGridTag").GetComponent<MasterGrid>();
-        //print("Movement square moves you to: "+(int)transform.position.x +", "+ (int)transform.position.y);
+        if (mg != null
+            && mg.gameMaster != null
+            && mg.gameMaster.sequenceManager != null
+            && !mg.gameMaster.sequenceManager.TryAcceptGuidedClickableClick(this))
+        {
+            return;
+        }
+
         mg.MoveSelectedUnit(new Vector2Int((int)transform.position.x, (int)transform.position.y));
     }
 
@@ -49,6 +56,64 @@ public class MovementSquare : ClickableObject
         //shield1.GetComponent<SpriteRenderer>().color = shieldColor;
         //shield2.GetComponent<SpriteRenderer>().color = shieldColor;
         //shield3.GetComponent<SpriteRenderer>().color = shieldColor;
+    }
+
+    Coroutine tutorialHighlightCoroutine;
+    Color tutorialHighlightRestoreColor;
+    const int TutorialHighlightFlashCount = 3;
+    const float TutorialHighlightFlashStepSeconds = 0.1f;
+    const float TutorialHighlightLoopPauseSeconds = 0.7f;
+
+    /// <summary>Tutorial sequence: pulse overlay fill between current colour and white.</summary>
+    public void SetTutorialHighlight(bool enabled)
+    {
+        if (enabled)
+        {
+            if (tutorialHighlightCoroutine != null)
+            {
+                return;
+            }
+
+            if (sr != null)
+            {
+                tutorialHighlightRestoreColor = sr.color;
+            }
+
+            tutorialHighlightCoroutine = StartCoroutine(TutorialHighlightFillFlashCoroutine());
+        }
+        else
+        {
+            if (tutorialHighlightCoroutine != null)
+            {
+                StopCoroutine(tutorialHighlightCoroutine);
+                tutorialHighlightCoroutine = null;
+            }
+
+            SetColor(tutorialHighlightRestoreColor);
+        }
+    }
+
+    IEnumerator TutorialHighlightFillFlashCoroutine()
+    {
+        if (sr == null)
+        {
+            tutorialHighlightCoroutine = null;
+            yield break;
+        }
+
+        while (true)
+        {
+            Color baseFill = tutorialHighlightRestoreColor;
+            for (int flash = 0; flash < TutorialHighlightFlashCount; flash++)
+            {
+                SetColor(Color.white);
+                yield return new WaitForSeconds(TutorialHighlightFlashStepSeconds);
+                SetColor(baseFill);
+                yield return new WaitForSeconds(TutorialHighlightFlashStepSeconds);
+            }
+
+            yield return new WaitForSeconds(TutorialHighlightLoopPauseSeconds);
+        }
     }
 
     public void ShowShields(int s)

@@ -11,25 +11,35 @@
       "reason": "tutorial_universal_intro"
     },
     {
+      "id": "cameraFocus",
+      "type": "cameraFocus",
+      "target": { "x": 5, "y": 4 },
+      "durationMs": 400
+    },
+    {
       "id": "dlg_welcome",
       "type": "dialogue",
       "speaker": "Tutorial",
-      "text": "Welcome Commander, to Tactica: a Space Opera.<page/>Your goal is to conquer this frontier space sector for control of its BISMUTH.<page/>Your task is to build an army, defend your structures, and crush any opposition.",
+      "text": "Welcome Commander, to <b>Tactica: A Space Opera</b>.<page/>Your goal is to conquer this frontier sector and control its <b>BISMUTH</b>.",
       "waitForContinue": true
     },
     {
       "id": "dlg_grid",
       "type": "dialogue",
       "speaker": "Tutorial",
-      "text": "The battle is fought on a grid of squares. You will need to master positioning, unit interactions, and terrain to win. ",
+      "text": "Battles are fought on a grid of squares. Positioning, unit matchups, and terrain decide who wins.",
       "waitForContinue": true
     },
     {
       "id": "dlg_progeny",
       "type": "dialogue",
       "speaker": "Tutorial",
-      "text": "Three <b>PROGENY</b> fight for control of the <b>BISMUTH</b>:\n- The Ertrians\n- The Virix<\n- The Sentus<page/><b>The Ertrians</b> \nHumans slowly colonizing the galaxy. Bismuth powers space travel.<page/> <b>The Virix</b> \nThe heat provided by Bismuth supports their breeding grounds and allows for life on hostile planets. <page/> <b>The Sentus</b> \nA religious monarchy. Proximity to Bismuth provides them their strength, and they become weak as they move further from it.<page/>Each faction is unique. It has its own production rules and bonuses.<page/>Commander, you will learn about the specifics ofeach progeny soon. First, let's start with universal tactics.",
+      "text": "Three <b>PROGENY</b> fight for the <b>BISMUTH</b>:<page/>◦ <b>Ertrians</b> — human colonists powered by trade and industry.<page/>◦ <b>Virix</b> — a hive that grows where BISMUTH burns hot.<page/>◦ <b>Sentus</b> — a holy monarchy strengthened near sacred nodes.<page/>Each faction produces and fights differently. Universal tactics come first.",
       "waitForContinue": true
+    },
+    {
+      "id": "complete",
+      "type": "showTutorialComplete"
     },
     {
       "id": "unlock",

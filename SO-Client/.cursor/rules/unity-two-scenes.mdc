@@ -1,0 +1,11 @@
+---
+description: Only MenuScene and GameScene exist; maps vary via MatchSettings and gsdat
+alwaysApply: true
+---
+
+# Two scenes only
+
+- **MenuScene** — menu, tutorial slideshow, launching play.
+- **GameScene** — all gameplay (skirmish and every tutorial map).
+
+Do not add per-tutorial Unity scenes. Select maps via `MatchSettings.ApplyTutorialMatch(scenarioId)` (metadata in `tutorial_curriculum_manifest.json`) and `.gsdat` files. Next lesson reloads map data in the same Game scene.

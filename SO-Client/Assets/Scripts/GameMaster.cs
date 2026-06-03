@@ -47,7 +47,6 @@ public class GameMaster : MonoBehaviour
 
 
     [Header("Game Prefab References")]
-    public BaseUnit infantryUnitPrefab;
     public Structure_Command commandStructurePrefab;
     public BaseStructure productionAirportStructurePrefab;
     public BaseStructure productionFactoryStructurePrefab;
@@ -67,6 +66,7 @@ public class GameMaster : MonoBehaviour
     public string exportMapType = "multi";
     public int exportMapNum = 8;
     public int exportMapVersion = 1;
+    bool hasSequence = true;
 
     [Header("UI Items")]
     public GameObject choicePanel;
@@ -113,7 +113,7 @@ public class GameMaster : MonoBehaviour
 
     [Header("CPU")]
     public static bool CPU_isOn = false;
-    public static bool CPU_isOn_manual = true;
+    public static bool CPU_isOn_manual = false;
     private static bool CPU_isMasterDebugging = false;
     public static bool[] CPU_PlayersList;
     public int virixCheapestUnit;
@@ -142,6 +142,7 @@ public class GameMaster : MonoBehaviour
         //Turn on CPU if game is started through MenuScene, otherwise if I've set it manually.
         if (MatchSettings.CPU_isOn || (!MatchSettings.isInit && CPU_isOn_manual))
         {
+            Debug.Log("CPU is on");
             CPU_isOn = true;
             //CPU_PlayersList = new bool[numPlayers + 1];
             if (MatchSettings.playerIsCPU.Length == numPlayers)
@@ -229,18 +230,13 @@ public class GameMaster : MonoBehaviour
         {
             (gridX, gridY) = tilemapManager.Initialize(true);
         }
-            
 
-
-
-
-
-            //initializes the masterGrid arrays etc with the map size
-            masterGrid.Startup(gridX, gridY, tilemapManager.GetTilemapByteArray(), gameValues.GetAttributesTilesDictionary(), gameValues.GetCombatMultiplierDictionary());
+        //initializes the masterGrid arrays etc with the map size
+        masterGrid.Startup(gridX, gridY, tilemapManager.GetTilemapByteArray(), gameValues.GetAttributesTilesDictionary(), gameValues.GetCombatMultiplierDictionary());
 
         HideChoicePanel();
         announcementCard.SetActive(false);
-        playerTurn = 1; //player 0 is neutral
+        //playerTurn = 1; //player 0 is neutral
 
         playersNotLost = new bool[numPlayers+1];
         //playerProgeny = new byte[numPlayers + 1];
@@ -252,7 +248,7 @@ public class GameMaster : MonoBehaviour
             playersNotLost[i] = true;
         }
         
-        SetPlayerTurnText(playerTurn);
+        SetPlayerTurnText(1);
         
 
 
@@ -316,7 +312,10 @@ public class GameMaster : MonoBehaviour
         //WaitForSeconds(0.5);
         if (isAnimating)
             AnimateStartTurnCard(1);
-        cameraManager.SetPosition(MasterGrid.commandStructures[1].pos);
+        if (!hasSequence && MasterGrid.commandStructures[1] != null)
+        {
+            cameraManager.SetPosition(MasterGrid.commandStructures[1].pos);
+        }
 
         StartupInstantiateUnits();
 
@@ -327,18 +326,11 @@ public class GameMaster : MonoBehaviour
 
         if (sequenceManager != null)
         {
-            if (MatchSettings.gameMode == MatchSettings.MatchGameMode.Tutorial)
-            {
-                string introPath = MatchSettings.GetIntroSequenceResourcePath();
-                if (!string.IsNullOrWhiteSpace(introPath))
-                {
-                    sequenceManager.runIntroOnStart = true;
-                    sequenceManager.introSequenceResourcePath = introPath;
-                }
-            }
-
-            sequenceManager.TryRunIntroSequence();
+            sequenceManager.BeginFromMatchSettings();
         }
+
+        playerTurn = 0;
+        StartTurn();
 
         if (saveGameStateOnPlayStart)
         {
@@ -373,20 +365,21 @@ public class GameMaster : MonoBehaviour
         {
             byte progeny = GetPlayerProgeny((byte)player);
             List <BaseStructure> initProdStructures = masterGrid.GetProductionStructures(player);
-            if (player != 1)
+            if (player != 1 && !hasSequence)
                 initProdStructures.Add(MasterGrid.commandStructures[player]);
             foreach (BaseStructure prod in initProdStructures)
             {
                 if (prod.structureType != 1 && prod.structureType != 5)
                     continue;
 
+                BaseUnit unit = null;
 				if (progeny == 0)
                 {
                     //BaseUnit infantryUnitPrefab = Resources.Load<BaseUnit>("UnitPrefabs/progeny1/InfantryPrefab");
                     BaseUnit infantryUnitPrefab = PrefabManager.GetBaseUnitFromName("Infantry", 0);
                     infantryUnitPrefab.playerControl = player;
-                    BaseUnit unit = GetInstantiateUnit(infantryUnitPrefab, prod.pos, player);
-                    unit.SetNonExhausted(true);
+                    unit = GetInstantiateUnit(infantryUnitPrefab, prod.pos, player);
+                    
                     //BaseUnit unit = Instantiate(infantryUnitPrefab, new Vector2(x, y), Quaternion.identity, unitContainer);
 
                 }
@@ -394,8 +387,7 @@ public class GameMaster : MonoBehaviour
                 {
                     BaseUnit sporeUnitPrefab = PrefabManager.GetBaseUnitFromName("Spore", 1);
                     sporeUnitPrefab.playerControl = player;
-                    BaseUnit unit = GetInstantiateUnit(sporeUnitPrefab, prod.pos, player);
-                    unit.SetNonExhausted(true);
+                    unit = GetInstantiateUnit(sporeUnitPrefab, prod.pos, player);
                     //BaseUnit unit = Instantiate(sporeUnitPrefab, new Vector2(x, y), Quaternion.identity, unitContainer);
 
                 }
@@ -403,11 +395,11 @@ public class GameMaster : MonoBehaviour
                 {
                     BaseUnit blacksmithUnitPrefab = PrefabManager.GetBaseUnitFromName("Blacksmith", 2);
                     blacksmithUnitPrefab.playerControl = player;
-                    BaseUnit unit = GetInstantiateUnit(blacksmithUnitPrefab, prod.pos, player);
-                    unit.SetNonExhausted(true);
+                    unit = GetInstantiateUnit(blacksmithUnitPrefab, prod.pos, player);
                     //BaseUnit unit = Instantiate(blacksmithUnitPrefab, new Vector2(x, y), Quaternion.identity, unitContainer);
 
                 }
+                unit.SetNonExhausted(true);
             }
         
         }
@@ -1023,13 +1015,15 @@ public class GameMaster : MonoBehaviour
 		Debug.Log($"Gamestate saved to file: {filePath}");
     }
 
-    public void LoadGameStateFromFile(string mapType, int mapNum, int versionNum)//, out TilemapData tilemapData)
+    public void LoadGameStateFromFile(string mapType, int mapNum, int versionNum, bool importTilemap = true)//, out TilemapData tilemapData)
     {
         if (toggleGamePiecesContainer != null)
         {
             toggleGamePiecesContainer.gameObject.SetActive(false);
         }
-        Debug.Log($"Loading game state for map {mapNum}, version {versionNum}...");
+        Debug.Log(importTilemap
+            ? $"Loading game state for map {mapType} {mapNum}, version {versionNum}..."
+            : $"Reloading game pieces for map {mapType} {mapNum}, version {versionNum} (tilemap unchanged)...");
 		//yield return null;
         //string mapFileLocation = $"InitializationData/Maps/Map{mapNum}/Map{mapNum}_v{versionNum}.gsdat"; //hardcoded map 7 for now
 		string mapFileLocation = "InitializationData/Maps/";
@@ -1072,25 +1066,37 @@ public class GameMaster : MonoBehaviour
             Debug.LogError("Deserialized game state data is null");
 			return;
 		}
+        if (gameStateData.GamePieceList == null)
+        {
+            Debug.LogError("Deserialized game state has null GamePieceList.");
+            return;
+        }
         //tilemapData = gameStateData.tilemapData;
         Debug.Log($"Loaded game state from file: {filePath} with {gameStateData.GamePieceList.Count} game pieces.");
-		
 
-
-		tilemapManager.ImportTilemapFromBytes(gameStateData.TilemapData);
-        gridX = gameStateData.TilemapData.Width;
-        gridY = gameStateData.TilemapData.Height;
+        if (importTilemap)
+        {
+            tilemapManager.ImportTilemapFromBytes(gameStateData.TilemapData);
+            gridX = gameStateData.TilemapData.Width;
+            gridY = gameStateData.TilemapData.Height;
+        }
         int debugStructureCount = 0;
         int debugUnitCount = 0;
+        int debugUnitSequenceIdCount = 0;
 		foreach (GamePieceInfo gp in gameStateData.GamePieceList)
         {
             if(gp.typeNum>=200)
                 debugStructureCount++;
             if(gp.typeNum<200)
+            {
 				debugUnitCount++;
+                if (!string.IsNullOrWhiteSpace(gp.sequenceId))
+                    debugUnitSequenceIdCount++;
+            }
 
 		}
         Debug.Log($"GamePieceList unit count: {debugUnitCount}, structure count {debugStructureCount}");
+        Debug.Log($"GamePieceList units with sequenceId: {debugUnitSequenceIdCount}/{debugUnitCount}");
 
 		ConvertListToGamePieces(gameStateData.GamePieceList);
 	}
@@ -1113,7 +1119,8 @@ public class GameMaster : MonoBehaviour
                         (byte)y,
                         (byte)unit.gamePieceId,
                         (byte)unit.playerControl,
-                        (byte)((double)unit.healthCurrent / (double)unit.healthMax * 100)
+                        (byte)((double)unit.healthCurrent / (double)unit.healthMax * 100),
+                        unit.sequenceId
                     );
                     //Debug.Log($"Added baseUnit to GameStateList x: {info.x}, y: {info.y}, bytenum: {info.typeNum}, health: {info.healthVal}");
                     gameStateList.Add(info);
@@ -1186,7 +1193,11 @@ public class GameMaster : MonoBehaviour
                     unit.playerControl = pieceInfo.playerID;
                     unit.SetHealth((int)((double)(pieceInfo.healthVal * unit.healthMax) / 100));
                     unit.pos = new Vector2Int(x, y);
-                    InstantiateUnit(unit, unit.pos);
+                    BaseUnit spawnedUnit = InstantiateUnit(unit, unit.pos);
+                    if (spawnedUnit != null)
+                    {
+                        spawnedUnit.sequenceId = string.IsNullOrWhiteSpace(pieceInfo.sequenceId) ? null : pieceInfo.sequenceId;
+                    }
                     //Instantiate(unit, new Vector2(x, y), Quaternion.identity, unitContainer);
                     //masterGrid.SetUnitInGrid(unit.pos, unit);
                 }
@@ -1213,9 +1224,14 @@ public class GameMaster : MonoBehaviour
                     structure.playerControl = pieceInfo.playerID;
                     structure.captureHealth = pieceInfo.healthVal;
                     structure.pos = new Vector2Int(x, y);
-                    Instantiate(structure, new Vector2(x, y), Quaternion.identity, structureContainer);
-					//structure.Initialize();
-					//masterGrid.SetStructureInGrid(structure.pos, structure);
+                    BaseStructure spawnedStructure = Instantiate(structure, new Vector2(x, y), Quaternion.identity, structureContainer);
+                    if (spawnedStructure != null)
+                    {
+                        spawnedStructure.sequenceId = string.IsNullOrWhiteSpace(pieceInfo.sequenceId)
+                            ? null
+                            : pieceInfo.sequenceId;
+                        spawnedStructure.Initialize();
+                    }
 
                 }
             }
@@ -1226,10 +1242,9 @@ public class GameMaster : MonoBehaviour
             Debug.LogError("gameStateList is empty!");
     }
 
-    public void InstantiateUnit(BaseUnit unit, Vector2Int pos)
+    public BaseUnit InstantiateUnit(BaseUnit unit, Vector2Int pos)
     {
-        Instantiate(unit, (Vector2)pos, Quaternion.identity, unitContainer);
-        //playerUnits[unit.playerControl].Add(unit);
+        return Instantiate(unit, (Vector2)pos, Quaternion.identity, unitContainer);
     }
     
     public BaseUnit GetInstantiateUnit(BaseUnit unit, Vector2Int pos, int? player)
@@ -1547,6 +1562,73 @@ public class GameMaster : MonoBehaviour
         if (loopSafetyCounter++ > loopSafetyLimit)
         {
             Debug.LogError(function + " has tripped the search limit counter");
+        }
+    }
+
+    static bool MapsMatch(
+        string mapTypeA,
+        int mapNumA,
+        int mapVersionA,
+        string mapTypeB,
+        int mapNumB,
+        int mapVersionB)
+    {
+        return string.Equals(mapTypeA, mapTypeB, StringComparison.OrdinalIgnoreCase)
+            && mapNumA == mapNumB
+            && mapVersionA == mapVersionB;
+    }
+
+    /// <summary>Reload map + intro sequence in place (next tutorial lesson, same Game scene).</summary>
+    public IEnumerator RestartTutorialScenario(string nextScenarioId)
+    {
+        if (string.IsNullOrWhiteSpace(nextScenarioId))
+        {
+            yield break;
+        }
+
+        MatchSettings.GetMapLoadParameters(out string previousMapType, out int previousMapNum, out int previousMapVersion);
+
+        if (!MatchSettings.ApplyTutorialMatch(nextScenarioId))
+        {
+            yield break;
+        }
+
+        MatchSettings.GetMapLoadParameters(out string mapType, out int mapNum, out int mapVersion);
+        bool sameMap = MapsMatch(previousMapType, previousMapNum, previousMapVersion, mapType, mapNum, mapVersion);
+
+        isGameComplete = false;
+        endTurnConfirmCard.SetActive(false);
+        HideChoicePanel();
+
+        if (sequenceManager != null)
+        {
+            sequenceManager.PrepareForTutorialRestart();
+        }
+
+        if (sequenceManager != null)
+        {
+            sequenceManager.HideCompletionPanel();
+        }
+
+        yield return masterGrid.DeleteAllGamePieces();
+        yield return null;
+
+        LoadGameStateFromFile(mapType, mapNum, mapVersion, importTilemap: !sameMap);
+
+        playerTurn = 0;
+        turnNumber = 0;
+        for (int i = 1; i <= numPlayers; i++)
+        {
+            playerResources[i] = baseResourcePerTurn;
+        }
+
+        playerResourceText.text = playerResources[1].ToString();
+        SetPlayerTurnText(1);
+        StartTurn();
+
+        if (sequenceManager != null)
+        {
+            sequenceManager.BeginFromMatchSettings();
         }
     }
 }

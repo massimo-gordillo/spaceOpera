@@ -4,7 +4,7 @@ using UnityEditor;
 using UnityEngine;
 
 [CustomEditor(typeof(GameMaster))]
-public class GameMasterEditor : Editor
+public class MapExportTool : Editor
 {
     private static readonly string[] MapTypes = { "multi", "single", "tutor" };
 

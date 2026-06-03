@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "sequenceId": "tutorial_universal_intro",
+  "missionId": "tutorial_curriculum",
+  "description": "Introduction — welcome, battlefield grid, and the three Progeny.",
+  "steps": [
+    {
+      "id": "lock",
+      "type": "setInputLock",
+      "locked": true,
+      "reason": "tutorial_universal_intro"
+    },
+    {
+      "id": "cameraFocus",
+      "type": "cameraFocus",
+      "target": { "x": 4, "y": 3 },
+      "durationMs": 0
+    },
+    {
+      "id": "dlg_welcome",
+      "type": "dialogue",
+      "speaker": "Tutorial",
+      "text": "Welcome Commander, to Tactica: a Space Opera.<page/>Your goal is to conquer this frontier space sector for control of its BISMUTH.<page/>To do so, you must build an army, defend your structures, and crush any opposition.",
+      "waitForContinue": true
+    },
+    {
+      "id": "dlg_grid",
+      "type": "dialogue",
+      "speaker": "Tutorial",
+      "text": "The battle is fought on a grid of squares. You will need to master positioning, unit interactions, and terrain to win. ",
+      "waitForContinue": true
+    },
+    {
+      "id": "dlg_progeny",
+      "type": "dialogue",
+      "speaker": "Tutorial",
+      "text": "Three <b>PROGENY</b> fight for control of the <b>BISMUTH</b>:\n- The Ertrians\n- The Virix<\n- The Sentus<page/><b>The Ertrians</b> \nHumans slowly colonizing the galaxy. Bismuth powers space travel.<page/> <b>The Virix</b> \nThe heat provided by Bismuth supports their breeding grounds and allows for life on hostile planets. <page/> <b>The Sentus</b> \nA religious monarchy. Proximity to Bismuth provides them their strength, and they become weak as they move further from it.<page/>Each faction is unique. It has its own production rules and bonuses.<page/>Commander, you will learn about the specifics ofeach progeny soon. First, let's start with universal tactics.",
+      "waitForContinue": true
+    },
+    {
+      "id": "unlock",
+      "type": "setInputLock",
+      "locked": false
+    }
+  ]
+}

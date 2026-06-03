@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "sequenceId": "tutorial_ertrian",
   "missionId": "tutorial_curriculum",
-  "description": "Ertrian faction — economy bonus, factories vs airports, ranged doctrine.",
+  "description": "Ertrian — income bonus, factories, airports, ranged fire.",
   "steps": [
     {
       "id": "lock",
@@ -11,32 +11,115 @@
       "reason": "tutorial_ertrian"
     },
     {
-      "id": "dlg_income_bonus",
+      "id": "dlg_welcome",
       "type": "dialogue",
       "speaker": "Tutorial",
-      "text": "<b>Ertrian economy</b>\n\nErtrians thrive on trade routes secured by <b>BISMUTH</b>.<page/>◦ You earn a <b>10% bonus</b> on structure income compared to the baseline — snowball map control into a stronger wallet.",
+      "text": "Welcome to the <b>Ertrian</b> tutorial. Here you will learn production and ranged warfare.",
       "waitForContinue": true
     },
     {
-      "id": "dlg_factories_airports",
+      "id": "dlg_income",
       "type": "dialogue",
       "speaker": "Tutorial",
-      "text": "<b>Factories and airports</b>\n\n◦ <b>Factories</b> train ground forces — your core capture and front-line toolkit.\n◦ <b>Airports</b> recruit flyers that bypass terrain and threaten exposed targets.<page/>Choose production buildings to match the map: chokepoints vs open flanks.",
+      "text": "Ertrians earn a <b>10% bonus</b> on structure income — control more BISMUTH to out-spend your foe.",
       "waitForContinue": true
+    },
+    {
+      "id": "camera_structures",
+      "type": "cameraMove",
+      "target": { "structureId": "factory" },
+      "durationMs": 500
+    },
+    {
+      "id": "dlg_factories",
+      "type": "dialogue",
+      "speaker": "Tutorial",
+      "text": "Ertrians build from <b>Factories</b> (ground) and <b>Airports</b> (flying units). Let's train a tank.",
+      "waitForContinue": true
+    },
+    {
+      "id": "guide_factory",
+      "type": "guideClick",
+      "speaker": "Tutorial",
+      "text": "Select your Factory.",
+      "target": { "structureId": "factory" }
+    },
+    {
+      "id": "dlg_produce_tank",
+      "type": "dialogue",
+      "speaker": "Tutorial",
+      "text": "Choose a unit from the production panel. Pick a tank.",
+      "waitForContinue": true
+    },
+    {
+      "id": "dlg_air",
+      "type": "dialogue",
+      "speaker": "Tutorial",
+      "text": "Airports recruit flyers that ignore terrain blocking — they are still blocked by enemy units.",
+      "waitForContinue": true
+    },
+    {
+      "id": "handoff_prod",
+      "type": "turnHandoff",
+      "endTurnUiTarget": "endTurnButton",
+      "waitMs": 700,
+      "resumePlayer": 1,
+      "textAfter": "New units arrive at the start of your turn. Move your tank to free the factory line."
+    },
+    {
+      "id": "guide_tank",
+      "type": "guideClick",
+      "target": { "unitId": "p1_tank" }
+    },
+    {
+      "id": "guide_move_tank",
+      "type": "guideClick",
+      "target": { "x": 4, "y": 4 }
     },
     {
       "id": "dlg_ranged",
       "type": "dialogue",
       "speaker": "Tutorial",
-      "text": "<b>Ranged units (Ertrian specialty)</b>\n\n◦ Ranged units strike from a distance but <b>cannot move and shoot in the same turn</b> — plan the tempo of your turns.<page/>◦ <color=#ADD8E6>Blue tiles</color> show movement; <color=#FF9999>red outlines</color> show attack range.<page/>◦ Screen fragile capture units, then delete defenders before they reach your line.",
+      "text": "Artillery can strike from distance but usually cannot move and fire the same turn.<page/>Use it to delete exposed enemies.",
       "waitForContinue": true
     },
     {
-      "id": "dlg_progeny_bonus",
+      "id": "handoff_enemy",
+      "type": "turnHandoff",
+      "requirePlayerEndTurn": false,
+      "waitMs": 500,
+      "resumePlayer": 1,
+      "scriptedSteps": {
+        "steps": [
+          {
+            "type": "moveUnit",
+            "unitId": "p2_enemy_tank",
+            "to": { "x": 8, "y": 4 }
+          }
+        ]
+      },
+      "textAfter": "Your artillery can reach that tank — attack it."
+    },
+    {
+      "id": "guide_attack",
+      "type": "guideClick",
+      "target": { "uiTarget": "attackButton" }
+    },
+    {
+      "id": "guide_enemy",
+      "type": "guideClick",
+      "target": { "unitId": "p2_enemy_tank" }
+    },
+    {
+      "id": "dlg_done",
       "type": "dialogue",
       "speaker": "Tutorial",
-      "text": "<b>Summary</b>\n\n<b>Ertrians</b> reward aggressive map control: <b>ranged firepower</b> plus <b>bonus income</b> from every secured <b>BISMUTH</b> node.",
+      "text": "Well done. You've learned the core of the <b>Ertrian</b> war machine.",
       "waitForContinue": true
+    },
+    {
+      "id": "complete",
+      "type": "showTutorialComplete"
     },
     {
       "id": "unlock",

@@ -134,10 +134,10 @@ public class CameraManager : MonoBehaviour
                 {
                     HandleObjectClick(clickableObject);
                 }
-/*                else
+                else if (gameMaster != null && gameMaster.sequenceManager != null)
                 {
-                    Debug.LogWarning("clickable object under pointer is null");
-                }*/
+                    gameMaster.sequenceManager.NotifyWrongGameplayWorldClick();
+                }
             }
 
             isDragging = false;
@@ -156,9 +156,8 @@ public class CameraManager : MonoBehaviour
         }
     }
 
-    public void SetPosition(Vector2 targetPos)
+    public void SetPosition(Vector2 targetPos, float duration = 0.3f)
     {
-        float duration = 0.3f;
         StartCoroutine(SmoothMoveTo(targetPos, duration));
     }
 
@@ -357,12 +356,6 @@ public class CameraManager : MonoBehaviour
     private void HandleObjectClick(ClickableObject clickableObject)
     {
         clickableObject.HandleClick();
-        if (gameMaster != null && gameMaster.sequenceManager != null)
-        {
-            Vector3 worldPos = clickableObject.transform.position;
-            Vector2Int gridPos = new Vector2Int(Mathf.RoundToInt(worldPos.x), Mathf.RoundToInt(worldPos.y));
-            gameMaster.sequenceManager.NotifyWorldObjectClicked(gridPos, clickableObject);
-        }
         Vector3 objectPosition = clickableObject.transform.position;
         float menuWidthInWorldUnits = gameMaster.choicePanel.GetComponent<RectTransform>().rect.width * cam.orthographicSize * 2 / Screen.height;
         float camHeight = cam.orthographicSize;

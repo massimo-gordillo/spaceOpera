@@ -1,0 +1,48 @@
+---
+description: Prefer extending existing C# classes; ask before adding new .cs files
+alwaysApply: true
+---
+
+# Minimize new C# scripts
+
+**Default:** extend an existing class, partial, or static helper on a related type — do not add a new `.cs` file unless there is a clear, durable reason.
+
+## Before creating a new script
+
+1. Search for an existing owner (`SequenceManager`, `GameMaster`, `MatchSettings`, `SequenceData`, UI managers, etc.) that already handles the same domain.
+2. Prefer adding methods, nested types, or DTOs to an existing file when the change is localized (e.g. curriculum metadata in `SequenceData.cs`, not a new `TutorialCurriculum.cs`).
+3. Prefer JSON/manifest data over new parser/manager classes when behavior is mostly configuration.
+4. Prefer Unity built-ins and Inspector wiring over thin wrapper MonoBehaviours.
+
+## When a new class might be justified
+
+- A genuinely separate lifecycle (e.g. a new persistent service with its own scene object and update loop).
+- A reusable type that would pollute an already-large class and has no natural home.
+- A third-party or generated pattern that requires its own file.
+
+## Approval required
+
+If the user **did not explicitly ask** for a new class or new `.cs` file:
+
+- **Do not create it** in the same turn.
+- **Propose it first**: name the file, why existing classes are insufficient, and what you would put in it.
+- Wait for the user to agree (or redirect you to an existing class) before implementing.
+
+If the user **did** ask for a new script (e.g. “add a `FooManager`”), proceed without re-asking.
+
+## Examples
+
+```csharp
+// ❌ BAD — new TutorialMapLoader.cs for one helper used only by GameMaster
+public static class TutorialMapLoader { ... }
+
+// ✅ GOOD — method on GameMaster or MatchSettings / SequenceCurriculum
+public static bool TryApplyScenarioToMatchSettings(...) { ... }
+```
+
+```csharp
+// ❌ BAD — new DialogTapForwarder.cs that only calls SequenceManager
+public class DialogTapForwarder : MonoBehaviour { public void OnTap() => sequenceManager.Advance(); }
+
+// ✅ GOOD — Button.onClick → SequenceManager in the Inspector (see unity-inspector-first)
+```

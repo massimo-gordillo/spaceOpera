@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "sequenceId": "tutorial_sentus",
   "missionId": "tutorial_curriculum",
-  "description": "Sentus faction — portals and defensive power near BISMUTH.",
+  "description": "Sentus — blacksmith, portals, BISMUTH defense aura.",
   "steps": [
     {
       "id": "lock",
@@ -11,25 +11,69 @@
       "reason": "tutorial_sentus"
     },
     {
-      "id": "dlg_portals",
+      "id": "dlg_welcome",
       "type": "dialogue",
       "speaker": "Tutorial",
-      "text": "<b>Portals</b>\n\n◦ Sentus armies emerge from <b>Portals</b> instead of traditional factories.<page/>◦ Treat portals as forward bases: secure them early, then project power toward contested <b>BISMUTH</b>.",
+      "text": "Welcome to the <b>Sentus</b> tutorial. The kingdom grows stronger near <b>BISMUTH</b>.",
       "waitForContinue": true
     },
     {
-      "id": "dlg_defense",
+      "id": "camera_blacksmith",
+      "type": "cameraFocus",
+      "target": { "unitId": "p1_blacksmith" },
+      "durationMs": 400
+    },
+    {
+      "id": "dlg_blacksmith",
       "type": "dialogue",
       "speaker": "Tutorial",
-      "text": "<b>Defense near BISMUTH</b>\n\n◦ Sentus units gain <b>bonus defense</b> while fighting near friendly <b>BISMUTH</b>.<page/>◦ Anchor your line on income nodes — enemies pay full price to uproot you.",
+      "text": "The <b>Blacksmith</b> captures structures. It is heavily armored but cannot strike air units.",
       "waitForContinue": true
     },
     {
-      "id": "dlg_summary",
+      "id": "guide_move_preview",
+      "type": "guideClick",
+      "speaker": "Tutorial",
+      "text": "Select the Blacksmith to preview movement — bonus defense near BISMUTH appears on the tiles (up to +3).",
+      "target": { "unitId": "p1_blacksmith" }
+    },
+    {
+      "id": "dlg_defense_aura",
       "type": "dialogue",
       "speaker": "Tutorial",
-      "text": "<b>Summary</b>\n\n<b>Sentus</b> excel at entrenched play: <b>Portals</b> for production and stubborn defenders bolstered by proximity to <b>BISMUTH</b>.",
+      "text": "Stay close to BISMUTH to sway fights in your favor.",
       "waitForContinue": true
+    },
+    {
+      "id": "camera_portal",
+      "type": "cameraMove",
+      "target": { "x": 5, "y": 3 },
+      "durationMs": 500
+    },
+    {
+      "id": "dlg_portal",
+      "type": "dialogue",
+      "speaker": "Tutorial",
+      "text": "The <b>Portal</b> trains every Sentus unit. Select it to open production.",
+      "waitForContinue": true
+    },
+    {
+      "id": "guide_portal",
+      "type": "guideClick",
+      "speaker": "Tutorial",
+      "text": "Click the Portal to open production.",
+      "target": { "structureId": "portal" }
+    },
+    {
+      "id": "dlg_done",
+      "type": "dialogue",
+      "speaker": "Tutorial",
+      "text": "Well done! You know how the Sentus fight and build.",
+      "waitForContinue": true
+    },
+    {
+      "id": "complete",
+      "type": "showTutorialComplete"
     },
     {
       "id": "unlock",

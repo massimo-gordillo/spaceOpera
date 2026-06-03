@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -11,44 +10,6 @@ public static class MatchSettings {
         Skirmish,
         Tutorial
     }
-
-    private sealed class ScenarioDefinition
-    {
-        public string mapType;
-        public int mapNum;
-        public int mapVersion;
-        /// <summary>Resources path without extension (e.g. Sequences/tutorial_01_intro).</summary>
-        public string introSequenceResourcePath;
-        public int[] progenys;
-        public bool[] playerIsCpu;
-    }
-
-    private static readonly Dictionary<string, ScenarioDefinition> Scenarios =
-        new Dictionary<string, ScenarioDefinition>(StringComparer.OrdinalIgnoreCase)
-        {
-            // ["tutorial_01_intro"] = new ScenarioDefinition
-            // {
-            //     mapType = "multi",
-            //     mapNum = 7,
-            //     mapVersion = 1,
-            //     introSequenceResourcePath = "Sequences/tutorial_01_intro",
-            //     progenys = new[] { 0, 0 },
-            //     playerIsCpu = new[] { false, true }
-            // }
-            ["tutorial_01_intro"] = new ScenarioDefinition
-            {
-                mapType = "multi",
-                mapNum = 7,
-                mapVersion = 1,
-                introSequenceResourcePath = "Sequences/tutorial_01_intro",
-                progenys = new[] { 0, 0 },
-                playerIsCpu = new[] { false, true }
-            }
-        };
-
-    // public const string DefaultSkirmishMapType = "multi";
-    // public const int DefaultSkirmishMapNum = 7;
-    // public const int DefaultSkirmishMapVersion = 1;
 
     public const string DefaultSkirmishMapType = "tutor";
     public const int DefaultSkirmishMapNum = 1;
@@ -64,8 +25,16 @@ public static class MatchSettings {
     /// <summary>Set for tutorials and other scripted scenarios; empty for normal skirmish.</summary>
     static public string scenarioId = "";
 
+    /// <summary>Resources path without extension for the active tutorial sequence (optional until a tutorial match is applied).</summary>
+    static public string introSequenceResourcePath = "";
 
+    /// <summary>Map load params for the active match (set when a tutorial scenario is applied).</summary>
+    static public string matchMapType = "";
+    static public int matchMapNum;
+    static public int matchMapVersion;
 
+    /// <summary>When true, Menu scene opens the tutorial page on load (Back to tutorials from Game scene).</summary>
+    public static bool openTutorialMenuOnLoad;
 
     static public void SetNumPlayers(int numPlayers)
     {
@@ -106,45 +75,40 @@ public static class MatchSettings {
     {
         gameMode = MatchGameMode.Skirmish;
         scenarioId = "";
+        introSequenceResourcePath = "";
+        matchMapType = "";
+        matchMapNum = 0;
+        matchMapVersion = 0;
+        openTutorialMenuOnLoad = false;
     }
 
-    public static bool ApplyTutorialScenario(string id)
+    /// <summary>
+    /// Configures a tutorial match from curriculum manifest metadata.
+    /// <paramref name="sequenceResourcePathOverride"/> is optional (Resources path without .json).
+    /// </summary>
+    public static bool ApplyTutorialMatch(string scenarioId, string sequenceResourcePathOverride = null)
     {
-        if (string.IsNullOrWhiteSpace(id) || !Scenarios.TryGetValue(id.Trim(), out ScenarioDefinition def))
+        if (!SequenceCurriculum.TryApplyScenarioToMatchSettings(
+                scenarioId,
+                sequenceResourcePathOverride,
+                out string error))
         {
-            Debug.LogError($"[MatchSettings] Unknown tutorial scenario '{id}'.");
+            Debug.LogError($"[MatchSettings] {error}");
             return false;
         }
 
-        SetNumPlayers(2);
-        SetPlayerColours();
-        for (int i = 0; i < numPlayers; i++)
-        {
-            SetPlayerProgeny(i, def.progenys[i]);
-            playerIsCPU[i] = def.playerIsCpu[i];
-        }
-
-        CPU_isOn = false;
-        foreach (bool cpu in playerIsCPU)
-        {
-            CPU_isOn |= cpu;
-        }
-
-        gameMode = MatchGameMode.Tutorial;
-        scenarioId = id.Trim();
-        isInit = true;
         return true;
     }
 
     public static void GetMapLoadParameters(out string mapType, out int mapNum, out int versionNum)
     {
         if (gameMode == MatchGameMode.Tutorial
-            && !string.IsNullOrEmpty(scenarioId)
-            && Scenarios.TryGetValue(scenarioId, out ScenarioDefinition def))
+            && !string.IsNullOrEmpty(matchMapType)
+            && matchMapNum > 0)
         {
-            mapType = def.mapType;
-            mapNum = def.mapNum;
-            versionNum = def.mapVersion;
+            mapType = matchMapType;
+            mapNum = matchMapNum;
+            versionNum = matchMapVersion > 0 ? matchMapVersion : 1;
             return;
         }
 
@@ -156,13 +120,11 @@ public static class MatchSettings {
     /// <summary>Resources path without .json, for SequenceManager.</summary>
     public static string GetIntroSequenceResourcePath()
     {
-        if (gameMode != MatchGameMode.Tutorial || string.IsNullOrEmpty(scenarioId))
+        if (gameMode != MatchGameMode.Tutorial || string.IsNullOrWhiteSpace(introSequenceResourcePath))
         {
             return null;
         }
 
-        return Scenarios.TryGetValue(scenarioId, out ScenarioDefinition def)
-            ? def.introSequenceResourcePath
-            : null;
+        return introSequenceResourcePath;
     }
 }

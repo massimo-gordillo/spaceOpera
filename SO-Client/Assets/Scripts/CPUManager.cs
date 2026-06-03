@@ -156,6 +156,8 @@ public class CPUManager : MonoBehaviour
 
     public void Start()
     {
+        if(!GameMaster.CPU_isOn)
+            return;
         StartCoroutine(SetDefaultTargets());
         ImportMatchupWeights();
     }

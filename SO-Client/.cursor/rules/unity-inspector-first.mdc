@@ -34,8 +34,7 @@ alwaysApply: true
 
 ## Avoid new classes unless necessary
 
-- Before adding a class, decide whether Unity features or an **existing** class can own the behavior.
-- **Do not add a new class** without the user's permission — first provide a short justification for why it is needed.
+See **unity-minimize-new-scripts** for the full policy: extend existing `.cs` files first; propose any new class to the user before creating it unless they explicitly requested it.
 - Examples that usually do **not** need a new class: forwarding a click to `SequenceManager` (use `Button.onClick` in the Inspector instead).
 
 ## Examples

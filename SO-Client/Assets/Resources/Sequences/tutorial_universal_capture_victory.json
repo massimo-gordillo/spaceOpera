@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "sequenceId": "tutorial_universal_capture_victory",
   "missionId": "tutorial_curriculum",
-  "description": "1.2 — Victory, capture units, and capturing structures.",
+  "description": "1.2 — Capturing BISMUTH and winning.",
   "steps": [
     {
       "id": "lock",
@@ -11,25 +11,103 @@
       "reason": "tutorial_universal_capture_victory"
     },
     {
-      "id": "dlg_winning",
+      "id": "dlg_bismuth",
       "type": "dialogue",
       "speaker": "Tutorial",
-      "text": "<b>How to win</b>\n\n◦ Each player has a <b>Command Structure</b>.\n◦ Capture the enemy's <b>Command Structure</b> while protecting your own.<page/>◦ Use <b>BISMUTH</b> income to grow an army that can contest the map.",
+      "text": "This is <b>BISMUTH</b>. Capture these nodes to earn income each turn.<page/>Each Progeny has a dedicated capture unit — Ertrians use <b>Infantry</b>.",
       "waitForContinue": true
     },
     {
-      "id": "dlg_capture_units",
+      "id": "guide_infantry",
+      "type": "guideClick",
+      "speaker": "Tutorial",
+      "text": "Select your Infantry.",
+      "target": { "unitId": "p1_infantry" }
+    },
+    {
+      "id": "guide_move_cap",
+      "type": "guideClick",
+      "speaker": "Tutorial",
+      "text": "Move adjacent to the neutral node.",
+      "target": { "x": 4, "y": 5 }
+    },
+    {
+      "id": "guide_capture",
+      "type": "guideClick",
+      "speaker": "Tutorial",
+      "text": "Press <b>Capture</b> to begin claiming the site.",
+      "target": { "uiTarget": "captureButton" }
+    },
+    {
+      "id": "dlg_two_turns",
       "type": "dialogue",
       "speaker": "Tutorial",
-      "text": "<b>Capture units</b>\n\nOnly certain units — <b>capture units</b> — can seize <b>BISMUTH</b> sites and other structures:\n\n◦ <b>Ertrian</b> Infantry\n◦ <b>Virix</b> Spore\n◦ <b>Sentus</b> Blacksmith<page/>Bring the right unit to the objective.",
+      "text": "Nice work. Most resource sites take <b>two turns</b> to fully capture.",
       "waitForContinue": true
     },
     {
-      "id": "dlg_capturing",
+      "id": "dlg_recapture",
       "type": "dialogue",
       "speaker": "Tutorial",
-      "text": "<b>Capturing structures</b>\n\n◦ Move a <b>capture unit</b> onto a structure and start capture.\n◦ Structures have <b>200 HP</b> while contested.<page/>◦ At full health, completing a capture takes <b>two turns</b> — pressure your opponent before they stabilize the line.",
+      "text": "Your opponent already holds this node. Let's take it back.",
       "waitForContinue": true
+    },
+    {
+      "id": "guide_infantry_2",
+      "type": "guideClick",
+      "target": { "unitId": "p1_infantry" }
+    },
+    {
+      "id": "guide_move_cap_2",
+      "type": "guideClick",
+      "target": { "x": 6, "y": 4 }
+    },
+    {
+      "id": "guide_capture_2",
+      "type": "guideClick",
+      "target": { "uiTarget": "captureButton" }
+    },
+    {
+      "id": "dlg_finish_next_turn",
+      "type": "dialogue",
+      "speaker": "Tutorial",
+      "text": "End the turn — you'll finish capturing on your next turn.",
+      "waitForContinue": true
+    },
+    {
+      "id": "handoff_capture",
+      "type": "turnHandoff",
+      "endTurnUiTarget": "endTurnButton",
+      "waitMs": 700,
+      "resumePlayer": 1,
+      "textAfter": "Your turn again. Complete the capture."
+    },
+    {
+      "id": "guide_infantry_3",
+      "type": "guideClick",
+      "target": { "unitId": "p1_infantry" }
+    },
+    {
+      "id": "guide_capture_3",
+      "type": "guideClick",
+      "target": { "uiTarget": "captureButton" }
+    },
+    {
+      "id": "dlg_victory",
+      "type": "dialogue",
+      "speaker": "Tutorial",
+      "text": "Lastly, victory: destroy or capture your opponent's <b>command structure</b>.<page/>Secure the BISMUTH economy, then remove their headquarters.",
+      "waitForContinue": true
+    },
+    {
+      "id": "camera_cmd",
+      "type": "cameraMove",
+      "target": { "x": 5, "y": 5 },
+      "durationMs": 500
+    },
+    {
+      "id": "complete",
+      "type": "showTutorialComplete"
     },
     {
       "id": "unlock",

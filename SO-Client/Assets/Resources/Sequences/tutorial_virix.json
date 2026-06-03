@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "sequenceId": "tutorial_virix",
   "missionId": "tutorial_curriculum",
-  "description": "Virix faction — growth on BISMUTH, spores, and swarm tactics.",
+  "description": "Virix — spores, flowers, production on BISMUTH.",
   "steps": [
     {
       "id": "lock",
@@ -11,32 +11,80 @@
       "reason": "tutorial_virix"
     },
     {
-      "id": "dlg_production_bismuth",
+      "id": "dlg_welcome",
       "type": "dialogue",
       "speaker": "Tutorial",
-      "text": "<b>Production on BISMUTH</b>\n\n◦ Virix do not rely on a separate factory line like Ertrians.<page/>◦ You may create units on <b>any owned BISMUTH tile</b> — income nodes double as incubators.<page/>Spread across the lattice and strike from unexpected angles.",
+      "text": "Welcome to the <b>Virix</b> tutorial. The hive thrives where <b>BISMUTH</b> burns hottest.",
       "waitForContinue": true
     },
     {
-      "id": "dlg_spores",
+      "id": "dlg_spore",
       "type": "dialogue",
       "speaker": "Tutorial",
-      "text": "<b>Virix Spores</b>\n\n◦ Spores are <b>flying</b> capture units — terrain does not slow them.\n◦ They <b>cannot attack</b>; they exist to slip past defenders.<page/>◦ To seize a structure, a Spore <b>sacrifices itself</b> — commit only when the capture is worth the trade.",
+      "text": "The <b>Spore</b> captures sites. It is fragile and cannot attack, but flies over terrain.",
       "waitForContinue": true
     },
     {
-      "id": "dlg_growth_economy",
+      "id": "camera_spore",
+      "type": "cameraFocus",
+      "target": { "unitId": "p1_spore" },
+      "durationMs": 400
+    },
+    {
+      "id": "guide_spore",
+      "type": "guideClick",
+      "target": { "unitId": "p1_spore" }
+    },
+    {
+      "id": "guide_capture",
+      "type": "guideClick",
+      "target": { "uiTarget": "captureButton" }
+    },
+    {
+      "id": "dlg_seed",
       "type": "dialogue",
       "speaker": "Tutorial",
-      "text": "<b>Growth and economy</b>\n\n◦ Virix receive <b>free Spores</b> each turn — your swarm replenishes without spending <b>BISMUTH</b> on every body.<page/>◦ Pair endless bodies with patient timing: sacrifice Spores for high-value structures, not chip damage.",
+      "text": "When a Spore captures a site it becomes a <b>seed</b> that blooms into a flower next turn.",
       "waitForContinue": true
     },
     {
-      "id": "dlg_summary",
+      "id": "handoff_bloom",
+      "type": "turnHandoff",
+      "endTurnUiTarget": "endTurnButton",
+      "waitMs": 800,
+      "resumePlayer": 1,
+      "textAfter": "The flower pollenates the tile and spawns a free Spore each turn."
+    },
+    {
+      "id": "dlg_produce_on_bismuth",
       "type": "dialogue",
       "speaker": "Tutorial",
-      "text": "<b>Summary</b>\n\n<b>Virix</b> weaponize growth: <b>free Spores</b>, production straight from <b>BISMUTH</b>, and relentless pressure through sacrifice captures.",
+      "text": "Stronger Virix units are built <b>on</b> captured BISMUTH. Select your owned node.",
       "waitForContinue": true
+    },
+    {
+      "id": "guide_bismuth",
+      "type": "guideClick",
+      "target": { "unitId": "owned_bismuth" }
+    },
+    {
+      "id": "handoff_cycle",
+      "type": "turnHandoff",
+      "endTurnUiTarget": "endTurnButton",
+      "waitMs": 700,
+      "resumePlayer": 1,
+      "textAfter": "Produce again from the same node when you are ready."
+    },
+    {
+      "id": "dlg_done",
+      "type": "dialogue",
+      "speaker": "Tutorial",
+      "text": "Well done — you understand Virix growth and production.",
+      "waitForContinue": true
+    },
+    {
+      "id": "complete",
+      "type": "showTutorialComplete"
     },
     {
       "id": "unlock",

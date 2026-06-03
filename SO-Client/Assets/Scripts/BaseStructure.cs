@@ -14,6 +14,8 @@ public class BaseStructure : MonoBehaviour
     public GameMaster gameMaster;
     public int captureHealth;
     public int maxCaptureHealth;
+    /// <summary>Optional stable ID for tutorial / sequence targeting (from map .gsdat).</summary>
+    public string sequenceId;
     public TextMeshPro healthTextContainer;
     public GameObject healthCanvas;
     //private Color baseColor;
@@ -400,7 +402,47 @@ public class BaseStructure : MonoBehaviour
 
     public void StaticSpriteHasBeenClicked()
     {
-        gameMaster.StructureHasBeenClicked(this);
+        SequenceManager sequenceManager = ResolveSequenceManager();
+        if (sequenceManager != null && !sequenceManager.TryAcceptGuidedStructureClick(this))
+        {
+            return;
+        }
+
+        GameMaster gm = ResolveGameMaster();
+        if (gm == null)
+        {
+            return;
+        }
+
+        gm.StructureHasBeenClicked(this);
+    }
+
+    SequenceManager ResolveSequenceManager()
+    {
+        GameMaster gm = ResolveGameMaster();
+        return gm != null ? gm.sequenceManager : null;
+    }
+
+    GameMaster ResolveGameMaster()
+    {
+        if (gameMaster != null)
+        {
+            return gameMaster;
+        }
+
+        if (masterGrid != null && masterGrid.gameMaster != null)
+        {
+            gameMaster = masterGrid.gameMaster;
+            return gameMaster;
+        }
+
+        GameObject gmObject = GameObject.FindGameObjectWithTag("GameMasterTag");
+        if (gmObject != null)
+        {
+            gameMaster = gmObject.GetComponent<GameMaster>();
+        }
+
+        return gameMaster;
     }
 
     public void TurnOnCollider()
@@ -457,5 +499,104 @@ public class BaseStructure : MonoBehaviour
         return (masterGrid.WhatUnitIsInThisLocation(pos) != null);
     }
 
+    Coroutine tutorialHighlightCoroutine;
+    const int TutorialHighlightFlashCount = 3;
+    const float TutorialHighlightFlashStepSeconds = 0.1f;
+    const float TutorialHighlightLoopPauseSeconds = 0.7f;
+    static readonly Color TutorialStructureFlashWhite = Color.white;
+    static readonly Color TutorialStructureFlashBlack = Color.black;
 
+    /// <summary>Tutorial sequence: pulse fill white ↔ black via active StaticSprite.SetFillColor.</summary>
+    public void SetTutorialHighlight(bool enabled)
+    {
+        if (enabled)
+        {
+            if (tutorialHighlightCoroutine != null)
+            {
+                return;
+            }
+
+            tutorialHighlightCoroutine = StartCoroutine(TutorialHighlightFillFlashCoroutine());
+        }
+        else
+        {
+            if (tutorialHighlightCoroutine != null)
+            {
+                StopCoroutine(tutorialHighlightCoroutine);
+                tutorialHighlightCoroutine = null;
+            }
+
+            SetCaptureSpritesAndColor();
+        }
+    }
+
+    public bool TryGetActiveFillStaticSprite(out StaticSprite sprite)
+    {
+        sprite = null;
+        if (progeny0CaptureSpriteContainer != null
+            && progeny0CaptureSpriteContainer.gameObject.activeInHierarchy)
+        {
+            sprite = progeny0CaptureSpriteContainer;
+            return true;
+        }
+
+        if (progeny1ProductionCaptureSpriteContainer != null
+            && progeny1ProductionCaptureSpriteContainer.gameObject.activeInHierarchy)
+        {
+            sprite = progeny1ProductionCaptureSpriteContainer;
+            return true;
+        }
+
+        if (progeny1ResourceCaptureSpriteContainer != null
+            && progeny1ResourceCaptureSpriteContainer.gameObject.activeInHierarchy)
+        {
+            sprite = progeny1ResourceCaptureSpriteContainer;
+            return true;
+        }
+
+        if (progeny2ProductionCaptureSpriteContainer != null
+            && progeny2ProductionCaptureSpriteContainer.gameObject.activeInHierarchy)
+        {
+            sprite = progeny2ProductionCaptureSpriteContainer;
+            return true;
+        }
+
+        if (progeny2ResourceCaptureSpriteContainer != null
+            && progeny2ResourceCaptureSpriteContainer.gameObject.activeInHierarchy)
+        {
+            sprite = progeny2ResourceCaptureSpriteContainer;
+            return true;
+        }
+
+        if (neutralSpriteContainer != null)
+        {
+            sprite = neutralSpriteContainer;
+            return true;
+        }
+
+        return false;
+    }
+
+    IEnumerator TutorialHighlightFillFlashCoroutine()
+    {
+        while (true)
+        {
+            if (!TryGetActiveFillStaticSprite(out StaticSprite fillSprite))
+            {
+                tutorialHighlightCoroutine = null;
+                yield break;
+            }
+
+            for (int flash = 0; flash < TutorialHighlightFlashCount; flash++)
+            {
+                fillSprite.SetFillColor(TutorialStructureFlashWhite);
+                yield return new WaitForSeconds(TutorialHighlightFlashStepSeconds);
+                fillSprite.SetFillColor(TutorialStructureFlashBlack);
+                yield return new WaitForSeconds(TutorialHighlightFlashStepSeconds);
+            }
+
+            SetCaptureSpritesAndColor();
+            yield return new WaitForSeconds(TutorialHighlightLoopPauseSeconds);
+        }
+    }
 }

@@ -94,7 +94,7 @@ public class MasterGrid : MonoBehaviour
         }
 
 
-            attackLuckDomain = 10;
+        attackLuckDomain = 10;
         defenceMultiplier = 4.0;
         firebackMultiplier = 0.7;
         //Dictionary<(byte, byte), GamePieceInfo> gameStateDict = ConvertGamePiecesToList();
@@ -2211,6 +2211,34 @@ public class MasterGrid : MonoBehaviour
             print("Out of Bounds in whatUnit");
             return null;
         }
+    }
+
+    /// <summary>Active move/attack overlay square at a cell, if any.</summary>
+    public MovementSquare FindMovementSquareAt(Vector2Int pos)
+    {
+        if (movementSquareList == null)
+        {
+            return null;
+        }
+
+        for (int i = 0; i < movementSquareList.childCount; i++)
+        {
+            MovementSquare square = movementSquareList.GetChild(i).GetComponent<MovementSquare>();
+            if (square == null)
+            {
+                continue;
+            }
+
+            Vector2Int squarePos = new Vector2Int(
+                Mathf.RoundToInt(square.transform.position.x),
+                Mathf.RoundToInt(square.transform.position.y));
+            if (squarePos == pos)
+            {
+                return square;
+            }
+        }
+
+        return null;
     }
 
     public BaseStructure WhatStructureIsInThisLocation(Vector2Int pos)

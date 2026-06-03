@@ -63,6 +63,23 @@ public class SequenceStepDto
 
     // Mission hook
     public string hook;
+
+    // Composite: turnHandoff
+    public bool requirePlayerEndTurn = true;
+    public string endTurnUiTarget;
+    public int waitMs;
+    public int resumePlayer;
+    public string textAfter;
+    public SequenceStepListDto scriptedSteps;
+
+    // Composite: guideClick
+    public bool clearHighlightOnComplete = true;
+}
+
+[Serializable]
+public class SequenceStepListDto
+{
+    public List<SequenceStepDto> steps = new List<SequenceStepDto>();
 }
 
 [Serializable]
@@ -145,6 +162,212 @@ public static class SequenceParser
             }
         }
 
+        return true;
+    }
+}
+
+[Serializable]
+public class SequenceCurriculumManifestDto
+{
+    public int schemaVersion = 1;
+    public string description;
+    public List<SequenceCurriculumTrackDto> tracks = new List<SequenceCurriculumTrackDto>();
+    /// <summary>Scenarios outside the main curriculum chain (e.g. menu-only intro).</summary>
+    public List<SequenceCurriculumTrackDto> extraScenarios = new List<SequenceCurriculumTrackDto>();
+}
+
+[Serializable]
+public class SequenceCurriculumTrackDto
+{
+    public string group;
+    public string title;
+    public string notes;
+    public string sequenceResourcePath;
+    public string scenarioId;
+    public string nextScenarioId;
+    public string mapType;
+    public int mapNum;
+    public int mapVersion = 1;
+    public int[] progenys;
+    public int[] playerIsCpu;
+}
+
+/// <summary>Loads tutorial_curriculum_manifest.json (course order, next lesson, menu copy).</summary>
+public static class SequenceCurriculum
+{
+    const string ManifestResourcePath = "Sequences/tutorial_curriculum_manifest";
+
+    static SequenceCurriculumManifestDto cachedManifest;
+
+    public static bool TryLoad(out SequenceCurriculumManifestDto manifest)
+    {
+        manifest = cachedManifest;
+        if (manifest != null)
+        {
+            return true;
+        }
+
+        TextAsset asset = Resources.Load<TextAsset>(ManifestResourcePath);
+        if (asset == null)
+        {
+            Debug.LogError($"[SequenceCurriculum] Missing manifest at Resources/{ManifestResourcePath}");
+            return false;
+        }
+
+        try
+        {
+            manifest = JsonUtility.FromJson<SequenceCurriculumManifestDto>(asset.text);
+            cachedManifest = manifest;
+            return manifest != null && manifest.tracks != null && manifest.tracks.Count > 0;
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"[SequenceCurriculum] Failed to parse manifest: {ex.Message}");
+            manifest = null;
+            return false;
+        }
+    }
+
+    public static bool TryGetTrackForScenario(string scenarioId, out SequenceCurriculumTrackDto track)
+    {
+        track = null;
+        if (string.IsNullOrWhiteSpace(scenarioId) || !TryLoad(out SequenceCurriculumManifestDto manifest))
+        {
+            return false;
+        }
+
+        return TryFindScenarioInList(manifest.tracks, scenarioId, out track)
+            || TryFindScenarioInList(manifest.extraScenarios, scenarioId, out track);
+    }
+
+    static bool TryFindScenarioInList(
+        List<SequenceCurriculumTrackDto> list,
+        string scenarioId,
+        out SequenceCurriculumTrackDto track)
+    {
+        track = null;
+        if (list == null)
+        {
+            return false;
+        }
+
+        string id = scenarioId.Trim();
+        for (int i = 0; i < list.Count; i++)
+        {
+            SequenceCurriculumTrackDto candidate = list[i];
+            if (candidate != null
+                && !string.IsNullOrWhiteSpace(candidate.scenarioId)
+                && string.Equals(candidate.scenarioId, id, StringComparison.OrdinalIgnoreCase))
+            {
+                track = candidate;
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /// <summary>Applies manifest map/progeny/sequence data into MatchSettings for Game scene load.</summary>
+    /// <param name="sequenceResourcePathOverride">Optional; when set, used instead of manifest sequenceResourcePath.</param>
+    public static bool TryApplyScenarioToMatchSettings(
+        string scenarioId,
+        string sequenceResourcePathOverride,
+        out string error)
+    {
+        error = null;
+        if (string.IsNullOrWhiteSpace(scenarioId))
+        {
+            error = "Scenario id is empty.";
+            return false;
+        }
+
+        if (!TryGetTrackForScenario(scenarioId, out SequenceCurriculumTrackDto track))
+        {
+            error = $"Unknown tutorial scenario '{scenarioId}'.";
+            return false;
+        }
+
+        if (track.progenys == null || track.progenys.Length < 2)
+        {
+            error = $"Scenario '{scenarioId}' is missing progenys[2] in curriculum manifest.";
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(track.mapType) || track.mapNum <= 0)
+        {
+            error = $"Scenario '{scenarioId}' is missing mapType/mapNum in curriculum manifest.";
+            return false;
+        }
+
+        MatchSettings.SetNumPlayers(2);
+        MatchSettings.SetPlayerColours();
+        for (int i = 0; i < MatchSettings.numPlayers; i++)
+        {
+            MatchSettings.SetPlayerProgeny(i, track.progenys[i]);
+            bool isCpu = track.playerIsCpu != null
+                && i < track.playerIsCpu.Length
+                && track.playerIsCpu[i] != 0;
+            MatchSettings.playerIsCPU[i] = isCpu;
+        }
+
+        MatchSettings.CPU_isOn = false;
+        foreach (bool cpu in MatchSettings.playerIsCPU)
+        {
+            MatchSettings.CPU_isOn |= cpu;
+        }
+
+        string sequencePath = string.IsNullOrWhiteSpace(sequenceResourcePathOverride)
+            ? track.sequenceResourcePath
+            : sequenceResourcePathOverride.Trim();
+        if (string.IsNullOrWhiteSpace(sequencePath))
+        {
+            error = $"Scenario '{scenarioId}' has no sequenceResourcePath.";
+            return false;
+        }
+
+        MatchSettings.gameMode = MatchSettings.MatchGameMode.Tutorial;
+        MatchSettings.scenarioId = scenarioId.Trim();
+        MatchSettings.introSequenceResourcePath = sequencePath;
+        MatchSettings.matchMapType = track.mapType.Trim();
+        MatchSettings.matchMapNum = track.mapNum;
+        MatchSettings.matchMapVersion = track.mapVersion > 0 ? track.mapVersion : 1;
+        MatchSettings.isInit = true;
+        return true;
+    }
+
+    public static string GetFirstPlayableScenarioId()
+    {
+        if (!TryLoad(out SequenceCurriculumManifestDto manifest))
+        {
+            return "tutorial_universal_intro";
+        }
+
+        for (int i = 0; i < manifest.tracks.Count; i++)
+        {
+            SequenceCurriculumTrackDto track = manifest.tracks[i];
+            if (track != null && !string.IsNullOrWhiteSpace(track.scenarioId))
+            {
+                return track.scenarioId;
+            }
+        }
+
+        return "tutorial_universal_intro";
+    }
+
+    public static bool TryGetNextScenarioId(string scenarioId, out string nextScenarioId)
+    {
+        nextScenarioId = null;
+        if (!TryGetTrackForScenario(scenarioId, out SequenceCurriculumTrackDto track))
+        {
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(track.nextScenarioId))
+        {
+            return false;
+        }
+
+        nextScenarioId = track.nextScenarioId.Trim();
         return true;
     }
 }

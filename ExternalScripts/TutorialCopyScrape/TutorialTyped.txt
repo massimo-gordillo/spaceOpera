@@ -1,0 +1,168 @@
+Introduction:
+Hello
+Goal is to capture bismuth
+Grid of squares
+Intro to the 3 factions
+
+*Movement and Attacking Tutorial*
+Camera Focus: Friendly Unit
+Highlight Target: Friendly Unit
+Require Click: Friendly Unit
+Dialog: Blue squares you can move to, red squares are units that are in range to attack this turn. Most units can move once and attack once in a single turn. Most units need to be adjacent to units they want to attack.
+Highlight Target: Movesquare
+Require Click: Movesquare
+Highlight Target: Enemy Combat Tooltip
+Highlight Target: Attack Button
+Require Click: Attack Button
+Highlight Target: Enemy Unit
+Require Click: Enemy Unit
+Highlight Target: End Turn Button
+Require Click: End Turn Button, now player 2's turn
+Move Unit: Enemy Unit, move into forest area
+End Turn: Now player 1's turn
+Dialog: Let's destroy the enemy unit
+Highlight Target: Friendly Unit
+Require Click: Friendly Unit
+Highlight Target: Movesquare
+Require Click: Movesquare
+Highlight Target: Enemy Combat Tooltip
+Dialog: Point out additional defense info
+Highlight Target: Attack Button
+Require Click: Attack Button
+Highlight Target: Enemy Unit
+Require Click: Enemy Unit
+Dialog: Explain that the unit died
+Dialog: Those are the basics of combat
+
+*Capturing Tutorial*
+Dialog: This is bismuth, you need to capture the locations to gain $. Each faction has a different unit that can capture locations. The Ertrian's is the Infantry.
+Highlight Target: Friendly Infantry
+Require Click: Friendly Infantry
+Highlight Target: Movesquare
+Require Click: Movesquare
+Highlight Target: Capture Button
+Require Click: Capture Button
+Dialog: Nice job. It typically takes 2 turns to capture a resource location.
+Dialog: Looks like your opp has already captured this location. Let's capture it back.
+Highlight Target: Friendly Infantry
+Require Click: Friendly Infantry
+Highlight Target: Movesquare
+Require Click: Movesquare
+Highlight Target: Capture Button
+Require Click: Capture Button
+Dialog: Ok let's end the turn and finish capturing next turn
+Highlight Target: End Turn Button
+Require Click: End Turn Button, now player 2's turn
+Wait
+End Turn: Now player 1's turn
+Highlight Target: Friendly Infantry
+Require Click: Friendly Infantry
+Highlight Target: Capture Button
+Require Click: Capture Button
+Dialog: Nice job. Lastly let's talk about winning the game
+Camera Move: command structures section
+Dialog: These are the command structures for each progeny. Capture your opponent's to win the game.
+
+*Ertrian Tutorial*
+Dialog: Welcome to the Ertrian tutorial. Here you will learn about production.
+Dialog: At the beginning of each turn your structures earn Bismuth for you to spend you build your army. Ertrians gain 10% bonus income over the other factions.
+Highlight Target: Resource Info Panel
+Wait
+Camera Move: To Factory and Airport
+Dialog: Ertrians have two different production structures, the Factory and Airport. Let's produce a factory unit.
+Highlight Target: Factory
+Require Click: Factory
+Highlight Target: Produce Tank
+Require Click: Produce Tank
+Dialog: Nice job. At the beginning of the next turn, the tank will be available to move and attack.
+Dialog: Let's produce an air unit.
+Highlight Target: Airport
+Require Click: Produce Helicopter
+Dialog: Nice job. The airport produces flying units. They ignore terrain restrictions but are still blocked by enemy units.
+Highlight Target: End Turn Button
+Require Click: End Turn Button, now player 2's turn
+Wait
+End Turn: Now player 1's turn
+Dialog: Move your tank so you can produce another factory unit
+Require Click: Tank
+Highlight Target: Movesquare
+Require Click: Movesquare
+Highlight Target: Factory
+Require Click: Factory
+Highlight Target: Produce Artillery
+Require Click: Produce Artillery
+Highlight Target: End Turn Button
+Require Click: End Turn Button, now player 2's turn
+Move Unit: Move enemy tank 2 squares above artillery
+End Turn: Now player 1's turn
+Dialog: Your artillery can attack that enemy tank with a ranged attack
+Highlight Target: Artillery
+Require Click: Artillery
+Highlight Target: Attack Button
+Require Click: Attack Button
+Highlight Target: Enemy Unit
+Require Click: Enemy Unit
+Camera Move: Command Structure
+Dialog: Nice job. You've learnt about the human Ertrian faction.
+
+*Virix Tutorial*
+Dialog: Welcome to the Virix tutorial. The Virix are an organic hivemind with a special relationship to Bismuth.
+Dialog: The Virix's capture unit is The Spore
+Camera Move: Friendly Spore
+Dialog: The spore is very weak and cannot attack, but can fly over terrain. Let's capture this factory location
+Highlight Target: Friendly Spore
+Require Click: Friendly Spore
+Highlight Target: Capture Button
+Require Click: Capture Button
+Dialog: When a Virix Spore captures a location, it morphs into a seed which will bloom into a beautiful plant next turn.
+Highlight Target: End Turn Button
+Require Click: End Turn Button, now player 2's turn
+Wait
+End Turn: Now player 1's turn
+Dialog: This factory has been converted into a pollenating flower. This flower will produce a free spore every turn. Captured airports are also turned into flowers.
+Dialog: To produce stronger units, the Virix produce units ON captured Bismuth locations. Click on this bismuth location you've already captured.
+Highlight: Captured Location
+Require Click: Captured Location
+Highlight Target: Produce Venus
+Require Click: Produce Venus
+Highlight Target: End Turn Button
+Require Click: End Turn Button, now player 2's turn
+Wait
+End Turn: Now player 1's turn
+Highlight Target: Venus
+Require Click: Venus
+Highlight Target: Movesquare
+Require Click: Movesquare
+Highlight: Captured Location
+Require Click: Captured Location
+Highlight Target: Produce Wasp
+Require Click: Produce Wasp
+Dialog: Well done, you've learned the special rules for the Virix.
+
+*Sentus Tutorial*
+Dialog: Welcome to the Sentus tutorial. The Sentus are all part of a religious kingdom: they gain strength when close to Bismuth.
+Camera Move: Friendly Blacksmith
+Dialog: This is the Blacksmith, it is the Sentus unit which captures structures. It has very high defense, but cannot attack air units.
+Highlight Target: Movesquare
+Dialog: When moving a Sentus unit, the additional defense value is displayed in the movement squares. The maximum additional defense value is 3. Stay close to Bismuth to sway the battle in your favour.
+Camera Move: Portal
+Dialog: This is the Sentus production structure. You can create all Sentus units at this structure.
+Highlight: Production Location
+Require Click: Production Location
+Highlight Target: Produce Horseman
+Require Click: Produce Horseman
+Dialog: Well done! You've learned all you need to play Tactica: A Space Opera. Good luck!
+
+
+
+
+
+
+
+
+
+
+
+
+
+

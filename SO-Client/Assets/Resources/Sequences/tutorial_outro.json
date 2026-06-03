@@ -14,8 +14,12 @@
       "id": "dlg_ready",
       "type": "dialogue",
       "speaker": "Tutorial",
-      "text": "<b>Ready for combat</b>\n\n◦ You have the universal toolkit and each Progeny's identity.\n◦ Capture <b>BISMUTH</b>, outthink your opponent, and claim the sector.<page/>Go forth — the frontier waits.",
+      "text": "<b>Ready for combat</b><page/>◦ You have the universal toolkit and each Progeny's identity.<page/>◦ Capture <b>BISMUTH</b>, outthink your opponent, and claim the sector.<page/>Go forth — the frontier waits.",
       "waitForContinue": true
+    },
+    {
+      "id": "complete",
+      "type": "showTutorialComplete"
     },
     {
       "id": "unlock",

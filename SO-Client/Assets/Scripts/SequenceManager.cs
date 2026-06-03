@@ -2,9 +2,16 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 using TMPro;
 
+/// <summary>
+/// Owns sequence execution, tutorial curriculum progression, and completion UI.
+/// Game scene: configured via <see cref="MatchSettings"/>; menu passes scenario id only.
+/// </summary>
+[DefaultExecutionOrder(-200)]
 public class SequenceManager : MonoBehaviour
 {
     [Header("Manager References")]
@@ -35,15 +42,51 @@ public class SequenceManager : MonoBehaviour
     public string introSequenceResourcePath;
     public string outroSequenceResourcePath;
 
+    [Header("Tutorial — full curriculum playtest")]
+    [Tooltip("Play from Game scene without Menu: start first lesson and auto-advance.")]
+    public bool autoRunFullCurriculum = true;
+    [Tooltip("Seconds after lesson complete before loading next (0 = next frame).")]
+    public float autoAdvanceDelaySeconds = 0.35f;
+
+    [Header("Tutorial — guideClick UI gate (Inspector)")]
+    [Tooltip("UIMaster/PriorityUIElements — stays clickable during guideClick waits.")]
+    public Transform priorityUiRoot;
+    [Tooltip("Typically UIMaster — all other Selectables here are disabled except the guide target.")]
+    public Transform uiGateScanRoot;
+
+    [Header("Tutorial — completion UI (Inspector)")]
+    [Tooltip("Panel under SequenceGlobalCanvas. Wire Next → OnNextLessonClicked, Back → OnBackToTutorialsClicked.")]
+    public GameObject completionPanel;
+    public Button nextLessonButton;
+    public Button backToTutorialsButton;
+    public TMP_Text completionTitleText;
+
+    bool completionPanelVisible;
+
     private readonly Dictionary<string, BaseUnit> unitRefs = new Dictionary<string, BaseUnit>();
+    private readonly Dictionary<string, BaseStructure> structureRefs = new Dictionary<string, BaseStructure>();
     private readonly HashSet<string> highlightedUiTargets = new HashSet<string>();
+    private readonly HashSet<BaseUnit> highlightedUnits = new HashSet<BaseUnit>();
+    private readonly HashSet<BaseStructure> highlightedStructures = new HashSet<BaseStructure>();
+    private readonly HashSet<MovementSquare> highlightedMovementSquares = new HashSet<MovementSquare>();
+    private Vector2Int? highlightedTilePos;
     private bool isRunningSequence;
     private bool inputLocked;
-    private bool waitingForWorldClick;
-    private bool worldClickSatisfied;
-    private TargetDto expectedWorldClickTarget;
-    private Vector2Int lastWorldClickPos;
-    private bool hasLastWorldClickPos;
+    private bool waitingForGameplayClick;
+    private bool gameplayClickSatisfied;
+    private GameplayClickExpectation expectedGameplayClick;
+    private TargetDto pendingGuideHighlightTarget;
+    private int pendingGuideHighlightStepIndex = -1;
+    private bool guideClickHintHighlightActive;
+    private bool guidedClickGateActive;
+
+    struct SavedSelectableState
+    {
+        public Selectable selectable;
+        public bool interactable;
+    }
+
+    readonly List<SavedSelectableState> gatedSelectableStates = new List<SavedSelectableState>();
 
     private Graphic dialogArrowGraphicOptional;
     private bool dialogUiInfrastructureReady;
@@ -57,10 +100,27 @@ public class SequenceManager : MonoBehaviour
     /// <summary>Player chose Skip dialog — exits the remainder of the current sequence cleanly.</summary>
     private bool sequenceSkippedRequested;
 
-    /// <remarks>Includes tutorial input lock plus dialogue Continue lock.</remarks>
+    /// <remarks>Dialogue continue blocks all input; guided clicks allow world pickers through CameraManager.</remarks>
     public bool SuppressNonDialogueGameplayInput()
     {
-        return inputLocked || waitingForDialogContinue;
+        if (waitingForDialogContinue)
+        {
+            return true;
+        }
+
+        if (waitingForGameplayClick)
+        {
+            return false;
+        }
+
+        return inputLocked;
+    }
+
+    private sealed class GameplayClickExpectation
+    {
+        public BaseUnit unit;
+        public BaseStructure structure;
+        public ClickableObject clickable;
     }
 
     public bool IsInputLocked()
@@ -70,7 +130,56 @@ public class SequenceManager : MonoBehaviour
 
     void Awake()
     {
+        if (gameMaster != null)
+        {
+            gameMaster.HideChoicePanel();
+        }
+
+        if (completionPanel != null)
+        {
+            completionPanel.SetActive(false);
+            completionPanelVisible = false;
+        }
+
         PrepareDialogInfrastructure();
+        BootstrapMatchSettingsIfNeeded();
+    }
+
+    /// <summary>Call from GameMaster.Start after map load — runs intro sequence from MatchSettings.</summary>
+    public void BeginFromMatchSettings()
+    {
+        if (MatchSettings.gameMode != MatchSettings.MatchGameMode.Tutorial)
+        {
+            return;
+        }
+
+        string path = MatchSettings.GetIntroSequenceResourcePath();
+        if (string.IsNullOrWhiteSpace(path))
+        {
+            Debug.LogWarning("[SequenceManager] Tutorial mode but no intro sequence path.");
+            return;
+        }
+
+        introSequenceResourcePath = path;
+        runIntroOnStart = true;
+        TryRunIntroSequence();
+    }
+
+    void BootstrapMatchSettingsIfNeeded()
+    {
+        if (!autoRunFullCurriculum || MatchSettings.isInit)
+        {
+            return;
+        }
+
+        string firstId = SequenceCurriculum.GetFirstPlayableScenarioId();
+        if (!MatchSettings.ApplyTutorialMatch(firstId))
+        {
+            Debug.LogError("[SequenceManager] autoRunFullCurriculum: could not apply first scenario.");
+            return;
+        }
+
+        Debug.Log($"[SequenceManager] autoRunFullCurriculum: starting at '{firstId}'.");
     }
 
     /// <summary>Wire from SequenceDialogFullscreenTapReceiver Button On Click in the Inspector.</summary>
@@ -105,20 +214,94 @@ public class SequenceManager : MonoBehaviour
         yield return RunSequenceFromResources(outroSequenceResourcePath, onComplete);
     }
 
-    public void NotifyWorldObjectClicked(Vector2Int pos, ClickableObject clickedObject)
+    /// <summary>Called from <see cref="BaseUnit.StaticSpriteHasBeenClicked"/> when the player selects a unit.</summary>
+    /// <summary>Returns true when gameplay should process the click (unit move, structure select, etc.).</summary>
+    public bool TryAcceptGuidedUnitClick(BaseUnit unit)
     {
-        hasLastWorldClickPos = true;
-        lastWorldClickPos = pos;
+        if (unit == null)
+        {
+            return false;
+        }
 
-        if (!waitingForWorldClick || expectedWorldClickTarget == null)
+        if (!guidedClickGateActive)
+        {
+            return true;
+        }
+
+        if (waitingForGameplayClick
+            && expectedGameplayClick != null
+            && expectedGameplayClick.unit != null
+            && ReferenceEquals(expectedGameplayClick.unit, unit))
+        {
+            gameplayClickSatisfied = true;
+            return true;
+        }
+
+        TryStartGuideClickHintHighlight();
+        return false;
+    }
+
+    /// <summary>Returns true when gameplay should process the structure click.</summary>
+    public bool TryAcceptGuidedStructureClick(BaseStructure structure)
+    {
+        if (structure == null)
+        {
+            return false;
+        }
+
+        if (!guidedClickGateActive)
+        {
+            return true;
+        }
+
+        if (waitingForGameplayClick
+            && expectedGameplayClick != null
+            && expectedGameplayClick.structure != null
+            && ReferenceEquals(expectedGameplayClick.structure, structure))
+        {
+            gameplayClickSatisfied = true;
+            return true;
+        }
+
+        TryStartGuideClickHintHighlight();
+        return false;
+    }
+
+    /// <summary>Returns true when gameplay should process the clickable (e.g. movement square).</summary>
+    public bool TryAcceptGuidedClickableClick(ClickableObject clickable)
+    {
+        if (clickable == null)
+        {
+            return false;
+        }
+
+        if (!guidedClickGateActive)
+        {
+            return true;
+        }
+
+        if (waitingForGameplayClick
+            && expectedGameplayClick != null
+            && expectedGameplayClick.clickable != null
+            && ReferenceEquals(expectedGameplayClick.clickable, clickable))
+        {
+            gameplayClickSatisfied = true;
+            return true;
+        }
+
+        TryStartGuideClickHintHighlight();
+        return false;
+    }
+
+    /// <summary>World tap with no clickable while guideClick gate is active.</summary>
+    public void NotifyWrongGameplayWorldClick()
+    {
+        if (!guidedClickGateActive)
         {
             return;
         }
 
-        if (TargetMatchesPosition(expectedWorldClickTarget, pos))
-        {
-            worldClickSatisfied = true;
-        }
+        TryStartGuideClickHintHighlight();
     }
 
     private IEnumerator RunSequenceFromResources(string resourcePath, Action onComplete)
@@ -177,7 +360,7 @@ public class SequenceManager : MonoBehaviour
             {
                 if (TryResolveTargetPosition(step.target, out Vector2Int focusPos))
                 {
-                    cameraManager.SetPosition(focusPos);
+                    cameraManager.SetPosition(focusPos, 1.0f);
                 }
                 else
                 {
@@ -192,7 +375,7 @@ public class SequenceManager : MonoBehaviour
             {
                 if (TryResolveTargetPosition(step.target, out Vector2Int movePos) || TryResolveTargetPosition(step.to, out movePos))
                 {
-                    cameraManager.SetPosition(movePos);
+                    cameraManager.SetPosition(movePos, 1.0f);
                 }
                 else
                 {
@@ -226,7 +409,7 @@ public class SequenceManager : MonoBehaviour
                 break;
 
             case "requireClick":
-                yield return WaitForWorldClick(stepIndex, step.target, step.timeoutMs);
+                yield return WaitForGameplayClick(stepIndex, step.target, step.timeoutMs);
                 break;
 
             case "setUiInteractable":
@@ -243,7 +426,7 @@ public class SequenceManager : MonoBehaviour
                 break;
 
             case "highlightTarget":
-                ApplyHighlight(stepIndex, step.target, true);
+                ApplyHighlightForTarget(stepIndex, step.target, true);
                 break;
 
             case "showTutorialHint":
@@ -258,9 +441,387 @@ public class SequenceManager : MonoBehaviour
                 Debug.Log($"[SequenceManager] missionHook={step.hook}");
                 break;
 
+            case "guideClick":
+                yield return ExecuteGuideClick(sequenceId, stepIndex, step);
+                break;
+
+            case "turnHandoff":
+                yield return ExecuteTurnHandoff(sequenceId, stepIndex, step);
+                break;
+
+            case "advanceTurn":
+                yield return ExecuteAdvanceTurn(stepIndex, step);
+                break;
+
+            case "showTutorialComplete":
+                ShowTutorialComplete();
+                break;
+
             default:
                 LogStepError(stepIndex, $"Unsupported step type '{stepType}'.");
                 break;
+        }
+    }
+
+    public void PrepareForTutorialRestart()
+    {
+        sequenceSkippedRequested = true;
+        StopAllCoroutines();
+        ClearAllHighlights();
+        unitRefs.Clear();
+        structureRefs.Clear();
+        waitingForGameplayClick = false;
+        expectedGameplayClick = null;
+        gameplayClickSatisfied = false;
+        pendingGuideHighlightTarget = null;
+        pendingGuideHighlightStepIndex = -1;
+        guideClickHintHighlightActive = false;
+        EndGuidedClickGate();
+        waitingForDialogContinue = false;
+        isRunningSequence = false;
+        inputLocked = false;
+    }
+
+    private void ShowTutorialComplete()
+    {
+        HandleSequenceComplete();
+    }
+
+    void HandleSequenceComplete()
+    {
+        bool hasNext = SequenceCurriculum.TryGetNextScenarioId(MatchSettings.scenarioId, out string nextId);
+
+        if (autoRunFullCurriculum)
+        {
+            if (hasNext)
+            {
+                Debug.Log($"[SequenceManager] autoRunFullCurriculum: advancing to '{nextId}'.");
+                StartCoroutine(AutoAdvanceToNextLesson());
+            }
+            else
+            {
+                Debug.Log("[SequenceManager] autoRunFullCurriculum: curriculum finished.");
+                HideCompletionPanel();
+            }
+
+            return;
+        }
+
+        if (completionPanel == null)
+        {
+            Debug.LogWarning("[SequenceManager] completionPanel not assigned.");
+            return;
+        }
+
+        if (completionTitleText != null
+            && SequenceCurriculum.TryGetTrackForScenario(MatchSettings.scenarioId, out SequenceCurriculumTrackDto track))
+        {
+            completionTitleText.text = string.IsNullOrWhiteSpace(track.title) ? "Lesson complete" : track.title;
+        }
+
+        if (nextLessonButton != null)
+        {
+            nextLessonButton.gameObject.SetActive(hasNext);
+            nextLessonButton.interactable = hasNext;
+        }
+
+        completionPanel.SetActive(true);
+        completionPanelVisible = true;
+        if (sequenceGlobalCanvas != null)
+        {
+            sequenceGlobalCanvas.SetActive(true);
+        }
+    }
+
+    IEnumerator AutoAdvanceToNextLesson()
+    {
+        HideCompletionPanel();
+
+        if (autoAdvanceDelaySeconds > 0f)
+        {
+            yield return new WaitForSeconds(autoAdvanceDelaySeconds);
+        }
+        else
+        {
+            yield return null;
+        }
+
+        OnNextLessonClicked();
+    }
+
+    public void HideCompletionPanel()
+    {
+        completionPanelVisible = false;
+        if (completionPanel != null)
+        {
+            completionPanel.SetActive(false);
+        }
+    }
+
+    /// <summary>Wire Next Lesson button On Click in Inspector.</summary>
+    public void OnNextLessonClicked()
+    {
+        if (!SequenceCurriculum.TryGetNextScenarioId(MatchSettings.scenarioId, out string nextScenarioId))
+        {
+            return;
+        }
+
+        HideCompletionPanel();
+        if (gameMaster != null)
+        {
+            gameMaster.StartCoroutine(gameMaster.RestartTutorialScenario(nextScenarioId));
+        }
+    }
+
+    /// <summary>Wire Back to Tutorials button On Click in Inspector.</summary>
+    public void OnBackToTutorialsClicked()
+    {
+        HideCompletionPanel();
+        MatchSettings.openTutorialMenuOnLoad = true;
+        if (gameMaster != null)
+        {
+            gameMaster.LoadMainMenuScreen();
+        }
+    }
+
+    private IEnumerator ExecuteGuideClick(string sequenceId, int stepIndex, SequenceStepDto step)
+    {
+        if (!string.IsNullOrWhiteSpace(step.text))
+        {
+            yield return PresentDialogueStep(sequenceId, stepIndex, step);
+        }
+
+        TargetDto target = step.target;
+        if (target == null)
+        {
+            LogStepError(stepIndex, "guideClick missing target.");
+            yield break;
+        }
+
+        BeginGuidedClickGate(target);
+
+        if (!string.IsNullOrWhiteSpace(target.uiTarget))
+        {
+            yield return WaitForUiClick(
+                stepIndex,
+                target.uiTarget,
+                step.timeoutMs,
+                target,
+                step.clearHighlightOnComplete);
+        }
+        else
+        {
+            yield return WaitForGameplayClick(
+                stepIndex,
+                target,
+                step.timeoutMs,
+                step.clearHighlightOnComplete);
+        }
+
+        EndGuidedClickGate();
+    }
+
+    private IEnumerator ExecuteTurnHandoff(string sequenceId, int stepIndex, SequenceStepDto step)
+    {
+        if (!string.IsNullOrWhiteSpace(step.text))
+        {
+            yield return PresentDialogueStep(sequenceId, stepIndex, step);
+        }
+
+        if (step.requirePlayerEndTurn)
+        {
+            string endTurnKey = string.IsNullOrWhiteSpace(step.endTurnUiTarget) ? "endTurnButton" : step.endTurnUiTarget;
+            TargetDto endTurnTarget = new TargetDto { uiTarget = endTurnKey };
+
+            if (!string.IsNullOrWhiteSpace(step.speaker) && string.IsNullOrWhiteSpace(step.text))
+            {
+                // text already shown above
+            }
+
+            BeginGuidedClickGate(endTurnTarget);
+            yield return WaitForUiClick(stepIndex, endTurnKey, step.timeoutMs, endTurnTarget, true);
+            EndGuidedClickGate();
+
+            gameMaster.endTurnConfirmCard.SetActive(false);
+            if (GameMaster.playerTurn == 1)
+            {
+                gameMaster.InitiateEndTurn();
+            }
+        }
+
+        yield return WaitForDurationMs(step.waitMs > 0 ? step.waitMs : 600);
+
+        if (step.scriptedSteps != null && step.scriptedSteps.steps != null)
+        {
+            for (int i = 0; i < step.scriptedSteps.steps.Count; i++)
+            {
+                SequenceStepDto nested = step.scriptedSteps.steps[i];
+                if (nested != null)
+                {
+                    yield return ExecuteStep(sequenceId, stepIndex, nested);
+                }
+            }
+        }
+
+        if (step.resumePlayer > 0)
+        {
+            SequenceStepDto advance = new SequenceStepDto
+            {
+                type = "advanceTurn",
+                resumePlayer = step.resumePlayer
+            };
+            yield return ExecuteAdvanceTurn(stepIndex, advance);
+        }
+
+        if (!string.IsNullOrWhiteSpace(step.textAfter))
+        {
+            SequenceStepDto afterDlg = new SequenceStepDto
+            {
+                type = "dialogue",
+                speaker = step.speaker,
+                text = step.textAfter,
+                waitForContinue = true
+            };
+            yield return PresentDialogueStep(sequenceId, stepIndex, afterDlg);
+        }
+    }
+
+    private IEnumerator ExecuteAdvanceTurn(int stepIndex, SequenceStepDto step)
+    {
+        int targetPlayer = step.resumePlayer > 0 ? step.resumePlayer : 1;
+        int safety = 0;
+        while (GameMaster.playerTurn != targetPlayer && safety < 12)
+        {
+            gameMaster.endTurnConfirmCard.SetActive(false);
+            gameMaster.InitiateEndTurn();
+            safety++;
+            yield return null;
+            yield return new WaitForSeconds(0.25f);
+        }
+
+        if (GameMaster.playerTurn != targetPlayer)
+        {
+            LogStepError(stepIndex, $"advanceTurn could not reach player {targetPlayer} (current {GameMaster.playerTurn}).");
+        }
+    }
+
+    void BeginGuidedClickGate(TargetDto target)
+    {
+        EndGuidedClickGate();
+        guidedClickGateActive = true;
+
+        string allowedUiKey = target != null ? target.uiTarget : null;
+        Selectable allowedSelectable = null;
+        if (!string.IsNullOrWhiteSpace(allowedUiKey) && uiBindings != null)
+        {
+            uiBindings.TryGetSelectable(allowedUiKey, out allowedSelectable);
+        }
+
+        if (uiGateScanRoot != null)
+        {
+            Selectable[] selectables = uiGateScanRoot.GetComponentsInChildren<Selectable>(true);
+            for (int i = 0; i < selectables.Length; i++)
+            {
+                Selectable selectable = selectables[i];
+                if (selectable == null)
+                {
+                    continue;
+                }
+
+                if (IsUnderTransform(selectable.transform, priorityUiRoot))
+                {
+                    continue;
+                }
+
+                if (allowedSelectable != null && selectable == allowedSelectable)
+                {
+                    selectable.interactable = true;
+                    continue;
+                }
+
+                gatedSelectableStates.Add(new SavedSelectableState
+                {
+                    selectable = selectable,
+                    interactable = selectable.interactable
+                });
+                selectable.interactable = false;
+            }
+        }
+        else if (uiBindings != null)
+        {
+            DisableBoundSelectablesExcept(allowedSelectable);
+        }
+
+        if (allowedSelectable != null && !IsUnderTransform(allowedSelectable.transform, uiGateScanRoot))
+        {
+            allowedSelectable.interactable = true;
+        }
+
+        if (!string.IsNullOrWhiteSpace(allowedUiKey)
+            && allowedUiKey == "endTurnButton"
+            && gameMaster.endTurnButton != null)
+        {
+            gameMaster.endTurnButton.interactable = true;
+        }
+    }
+
+    void EndGuidedClickGate()
+    {
+        guidedClickGateActive = false;
+
+        for (int i = 0; i < gatedSelectableStates.Count; i++)
+        {
+            SavedSelectableState saved = gatedSelectableStates[i];
+            if (saved.selectable != null)
+            {
+                saved.selectable.interactable = saved.interactable;
+            }
+        }
+
+        gatedSelectableStates.Clear();
+    }
+
+    static bool IsUnderTransform(Transform child, Transform ancestor)
+    {
+        if (child == null || ancestor == null)
+        {
+            return false;
+        }
+
+        return child == ancestor || child.IsChildOf(ancestor);
+    }
+
+    void DisableBoundSelectablesExcept(Selectable allowedSelectable)
+    {
+        if (uiBindings == null)
+        {
+            return;
+        }
+
+        string[] keys =
+        {
+            "endTurnButton", "attackButton", "captureButton", "undoButton", "exitButton"
+        };
+
+        for (int i = 0; i < keys.Length; i++)
+        {
+            if (!uiBindings.TryGetSelectable(keys[i], out Selectable selectable) || selectable == null)
+            {
+                continue;
+            }
+
+            if (allowedSelectable != null && selectable == allowedSelectable)
+            {
+                selectable.interactable = true;
+                continue;
+            }
+
+            gatedSelectableStates.Add(new SavedSelectableState
+            {
+                selectable = selectable,
+                interactable = selectable.interactable
+            });
+            selectable.interactable = false;
         }
     }
 
@@ -543,6 +1104,7 @@ public class SequenceManager : MonoBehaviour
 
         if (!string.IsNullOrWhiteSpace(step.unitId))
         {
+            unit.sequenceId = step.unitId;
             unitRefs[step.unitId] = unit;
         }
     }
@@ -611,7 +1173,11 @@ public class SequenceManager : MonoBehaviour
         Debug.Log($"[SequenceManager] Input lock set to {locked}. reason='{reason}'");
     }
 
-    private IEnumerator WaitForWorldClick(int stepIndex, TargetDto expectedTarget, int timeoutMs)
+    private IEnumerator WaitForGameplayClick(
+        int stepIndex,
+        TargetDto expectedTarget,
+        int timeoutMs,
+        bool clearHintWhenDone = true)
     {
         if (expectedTarget == null)
         {
@@ -619,14 +1185,27 @@ public class SequenceManager : MonoBehaviour
             yield break;
         }
 
-        expectedWorldClickTarget = expectedTarget;
-        waitingForWorldClick = true;
-        worldClickSatisfied = false;
+        if (!TryResolveGameplayClickExpectation(stepIndex, expectedTarget, out GameplayClickExpectation expectation))
+        {
+            yield break;
+        }
+
+        if (!guidedClickGateActive)
+        {
+            BeginGuidedClickGate(expectedTarget);
+        }
+
+        expectedGameplayClick = expectation;
+        waitingForGameplayClick = true;
+        gameplayClickSatisfied = false;
+        pendingGuideHighlightTarget = expectedTarget;
+        pendingGuideHighlightStepIndex = stepIndex;
+        guideClickHintHighlightActive = false;
 
         float timeout = timeoutMs > 0 ? timeoutMs / 1000f : -1f;
         float elapsed = 0f;
 
-        while (!worldClickSatisfied)
+        while (!gameplayClickSatisfied)
         {
             if (timeout > 0f && elapsed >= timeout)
             {
@@ -638,11 +1217,100 @@ public class SequenceManager : MonoBehaviour
             yield return null;
         }
 
-        waitingForWorldClick = false;
-        expectedWorldClickTarget = null;
+        waitingForGameplayClick = false;
+        expectedGameplayClick = null;
+        if (clearHintWhenDone)
+        {
+            ClearGuideClickHintHighlight();
+        }
+
+        pendingGuideHighlightTarget = null;
+        pendingGuideHighlightStepIndex = -1;
     }
 
-    private IEnumerator WaitForUiClick(int stepIndex, string uiTarget, int timeoutMs)
+    void TryStartGuideClickHintHighlight()
+    {
+        if (!guidedClickGateActive || guideClickHintHighlightActive || pendingGuideHighlightTarget == null)
+        {
+            return;
+        }
+
+        guideClickHintHighlightActive = true;
+        ApplyHighlightForTarget(pendingGuideHighlightStepIndex, pendingGuideHighlightTarget, true);
+    }
+
+    void ClearGuideClickHintHighlight()
+    {
+        if (!guideClickHintHighlightActive || pendingGuideHighlightTarget == null)
+        {
+            guideClickHintHighlightActive = false;
+            return;
+        }
+
+        ApplyHighlightForTarget(pendingGuideHighlightStepIndex, pendingGuideHighlightTarget, false);
+        guideClickHintHighlightActive = false;
+    }
+
+    private bool TryResolveGameplayClickExpectation(int stepIndex, TargetDto target, out GameplayClickExpectation expectation)
+    {
+        expectation = new GameplayClickExpectation();
+        if (target == null)
+        {
+            LogStepError(stepIndex, "Could not resolve gameplay click target (null).");
+            return false;
+        }
+
+        if (!string.IsNullOrWhiteSpace(target.unitId)
+            && TryResolveUnitBySequenceId(target.unitId, out BaseUnit unit))
+        {
+            expectation.unit = unit;
+            return true;
+        }
+
+        if (!string.IsNullOrWhiteSpace(target.structureId)
+            && TryResolveStructureBySequenceId(target.structureId, out BaseStructure structureById))
+        {
+            expectation.structure = structureById;
+            return true;
+        }
+
+        Vector2Int tile = new Vector2Int(target.x, target.y);
+        if (masterGrid != null)
+        {
+            MovementSquare movementSquare = masterGrid.FindMovementSquareAt(tile);
+            if (movementSquare != null)
+            {
+                expectation.clickable = movementSquare;
+                return true;
+            }
+
+            BaseStructure structureAtTile = masterGrid.WhatStructureIsInThisLocation(tile);
+            if (structureAtTile != null)
+            {
+                expectation.structure = structureAtTile;
+                return true;
+            }
+
+            BaseUnit unitAtTile = masterGrid.WhatUnitIsInThisLocation(tile);
+            if (unitAtTile != null)
+            {
+                expectation.unit = unitAtTile;
+                return true;
+            }
+        }
+
+        LogStepError(stepIndex,
+            "Could not resolve gameplay click target to a unit, structure, or movement square. " +
+            "Use unitId/structureId, or a tile with a visible piece or move overlay.");
+        return false;
+    }
+
+    private IEnumerator WaitForUiClick(
+        int stepIndex,
+        string uiTarget,
+        int timeoutMs,
+        TargetDto highlightTarget = null,
+        bool clearHintWhenDone = true)
     {
         if (uiBindings == null)
         {
@@ -667,10 +1335,21 @@ public class SequenceManager : MonoBehaviour
         UnityEngine.Events.UnityAction listener = () => clicked = true;
         button.onClick.AddListener(listener);
 
+        TargetDto guideTarget = highlightTarget ?? new TargetDto { uiTarget = uiTarget };
+        pendingGuideHighlightTarget = guideTarget;
+        pendingGuideHighlightStepIndex = stepIndex;
+        guideClickHintHighlightActive = false;
+
         float timeout = timeoutMs > 0 ? timeoutMs / 1000f : -1f;
         float elapsed = 0f;
         while (!clicked)
         {
+            if (TryGetPointerPressedScreenPosition(out Vector2 pressPosition)
+                && !IsPointerOverUiTarget(button, pressPosition))
+            {
+                TryStartGuideClickHintHighlight();
+            }
+
             if (timeout > 0f && elapsed >= timeout)
             {
                 LogStepError(stepIndex, $"requireUiClick timed out for '{uiTarget}'.");
@@ -682,6 +1361,54 @@ public class SequenceManager : MonoBehaviour
         }
 
         button.onClick.RemoveListener(listener);
+        if (clearHintWhenDone)
+        {
+            ClearGuideClickHintHighlight();
+        }
+
+        pendingGuideHighlightTarget = null;
+        pendingGuideHighlightStepIndex = -1;
+        EndGuidedClickGate();
+    }
+
+    static bool TryGetPointerPressedScreenPosition(out Vector2 screenPosition)
+    {
+        screenPosition = default;
+        if (Touchscreen.current != null && Touchscreen.current.primaryTouch.press.wasPressedThisFrame)
+        {
+            screenPosition = Touchscreen.current.primaryTouch.position.ReadValue();
+            return true;
+        }
+
+        if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame)
+        {
+            screenPosition = Mouse.current.position.ReadValue();
+            return true;
+        }
+
+        return false;
+    }
+
+    static bool IsPointerOverUiTarget(Button targetButton, Vector2 screenPosition)
+    {
+        if (targetButton == null || EventSystem.current == null)
+        {
+            return false;
+        }
+
+        PointerEventData eventData = new PointerEventData(EventSystem.current) { position = screenPosition };
+        var results = new List<RaycastResult>();
+        EventSystem.current.RaycastAll(eventData, results);
+        Transform targetTransform = targetButton.transform;
+        for (int i = 0; i < results.Count; i++)
+        {
+            if (results[i].gameObject != null && results[i].gameObject.transform.IsChildOf(targetTransform))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private void ApplyUiInteractable(int stepIndex, SequenceStepDto step)
@@ -703,23 +1430,83 @@ public class SequenceManager : MonoBehaviour
         uiBindings.SetInteractable(targetSet, enable);
     }
 
-    private void ApplyHighlight(int stepIndex, TargetDto target, bool enabled)
+    private void ApplyHighlightForTarget(int stepIndex, TargetDto target, bool enabled)
     {
-        if (target == null || string.IsNullOrWhiteSpace(target.uiTarget))
+        if (target == null)
         {
-            LogStepError(stepIndex, "highlightTarget currently supports uiTarget only.");
+            LogStepError(stepIndex, "highlightTarget missing target.");
             return;
         }
 
+        if (!string.IsNullOrWhiteSpace(target.uiTarget))
+        {
+            ApplyUiHighlight(stepIndex, target.uiTarget, enabled);
+            return;
+        }
+
+        if (!string.IsNullOrWhiteSpace(target.unitId) && TryResolveUnitBySequenceId(target.unitId, out BaseUnit unit))
+        {
+            ApplyUnitHighlight(unit, enabled);
+            return;
+        }
+
+        if (!string.IsNullOrWhiteSpace(target.structureId)
+            && TryResolveStructureBySequenceId(target.structureId, out BaseStructure structureById))
+        {
+            ApplyStructureHighlight(structureById, enabled);
+            return;
+        }
+
+        Vector2Int tile = new Vector2Int(target.x, target.y);
+        if (masterGrid != null)
+        {
+            MovementSquare movementSquare = masterGrid.FindMovementSquareAt(tile);
+            if (movementSquare != null)
+            {
+                ApplyClickableHighlight(movementSquare, enabled);
+                return;
+            }
+
+            BaseStructure structureAtTile = masterGrid.WhatStructureIsInThisLocation(tile);
+            if (structureAtTile != null)
+            {
+                ApplyStructureHighlight(structureAtTile, enabled);
+                return;
+            }
+
+            BaseUnit unitAtTile = masterGrid.WhatUnitIsInThisLocation(tile);
+            if (unitAtTile != null)
+            {
+                ApplyUnitHighlight(unitAtTile, enabled);
+                return;
+            }
+        }
+
+        if (enabled)
+        {
+            highlightedTilePos = tile;
+            if (cameraManager != null)
+            {
+                cameraManager.SetPosition(tile, 0.5f);
+            }
+        }
+        else if (highlightedTilePos.HasValue && highlightedTilePos.Value == tile)
+        {
+            highlightedTilePos = null;
+        }
+    }
+
+    private void ApplyUiHighlight(int stepIndex, string uiTarget, bool enabled)
+    {
         if (uiBindings == null)
         {
             LogStepError(stepIndex, "highlightTarget failed because SequenceUIBindings is not assigned.");
             return;
         }
 
-        if (!uiBindings.TryGetObject(target.uiTarget, out GameObject targetObject))
+        if (!uiBindings.TryGetObject(uiTarget, out GameObject targetObject))
         {
-            LogStepError(stepIndex, $"highlightTarget failed, missing UI key '{target.uiTarget}'.");
+            LogStepError(stepIndex, $"highlightTarget failed, missing UI key '{uiTarget}'.");
             return;
         }
 
@@ -727,17 +1514,117 @@ public class SequenceManager : MonoBehaviour
         t.localScale = enabled ? Vector3.one * 1.05f : Vector3.one;
         if (enabled)
         {
-            highlightedUiTargets.Add(target.uiTarget);
+            highlightedUiTargets.Add(uiTarget);
         }
         else
         {
-            highlightedUiTargets.Remove(target.uiTarget);
+            highlightedUiTargets.Remove(uiTarget);
         }
+    }
+
+    private void ApplyUnitHighlight(BaseUnit unit, bool enabled)
+    {
+        if (unit == null)
+        {
+            return;
+        }
+
+        unit.SetTutorialHighlight(enabled);
+        if (enabled)
+        {
+            highlightedUnits.Add(unit);
+        }
+        else
+        {
+            highlightedUnits.Remove(unit);
+        }
+    }
+
+    private void ApplyStructureHighlight(BaseStructure structure, bool enabled)
+    {
+        if (structure == null)
+        {
+            return;
+        }
+
+        structure.SetTutorialHighlight(enabled);
+        if (enabled)
+        {
+            highlightedStructures.Add(structure);
+        }
+        else
+        {
+            highlightedStructures.Remove(structure);
+        }
+    }
+
+    private void ApplyClickableHighlight(ClickableObject clickable, bool enabled)
+    {
+        if (clickable is MovementSquare movementSquare)
+        {
+            movementSquare.SetTutorialHighlight(enabled);
+            if (enabled)
+            {
+                highlightedMovementSquares.Add(movementSquare);
+            }
+            else
+            {
+                highlightedMovementSquares.Remove(movementSquare);
+            }
+
+            return;
+        }
+
+        if (clickable == null)
+        {
+            return;
+        }
+    }
+
+    private void ClearAllHighlights()
+    {
+        foreach (string uiKey in new List<string>(highlightedUiTargets))
+        {
+            ApplyUiHighlight(-1, uiKey, false);
+        }
+
+        highlightedUiTargets.Clear();
+
+        foreach (BaseUnit unit in new List<BaseUnit>(highlightedUnits))
+        {
+            if (unit != null)
+            {
+                unit.SetTutorialHighlight(false);
+            }
+        }
+
+        highlightedUnits.Clear();
+
+        foreach (BaseStructure structure in new List<BaseStructure>(highlightedStructures))
+        {
+            if (structure != null)
+            {
+                structure.SetTutorialHighlight(false);
+            }
+        }
+
+        highlightedStructures.Clear();
+
+        foreach (MovementSquare square in new List<MovementSquare>(highlightedMovementSquares))
+        {
+            if (square != null)
+            {
+                square.SetTutorialHighlight(false);
+            }
+        }
+
+        highlightedMovementSquares.Clear();
+        highlightedTilePos = null;
     }
 
     private BaseUnit ResolveUnit(SequenceStepDto step)
     {
-        if (!string.IsNullOrWhiteSpace(step.unitId) && unitRefs.TryGetValue(step.unitId, out BaseUnit mapped) && mapped != null)
+        if (!string.IsNullOrWhiteSpace(step.unitId) && TryResolveUnitBySequenceId(step.unitId, out BaseUnit mapped))
         {
             return mapped;
         }
@@ -758,9 +1645,16 @@ public class SequenceManager : MonoBehaviour
             return false;
         }
 
-        if (!string.IsNullOrWhiteSpace(target.unitId) && unitRefs.TryGetValue(target.unitId, out BaseUnit mappedUnit) && mappedUnit != null)
+        if (!string.IsNullOrWhiteSpace(target.unitId) && TryResolveUnitBySequenceId(target.unitId, out BaseUnit mappedUnit))
         {
             pos = mappedUnit.pos;
+            return true;
+        }
+
+        if (!string.IsNullOrWhiteSpace(target.structureId)
+            && TryResolveStructureBySequenceId(target.structureId, out BaseStructure mappedStructure))
+        {
+            pos = mappedStructure.pos;
             return true;
         }
 
@@ -768,14 +1662,88 @@ public class SequenceManager : MonoBehaviour
         return true;
     }
 
-    private bool TargetMatchesPosition(TargetDto target, Vector2Int pos)
+    private bool TryResolveStructureBySequenceId(string sequenceId, out BaseStructure structure)
     {
-        if (!TryResolveTargetPosition(target, out Vector2Int expectedPos))
+        structure = null;
+        if (string.IsNullOrWhiteSpace(sequenceId))
         {
             return false;
         }
 
-        return expectedPos == pos;
+        if (structureRefs.TryGetValue(sequenceId, out BaseStructure mapped) && mapped != null)
+        {
+            structure = mapped;
+            return true;
+        }
+
+        if (masterGrid == null)
+        {
+            return false;
+        }
+
+        foreach (BaseStructure candidate in masterGrid.GetStructures(null))
+        {
+            if (candidate == null || string.IsNullOrWhiteSpace(candidate.sequenceId))
+            {
+                continue;
+            }
+
+            if (string.Equals(candidate.sequenceId, sequenceId, StringComparison.Ordinal))
+            {
+                structureRefs[sequenceId] = candidate;
+                structure = candidate;
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private bool TryResolveUnitBySequenceId(string sequenceId, out BaseUnit unit)
+    {
+        unit = null;
+        if (string.IsNullOrWhiteSpace(sequenceId))
+        {
+            return false;
+        }
+
+        if (unitRefs.TryGetValue(sequenceId, out BaseUnit mapped) && mapped != null)
+        {
+            unit = mapped;
+            return true;
+        }
+
+        if (MasterGrid.playerUnits == null)
+        {
+            return false;
+        }
+
+        for (int i = 0; i < MasterGrid.playerUnits.Length; i++)
+        {
+            List<BaseUnit> units = MasterGrid.playerUnits[i];
+            if (units == null)
+            {
+                continue;
+            }
+
+            for (int j = 0; j < units.Count; j++)
+            {
+                BaseUnit candidate = units[j];
+                if (candidate == null)
+                {
+                    continue;
+                }
+
+                if (string.Equals(candidate.sequenceId, sequenceId, StringComparison.Ordinal))
+                {
+                    unitRefs[sequenceId] = candidate;
+                    unit = candidate;
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     /// <summary>Blocks until tap-to-continue anywhere on-screen (or dialog panel / portrait area) or Skip.</summary>
@@ -900,6 +1868,7 @@ public class SequenceManager : MonoBehaviour
     private void TearDownSequencePresentation()
     {
         EndDialogContinueMode();
+        ClearAllHighlights();
 
         sequenceSkippedRequested = false;
 
@@ -908,7 +1877,7 @@ public class SequenceManager : MonoBehaviour
             SetInputLock(false, "sequence_finished");
         }
 
-        if (sequenceGlobalCanvas != null && sequenceGlobalCanvas.activeSelf)
+        if (sequenceGlobalCanvas != null && sequenceGlobalCanvas.activeSelf && !completionPanelVisible)
         {
             sequenceGlobalCanvas.SetActive(false);
         }

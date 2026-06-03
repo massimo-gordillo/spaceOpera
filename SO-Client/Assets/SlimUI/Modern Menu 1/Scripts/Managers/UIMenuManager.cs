@@ -100,8 +100,8 @@ namespace SlimUI.ModernMenu{
         public GameObject progenySelectMenu;
         public TutorialManager tutorialManager;
 
-        [Tooltip("Must match a key in MatchSettings scenario table (e.g. tutorial_01_intro).")]
-        public string playableTutorialScenarioId = "tutorial_01_intro";
+        [Tooltip("scenarioId from tutorial_curriculum_manifest.json (tracks or extraScenarios).")]
+        public string playableTutorialScenarioId = "tutorial_universal_intro";
 
 
         void Awake()
@@ -178,6 +178,12 @@ namespace SlimUI.ModernMenu{
             }
 
 			SetThemeColors();
+
+            if (MatchSettings.openTutorialMenuOnLoad)
+            {
+                MatchSettings.openTutorialMenuOnLoad = false;
+                Position4();
+            }
 		}
 
 /*        void Update()
@@ -513,7 +519,7 @@ namespace SlimUI.ModernMenu{
         public void StartPlayableTutorialFromMenu()
         {
 
-            if (!MatchSettings.ApplyTutorialScenario(playableTutorialScenarioId))
+            if (!MatchSettings.ApplyTutorialMatch(playableTutorialScenarioId))
             {
                 return;
             }

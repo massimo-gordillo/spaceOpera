@@ -374,7 +374,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &3011213990099346066
 RectTransform:
   m_ObjectHideFlags: 0
@@ -549,6 +549,7 @@ MonoBehaviour:
   playerControl: 2
   team: 0
   orientation: 3
+  sequenceId: 
   pos: {x: 0, y: 0}
   movementNonExhausted: 0
   nonExhausted: 0
