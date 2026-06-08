@@ -234,6 +234,8 @@ public class GameMaster : MonoBehaviour
         //initializes the masterGrid arrays etc with the map size
         masterGrid.Startup(gridX, gridY, tilemapManager.GetTilemapByteArray(), gameValues.GetAttributesTilesDictionary(), gameValues.GetCombatMultiplierDictionary());
 
+        
+
         HideChoicePanel();
         announcementCard.SetActive(false);
         //playerTurn = 1; //player 0 is neutral
@@ -1017,6 +1019,11 @@ public class GameMaster : MonoBehaviour
 
     public void LoadGameStateFromFile(string mapType, int mapNum, int versionNum, bool importTilemap = true)//, out TilemapData tilemapData)
     {
+        if(masterGrid == null){
+            Debug.LogError("Loading game state: MasterGrid is null, cannot load game state");
+            return;
+        }
+        
         if (toggleGamePiecesContainer != null)
         {
             toggleGamePiecesContainer.gameObject.SetActive(false);
@@ -1168,6 +1175,34 @@ public class GameMaster : MonoBehaviour
     //Structure can only be placed on grass
     //units must be placed on a legal square
     //units and structures must not be outside of boundaries
+    /// <summary>After .gsdat spawn: register structures in the grid (Startup handles first load).</summary>
+    void RefreshStructuresAfterMapLoad(bool sameMapDimensions)
+    {
+        if (masterGrid == null)
+        {
+            return;
+        }
+
+        if (!sameMapDimensions)
+        {
+            masterGrid.Startup(
+                gridX,
+                gridY,
+                tilemapManager.GetTilemapByteArray(),
+                gameValues.GetAttributesTilesDictionary(),
+                gameValues.GetCombatMultiplierDictionary());
+        }
+        else
+        {
+            masterGrid.InitializeStructuresFromScene();
+        }
+
+        if (sequenceManager != null)
+        {
+            sequenceManager.RebuildMapPieceRefs();
+        }
+    }
+
     public void ConvertListToGamePieces(List<GamePieceInfo> gameStateList)
     {
         if (gameStateList != null && gameStateList.Count != 0)
@@ -1205,38 +1240,41 @@ public class GameMaster : MonoBehaviour
                 {
                     int x = pieceInfo.x;
                     int y = pieceInfo.y;
-                    BaseStructure structure = null;
+                    BaseStructure structurePrefab = null;
                     if (pieceInfo.typeNum == 200)
-                        structure = resourceStructurePrefab.GetComponent<BaseStructure>();
+                        structurePrefab = resourceStructurePrefab.GetComponent<BaseStructure>();
                     else if (pieceInfo.typeNum == 201)
-                        structure = productionFactoryStructurePrefab.GetComponent<BaseStructure>();
+                        structurePrefab = productionFactoryStructurePrefab.GetComponent<BaseStructure>();
                     else if (pieceInfo.typeNum == 202)
-                        structure = productionAirportStructurePrefab.GetComponent<BaseStructure>();
+                        structurePrefab = productionAirportStructurePrefab.GetComponent<BaseStructure>();
                     else if (pieceInfo.typeNum == 205)
-                    {
-                        structure = commandStructurePrefab.GetComponent<BaseStructure>();
-                        Structure_Command commandStructure = commandStructurePrefab;
-						commandStructure.playerControl = pieceInfo.playerID;
-						MasterGrid.commandStructures[pieceInfo.playerID] = commandStructure;
-					}
+                        structurePrefab = commandStructurePrefab.GetComponent<BaseStructure>();
                     else
                         Debug.LogError($"No structure for byte value {pieceInfo.typeNum} found.");
-                    structure.playerControl = pieceInfo.playerID;
-                    structure.captureHealth = pieceInfo.healthVal;
-                    structure.pos = new Vector2Int(x, y);
-                    BaseStructure spawnedStructure = Instantiate(structure, new Vector2(x, y), Quaternion.identity, structureContainer);
-                    if (spawnedStructure != null)
+
+                    if (structurePrefab == null)
                     {
-                        spawnedStructure.sequenceId = string.IsNullOrWhiteSpace(pieceInfo.sequenceId)
-                            ? null
-                            : pieceInfo.sequenceId;
-                        spawnedStructure.Initialize();
+                        continue;
                     }
 
+                    BaseStructure spawnedStructure = Instantiate(
+                        structurePrefab,
+                        new Vector2(x, y),
+                        Quaternion.identity,
+                        structureContainer);
+                    spawnedStructure.playerControl = pieceInfo.playerID;
+                    spawnedStructure.captureHealth = pieceInfo.healthVal;
+                    spawnedStructure.pos = new Vector2Int(x, y);
+                    spawnedStructure.sequenceId = string.IsNullOrWhiteSpace(pieceInfo.sequenceId)
+                        ? null
+                        : pieceInfo.sequenceId;
+
+                    if (spawnedStructure is Structure_Command commandStructure)
+                    {
+                        MasterGrid.commandStructures[pieceInfo.playerID] = commandStructure;
+                    }
                 }
             }
-
-            masterGrid.GenerateInitHash();
         }
         else
             Debug.LogError("gameStateList is empty!");
@@ -1614,6 +1652,7 @@ public class GameMaster : MonoBehaviour
         yield return null;
 
         LoadGameStateFromFile(mapType, mapNum, mapVersion, importTilemap: !sameMap);
+        RefreshStructuresAfterMapLoad(sameMap);
 
         playerTurn = 0;
         turnNumber = 0;

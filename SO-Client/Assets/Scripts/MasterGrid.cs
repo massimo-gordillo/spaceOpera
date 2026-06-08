@@ -88,11 +88,7 @@ public class MasterGrid : MonoBehaviour
         attackableUnits = new List<BaseUnit>();
         spriteOffStructures = new List<BaseStructure>();
 
-        foreach (BaseStructure structure in GetStructures(null))
-        {
-            structure.Initialize();
-        }
-
+        InitializeStructuresFromScene();
 
         attackLuckDomain = 10;
         defenceMultiplier = 4.0;
@@ -101,10 +97,27 @@ public class MasterGrid : MonoBehaviour
         //printUnitGrid();
 
 
-        structuresList = GetStructures(null);
-        prodStructuresList = GetProductionStructures(null);
+
         commandStructures[0] = null;
 
+    }
+
+    /// <summary>Register spawned scene structures in structureGrid and run visuals. Call after map spawn when grids already exist.</summary>
+    public void InitializeStructuresFromScene()
+    {
+        structuresList = GetStructures(null);
+        prodStructuresList = GetProductionStructures(null);
+
+        for (int i = 0; i < structuresList.Count; i++)
+        {
+            BaseStructure structure = structuresList[i];
+            if (structure != null)
+            {
+                structure.Initialize(this, gameMaster);
+            }
+        }
+
+        commandStructures[0] = null;
     }
 
     public void Start()

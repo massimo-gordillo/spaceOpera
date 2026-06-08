@@ -153,6 +153,8 @@ public class SequenceManager : MonoBehaviour
             return;
         }
 
+        RebuildMapPieceRefs();
+
         string path = MatchSettings.GetIntroSequenceResourcePath();
         if (string.IsNullOrWhiteSpace(path))
         {
@@ -1138,9 +1140,10 @@ public class SequenceManager : MonoBehaviour
         }
 
         BaseStructure structure = null;
-        if (!string.IsNullOrWhiteSpace(step.structureId))
+        if (!string.IsNullOrWhiteSpace(step.structureId)
+            && TryResolveStructureBySequenceId(step.structureId, out BaseStructure mappedStructure))
         {
-            LogStepError(stepIndex, "CaptureStructure currently supports coordinate targeting; structureId lookup is not implemented yet.");
+            structure = mappedStructure;
         }
 
         if (structure == null && TryResolveTargetPosition(step.at, out Vector2Int atPos))
@@ -1660,6 +1663,51 @@ public class SequenceManager : MonoBehaviour
 
         pos = new Vector2Int(target.x, target.y);
         return true;
+    }
+
+    /// <summary>Index map units/structures with sequenceId after load or tutorial reload.</summary>
+    public void RebuildMapPieceRefs()
+    {
+        unitRefs.Clear();
+        structureRefs.Clear();
+
+        if (masterGrid != null)
+        {
+            foreach (BaseStructure candidate in masterGrid.GetStructures(null))
+            {
+                if (candidate == null || string.IsNullOrWhiteSpace(candidate.sequenceId))
+                {
+                    continue;
+                }
+
+                structureRefs[candidate.sequenceId] = candidate;
+            }
+        }
+
+        if (MasterGrid.playerUnits == null)
+        {
+            return;
+        }
+
+        for (int i = 0; i < MasterGrid.playerUnits.Length; i++)
+        {
+            List<BaseUnit> units = MasterGrid.playerUnits[i];
+            if (units == null)
+            {
+                continue;
+            }
+
+            for (int j = 0; j < units.Count; j++)
+            {
+                BaseUnit candidate = units[j];
+                if (candidate == null || string.IsNullOrWhiteSpace(candidate.sequenceId))
+                {
+                    continue;
+                }
+
+                unitRefs[candidate.sequenceId] = candidate;
+            }
+        }
     }
 
     private bool TryResolveStructureBySequenceId(string sequenceId, out BaseStructure structure)

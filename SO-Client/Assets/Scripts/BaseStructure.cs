@@ -34,15 +34,22 @@ public class BaseStructure : MonoBehaviour
 
     public LineRenderer CPUDebugLine;
 
-    public virtual void Initialize()
+    public virtual void Initialize(MasterGrid masterGrid, GameMaster gameMaster)
     {
+        this.masterGrid = masterGrid;
+        this.gameMaster = gameMaster;
+        
         gamePieceId = 200 + structureType; //structure ids start at 200.
         pos = new Vector2Int((int)transform.position.x, (int)transform.position.y);
         //private GameObject boxColliderComponent;
-        gameMaster = GameObject.FindGameObjectWithTag("GameMasterTag").GetComponent<GameMaster>();
+        //gameMaster = GameObject.FindGameObjectWithTag("GameMasterTag").GetComponent<GameMaster>();
+
         maxCaptureHealth = 200;
-        captureHealth = maxCaptureHealth;
-        masterGrid = GameObject.FindGameObjectWithTag("MasterGridTag").GetComponent<MasterGrid>();
+        if (captureHealth <= 0)
+        {
+            captureHealth = maxCaptureHealth;
+        }
+        //masterGrid = GameObject.FindGameObjectWithTag("MasterGridTag").GetComponent<MasterGrid>();
         masterGrid.SetStructureInGrid(pos, this);
 
 
@@ -402,47 +409,14 @@ public class BaseStructure : MonoBehaviour
 
     public void StaticSpriteHasBeenClicked()
     {
-        SequenceManager sequenceManager = ResolveSequenceManager();
-        if (sequenceManager != null && !sequenceManager.TryAcceptGuidedStructureClick(this))
+        if (gameMaster != null
+            && gameMaster.sequenceManager != null
+            && !gameMaster.sequenceManager.TryAcceptGuidedStructureClick(this))
         {
             return;
         }
 
-        GameMaster gm = ResolveGameMaster();
-        if (gm == null)
-        {
-            return;
-        }
-
-        gm.StructureHasBeenClicked(this);
-    }
-
-    SequenceManager ResolveSequenceManager()
-    {
-        GameMaster gm = ResolveGameMaster();
-        return gm != null ? gm.sequenceManager : null;
-    }
-
-    GameMaster ResolveGameMaster()
-    {
-        if (gameMaster != null)
-        {
-            return gameMaster;
-        }
-
-        if (masterGrid != null && masterGrid.gameMaster != null)
-        {
-            gameMaster = masterGrid.gameMaster;
-            return gameMaster;
-        }
-
-        GameObject gmObject = GameObject.FindGameObjectWithTag("GameMasterTag");
-        if (gmObject != null)
-        {
-            gameMaster = gmObject.GetComponent<GameMaster>();
-        }
-
-        return gameMaster;
+        gameMaster.StructureHasBeenClicked(this);
     }
 
     public void TurnOnCollider()

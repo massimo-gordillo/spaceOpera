@@ -21,9 +21,9 @@ public class Structure_Command : BaseStructure
     public StaticSprite progeny2UpperSpriteContainer;
     public SpriteRenderer progeny2UpperSpriteSR;
 
-    public override void Initialize()
+    public override void Initialize(MasterGrid masterGrid, GameMaster gameMaster)
     {
-        base.Initialize(); 
+        base.Initialize(masterGrid, gameMaster); 
         //Debug.Log($"[CommandStructure] Start called. pos is {pos} and playerControl is {playerControl}, with progeny {gameMaster.GetPlayerProgeny((byte)playerControl)}");
         MasterGrid.commandStructures[playerControl] = this;
         TurnOffCommandSprites();
