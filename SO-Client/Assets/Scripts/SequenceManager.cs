@@ -28,6 +28,8 @@ public class SequenceManager : MonoBehaviour
     [Tooltip("Optional. Wire its Button On Click to SkipDialogSequence. Used at runtime to keep the skip control above the tap blocker.")]
     public Button skipDialogButton;
 
+    public GameObject sequenceCharacterPortrait;
+
     [Header("Dialogue typing")]
     [Tooltip("Reveal dialogue one character at a time before waiting for continue.")]
     public bool enableDialogueTyping = true;
@@ -729,6 +731,7 @@ public class SequenceManager : MonoBehaviour
         if (step.requirePlayerEndTurn)
         {
             string endTurnKey = string.IsNullOrWhiteSpace(step.endTurnUiTarget) ? "endTurnButton" : step.endTurnUiTarget;
+            sequenceCharacterPortrait.SetActive(false);
             TargetDto endTurnTarget = new TargetDto { uiTarget = endTurnKey };
 
             if (!string.IsNullOrWhiteSpace(step.speaker) && string.IsNullOrWhiteSpace(step.text))
@@ -739,6 +742,7 @@ public class SequenceManager : MonoBehaviour
             BeginGuidedClickGate(endTurnTarget);
             yield return WaitForUiClick(stepIndex, endTurnKey, step.timeoutMs, endTurnTarget, true);
             EndGuidedClickGate();
+            sequenceCharacterPortrait.SetActive(true);
 
             gameMaster.endTurnConfirmCard.SetActive(false);
             if (GameMaster.playerTurn == 1)
