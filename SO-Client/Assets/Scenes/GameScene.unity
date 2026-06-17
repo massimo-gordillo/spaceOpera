@@ -1926,7 +1926,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &214039865
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1945,7 +1945,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: -283.3333, y: 250}
+  m_AnchoredPosition: {x: 300, y: 0}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &214039866
@@ -6293,7 +6293,7 @@ RectTransform:
   - {fileID: 1278561641}
   - {fileID: 163089928}
   m_Father: {fileID: 1151130069}
-  m_RootOrder: 4
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -6851,7 +6851,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1151130069}
-  m_RootOrder: 3
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 45}
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 0}
@@ -8609,6 +8609,7 @@ MonoBehaviour:
   loadingScreen: {fileID: 1215920568}
   loadingBar: {fileID: 1296113969}
   loadPromptText: {fileID: 904776383}
+  openDevMenuButton: {fileID: 214039866}
   musicAudio: {fileID: 519420036}
   virixCheapestUnit: 0
   airportCheapestUnit: 0
@@ -18057,7 +18058,7 @@ RectTransform:
   - {fileID: 670564171}
   - {fileID: 1552507041}
   m_Father: {fileID: 1151130069}
-  m_RootOrder: 2
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 0}

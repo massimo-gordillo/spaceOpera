@@ -5,6 +5,14 @@
   "description": "Introduction — welcome, battlefield grid, and the three Progeny.",
   "steps": [
     {
+      "id": "load_map",
+      "type": "loadMap",
+      "mapType": "tutor",
+      "mapNum": 1,
+      "mapVersion": 1
+    },
+    {
+      
       "id": "lock",
       "type": "setInputLock",
       "locked": true,

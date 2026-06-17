@@ -5,6 +5,13 @@
   "description": "1.1 — Movement, attacking, and damage.",
   "steps": [
     {
+      "id": "load_map",
+      "type": "loadMap",
+      "mapType": "tutor",
+      "mapNum": 1,
+      "mapVersion": 1
+    },
+    {
       "id": "lock",
       "type": "setInputLock",
       "locked": true,
@@ -64,7 +71,7 @@
     {
       "id": "guide_enemy",
       "type": "guideClick",
-      "target": { "unitId": "p2_enemy" }
+      "target": { "unitId": "p2_unit" }
     },
     {
       "id": "dlg_end_turn",
@@ -83,8 +90,8 @@
         "steps": [
           {
             "type": "moveUnit",
-            "unitId": "p2_enemy",
-            "to": { "x": 7, "y": 3 }
+            "unitId": "p2_unit",
+            "to": { "x": 9, "y": 2 }
           }
         ]
       }
@@ -106,7 +113,7 @@
       "type": "guideClick",
       "speaker": "Tutorial",
       "text": "Close the distance.",
-      "target": { "x": 5, "y": 4 }
+      "target": { "x": 8, "y": 2 }
     },
     {
       "id": "dlg_defense_preview",
@@ -123,7 +130,7 @@
     {
       "id": "guide_enemy_2",
       "type": "guideClick",
-      "target": { "unitId": "p2_enemy" }
+      "target": { "unitId": "p2_unit" }
     },
     {
       "id": "dlg_done",

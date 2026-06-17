@@ -74,6 +74,11 @@ public class SequenceStepDto
 
     // Composite: guideClick
     public bool clearHighlightOnComplete = true;
+
+    // loadMap — optional first step; when omitted, the match's current map is used
+    public string mapType;
+    public int mapNum;
+    public int mapVersion = 1;
 }
 
 [Serializable]
@@ -159,6 +164,22 @@ public static class SequenceParser
             {
                 error = $"Step {i} has invalid durationMs '{step.durationMs}'.";
                 return false;
+            }
+
+            string stepType = step.type.Trim();
+            if (string.Equals(stepType, "loadMap", StringComparison.OrdinalIgnoreCase))
+            {
+                if (i != 0)
+                {
+                    error = $"Step {i}: loadMap must be the first step in the sequence.";
+                    return false;
+                }
+
+                if (string.IsNullOrWhiteSpace(step.mapType) || step.mapNum <= 0)
+                {
+                    error = $"Step {i}: loadMap requires mapType and mapNum > 0.";
+                    return false;
+                }
             }
         }
 

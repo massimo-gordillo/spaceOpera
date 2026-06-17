@@ -83,6 +83,7 @@ public class SequenceManager : MonoBehaviour
     private int pendingGuideHighlightStepIndex = -1;
     private bool guideClickHintHighlightActive;
     private bool guidedClickGateActive;
+    private bool initialSequenceLoadMapStepConsumed;
 
     struct SavedSelectableState
     {
@@ -147,6 +148,42 @@ public class SequenceManager : MonoBehaviour
 
         PrepareDialogInfrastructure();
         BootstrapMatchSettingsIfNeeded();
+    }
+
+    /// <summary>Runs an optional leading loadMap step before gameplay / StartTurn.</summary>
+    public IEnumerator EnsureSequenceMapReady(string resourcePath)
+    {
+        if (string.IsNullOrWhiteSpace(resourcePath))
+        {
+            yield break;
+        }
+
+        TextAsset textAsset = Resources.Load<TextAsset>(resourcePath);
+        if (textAsset == null)
+        {
+            yield break;
+        }
+
+        if (!SequenceParser.TryParse(textAsset.text, out SequenceFileDto sequence, out string parseError))
+        {
+            Debug.LogWarning($"[SequenceManager] EnsureSequenceMapReady: could not parse '{resourcePath}': {parseError}");
+            yield break;
+        }
+
+        if (sequence.steps == null || sequence.steps.Count == 0)
+        {
+            yield break;
+        }
+
+        SequenceStepDto firstStep = sequence.steps[0];
+        if (firstStep == null
+            || !string.Equals(firstStep.type?.Trim(), "loadMap", StringComparison.OrdinalIgnoreCase))
+        {
+            yield break;
+        }
+
+        yield return ExecuteLoadMap(0, firstStep);
+        initialSequenceLoadMapStepConsumed = true;
     }
 
     /// <summary>Call from GameMaster.Start after map load — runs intro sequence from MatchSettings.</summary>
@@ -335,9 +372,19 @@ public class SequenceManager : MonoBehaviour
         isRunningSequence = true;
         Debug.Log($"[SequenceManager] Running sequence '{sequence.sequenceId}' ({sequence.steps.Count} steps).");
 
+        int startStepIndex = 0;
+        if (initialSequenceLoadMapStepConsumed
+            && sequence.steps.Count > 0
+            && sequence.steps[0] != null
+            && string.Equals(sequence.steps[0].type?.Trim(), "loadMap", StringComparison.OrdinalIgnoreCase))
+        {
+            startStepIndex = 1;
+            initialSequenceLoadMapStepConsumed = false;
+        }
+
         try
         {
-            for (int i = 0; i < sequence.steps.Count && !sequenceSkippedRequested; i++)
+            for (int i = startStepIndex; i < sequence.steps.Count && !sequenceSkippedRequested; i++)
             {
                 SequenceStepDto step = sequence.steps[i];
                 yield return ExecuteStep(sequence.sequenceId, i, step);
@@ -410,6 +457,10 @@ public class SequenceManager : MonoBehaviour
                 SetInputLock(step.locked, step.reason);
                 break;
 
+            case "loadMap":
+                yield return ExecuteLoadMap(stepIndex, step);
+                break;
+
             case "wait":
                 yield return WaitForDurationMs(step.durationMs);
                 break;
@@ -471,6 +522,7 @@ public class SequenceManager : MonoBehaviour
 
     public void PrepareForTutorialRestart()
     {
+        initialSequenceLoadMapStepConsumed = false;
         sequenceSkippedRequested = true;
         StopAllCoroutines();
         ClearAllHighlights();
@@ -588,6 +640,24 @@ public class SequenceManager : MonoBehaviour
         {
             gameMaster.LoadMainMenuScreen();
         }
+    }
+
+    private IEnumerator ExecuteLoadMap(int stepIndex, SequenceStepDto step)
+    {
+        if (string.IsNullOrWhiteSpace(step.mapType) || step.mapNum <= 0)
+        {
+            LogStepError(stepIndex, "loadMap requires mapType and mapNum > 0.");
+            yield break;
+        }
+
+        if (gameMaster == null)
+        {
+            LogStepError(stepIndex, "loadMap failed: gameMaster is not assigned.");
+            yield break;
+        }
+
+        int version = step.mapVersion > 0 ? step.mapVersion : 1;
+        yield return gameMaster.EnsureMapLoadedForSequence(step.mapType.Trim(), step.mapNum, version);
     }
 
     private IEnumerator ExecuteGuideClick(string sequenceId, int stepIndex, SequenceStepDto step)
@@ -1258,52 +1328,81 @@ public class SequenceManager : MonoBehaviour
         expectation = new GameplayClickExpectation();
         if (target == null)
         {
-            LogStepError(stepIndex, "Could not resolve gameplay click target (null).");
+            LogStepError(stepIndex, "requireClick target is null.");
             return false;
         }
 
-        if (!string.IsNullOrWhiteSpace(target.unitId)
-            && TryResolveUnitBySequenceId(target.unitId, out BaseUnit unit))
+        string targetDescription = DescribeTargetDto(target);
+
+        if (!string.IsNullOrWhiteSpace(target.unitId))
         {
-            expectation.unit = unit;
-            return true;
+            if (TryResolveUnitBySequenceId(target.unitId, out BaseUnit unit))
+            {
+                expectation.unit = unit;
+                return true;
+            }
+
+            LogStepError(stepIndex,
+                $"requireClick could not resolve unitId '{target.unitId}'. " +
+                $"Registered unit sequenceIds ({unitRefs.Count}): {FormatSequenceIdList(unitRefs.Keys)}. " +
+                $"masterGrid={(masterGrid != null ? "assigned" : "null")}, " +
+                $"playerUnits={(MasterGrid.playerUnits != null ? MasterGrid.playerUnits.Length + " players" : "null")}. " +
+                $"Target fields: {targetDescription}");
+            return false;
         }
 
-        if (!string.IsNullOrWhiteSpace(target.structureId)
-            && TryResolveStructureBySequenceId(target.structureId, out BaseStructure structureById))
+        if (!string.IsNullOrWhiteSpace(target.structureId))
         {
-            expectation.structure = structureById;
-            return true;
+            if (TryResolveStructureBySequenceId(target.structureId, out BaseStructure structureById))
+            {
+                expectation.structure = structureById;
+                return true;
+            }
+
+            LogStepError(stepIndex,
+                $"requireClick could not resolve structureId '{target.structureId}'. " +
+                $"Registered structure sequenceIds ({structureRefs.Count}): {FormatSequenceIdList(structureRefs.Keys)}. " +
+                $"masterGrid={(masterGrid != null ? "assigned" : "null")}. " +
+                $"Target fields: {targetDescription}");
+            return false;
+        }
+
+        if (masterGrid == null)
+        {
+            LogStepError(stepIndex,
+                $"requireClick could not resolve tile ({target.x},{target.y}) because masterGrid is not assigned. " +
+                $"Target fields: {targetDescription}");
+            return false;
         }
 
         Vector2Int tile = new Vector2Int(target.x, target.y);
-        if (masterGrid != null)
+        MovementSquare movementSquare = masterGrid.FindMovementSquareAt(tile);
+        if (movementSquare != null)
         {
-            MovementSquare movementSquare = masterGrid.FindMovementSquareAt(tile);
-            if (movementSquare != null)
-            {
-                expectation.clickable = movementSquare;
-                return true;
-            }
+            expectation.clickable = movementSquare;
+            return true;
+        }
 
-            BaseStructure structureAtTile = masterGrid.WhatStructureIsInThisLocation(tile);
-            if (structureAtTile != null)
-            {
-                expectation.structure = structureAtTile;
-                return true;
-            }
+        BaseStructure structureAtTile = masterGrid.WhatStructureIsInThisLocation(tile);
+        if (structureAtTile != null)
+        {
+            expectation.structure = structureAtTile;
+            return true;
+        }
 
-            BaseUnit unitAtTile = masterGrid.WhatUnitIsInThisLocation(tile);
-            if (unitAtTile != null)
-            {
-                expectation.unit = unitAtTile;
-                return true;
-            }
+        BaseUnit unitAtTile = masterGrid.WhatUnitIsInThisLocation(tile);
+        if (unitAtTile != null)
+        {
+            expectation.unit = unitAtTile;
+            return true;
         }
 
         LogStepError(stepIndex,
-            "Could not resolve gameplay click target to a unit, structure, or movement square. " +
-            "Use unitId/structureId, or a tile with a visible piece or move overlay.");
+            $"requireClick could not resolve tile ({target.x},{target.y}): " +
+            $"no movement overlay, structure, or unit found. " +
+            $"inBounds={masterGrid.IsInBounds(tile)}, gridSize=({masterGrid.gridX},{masterGrid.gridY}). " +
+            $"Target fields: {targetDescription}. " +
+            "Hint: use unitId/structureId, or a tile with a visible piece or move overlay.");
         return false;
     }
 
@@ -1931,6 +2030,62 @@ public class SequenceManager : MonoBehaviour
     private void LogStepError(int stepIndex, string message)
     {
         Debug.LogError($"[SequenceManager] Step {stepIndex}: {message}");
+    }
+
+    static string DescribeTargetDto(TargetDto target)
+    {
+        if (target == null)
+        {
+            return "null";
+        }
+
+        var parts = new List<string>();
+        if (!string.IsNullOrWhiteSpace(target.unitId))
+        {
+            parts.Add($"unitId='{target.unitId}'");
+        }
+
+        if (!string.IsNullOrWhiteSpace(target.structureId))
+        {
+            parts.Add($"structureId='{target.structureId}'");
+        }
+
+        if (!string.IsNullOrWhiteSpace(target.markerId))
+        {
+            parts.Add($"markerId='{target.markerId}'");
+        }
+
+        if (!string.IsNullOrWhiteSpace(target.uiTarget))
+        {
+            parts.Add($"uiTarget='{target.uiTarget}'");
+        }
+
+        parts.Add($"tile=({target.x},{target.y})");
+        return string.Join(", ", parts);
+    }
+
+    static string FormatSequenceIdList(ICollection<string> ids, int maxCount = 16)
+    {
+        if (ids == null || ids.Count == 0)
+        {
+            return "(none)";
+        }
+
+        var parts = new List<string>();
+        int shown = 0;
+        foreach (string id in ids)
+        {
+            if (shown >= maxCount)
+            {
+                parts.Add($"... +{ids.Count - maxCount} more");
+                break;
+            }
+
+            parts.Add(id);
+            shown++;
+        }
+
+        return string.Join(", ", parts);
     }
 
     bool TryGetUiSelectable(string key, out Selectable selectable)

@@ -99,6 +99,7 @@ public class GameMaster : MonoBehaviour
     public TMP_Text loadPromptText;
     public AsyncOperation sceneLoadingOperation = null;
     private InputAction continueAction;
+    public Button openDevMenuButton;
 
     [Header("Animations")]
     public static bool isAnimating;
@@ -161,10 +162,10 @@ public class GameMaster : MonoBehaviour
             }
         }
 
-        //If the MatchSettings not initialized through the MenuScene, set the default values.
         if (Application.isEditor)
         {
                 musicAudio.Pause();
+                openDevMenuButton.gameObject.SetActive(true);
         }
 
         if (!MatchSettings.isInit)
@@ -328,6 +329,34 @@ public class GameMaster : MonoBehaviour
         if (CPU_isOn)
         {
             StartCoroutine(WaitForCPUFirstTurn());
+        }
+
+        if (sequenceManager != null && MatchSettings.gameMode == MatchSettings.MatchGameMode.Tutorial)
+        {
+            StartCoroutine(FinishTutorialStart());
+            return;
+        }
+
+        if (sequenceManager != null)
+        {
+            sequenceManager.BeginFromMatchSettings();
+        }
+
+        playerTurn = 0;
+        StartTurn();
+
+        if (saveGameStateOnPlayStart)
+        {
+            SaveGameStateToFile(exportMapType, exportMapNum, exportMapVersion);
+        }
+    }
+
+    IEnumerator FinishTutorialStart()
+    {
+        string path = MatchSettings.GetIntroSequenceResourcePath();
+        if (!string.IsNullOrWhiteSpace(path) && sequenceManager != null)
+        {
+            yield return sequenceManager.EnsureSequenceMapReady(path);
         }
 
         if (sequenceManager != null)
@@ -1608,7 +1637,7 @@ public class GameMaster : MonoBehaviour
         }
     }
 
-    static bool MapsMatch(
+    public static bool MapsMatch(
         string mapTypeA,
         int mapNumA,
         int mapVersionA,
@@ -1619,6 +1648,49 @@ public class GameMaster : MonoBehaviour
         return string.Equals(mapTypeA, mapTypeB, StringComparison.OrdinalIgnoreCase)
             && mapNumA == mapNumB
             && mapVersionA == mapVersionB;
+    }
+
+    public static void SetMatchSettingsMap(string mapType, int mapNum, int mapVersion)
+    {
+        MatchSettings.matchMapType = mapType;
+        MatchSettings.matchMapNum = mapNum;
+        MatchSettings.matchMapVersion = mapVersion > 0 ? mapVersion : 1;
+    }
+
+    /// <summary>Delete pieces and load .gsdat; <paramref name="importTilemap"/> false when only game pieces change.</summary>
+    public IEnumerator ReloadMapPieces(string mapType, int mapNum, int mapVersion, bool importTilemap)
+    {
+        yield return masterGrid.DeleteAllGamePieces();
+        yield return null;
+
+        LoadGameStateFromFile(mapType, mapNum, mapVersion, importTilemap);
+        RefreshStructuresAfterMapLoad(sameMapDimensions: !importTilemap);
+
+        if (sequenceManager != null)
+        {
+            sequenceManager.RebuildMapPieceRefs();
+        }
+    }
+
+    /// <summary>Sequence loadMap step: no-op when the requested map is already loaded.</summary>
+    public IEnumerator EnsureMapLoadedForSequence(string mapType, int mapNum, int mapVersion)
+    {
+        int version = mapVersion > 0 ? mapVersion : 1;
+        MatchSettings.GetMapLoadParameters(out string currentType, out int currentNum, out int currentVersion);
+        if (MapsMatch(currentType, currentNum, currentVersion, mapType, mapNum, version))
+        {
+            Debug.Log($"[GameMaster] loadMap skipped — already on {mapType} Map{mapNum} v{version}.");
+            if (sequenceManager != null)
+            {
+                sequenceManager.RebuildMapPieceRefs();
+            }
+
+            yield break;
+        }
+
+        Debug.Log($"[GameMaster] loadMap loading {mapType} Map{mapNum} v{version}...");
+        SetMatchSettingsMap(mapType, mapNum, version);
+        yield return ReloadMapPieces(mapType, mapNum, version, importTilemap: true);
     }
 
     /// <summary>Reload map + intro sequence in place (next tutorial lesson, same Game scene).</summary>
@@ -1653,11 +1725,16 @@ public class GameMaster : MonoBehaviour
             sequenceManager.HideCompletionPanel();
         }
 
-        yield return masterGrid.DeleteAllGamePieces();
-        yield return null;
+        yield return ReloadMapPieces(mapType, mapNum, mapVersion, importTilemap: !sameMap);
 
-        LoadGameStateFromFile(mapType, mapNum, mapVersion, importTilemap: !sameMap);
-        RefreshStructuresAfterMapLoad(sameMap);
+        string sequencePath = MatchSettings.GetIntroSequenceResourcePath();
+        if (sequenceManager != null)
+        {
+            if (!string.IsNullOrWhiteSpace(sequencePath))
+            {
+                yield return sequenceManager.EnsureSequenceMapReady(sequencePath);
+            }
+        }
 
         playerTurn = 0;
         turnNumber = 0;
