@@ -502,18 +502,13 @@ public class MasterGrid : MonoBehaviour
         Queue<Vector2Int> attackQueue = new Queue<Vector2Int>();
         Queue<Vector2Int> structureQueue = new Queue<Vector2Int>();
 
-        ClearParentMap(mTarget.pos);
-
-        int newDistance = movementDistanceMap.TryGetValue(mTarget.pos, out var dist) ? dist + 1 : 1;
-
-
         if (mTarget.canMoveAndAttack)
         {
             //cellsToCheck.Enqueue((new Vector2Int(xpos + 1, ypos + 1), movementRange + 1));//assuming unit only has 1 attack range for the first vectorA* search.
             //List<Queue<Vector2Int>> squareQueuesList = FloodFillSearch(mTarget, movementRange, attackRange, cellsToCheck, checkedCells, new List<Queue<Vector2Int>> { new Queue<Vector2Int>(), new Queue<Vector2Int>(), new Queue<Vector2Int>() }, true);
             //List<Queue<Vector2Int>> squareQueuesList = null;
 
-            FloodFillSearch(mTarget, mTarget.movementRange, mTarget.attackRange,
+            PrepareMovementSearch(mTarget, mTarget.movementRange, mTarget.attackRange,
                 out movementQueue, out attackQueue, out structureQueue);
 
             /*            if (attackRange >= 1)
@@ -569,7 +564,7 @@ public class MasterGrid : MonoBehaviour
             //cellsToCheck.Enqueue((new Vector2Int(xpos + 1, ypos + 1), movementRange));
             //List<Queue<Vector2Int>> movementSquareQueuesList = FloodFillSearch(mTarget, movementRange, 0, cellsToCheck, checkedCells, new List<Queue<Vector2Int>> { new Queue<Vector2Int>(), new Queue<Vector2Int>(), new Queue<Vector2Int>()});
 
-            FloodFillSearch(mTarget, movementRange, 0,
+            PrepareMovementSearch(mTarget, movementRange, 0,
             out movementQueue, out _, out structureQueue);
 
 
@@ -802,6 +797,28 @@ public class MasterGrid : MonoBehaviour
         {*/
             movementParentsDictionary[child] = new List<Vector2Int> { parent };
         //}
+    }
+
+    public void PrepareMovementSearch(
+        BaseUnit unit,
+        int movementRange,
+        int attackRange,
+        out Queue<Vector2Int> movementQueue,
+        out Queue<Vector2Int> attackQueue,
+        out Queue<Vector2Int> structureQueue)
+    {
+        ClearParentMap(unit.pos);
+        FloodFillSearch(unit, movementRange, attackRange, out movementQueue, out attackQueue, out structureQueue);
+    }
+
+    public void PrepareMovementSearch(BaseUnit unit, int movementRange, int attackRange = 0)
+    {
+        PrepareMovementSearch(unit, movementRange, attackRange, out _, out _, out _);
+    }
+
+    public bool IsCellReachable(Vector2Int cell, int maxMovementRange)
+    {
+        return movementDistanceMap.TryGetValue(cell, out int distance) && distance <= maxMovementRange;
     }
 
 
@@ -1267,8 +1284,9 @@ public class MasterGrid : MonoBehaviour
     {
         
         //Debug.Log($"Animating movement from {start} to {end}");
-        //List<Vector2Int> path = BidirectionalSearch(start, end, unit, unit.movementRange);
         List<Vector2Int> path = GetMovementPath(start, end, unit);
+        if (path.Count == 0 || path[path.Count - 1] != end)
+            path = BidirectionalSearch(start, end, unit, unit.movementRange);
 
         //movement animation speed
         //float speed = 12.0f;

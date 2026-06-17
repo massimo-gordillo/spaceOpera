@@ -205,12 +205,9 @@ public class CPUManager : MonoBehaviour
         Queue<Vector2Int> structureQueue = new Queue<Vector2Int>();
         Queue<Vector2Int> tempAttackUnitQueue = new Queue<Vector2Int>();
 
-        masterGrid.ClearParentMap(unit.pos); //clear the movement parent map for this unit, otherwise it will be stale from last turn.
-
-        //List<Queue<Vector2Int>> squareQueuesList = null;
         if (unit.attackRange <= 1)
         {
-            masterGrid.FloodFillSearch(unit, unit.movementRange, unit.attackRange, out movementQueue, out Queue<Vector2Int> tempAttackSquareQueue, out structureQueue);
+            masterGrid.PrepareMovementSearch(unit, unit.movementRange, unit.attackRange, out movementQueue, out Queue<Vector2Int> tempAttackSquareQueue, out structureQueue);
             while (tempAttackSquareQueue.Count > 0)
             {
                 Vector2Int attackSquare = tempAttackSquareQueue.Dequeue();
@@ -297,7 +294,7 @@ public class CPUManager : MonoBehaviour
         }
         if (unit.attackRange > 1) //notably this logic is the same in masterGrid.DrawMovement(). I suspect I should generalize DrawMovement, it would be much better.
         {
-            masterGrid.FloodFillSearch(unit, unit.movementRange, 0, out movementQueue, out _, out structureQueue);
+            masterGrid.PrepareMovementSearch(unit, unit.movementRange, 0, out movementQueue, out _, out structureQueue);
             //squareQueuesList = masterGrid.FloodFillSearch(unit, unit.movementRange, 0, cellsToCheck, checkedCells);
 
             masterGrid.FloodFillSearch(unit, 0, unit.attackRange - 1,  out _, out attackQueue, out _);

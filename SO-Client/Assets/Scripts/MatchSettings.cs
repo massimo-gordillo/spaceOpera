@@ -11,8 +11,8 @@ public static class MatchSettings {
         Tutorial
     }
 
-    public const string DefaultSkirmishMapType = "tutor";
-    public const int DefaultSkirmishMapNum = 1;
+    public const string DefaultSkirmishMapType = "multi";
+    public const int DefaultSkirmishMapNum = 7;
     public const int DefaultSkirmishMapVersion = 1;
 
     static public int numPlayers = 2;

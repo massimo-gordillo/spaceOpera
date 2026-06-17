@@ -65,7 +65,7 @@
     {
       "id": "guide_bismuth",
       "type": "guideClick",
-      "target": { "unitId": "owned_bismuth" }
+      "target": { "structureId": "owned_bismuth" }
     },
     {
       "id": "handoff_cycle",

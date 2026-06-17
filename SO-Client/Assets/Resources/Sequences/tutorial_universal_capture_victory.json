@@ -5,6 +5,13 @@
   "description": "1.2 — Capturing BISMUTH and winning.",
   "steps": [
     {
+      "id": "load_map",
+      "type": "loadMap",
+      "mapType": "tutor",
+      "mapNum": 3,
+      "mapVersion": 1
+    },
+    {
       "id": "lock",
       "type": "setInputLock",
       "locked": true,

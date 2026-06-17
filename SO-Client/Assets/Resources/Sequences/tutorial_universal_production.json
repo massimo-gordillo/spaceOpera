@@ -27,7 +27,7 @@
     {
       "id": "camera_bismuth",
       "type": "cameraFocus",
-      "target": { "unitId": "bismuth" },
+      "target": { "structureId": "bismuth" },
       "durationMs": 400
     },
     {

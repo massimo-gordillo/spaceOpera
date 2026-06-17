@@ -541,7 +541,7 @@ MonoBehaviour:
   isResourceUnit: 1
   isInfantry: 1
   healthMax: 100
-  healthCurrent: 0
+  healthCurrent: 100
   baseDamage: 60
   attackRange: 1
   price: 100
@@ -550,7 +550,7 @@ MonoBehaviour:
   team: 0
   orientation: 3
   sequenceId: 
-  pos: {x: 0, y: 0}
+  pos: {x: 17, y: 3}
   movementNonExhausted: 0
   nonExhausted: 0
   undoingMovement: 0

@@ -91,7 +91,7 @@
           {
             "type": "moveUnit",
             "unitId": "p2_unit",
-            "to": { "x": 9, "y": 2 }
+            "to": { "x": 9, "y": 3 }
           }
         ]
       }
@@ -113,7 +113,7 @@
       "type": "guideClick",
       "speaker": "Tutorial",
       "text": "Close the distance.",
-      "target": { "x": 8, "y": 2 }
+      "target": { "x": 8, "y": 3 }
     },
     {
       "id": "dlg_defense_preview",

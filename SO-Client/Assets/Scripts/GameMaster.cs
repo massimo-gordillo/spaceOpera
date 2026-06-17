@@ -67,6 +67,7 @@ public class GameMaster : MonoBehaviour
     public int exportMapNum = 8;
     public int exportMapVersion = 1;
     bool hasSequence = true;
+    bool matchSettingsWereUnsetOnAwake;
 
     [Header("UI Items")]
     public GameObject choicePanel;
@@ -114,7 +115,7 @@ public class GameMaster : MonoBehaviour
 
     [Header("CPU")]
     public static bool CPU_isOn = false;
-    public static bool CPU_isOn_manual = false;
+    public bool CPU_isOn_manual;
     private static bool CPU_isMasterDebugging = false;
     public static bool[] CPU_PlayersList;
     public int virixCheapestUnit;
@@ -136,6 +137,7 @@ public class GameMaster : MonoBehaviour
     private void Awake()
     {
         //Debug.Log("GameMaster Awake called");
+        matchSettingsWereUnsetOnAwake = !MatchSettings.isInit;
         match_id = Guid.Parse("aaaaaaaa-8761-4e77-a086-a7365ae9e0b4");
         turnNumber = 1;
         numPlayers = 2; //will set dynamically later
@@ -228,6 +230,7 @@ public class GameMaster : MonoBehaviour
         if (loadGameStateOnStartup)
         {
             tilemapManager.Initialize(false);
+            ApplyEditorSkirmishMapDefaultsIfNeeded();
             MatchSettings.GetMapLoadParameters(out string mapType, out int mapNum, out int mapVersion);
             LoadGameStateFromFile(mapType, mapNum, mapVersion);
         }
@@ -1655,6 +1658,30 @@ public class GameMaster : MonoBehaviour
         MatchSettings.matchMapType = mapType;
         MatchSettings.matchMapNum = mapNum;
         MatchSettings.matchMapVersion = mapVersion > 0 ? mapVersion : 1;
+    }
+
+    /// <summary>
+    /// Direct Game-scene play (no menu): use export map fields instead of curriculum/tutorial defaults.
+    /// Menu and tutorial matches already set map params before Awake map load.
+    /// </summary>
+    void ApplyEditorSkirmishMapDefaultsIfNeeded()
+    {
+        if (!matchSettingsWereUnsetOnAwake)
+        {
+            return;
+        }
+
+        if (MatchSettings.gameMode == MatchSettings.MatchGameMode.Tutorial)
+        {
+            return;
+        }
+
+        if (!string.IsNullOrEmpty(MatchSettings.matchMapType))
+        {
+            return;
+        }
+
+        SetMatchSettingsMap(exportMapType, exportMapNum, exportMapVersion);
     }
 
     /// <summary>Delete pieces and load .gsdat; <paramref name="importTilemap"/> false when only game pieces change.</summary>

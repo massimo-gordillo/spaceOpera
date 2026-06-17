@@ -41,8 +41,18 @@ public class SequenceManager : MonoBehaviour
     public string introSequenceResourcePath;
     public string outroSequenceResourcePath;
 
+    [Header("Game scene — dev play mode")]
+    [Tooltip("When on, pressing Play in Game scene applies a tutorial scenario before map load. When off, GameMaster loads the skirmish/default map from MatchSettings (menu) or GameMaster export fields.")]
+    public bool playTestTutorialOnStart = true;
+    [Tooltip("When on, starts at Play Test Scenario Id instead of the first curriculum lesson.")]
+    public bool useCustomPlayTestScenario;
+    [Tooltip("scenarioId from tutorial_curriculum_manifest.json (tracks or extraScenarios).")]
+    public string playTestScenarioId = "tutorial_universal_intro";
+    [Tooltip("Optional Resources path without .json — overrides the manifest sequence for Play Test Scenario Id.")]
+    public string playTestSequenceResourcePathOverride = "";
+
     [Header("Tutorial — full curriculum playtest")]
-    [Tooltip("Play from Game scene without Menu: start first lesson and auto-advance.")]
+    [Tooltip("After each lesson completes, auto-load the next lesson without the completion panel. Only applies in tutorial matches.")]
     public bool autoRunFullCurriculum = true;
     [Tooltip("Seconds after lesson complete before loading next (0 = next frame).")]
     public float autoAdvanceDelaySeconds = 0.35f;
@@ -210,19 +220,31 @@ public class SequenceManager : MonoBehaviour
 
     void BootstrapMatchSettingsIfNeeded()
     {
-        if (!autoRunFullCurriculum || MatchSettings.isInit)
+        if (!playTestTutorialOnStart || MatchSettings.isInit)
         {
             return;
         }
 
-        string firstId = SequenceCurriculum.GetFirstPlayableScenarioId();
-        if (!MatchSettings.ApplyTutorialMatch(firstId))
+        string scenarioId = useCustomPlayTestScenario
+            ? playTestScenarioId?.Trim()
+            : SequenceCurriculum.GetFirstPlayableScenarioId();
+        if (string.IsNullOrWhiteSpace(scenarioId))
         {
-            Debug.LogError("[SequenceManager] autoRunFullCurriculum: could not apply first scenario.");
+            Debug.LogError("[SequenceManager] playTestTutorialOnStart: no scenario id to apply.");
             return;
         }
 
-        Debug.Log($"[SequenceManager] autoRunFullCurriculum: starting at '{firstId}'.");
+        string sequenceOverride = string.IsNullOrWhiteSpace(playTestSequenceResourcePathOverride)
+            ? null
+            : playTestSequenceResourcePathOverride.Trim();
+        if (!MatchSettings.ApplyTutorialMatch(scenarioId, sequenceOverride))
+        {
+            Debug.LogError($"[SequenceManager] playTestTutorialOnStart: could not apply scenario '{scenarioId}'.");
+            return;
+        }
+
+        Debug.Log($"[SequenceManager] playTestTutorialOnStart: starting at '{scenarioId}'"
+            + (sequenceOverride != null ? $" (sequence override: '{sequenceOverride}')" : "") + ".");
     }
 
     /// <summary>Wire from SequenceDialogFullscreenTapReceiver Button On Click in the Inspector.</summary>
@@ -1196,6 +1218,13 @@ public class SequenceManager : MonoBehaviour
         }
 
         masterGrid.SetSelectedUnit(unit);
+        masterGrid.PrepareMovementSearch(unit, unit.movementRange, 0);
+        if (!masterGrid.IsCellReachable(destination, unit.movementRange))
+        {
+            LogStepError(stepIndex, $"moveUnit destination {destination} is not reachable within movement range.");
+            return;
+        }
+
         masterGrid.MoveSelectedUnit(destination);
     }
 
