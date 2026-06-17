@@ -550,7 +550,7 @@ MonoBehaviour:
   team: 0
   orientation: 3
   sequenceId: 
-  pos: {x: 17, y: 3}
+  pos: {x: 3, y: 4}
   movementNonExhausted: 0
   nonExhausted: 0
   undoingMovement: 0

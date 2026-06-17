@@ -64,9 +64,13 @@ public class SequenceStepDto
     // Mission hook
     public string hook;
 
-    // Composite: turnHandoff
-    public bool requirePlayerEndTurn = true;
+    // endPlayerTurn
+    public int player;
+    public bool waitForClick;
     public string endTurnUiTarget;
+
+    // Legacy composite: turnHandoff (prefer explicit endPlayerTurn steps in JSON)
+    public bool requirePlayerEndTurn = true;
     public int waitMs;
     public int resumePlayer;
     public string textAfter;

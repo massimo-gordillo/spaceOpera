@@ -106,6 +106,7 @@ public class GameMaster : MonoBehaviour
     public static bool isAnimating;
     public static float globalAnimationDuration = 0.6f;
     public static float swoopCardAnimationDuration = 2.4f;
+    private Coroutine turnCardAnimationCoroutine;
     private RectTransform announcementCardRT;
     private Vector2 offScreenLeft;
     private Vector2 offScreenRight;
@@ -320,7 +321,7 @@ public class GameMaster : MonoBehaviour
 
 
         //WaitForSeconds(0.5);
-        if (isAnimating)
+        if (isAnimating && MatchSettings.gameMode != MatchSettings.MatchGameMode.Tutorial)
             AnimateStartTurnCard(1);
         if (!hasSequence && MasterGrid.commandStructures[1] != null)
         {
@@ -594,7 +595,7 @@ public class GameMaster : MonoBehaviour
     {
         var (gameActions, preTurnHash, postTurnHash) = masterGrid.EndTurn(playerTurn);
         SubmitTurnToServer(gameActions, preTurnHash, postTurnHash);
-        masterGrid.RefreshUnits(playerTurn);
+        
 
         if (GetPlayerProgeny((byte)playerTurn) == 1)
         {
@@ -721,8 +722,12 @@ public class GameMaster : MonoBehaviour
             PlayerWins(-1); //error case
         turnNumber++;
 
+        
+
         if (isAnimating)
+        {
             AnimateStartTurnCard(playerTurn);
+        }
         cameraManager.SnapCameraToUnitCluster(playerTurn);
 
 
@@ -1402,34 +1407,59 @@ public class GameMaster : MonoBehaviour
 
     public void AnimateStartTurnCard(int player)
     {
-
         Vector2 endPos = (player % 2 == 0) ? offScreenRight : offScreenLeft;
         Vector2 startPos = (player % 2 == 0) ? offScreenLeft : offScreenRight;
         Color playerColor = playerColors[player];
-        string hexColor = ColorUtility.ToHtmlStringRGBA(playerColor);
-        string openText = "Player ";
-        if (CPU_PlayersList != null && CPU_PlayersList[player])
-            openText = "CPU P";
 
-        //openText += $"{player}'s ";
-        //openText = $"<color=#{hexColor}>" + openText + "</color>";
+        if (MatchSettings.gameMode == MatchSettings.MatchGameMode.Tutorial && player == 1)
+        {
+            announcementCardText.text = "Your Turn";
+        }
+        else
+        {
+            string openText = "Player ";
+            if (CPU_PlayersList != null && CPU_PlayersList[player])
+            {
+                openText = "CPU P";
+            }
 
-        announcementCardText.text = openText + $"{player}'s turn!";
+            announcementCardText.text = openText + $"{player}'s turn!";
+        }
+
         announcementCardText.color = playerColor;
         announcementCardRT.anchoredPosition = startPos;
 
-        StartCoroutine(SwoopInAndOutTurnCard(startPos, centerPosition, endPos));
+        if (turnCardAnimationCoroutine != null)
+        {
+            StopCoroutine(turnCardAnimationCoroutine);
+            turnCardAnimationCoroutine = null;
+        }
+
+        turnCardAnimationCoroutine = StartCoroutine(SwoopInAndOutTurnCard(startPos, centerPosition, endPos));
+    }
+
+    public IEnumerator WaitForTurnCardAnimation()
+    {
+        while (turnCardAnimationCoroutine != null)
+        {
+            yield return null;
+        }
     }
 
     private IEnumerator SwoopInAndOutTurnCard(Vector2 startPos, Vector2 centerPos, Vector2 endPos)
     {
-        endTurnButton.interactable = false; 
-        yield return SwoopTurnCard(startPos, centerPos, swoopCardAnimationDuration/2f, EaseOutCubic);
-        yield return new WaitForSeconds(swoopCardAnimationDuration / 7f);
-        yield return SwoopTurnCard(centerPos, endPos, swoopCardAnimationDuration/3f, EaseInCubic); // * 3 / 8
-        //I don't like this being here but I need to wait.
-        //endTurnButton.GetComponent<Button>().interactable = !CPU_PlayersList[playerTurn];
-        EndTurnButtonSwitch();
+        endTurnButton.interactable = false;
+        try
+        {
+            yield return SwoopTurnCard(startPos, centerPos, swoopCardAnimationDuration / 2f, EaseOutCubic);
+            yield return new WaitForSeconds(swoopCardAnimationDuration / 7f);
+            yield return SwoopTurnCard(centerPos, endPos, swoopCardAnimationDuration / 3f, EaseInCubic);
+        }
+        finally
+        {
+            turnCardAnimationCoroutine = null;
+            EndTurnButtonSwitch();
+        }
     }
 
     private IEnumerator SwoopTurnCard(Vector2 startPos, Vector2 endPos, float duration, System.Func<float, float> easingFunction)

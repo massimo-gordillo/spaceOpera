@@ -48,12 +48,23 @@
       "waitForContinue": true
     },
     {
-      "id": "handoff_bloom",
-      "type": "turnHandoff",
-      "endTurnUiTarget": "endTurnButton",
-      "waitMs": 800,
-      "resumePlayer": 1,
-      "textAfter": "The flower pollenates the tile and spawns a free Spore each turn."
+      "id": "end_p1_bloom_turn",
+      "type": "endPlayerTurn",
+      "player": 1,
+      "waitForClick": true,
+      "endTurnUiTarget": "endTurnButton"
+    },
+    {
+      "id": "end_p2_bloom_turn",
+      "type": "endPlayerTurn",
+      "player": 2
+    },
+    {
+      "id": "dlg_flower_spore",
+      "type": "dialogue",
+      "speaker": "Tutorial",
+      "text": "The flower pollenates the tile and spawns a free Spore each turn.",
+      "waitForContinue": true
     },
     {
       "id": "dlg_produce_on_bismuth",
@@ -68,12 +79,23 @@
       "target": { "structureId": "owned_bismuth" }
     },
     {
-      "id": "handoff_cycle",
-      "type": "turnHandoff",
-      "endTurnUiTarget": "endTurnButton",
-      "waitMs": 700,
-      "resumePlayer": 1,
-      "textAfter": "Produce again from the same node when you are ready."
+      "id": "end_p1_cycle_turn",
+      "type": "endPlayerTurn",
+      "player": 1,
+      "waitForClick": true,
+      "endTurnUiTarget": "endTurnButton"
+    },
+    {
+      "id": "end_p2_cycle_turn",
+      "type": "endPlayerTurn",
+      "player": 2
+    },
+    {
+      "id": "dlg_produce_again",
+      "type": "dialogue",
+      "speaker": "Tutorial",
+      "text": "Produce again from the same node when you are ready.",
+      "waitForContinue": true
     },
     {
       "id": "dlg_done",

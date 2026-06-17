@@ -18,11 +18,30 @@
       "reason": "tutorial_universal_capture_victory"
     },
     {
+      "id": "dlg_summary",
+      "type": "dialogue",
+      "speaker": "Tutorial",
+      "text": "To win a game of Tactica, you must capture your opponent's <b>command structure</b>. To do so, you must first capture <b>BISMUTH</b> to grow your forces.",
+      "waitForContinue": true
+    },
+    {
+      "id": "camera_cmd_1",
+      "type": "cameraMove",
+      "target": { "x": 5, "y": 4 },
+      "durationMs": 500
+    },
+    {
       "id": "dlg_bismuth",
       "type": "dialogue",
       "speaker": "Tutorial",
-      "text": "This is <b>BISMUTH</b>. Capture these nodes to earn income each turn.<page/>Each Progeny has a dedicated capture unit — Ertrians use <b>Infantry</b>.",
+      "text": "This is <b>BISMUTH</b>. Capture these locations to earn income each turn.<page/>Each Progeny has a dedicated capture unit — Ertrians use <b>Infantry</b>.",
       "waitForContinue": true
+    },
+    {
+      "id": "camera_cmd_2",
+      "type": "cameraMove",
+      "target": { "x": 3, "y": 3 },
+      "durationMs": 500
     },
     {
       "id": "guide_infantry",
@@ -36,7 +55,7 @@
       "type": "guideClick",
       "speaker": "Tutorial",
       "text": "Move adjacent to the neutral node.",
-      "target": { "x": 4, "y": 5 }
+      "target": { "x": 5, "y": 5 }
     },
     {
       "id": "guide_capture",
@@ -53,6 +72,25 @@
       "waitForContinue": true
     },
     {
+      "id": "dlg_end_turn",
+      "type": "dialogue",
+      "speaker": "Tutorial",
+      "text": "End your turn when you are finished issuing orders.",
+      "waitForContinue": true
+    },
+    {
+      "id": "end_p1_turn",
+      "type": "endPlayerTurn",
+      "player": 1,
+      "waitForClick": true,
+      "endTurnUiTarget": "endTurnButton"
+    },
+    {
+      "id": "end_p2_turn",
+      "type": "endPlayerTurn",
+      "player": 2
+    },
+    {
       "id": "dlg_recapture",
       "type": "dialogue",
       "speaker": "Tutorial",
@@ -67,7 +105,7 @@
     {
       "id": "guide_move_cap_2",
       "type": "guideClick",
-      "target": { "x": 6, "y": 4 }
+      "target": { "x": 8, "y": 5 }
     },
     {
       "id": "guide_capture_2",
@@ -82,12 +120,23 @@
       "waitForContinue": true
     },
     {
-      "id": "handoff_capture",
-      "type": "turnHandoff",
-      "endTurnUiTarget": "endTurnButton",
-      "waitMs": 700,
-      "resumePlayer": 1,
-      "textAfter": "Your turn again. Complete the capture."
+      "id": "end_p1_capture_turn",
+      "type": "endPlayerTurn",
+      "player": 1,
+      "waitForClick": true,
+      "endTurnUiTarget": "endTurnButton"
+    },
+    {
+      "id": "end_p2_capture_turn",
+      "type": "endPlayerTurn",
+      "player": 2
+    },
+    {
+      "id": "dlg_your_turn_again",
+      "type": "dialogue",
+      "speaker": "Tutorial",
+      "text": "Your turn again. Complete the capture.",
+      "waitForContinue": true
     },
     {
       "id": "guide_infantry_3",
@@ -100,17 +149,94 @@
       "target": { "uiTarget": "captureButton" }
     },
     {
-      "id": "dlg_victory",
+      "id": "dlg_end_turn",
       "type": "dialogue",
       "speaker": "Tutorial",
-      "text": "Lastly, victory: destroy or capture your opponent's <b>command structure</b>.<page/>Secure the BISMUTH economy, then remove their headquarters.",
+      "text": "End your turn.",
       "waitForContinue": true
     },
     {
-      "id": "camera_cmd",
+      "id": "end_p1_turn_3",
+      "type": "endPlayerTurn",
+      "player": 1,
+      "waitForClick": true,
+      "endTurnUiTarget": "endTurnButton"
+    },
+    {
+      "id": "end_p2_turn_3",
+      "type": "endPlayerTurn",
+      "player": 2
+    },
+    {
+      "id": "camera_cmd_3",
       "type": "cameraMove",
-      "target": { "x": 5, "y": 5 },
+      "target": { "x": 8, "y": 2 },
       "durationMs": 500
+    },
+    {
+      "id": "dlg_prompt_capture_cmd",
+      "type": "dialogue",
+      "speaker": "Tutorial",
+      "text": "Now we can capture your opponent's <b>command structure</b> and win the game!",
+      "waitForContinue": true
+    },
+    {
+      "id": "guide_infantry_4",
+      "type": "guideClick",
+      "target": { "unitId": "p1_infantry" }
+    },
+    {
+      "id": "guide_move_cap_4",
+      "type": "guideClick",
+      "target": { "x": 8, "y": 2 }
+    },
+    {
+      "id": "guide_capture_4",
+      "type": "guideClick",
+      "target": { "uiTarget": "captureButton" }
+    },
+    {
+      "id": "dlg_finish_next_turn_4",
+      "type": "dialogue",
+      "speaker": "Tutorial",
+      "text": "End the turn — you'll finish capturing on your next turn.",
+      "waitForContinue": true
+    },
+    {
+      "id": "end_p1_capture_turn_4",
+      "type": "endPlayerTurn",
+      "player": 1,
+      "waitForClick": true,
+      "endTurnUiTarget": "endTurnButton"
+    },
+    {
+      "id": "end_p2_capture_turn_4",
+      "type": "endPlayerTurn",
+      "player": 2
+    },
+    {
+      "id": "dlg_your_turn_again_4",
+      "type": "dialogue",
+      "speaker": "Tutorial",
+      "text": "Your turn again. Complete the capture.",
+      "waitForContinue": true
+    },
+    {
+      "id": "guide_infantry_5",
+      "type": "guideClick",
+      "target": { "unitId": "p1_infantry" }
+    },
+    {
+      "id": "guide_capture_5",
+      "type": "guideClick",
+      "target": { "uiTarget": "captureButton" }
+    },
+    {
+      "id": "dlg_victory",
+      "type": "dialogue",
+      "speaker": "Tutorial",
+      "text": "Well done! You are victorious! Now to learn about producing units.",
+      "waitForContinue": true
     },
     {
       "id": "complete",

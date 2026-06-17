@@ -2779,7 +2779,7 @@ public class MasterGrid : MonoBehaviour
         long tempPreTurnHash = preTurnHash;
         long tempPostTurnHash = ComputeGameStateHash_v1();
         //Debug.Log($"End of turn gameStateHash: {tempPostTurnHash}");
-
+        
         ClearMovement();
         ClearSelectedUnit();
         turnActionCount = 0;
@@ -2788,6 +2788,7 @@ public class MasterGrid : MonoBehaviour
         List<GameAction> tempGameActions = new List<GameAction>(gameActions);
         gameActions.Clear();
         preTurnHash = tempPostTurnHash;
+        RefreshUnits(playerNum);
         return (tempGameActions, tempPreTurnHash, tempPostTurnHash);
     }
 

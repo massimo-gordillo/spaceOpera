@@ -59,12 +59,23 @@
       "waitForContinue": true
     },
     {
-      "id": "handoff_prod",
-      "type": "turnHandoff",
-      "endTurnUiTarget": "endTurnButton",
-      "waitMs": 700,
-      "resumePlayer": 1,
-      "textAfter": "New units arrive at the start of your turn. Move your tank to free the factory line."
+      "id": "end_p1_prod_turn",
+      "type": "endPlayerTurn",
+      "player": 1,
+      "waitForClick": true,
+      "endTurnUiTarget": "endTurnButton"
+    },
+    {
+      "id": "end_p2_prod_turn",
+      "type": "endPlayerTurn",
+      "player": 2
+    },
+    {
+      "id": "dlg_new_units",
+      "type": "dialogue",
+      "speaker": "Tutorial",
+      "text": "New units arrive at the start of your turn. Move your tank to free the factory line.",
+      "waitForContinue": true
     },
     {
       "id": "guide_tank",
@@ -84,21 +95,27 @@
       "waitForContinue": true
     },
     {
-      "id": "handoff_enemy",
-      "type": "turnHandoff",
-      "requirePlayerEndTurn": false,
-      "waitMs": 500,
-      "resumePlayer": 1,
-      "scriptedSteps": {
-        "steps": [
-          {
-            "type": "moveUnit",
-            "unitId": "p2_enemy_tank",
-            "to": { "x": 8, "y": 4 }
-          }
-        ]
-      },
-      "textAfter": "Your artillery can reach that tank — attack it."
+      "id": "end_p1_enemy_turn",
+      "type": "endPlayerTurn",
+      "player": 1
+    },
+    {
+      "id": "p2_enemy_move",
+      "type": "moveUnit",
+      "unitId": "p2_enemy_tank",
+      "to": { "x": 8, "y": 4 }
+    },
+    {
+      "id": "end_p2_enemy_turn",
+      "type": "endPlayerTurn",
+      "player": 2
+    },
+    {
+      "id": "dlg_artillery_range",
+      "type": "dialogue",
+      "speaker": "Tutorial",
+      "text": "Your artillery can reach that tank — attack it.",
+      "waitForContinue": true
     },
     {
       "id": "guide_attack",

@@ -25,7 +25,7 @@ public class SequenceManager : MonoBehaviour
     [Header("Sequence dialog controls (inspector)")]
     [Tooltip("Full-screen invisible tap catcher on SequenceGlobalCanvas. Leave disabled in the scene; enabled while dialogue waits for continue. Wire its Button On Click to NotifyDialogAdvanceFromSequenceDialogPanelTap.")]
     public GameObject dialogFullscreenTapBlocker;
-    [Tooltip("Optional. Wire its Button On Click to SkipDialogSequence. Used at runtime to keep the skip control above the tap blocker.")]
+    [Tooltip("Optional. Wire its Button On Click to SkipDialogSequence. Hidden during tutorial matches; shown for other sequences.")]
     public Button skipDialogButton;
 
     public GameObject sequenceCharacterPortrait;
@@ -82,6 +82,9 @@ public class SequenceManager : MonoBehaviour
     private readonly Dictionary<string, BaseUnit> unitRefs = new Dictionary<string, BaseUnit>();
     private readonly Dictionary<string, BaseStructure> structureRefs = new Dictionary<string, BaseStructure>();
     private readonly HashSet<string> highlightedUiTargets = new HashSet<string>();
+    private readonly Dictionary<string, Coroutine> uiHighlightCoroutines = new Dictionary<string, Coroutine>();
+    private readonly Dictionary<string, List<UiHighlightFlashTarget>> uiHighlightTargets =
+        new Dictionary<string, List<UiHighlightFlashTarget>>();
     private readonly HashSet<BaseUnit> highlightedUnits = new HashSet<BaseUnit>();
     private readonly HashSet<BaseStructure> highlightedStructures = new HashSet<BaseStructure>();
     private readonly HashSet<MovementSquare> highlightedMovementSquares = new HashSet<MovementSquare>();
@@ -160,6 +163,7 @@ public class SequenceManager : MonoBehaviour
 
         PrepareDialogInfrastructure();
         BootstrapMatchSettingsIfNeeded();
+        RefreshSkipDialogButton();
     }
 
     /// <summary>Runs an optional leading loadMap step before gameplay / StartTurn.</summary>
@@ -526,12 +530,8 @@ public class SequenceManager : MonoBehaviour
                 yield return ExecuteGuideClick(sequenceId, stepIndex, step);
                 break;
 
-            case "turnHandoff":
-                yield return ExecuteTurnHandoff(sequenceId, stepIndex, step);
-                break;
-
-            case "advanceTurn":
-                yield return ExecuteAdvanceTurn(stepIndex, step);
+            case "endPlayerTurn":
+                yield return ExecuteEndPlayerTurn(stepIndex, step);
                 break;
 
             case "showTutorialComplete":
@@ -721,89 +721,57 @@ public class SequenceManager : MonoBehaviour
         EndGuidedClickGate();
     }
 
-    private IEnumerator ExecuteTurnHandoff(string sequenceId, int stepIndex, SequenceStepDto step)
+    private IEnumerator ExecuteEndPlayerTurn(int stepIndex, SequenceStepDto step)
     {
-        if (!string.IsNullOrWhiteSpace(step.text))
+        int player = step.player > 0 ? step.player : 1;
+        if (GameMaster.playerTurn != player)
         {
-            yield return PresentDialogueStep(sequenceId, stepIndex, step);
+            LogStepError(stepIndex, $"endPlayerTurn expected player {player} but current is {GameMaster.playerTurn}.");
+            yield break;
         }
 
-        if (step.requirePlayerEndTurn)
+        if (step.waitForClick)
         {
             string endTurnKey = string.IsNullOrWhiteSpace(step.endTurnUiTarget) ? "endTurnButton" : step.endTurnUiTarget;
+            int playerBeforeEndTurn = GameMaster.playerTurn;
+
             sequenceCharacterPortrait.SetActive(false);
             TargetDto endTurnTarget = new TargetDto { uiTarget = endTurnKey };
-
-            if (!string.IsNullOrWhiteSpace(step.speaker) && string.IsNullOrWhiteSpace(step.text))
-            {
-                // text already shown above
-            }
-
             BeginGuidedClickGate(endTurnTarget);
             yield return WaitForUiClick(stepIndex, endTurnKey, step.timeoutMs, endTurnTarget, true);
             EndGuidedClickGate();
             sequenceCharacterPortrait.SetActive(true);
 
-            gameMaster.endTurnConfirmCard.SetActive(false);
-            if (GameMaster.playerTurn == 1)
+            if (GameMaster.playerTurn == playerBeforeEndTurn)
             {
+                gameMaster.endTurnConfirmCard.SetActive(false);
                 gameMaster.InitiateEndTurn();
             }
+
+            yield return WaitForTurnAdvanceFrom(playerBeforeEndTurn, stepIndex);
         }
-
-        yield return WaitForDurationMs(step.waitMs > 0 ? step.waitMs : 600);
-
-        if (step.scriptedSteps != null && step.scriptedSteps.steps != null)
-        {
-            for (int i = 0; i < step.scriptedSteps.steps.Count; i++)
-            {
-                SequenceStepDto nested = step.scriptedSteps.steps[i];
-                if (nested != null)
-                {
-                    yield return ExecuteStep(sequenceId, stepIndex, nested);
-                }
-            }
-        }
-
-        if (step.resumePlayer > 0)
-        {
-            SequenceStepDto advance = new SequenceStepDto
-            {
-                type = "advanceTurn",
-                resumePlayer = step.resumePlayer
-            };
-            yield return ExecuteAdvanceTurn(stepIndex, advance);
-        }
-
-        if (!string.IsNullOrWhiteSpace(step.textAfter))
-        {
-            SequenceStepDto afterDlg = new SequenceStepDto
-            {
-                type = "dialogue",
-                speaker = step.speaker,
-                text = step.textAfter,
-                waitForContinue = true
-            };
-            yield return PresentDialogueStep(sequenceId, stepIndex, afterDlg);
-        }
-    }
-
-    private IEnumerator ExecuteAdvanceTurn(int stepIndex, SequenceStepDto step)
-    {
-        int targetPlayer = step.resumePlayer > 0 ? step.resumePlayer : 1;
-        int safety = 0;
-        while (GameMaster.playerTurn != targetPlayer && safety < 12)
+        else
         {
             gameMaster.endTurnConfirmCard.SetActive(false);
             gameMaster.InitiateEndTurn();
-            safety++;
-            yield return null;
-            yield return new WaitForSeconds(0.25f);
         }
 
-        if (GameMaster.playerTurn != targetPlayer)
+        yield return gameMaster.WaitForTurnCardAnimation();
+    }
+
+    IEnumerator WaitForTurnAdvanceFrom(int fromPlayer, int stepIndex)
+    {
+        const float timeoutSeconds = 60f;
+        float elapsed = 0f;
+        while (GameMaster.playerTurn == fromPlayer && elapsed < timeoutSeconds)
         {
-            LogStepError(stepIndex, $"advanceTurn could not reach player {targetPlayer} (current {GameMaster.playerTurn}).");
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        if (GameMaster.playerTurn == fromPlayer)
+        {
+            LogStepError(stepIndex, $"endPlayerTurn timed out waiting for player {fromPlayer} to end their turn.");
         }
     }
 
@@ -959,7 +927,7 @@ public class SequenceManager : MonoBehaviour
             sequenceDialogText.maxVisibleCharacters = int.MaxValue;
             sequenceDialogText.ForceMeshUpdate();
 
-            EnsureSkipButtonForeground();
+            RefreshSkipDialogButton();
 
             int pageCount = 1;
             if (sequenceDialogText.textInfo != null)
@@ -1626,15 +1594,135 @@ public class SequenceManager : MonoBehaviour
             return;
         }
 
-        Transform t = targetObject.transform;
-        t.localScale = enabled ? Vector3.one * 1.05f : Vector3.one;
         if (enabled)
         {
+            if (uiHighlightCoroutines.ContainsKey(uiTarget))
+            {
+                return;
+            }
+
+            if (!TryCollectUiHighlightTargets(targetObject, out List<UiHighlightFlashTarget> targets))
+            {
+                LogStepError(stepIndex, $"highlightTarget failed, no flashable graphics on UI key '{uiTarget}'.");
+                return;
+            }
+
+            uiHighlightTargets[uiTarget] = targets;
             highlightedUiTargets.Add(uiTarget);
+            uiHighlightCoroutines[uiTarget] = StartCoroutine(UiHighlightFlashCoroutine(uiTarget, targets));
         }
         else
         {
+            StopUiHighlight(uiTarget);
             highlightedUiTargets.Remove(uiTarget);
+        }
+    }
+
+    const int UiTutorialHighlightFlashCount = 3;
+    const float UiTutorialHighlightFlashStepSeconds = 0.2f;
+    const float UiTutorialHighlightLoopPauseSeconds = 1.5f;
+
+    sealed class UiHighlightFlashTarget
+    {
+        public Graphic graphic;
+        public Color baseColor;
+    }
+
+    static bool TryCollectUiHighlightTargets(GameObject root, out List<UiHighlightFlashTarget> targets)
+    {
+        targets = new List<UiHighlightFlashTarget>();
+        if (root == null)
+        {
+            return false;
+        }
+
+        Button button = root.GetComponent<Button>();
+        Graphic buttonImage = button != null ? button.targetGraphic : null;
+        if (buttonImage == null)
+        {
+            buttonImage = root.GetComponent<Graphic>();
+        }
+
+        if (buttonImage != null)
+        {
+            targets.Add(new UiHighlightFlashTarget
+            {
+                graphic = buttonImage,
+                baseColor = buttonImage.color
+            });
+        }
+
+        TMP_Text label = root.GetComponentInChildren<TMP_Text>(true);
+        if (label != null && (buttonImage == null || label != buttonImage))
+        {
+            targets.Add(new UiHighlightFlashTarget
+            {
+                graphic = label,
+                baseColor = label.color
+            });
+        }
+
+        return targets.Count > 0;
+    }
+
+    IEnumerator UiHighlightFlashCoroutine(string uiTarget, List<UiHighlightFlashTarget> targets)
+    {
+        while (true)
+        {
+            for (int flash = 0; flash < UiTutorialHighlightFlashCount; flash++)
+            {
+                SetUiHighlightColors(targets, Color.white);
+                yield return new WaitForSeconds(UiTutorialHighlightFlashStepSeconds);
+                RestoreUiHighlightTargets(targets);
+                yield return new WaitForSeconds(UiTutorialHighlightFlashStepSeconds);
+            }
+
+            yield return new WaitForSeconds(UiTutorialHighlightLoopPauseSeconds);
+        }
+    }
+
+    static void SetUiHighlightColors(List<UiHighlightFlashTarget> targets, Color color)
+    {
+        for (int i = 0; i < targets.Count; i++)
+        {
+            UiHighlightFlashTarget target = targets[i];
+            if (target?.graphic != null)
+            {
+                target.graphic.color = color;
+            }
+        }
+    }
+
+    static void RestoreUiHighlightTargets(List<UiHighlightFlashTarget> targets)
+    {
+        for (int i = 0; i < targets.Count; i++)
+        {
+            UiHighlightFlashTarget target = targets[i];
+            if (target?.graphic != null)
+            {
+                target.graphic.color = target.baseColor;
+            }
+        }
+    }
+
+    void StopUiHighlight(string uiTarget)
+    {
+        if (uiHighlightCoroutines.TryGetValue(uiTarget, out Coroutine running) && running != null)
+        {
+            StopCoroutine(running);
+        }
+
+        uiHighlightCoroutines.Remove(uiTarget);
+
+        if (uiHighlightTargets.TryGetValue(uiTarget, out List<UiHighlightFlashTarget> targets))
+        {
+            RestoreUiHighlightTargets(targets);
+            uiHighlightTargets.Remove(uiTarget);
+        }
+
+        if (TryGetUiObject(uiTarget, out GameObject targetObject) && targetObject != null)
+        {
+            targetObject.transform.localScale = Vector3.one;
         }
     }
 
@@ -1701,10 +1789,12 @@ public class SequenceManager : MonoBehaviour
     {
         foreach (string uiKey in new List<string>(highlightedUiTargets))
         {
-            ApplyUiHighlight(-1, uiKey, false);
+            StopUiHighlight(uiKey);
         }
 
         highlightedUiTargets.Clear();
+        uiHighlightCoroutines.Clear();
+        uiHighlightTargets.Clear();
 
         foreach (BaseUnit unit in new List<BaseUnit>(highlightedUnits))
         {
@@ -1965,7 +2055,7 @@ public class SequenceManager : MonoBehaviour
         PrepareDialogInfrastructure();
         dialogAdvanceSignalRaise = raiseAdvanceSignal;
 
-        EnsureSkipButtonForeground();
+        RefreshSkipDialogButton();
 
         if (sequenceDialogText != null)
         {
@@ -1989,7 +2079,7 @@ public class SequenceManager : MonoBehaviour
         {
             dialogFullscreenTapBlocker.transform.SetAsFirstSibling();
             dialogFullscreenTapBlocker.SetActive(true);
-            EnsureSkipButtonForeground();
+            RefreshSkipDialogButton();
         }
         else
         {
@@ -2044,17 +2134,37 @@ public class SequenceManager : MonoBehaviour
         }
     }
 
-    private void EnsureSkipButtonForeground()
+    static bool IsTutorialMatch()
     {
-        if (skipDialogButton != null)
+        return MatchSettings.gameMode == MatchSettings.MatchGameMode.Tutorial;
+    }
+
+    void RefreshSkipDialogButton()
+    {
+        if (skipDialogButton == null)
         {
-            skipDialogButton.transform.SetAsLastSibling();
+            return;
         }
+
+        bool allowSkip = !IsTutorialMatch();
+        skipDialogButton.gameObject.SetActive(allowSkip);
+        if (!allowSkip)
+        {
+            return;
+        }
+
+        skipDialogButton.interactable = true;
+        skipDialogButton.transform.SetAsLastSibling();
     }
 
     /// <summary>Wire from SkipDialogButton On Click in the Inspector.</summary>
     public void SkipDialogSequence()
     {
+        if (IsTutorialMatch())
+        {
+            return;
+        }
+
         Debug.Log("[SequenceManager] Skip dialog — terminating current sequence.");
         sequenceSkippedRequested = true;
         dialogAdvanceSignalRaise?.Invoke();
