@@ -18,7 +18,6 @@ public class SequenceManager : MonoBehaviour
     public GameMaster gameMaster;
     public MasterGrid masterGrid;
     public CameraManager cameraManager;
-    public SequenceUIBindings uiBindings;
     public GameObject sequenceGlobalCanvas;
     public TMP_Text sequenceDialogText;
     public Image sequenceDialogImage;
@@ -47,6 +46,11 @@ public class SequenceManager : MonoBehaviour
     public bool autoRunFullCurriculum = true;
     [Tooltip("Seconds after lesson complete before loading next (0 = next frame).")]
     public float autoAdvanceDelaySeconds = 0.35f;
+
+    [Header("Tutorial — UI key bindings (Inspector)")]
+    [Tooltip("Maps sequence JSON uiTarget keys to scene UI objects and Selectables.")]
+    [SerializeField]
+    private List<UiBindingEntry> uiBindings = new List<UiBindingEntry>();
 
     [Header("Tutorial — guideClick UI gate (Inspector)")]
     [Tooltip("UIMaster/PriorityUIElements — stays clickable during guideClick waits.")]
@@ -714,9 +718,9 @@ public class SequenceManager : MonoBehaviour
 
         string allowedUiKey = target != null ? target.uiTarget : null;
         Selectable allowedSelectable = null;
-        if (!string.IsNullOrWhiteSpace(allowedUiKey) && uiBindings != null)
+        if (!string.IsNullOrWhiteSpace(allowedUiKey))
         {
-            uiBindings.TryGetSelectable(allowedUiKey, out allowedSelectable);
+            TryGetUiSelectable(allowedUiKey, out allowedSelectable);
         }
 
         if (uiGateScanRoot != null)
@@ -749,7 +753,7 @@ public class SequenceManager : MonoBehaviour
                 selectable.interactable = false;
             }
         }
-        else if (uiBindings != null)
+        else
         {
             DisableBoundSelectablesExcept(allowedSelectable);
         }
@@ -795,11 +799,6 @@ public class SequenceManager : MonoBehaviour
 
     void DisableBoundSelectablesExcept(Selectable allowedSelectable)
     {
-        if (uiBindings == null)
-        {
-            return;
-        }
-
         string[] keys =
         {
             "endTurnButton", "attackButton", "captureButton", "undoButton", "exitButton"
@@ -807,7 +806,7 @@ public class SequenceManager : MonoBehaviour
 
         for (int i = 0; i < keys.Length; i++)
         {
-            if (!uiBindings.TryGetSelectable(keys[i], out Selectable selectable) || selectable == null)
+            if (!TryGetUiSelectable(keys[i], out Selectable selectable) || selectable == null)
             {
                 continue;
             }
@@ -1315,13 +1314,7 @@ public class SequenceManager : MonoBehaviour
         TargetDto highlightTarget = null,
         bool clearHintWhenDone = true)
     {
-        if (uiBindings == null)
-        {
-            LogStepError(stepIndex, "requireUiClick failed because SequenceUIBindings is not assigned.");
-            yield break;
-        }
-
-        if (!uiBindings.TryGetSelectable(uiTarget, out Selectable selectable))
+        if (!TryGetUiSelectable(uiTarget, out Selectable selectable))
         {
             LogStepError(stepIndex, $"requireUiClick failed, missing UI key '{uiTarget}'.");
             yield break;
@@ -1416,12 +1409,6 @@ public class SequenceManager : MonoBehaviour
 
     private void ApplyUiInteractable(int stepIndex, SequenceStepDto step)
     {
-        if (uiBindings == null)
-        {
-            LogStepError(stepIndex, "setUiInteractable failed because SequenceUIBindings is not assigned.");
-            return;
-        }
-
         if (step.uiTargets == null || step.uiTargets.Count == 0)
         {
             LogStepError(stepIndex, "setUiInteractable requires uiTargets.");
@@ -1430,7 +1417,7 @@ public class SequenceManager : MonoBehaviour
 
         HashSet<string> targetSet = new HashSet<string>(step.uiTargets);
         bool enable = step.mode == "allowOnly";
-        uiBindings.SetInteractable(targetSet, enable);
+        SetUiBindingsInteractable(targetSet, enable);
     }
 
     private void ApplyHighlightForTarget(int stepIndex, TargetDto target, bool enabled)
@@ -1501,13 +1488,7 @@ public class SequenceManager : MonoBehaviour
 
     private void ApplyUiHighlight(int stepIndex, string uiTarget, bool enabled)
     {
-        if (uiBindings == null)
-        {
-            LogStepError(stepIndex, "highlightTarget failed because SequenceUIBindings is not assigned.");
-            return;
-        }
-
-        if (!uiBindings.TryGetObject(uiTarget, out GameObject targetObject))
+        if (!TryGetUiObject(uiTarget, out GameObject targetObject))
         {
             LogStepError(stepIndex, $"highlightTarget failed, missing UI key '{uiTarget}'.");
             return;
@@ -1950,5 +1931,86 @@ public class SequenceManager : MonoBehaviour
     private void LogStepError(int stepIndex, string message)
     {
         Debug.LogError($"[SequenceManager] Step {stepIndex}: {message}");
+    }
+
+    bool TryGetUiSelectable(string key, out Selectable selectable)
+    {
+        selectable = null;
+        if (string.IsNullOrWhiteSpace(key) || uiBindings == null)
+        {
+            return false;
+        }
+
+        for (int i = 0; i < uiBindings.Count; i++)
+        {
+            UiBindingEntry entry = uiBindings[i];
+            if (entry != null && entry.key == key && entry.selectable != null)
+            {
+                selectable = entry.selectable;
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    bool TryGetUiObject(string key, out GameObject targetObject)
+    {
+        targetObject = null;
+        if (string.IsNullOrWhiteSpace(key) || uiBindings == null)
+        {
+            return false;
+        }
+
+        for (int i = 0; i < uiBindings.Count; i++)
+        {
+            UiBindingEntry entry = uiBindings[i];
+            if (entry != null && entry.key == key)
+            {
+                if (entry.targetObject != null)
+                {
+                    targetObject = entry.targetObject;
+                    return true;
+                }
+
+                if (entry.selectable != null)
+                {
+                    targetObject = entry.selectable.gameObject;
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    void SetUiBindingsInteractable(HashSet<string> keys, bool interactable)
+    {
+        if (keys == null || keys.Count == 0 || uiBindings == null)
+        {
+            return;
+        }
+
+        for (int i = 0; i < uiBindings.Count; i++)
+        {
+            UiBindingEntry entry = uiBindings[i];
+            if (entry == null || entry.selectable == null)
+            {
+                continue;
+            }
+
+            if (keys.Contains(entry.key))
+            {
+                entry.selectable.interactable = interactable;
+            }
+        }
+    }
+
+    [Serializable]
+    public class UiBindingEntry
+    {
+        public string key;
+        public GameObject targetObject;
+        public Selectable selectable;
     }
 }

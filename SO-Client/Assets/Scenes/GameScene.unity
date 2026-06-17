@@ -8904,69 +8904,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1032922011}
   m_CullTransparentMesh: 1
---- !u!1 &1036341366
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1036341367}
-  - component: {fileID: 1036341368}
-  m_Layer: 5
-  m_Name: SequenceUIBindings
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1036341367
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1036341366}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 120, y: 120, z: 120}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1151130069}
-  m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1036341368
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1036341366}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f254eef2da588024e9154cb4b60d0928, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  bindings:
-  - key: endTurnButton
-    targetObject: {fileID: 2003348278}
-    selectable: {fileID: 2003348280}
-  - key: attackButton
-    targetObject: {fileID: 99806016}
-    selectable: {fileID: 99806018}
-  - key: captureButton
-    targetObject: {fileID: 1570366190}
-    selectable: {fileID: 1570366192}
-  - key: undoButton
-    targetObject: {fileID: 1480146371}
-    selectable: {fileID: 1480146372}
-  - key: exitButton
-    targetObject: {fileID: 1921249645}
-    selectable: {fileID: 1921249647}
-  - key: productionContent
-    targetObject: {fileID: 1046091508}
-    selectable: {fileID: 0}
 --- !u!1 &1044885554
 GameObject:
   m_ObjectHideFlags: 0
@@ -10202,7 +10139,6 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2087654322}
-  - {fileID: 1036341367}
   - {fileID: 1904066698}
   - {fileID: 684725187}
   - {fileID: 589444399}
@@ -13241,7 +13177,6 @@ MonoBehaviour:
   gameMaster: {fileID: 1024135144}
   masterGrid: {fileID: 450342577}
   cameraManager: {fileID: 519420030}
-  uiBindings: {fileID: 1036341368}
   sequenceGlobalCanvas: {fileID: 1151130068}
   sequenceDialogText: {fileID: 1503368042}
   sequenceDialogImage: {fileID: 1138927563}
@@ -13255,12 +13190,31 @@ MonoBehaviour:
   outroSequenceResourcePath: 
   autoRunFullCurriculum: 1
   autoAdvanceDelaySeconds: 0.35
+  uiBindings:
+  - key: endTurnButton
+    targetObject: {fileID: 2003348278}
+    selectable: {fileID: 2003348280}
+  - key: attackButton
+    targetObject: {fileID: 99806016}
+    selectable: {fileID: 99806018}
+  - key: captureButton
+    targetObject: {fileID: 1570366190}
+    selectable: {fileID: 1570366192}
+  - key: undoButton
+    targetObject: {fileID: 1480146371}
+    selectable: {fileID: 1480146372}
+  - key: exitButton
+    targetObject: {fileID: 1921249645}
+    selectable: {fileID: 1921249647}
+  - key: productionContent
+    targetObject: {fileID: 1046091508}
+    selectable: {fileID: 0}
+  priorityUiRoot: {fileID: 678671369}
+  uiGateScanRoot: {fileID: 1887924841}
   completionPanel: {fileID: 589444398}
   nextLessonButton: {fileID: 163089932}
   backToTutorialsButton: {fileID: 1278561645}
   completionTitleText: {fileID: 2002019082}
-  priorityUiRoot: {fileID: 678671369}
-  uiGateScanRoot: {fileID: 1887924841}
 --- !u!1 &1333106502
 GameObject:
   m_ObjectHideFlags: 0

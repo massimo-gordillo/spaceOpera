@@ -162,13 +162,17 @@ public class GameMaster : MonoBehaviour
         }
 
         //If the MatchSettings not initialized through the MenuScene, set the default values.
+        if (Application.isEditor)
+        {
+                musicAudio.Pause();
+        }
+
         if (!MatchSettings.isInit)
         {
             Debug.LogWarning("MatchSettings.numPlayers is null, defaulting to 2");
             MatchSettings.SetNumPlayers(2);
             MatchSettings.SetPlayerColours();
             MatchSettings.isInit = true;
-            musicAudio.Pause();
 
             
             SetPlayerColors(true);
@@ -1169,12 +1173,7 @@ public class GameMaster : MonoBehaviour
         Debug.Log("Game state saved to " + gameStateFilePath);
     }*/
 
-    //need error checking here.
-    //Cannot have two units on the same hex.
-    //Cannot hvae two structures on the same hex.
-    //Structure can only be placed on grass
-    //units must be placed on a legal square
-    //units and structures must not be outside of boundaries
+
     /// <summary>After .gsdat spawn: register structures in the grid (Startup handles first load).</summary>
     void RefreshStructuresAfterMapLoad(bool sameMapDimensions)
     {
@@ -1203,6 +1202,12 @@ public class GameMaster : MonoBehaviour
         }
     }
 
+        //need error checking here.
+    //Cannot have two units on the same hex.
+    //Cannot hvae two structures on the same hex.
+    //Structure can only be placed on grass
+    //units must be placed on a legal square
+    //units and structures must not be outside of boundaries
     public void ConvertListToGamePieces(List<GamePieceInfo> gameStateList)
     {
         if (gameStateList != null && gameStateList.Count != 0)

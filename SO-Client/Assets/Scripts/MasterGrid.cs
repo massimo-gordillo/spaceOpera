@@ -96,10 +96,6 @@ public class MasterGrid : MonoBehaviour
         //Dictionary<(byte, byte), GamePieceInfo> gameStateDict = ConvertGamePiecesToList();
         //printUnitGrid();
 
-
-
-        commandStructures[0] = null;
-
     }
 
     /// <summary>Register spawned scene structures in structureGrid and run visuals. Call after map spawn when grids already exist.</summary>
