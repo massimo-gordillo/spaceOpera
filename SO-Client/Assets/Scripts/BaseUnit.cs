@@ -33,6 +33,8 @@ public class BaseUnit : MonoBehaviour
     public int price;
     public int movementRange;
     public int playerControl;
+    /// <summary>When set before Start(), overrides the default full-health spawn (0–100 from .gsdat).</summary>
+    public int? spawnHealthPercent;
     public int team;
     public int orientation;
     public string sequenceId;
@@ -89,6 +91,17 @@ public class BaseUnit : MonoBehaviour
 
 
 
+    public void ApplyInitialPlayerVisuals()
+    {
+        if (spriteContainer != null)
+            spriteContainer.ApplyPlayerColor(playerControl, nonExhausted, false);
+
+        if ((playerControl + 1) % 2 == 1)
+            FlipSprites();
+
+        InitializeColors();
+    }
+
     void Start()
     {
         pos.x = (int)transform.position.x;
@@ -105,26 +118,22 @@ public class BaseUnit : MonoBehaviour
             onLocation.TurnOffCollider();
         }
 
-        //baseColor = spriteFillSR.color;
-        //originalLightsColor = spriteLightsSR.color;
-        spriteContainer.SetColor(playerControl, false, false);
+        ApplyInitialPlayerVisuals();
 
-        //a good hack will probably want to fix later.
-        if ((playerControl+1) % 2 == 1)
-            FlipSprites();
-
-        //Debug.Log($"Setting health {healthCurrent} to health max {healthMax}");
-        healthCurrent = healthMax; //set current health to max health on start
-        SetHealth(healthMax);
+        if (spawnHealthPercent.HasValue)
+            SetHealth((int)((double)(spawnHealthPercent.Value * healthMax) / 100));
+        else
+        {
+            healthCurrent = healthMax;
+            SetHealth(healthMax);
+        }
+        spawnHealthPercent = null;
         if (unitNameTextContainer != null)
         {
             unitNameTextContainer.text = $"P{playerControl}'s {unitName}";
         }
         else
             Debug.LogError("No unitNameTextContainerFound");
-
-
-        InitializeColors();
 
         HideCrosshairs();
         HideCombatTooltip();
@@ -372,37 +381,22 @@ public class BaseUnit : MonoBehaviour
 
     public void SetNonExhausted(bool ready)
     {
-        //Debug.Log($"{this.unitName} is being set to non-exhausted {b}");
         movementNonExhausted = ready;
         nonExhausted = ready;
-        //spriteContainer.SetColor(playerControl, b, false);
-        /*        if (GameMaster.CPU_PlayersList[playerControl])
-                    DelaySetColor(b);
-                else
-                    spriteContainer.SetColor(playerControl, b, false);*/
-        /*        if (unitName.ToLower() != "seed")
-                    StartCoroutine(DelaySetColor(ready));
-                else
-                {
-                    spriteFillSR.color = GameMaster.playerColors[GameMaster.playerTurn - 1];
-                    spriteLightsSR.color = Color.white;
-                }*/
-/*        if (unitName.ToLower() == "seed")
-        {
-            //debug print hglight colour
-            Debug.Log($"Seed highlight color: {spriteLightsSR.color}");
-        }*/
+        if (spriteContainer == null)
+            return;
 
-        StartCoroutine(DelaySetColor(ready));
+        if (ready)
+            spriteContainer.ApplyPlayerColor(playerControl, true, false);
+        else
+            StartCoroutine(DelayExhaustedColor());
     }
 
-    public IEnumerator DelaySetColor(bool ready)
+    IEnumerator DelayExhaustedColor()
     {
-        if (ready)
-            yield return null;
-        else
-            yield return new WaitForSeconds(GameMaster.globalAnimationDuration);
-        spriteContainer.SetColor(playerControl, ready, false);
+        yield return new WaitForSeconds(GameMaster.globalAnimationDuration);
+        if (spriteContainer != null)
+            spriteContainer.ApplyPlayerColor(playerControl, false, false);
     }
 
 

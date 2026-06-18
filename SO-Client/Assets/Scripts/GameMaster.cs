@@ -421,29 +421,18 @@ public class GameMaster : MonoBehaviour
                 BaseUnit unit = null;
 				if (progeny == 0)
                 {
-                    //BaseUnit infantryUnitPrefab = Resources.Load<BaseUnit>("UnitPrefabs/progeny1/InfantryPrefab");
                     BaseUnit infantryUnitPrefab = PrefabManager.GetBaseUnitFromName("Infantry", 0);
-                    infantryUnitPrefab.playerControl = player;
                     unit = GetInstantiateUnit(infantryUnitPrefab, prod.pos, player);
-                    
-                    //BaseUnit unit = Instantiate(infantryUnitPrefab, new Vector2(x, y), Quaternion.identity, unitContainer);
-
                 }
                 else if (progeny == 1)
                 {
                     BaseUnit sporeUnitPrefab = PrefabManager.GetBaseUnitFromName("Spore", 1);
-                    sporeUnitPrefab.playerControl = player;
                     unit = GetInstantiateUnit(sporeUnitPrefab, prod.pos, player);
-                    //BaseUnit unit = Instantiate(sporeUnitPrefab, new Vector2(x, y), Quaternion.identity, unitContainer);
-
                 }
                 else if (progeny == 2)
                 {
                     BaseUnit blacksmithUnitPrefab = PrefabManager.GetBaseUnitFromName("Blacksmith", 2);
-                    blacksmithUnitPrefab.playerControl = player;
                     unit = GetInstantiateUnit(blacksmithUnitPrefab, prod.pos, player);
-                    //BaseUnit unit = Instantiate(blacksmithUnitPrefab, new Vector2(x, y), Quaternion.identity, unitContainer);
-
                 }
                 unit.SetNonExhausted(true);
             }
@@ -531,57 +520,47 @@ public class GameMaster : MonoBehaviour
             if (progeny == 0)
             {
                 BaseUnit infantry = PrefabManager.GetBaseUnitFromName("Infantry", 0);
-                ProduceUnit(infantry, player, false);
-                return infantry;
+                return ProduceUnit(infantry, player, false);
             }
             if (progeny == 1)
             {
                 BaseUnit spore = PrefabManager.GetBaseUnitFromName("Spore", 1);
-                ProduceUnit(spore, player, true); //true for virix in current implementation
-                return spore;
+                return ProduceUnit(spore, player, true);
             }
             if (progeny == 2)
             {
                 BaseUnit blacksmith = PrefabManager.GetBaseUnitFromName("Blacksmith", 2);
-                ProduceUnit(blacksmith, player, false);
-                return blacksmith;
+                return ProduceUnit(blacksmith, player, false);
             }
         }
         return null;
     }
 
-    public void ProduceUnit(BaseUnit unit, int playerControl, bool isNonExhausted)
+    public BaseUnit ProduceUnit(BaseUnit unit, int playerControl, bool isNonExhausted)
     {
         if(playerResources[playerTurn] < unit.price)
         {
             Debug.LogWarning($"Trying to produce a {unit.unitName} at {selectedStructure.pos} but not enough funds");
-            return;
+            return null;
         }
 
         if (masterGrid.WhatUnitIsInThisLocation(selectedStructure.pos) != null)
         {
             Debug.LogWarning($"Trying to produce a unit at {selectedStructure.pos} but it is covered by a unit");
             selectedStructure = null;
-            return;
+            return null;
         }
         int previousSpend = playerResources[playerTurn];
         playerResources[playerTurn] -= unit.price;
-        //unit.playerControl = playerTurn;
 
         StartCoroutine(AnimateResourceText(previousSpend, playerResources[playerTurn],false));
-        //need a way to set to exhausted from here so the units don't have to start exhausted on the 1st turn.
-        BaseUnit tempUnit = GetInstantiateUnit(unit, selectedStructure.pos, null);
-        //BaseUnit tempUnit = Instantiate(unit, new Vector2(selectedStructure.xPos, selectedStructure.yPos), Quaternion.identity, unitContainer);
-        tempUnit.SetNonExhausted(isNonExhausted);
+        BaseUnit spawnedUnit = GetInstantiateUnit(unit, selectedStructure.pos, playerControl);
+        spawnedUnit.SetNonExhausted(isNonExhausted);
 
-        //GameObject tempInstance = Object.Instantiate(unit, new Vector2(selectedStructure.xPos, selectedStructure.yPos), Quaternion.identity, unitContainer);
-        //BaseUnit tempUnit = tempInstance.GetComponent<BaseUnit>();
-
-        //3 is produce a unit
-        //not sure why the unit x and y coordiantes aren't available here but this works.
-        masterGrid.AddGameAction(3, (byte)tempUnit.gamePieceId, (byte)selectedStructure.pos.x, (byte)selectedStructure.pos.y, (byte)selectedStructure.pos.x, (byte)selectedStructure.pos.y);
+        masterGrid.AddGameAction(3, (byte)spawnedUnit.gamePieceId, (byte)selectedStructure.pos.x, (byte)selectedStructure.pos.y, (byte)selectedStructure.pos.x, (byte)selectedStructure.pos.y);
         playerResourceText.text = "" + playerResources[playerTurn];
         selectedStructure.TurnOffCollider();
+        return spawnedUnit;
     }
 
     public void ExitButtonPressed()
@@ -1273,22 +1252,21 @@ public class GameMaster : MonoBehaviour
                     int y = pieceInfo.y;
                     AttributesBaseUnit data = gameValues.GetUnitDataByByte(pieceInfo.typeNum);
 
-                    BaseUnit unit = PrefabManager.GetBaseUnitFromPath(data.prefabPath);
-                    if (unit == null)
+                    BaseUnit unitPrefab = PrefabManager.GetBaseUnitFromPath(data.prefabPath);
+                    if (unitPrefab == null)
                     {
                         Debug.LogError($"No unit prefab found for byte value {pieceInfo.typeNum}");
                         continue;
                     }
-                    unit.playerControl = pieceInfo.playerID;
-                    unit.SetHealth((int)((double)(pieceInfo.healthVal * unit.healthMax) / 100));
-                    unit.pos = new Vector2Int(x, y);
-                    BaseUnit spawnedUnit = InstantiateUnit(unit, unit.pos);
-                    if (spawnedUnit != null)
-                    {
-                        spawnedUnit.sequenceId = string.IsNullOrWhiteSpace(pieceInfo.sequenceId) ? null : pieceInfo.sequenceId;
-                    }
-                    //Instantiate(unit, new Vector2(x, y), Quaternion.identity, unitContainer);
-                    //masterGrid.SetUnitInGrid(unit.pos, unit);
+
+                    Vector2Int spawnPos = new Vector2Int(x, y);
+                    BaseUnit spawnedUnit = InstantiateUnit(unitPrefab, spawnPos);
+                    spawnedUnit.playerControl = pieceInfo.playerID;
+                    spawnedUnit.spawnHealthPercent = pieceInfo.healthVal;
+                    spawnedUnit.pos = spawnPos;
+                    spawnedUnit.ApplyInitialPlayerVisuals();
+                    if (!string.IsNullOrWhiteSpace(pieceInfo.sequenceId))
+                        spawnedUnit.sequenceId = pieceInfo.sequenceId;
                 }
                 else if (pieceInfo.typeNum >= 200 && pieceInfo.typeNum < 255)
                 {
@@ -1339,16 +1317,14 @@ public class GameMaster : MonoBehaviour
         return Instantiate(unit, (Vector2)pos, Quaternion.identity, unitContainer);
     }
     
-    public BaseUnit GetInstantiateUnit(BaseUnit unit, Vector2Int pos, int? player)
+    public BaseUnit GetInstantiateUnit(BaseUnit prefab, Vector2Int pos, int? player)
     {
-        if(player==null)
-            unit.playerControl = playerTurn;
-        else
-            unit.playerControl = (int)player;
-        //unit.spriteContainer.transform.localScale = new Vector2(0.01f, 0.01f);
-        unit = Instantiate(unit, (Vector2)pos, Quaternion.identity, unitContainer);
-        //StartCoroutine(AnimateCreateUnit(unit));
-        return unit;
+        BaseUnit instance = Instantiate(prefab, (Vector2)pos, Quaternion.identity, unitContainer);
+        instance.playerControl = player ?? playerTurn;
+        instance.ApplyInitialPlayerVisuals();
+        instance.spriteContainer.transform.localScale = new Vector3(0.01f, 0.01f, 1f);
+        StartCoroutine(AnimateCreateUnit(instance));
+        return instance;
     }
 
     public IEnumerator AnimateCreateUnit(BaseUnit unit)

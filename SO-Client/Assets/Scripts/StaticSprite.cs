@@ -124,10 +124,8 @@ public class StaticSprite : ClickableObject
 
     }
 
-    public IEnumerator WaitedSetColor(int player, bool nonExhausted, bool isStructure)
+    public void ApplyPlayerColor(int player, bool nonExhausted, bool isStructure)
     {
-        yield return null; 
-        //Debug.Log($"Setting Color for {this.name}");
         Color playerColor = GameMaster.playerColors[player];
         //Color white = new Color32 (255, 255, 255, 255);
         /*        if(parentGameObject == null)
@@ -203,14 +201,7 @@ public class StaticSprite : ClickableObject
 
     public void SetColor(int player, bool nonExhausted, bool isStructure)
     {
-        if (this.isActiveAndEnabled == true)
-        {
-            StartCoroutine(WaitedSetColor(player, nonExhausted, isStructure));
-        }
-/*        else
-        {
-            Debug.LogWarning($"StaticSprite is not active, cannot set color.");
-        }*/
+        ApplyPlayerColor(player, nonExhausted, isStructure);
     }
 
     public void SetFillColor(Color c)
