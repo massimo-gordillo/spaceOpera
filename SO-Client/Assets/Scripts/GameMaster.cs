@@ -37,6 +37,8 @@ public class GameMaster : MonoBehaviour
     public short turnNumber;
     private bool[] playersNotLost;
     public static bool isGameComplete = false;
+    /// <summary>Tutorial-only: when true, command capture does not eliminate opponents or show the win screen.</summary>
+    bool tutorialMatchVictorySuppressed;
     public static Dictionary<byte, byte> playerProgeny;
     private int[] playerResources;
     private int baseResourcePerTurn = 200;
@@ -139,6 +141,7 @@ public class GameMaster : MonoBehaviour
     {
         //Debug.Log("GameMaster Awake called");
         matchSettingsWereUnsetOnAwake = !MatchSettings.isInit;
+        tutorialMatchVictorySuppressed = false;
         match_id = Guid.Parse("aaaaaaaa-8761-4e77-a086-a7365ae9e0b4");
         turnNumber = 1;
         numPlayers = 2; //will set dynamically later
@@ -399,6 +402,10 @@ public class GameMaster : MonoBehaviour
 
     public void StartupInstantiateUnits()
     {
+        if (MatchSettings.gameMode == MatchSettings.MatchGameMode.Tutorial)
+        {
+            return;
+        }
 
         for (int player = 1; player <= numPlayers; player++)
         {
@@ -496,6 +503,11 @@ public class GameMaster : MonoBehaviour
 
     public void UnitProductionButtonPressed(BaseUnit unit)
     {
+        if (sequenceManager != null && !sequenceManager.TryAcceptGuidedProductionClick(unit))
+        {
+            return;
+        }
+
 /*        int price = unit.price;
         print(price);*/
         if (playerResources[playerTurn] >= unit.price)
@@ -1333,10 +1345,9 @@ public class GameMaster : MonoBehaviour
             unit.playerControl = playerTurn;
         else
             unit.playerControl = (int)player;
-        unit.spriteContainer.transform.localScale = new Vector2(0.01f, 0.01f);
+        //unit.spriteContainer.transform.localScale = new Vector2(0.01f, 0.01f);
         unit = Instantiate(unit, (Vector2)pos, Quaternion.identity, unitContainer);
-        if(isAnimating)
-            StartCoroutine(AnimateCreateUnit(unit));
+        //StartCoroutine(AnimateCreateUnit(unit));
         return unit;
     }
 
@@ -1506,15 +1517,61 @@ public class GameMaster : MonoBehaviour
     public void ConcedePlayer(int p)
     {
         playersNotLost[p] = false;
-        CheckIfWinner();
+        if (IsMatchVictoryResolutionAllowed())
+        {
+            CheckIfWinner();
+        }
+
         if (p == playerTurn)
         {
             EndTurnButtonPressed();
         }
     }
 
+    /// <summary>
+    /// Command-structure capture elimination. Skipped during tutorial when a sequence has setMatchVictory suppress.
+    /// </summary>
+    public void OnCommandStructureCaptured(int losingPlayer)
+    {
+        if (!IsMatchVictoryResolutionAllowed())
+        {
+            return;
+        }
+
+        ConcedePlayer(losingPlayer);
+    }
+
+    /// <summary>
+    /// Tutorial sequences only — ignored in skirmish so real matches always resolve victory normally.
+    /// </summary>
+    public void SetTutorialMatchVictorySuppressed(bool suppressed)
+    {
+        if (MatchSettings.gameMode != MatchSettings.MatchGameMode.Tutorial)
+        {
+            if (suppressed)
+            {
+                Debug.LogWarning("[GameMaster] setMatchVictory suppress ignored outside tutorial matches.");
+            }
+
+            return;
+        }
+
+        tutorialMatchVictorySuppressed = suppressed;
+    }
+
+    bool IsMatchVictoryResolutionAllowed()
+    {
+        return MatchSettings.gameMode != MatchSettings.MatchGameMode.Tutorial
+            || !tutorialMatchVictorySuppressed;
+    }
+
     private void CheckIfWinner()
     {
+        if (!IsMatchVictoryResolutionAllowed())
+        {
+            return;
+        }
+
         int? winner = null;
         int playerNotLostCount = 0;
 

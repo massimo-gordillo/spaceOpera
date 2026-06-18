@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -177,6 +178,33 @@ public class MenuProductionPanel : MonoBehaviour
 
 
 
+    }
+
+    public bool TryGetActiveProductionButton(string unitName, out MenuProductionButton button)
+    {
+        button = null;
+        if (string.IsNullOrWhiteSpace(unitName))
+        {
+            return false;
+        }
+
+        MenuProductionButton[] buttons = GetComponentsInChildren<MenuProductionButton>(true);
+        for (int i = 0; i < buttons.Length; i++)
+        {
+            MenuProductionButton candidate = buttons[i];
+            if (candidate == null || !candidate.gameObject.activeInHierarchy)
+            {
+                continue;
+            }
+
+            if (string.Equals(candidate.GetUnitName(), unitName.Trim(), StringComparison.OrdinalIgnoreCase))
+            {
+                button = candidate;
+                return true;
+            }
+        }
+
+        return false;
     }
 
     static string InsertSpacesBeforeCapitals(string input)

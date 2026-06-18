@@ -118,7 +118,7 @@ public class BaseStructure : MonoBehaviour
         yield return StartCoroutine(AnimateCaptureHealth(captureHealth, 0));
         yield return new WaitForSeconds(GameMaster.globalAnimationDuration / 3);
         if (structureType == 5 && playerControl != capturePlayerInt)
-            gameMaster.ConcedePlayer(playerControl);
+            gameMaster.OnCommandStructureCaptured(playerControl);
 
         playerControl = (byte)capturePlayerInt;
         ResetCaptureHealth();

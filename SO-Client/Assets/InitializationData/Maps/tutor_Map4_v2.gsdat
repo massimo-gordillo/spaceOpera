@@ -1,0 +1,15 @@
+{"TilemapData":{"Width":13,"Height":12,"TileBytes":[4,4,4,4,4,4,4,4,4,4,4,4,4,4,3,3,1,1,1,1,1,1,1,3,3,4,4,3,1,1,1,1,1,1,1,1,1,3,4,4,3,1,1,1,3,3,3,1,1,1,3,4,4,3,1,1,1,1,3,1,1,1,1,3,4,4,3,1,1,1,1,3,1,1,1,1,3,4,4,3,1,1,1,1,3,1,1,1,1,3,4,4,3,1,1,1,4,4,4,1,1,1,3,4,4,3,2,2,2,4,4,4,2,2,2,3,4,4,3,3,1,2,4,4,4,2,1,3,3,4,4,3,3,3,3,4,4,4,3,3,3,3,4,4,4,4,4,4,4,4,4,4,4,4,4,4]},
+"GamePieceList":[
+    {"x":8,"y":7,"typeNum":102,"playerID":2,"healthVal":0,"sequenceId":"p2_horsemen"},
+    {"x":9,"y":7,"typeNum":2,"playerID":2,"healthVal":0,"sequenceId":"p2_tank"},
+    {"x":7,"y":4,"typeNum":100,"playerID":2,"healthVal":0,"sequenceId":"p2_blacksmith"},
+    {"x":3,"y":5,"typeNum":2,"playerID":1,"healthVal":0,"sequenceId":"p1_tank"},
+    {"x":4,"y":7,"typeNum":202,"playerID":1,"healthVal":200,"sequenceId":"p1_airport"},
+    {"x":3,"y":5,"typeNum":201,"playerID":1,"healthVal":200,"sequenceId":"p1_factory"},
+    {"x":3,"y":9,"typeNum":205,"playerID":1,"healthVal":200,"sequenceId":""},
+    {"x":9,"y":9,"typeNum":205,"playerID":2,"healthVal":200,"sequenceId":""},
+    {"x":10,"y":2,"typeNum":200,"playerID":2,"healthVal":200,"sequenceId":""},
+    {"x":9,"y":1,"typeNum":200,"playerID":2,"healthVal":200,"sequenceId":""},
+    {"x":3,"y":1,"typeNum":200,"playerID":1,"healthVal":200,"sequenceId":""},
+    {"x":2,"y":2,"typeNum":200,"playerID":1,"healthVal":200,"sequenceId":""}
+]}

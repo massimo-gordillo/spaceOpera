@@ -98,6 +98,8 @@ public class SequenceManager : MonoBehaviour
     private int pendingGuideHighlightStepIndex = -1;
     private bool guideClickHintHighlightActive;
     private bool guidedClickGateActive;
+    private bool waitingForProductionClick;
+    private string expectedProductionUnitType;
     private bool initialSequenceLoadMapStepConsumed;
 
     struct SavedSelectableState
@@ -338,6 +340,35 @@ public class SequenceManager : MonoBehaviour
         return false;
     }
 
+    /// <summary>Returns true when gameplay should process a production-button click.</summary>
+    public bool TryAcceptGuidedProductionClick(BaseUnit unit)
+    {
+        if (unit == null)
+        {
+            return false;
+        }
+
+        if (!guidedClickGateActive)
+        {
+            return true;
+        }
+
+        if (!waitingForProductionClick)
+        {
+            TryStartGuideClickHintHighlight();
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(expectedProductionUnitType)
+            || !string.Equals(unit.unitName, expectedProductionUnitType, StringComparison.OrdinalIgnoreCase))
+        {
+            TryStartGuideClickHintHighlight();
+            return false;
+        }
+
+        return true;
+    }
+
     /// <summary>Returns true when gameplay should process the clickable (e.g. movement square).</summary>
     public bool TryAcceptGuidedClickableClick(ClickableObject clickable)
     {
@@ -398,6 +429,11 @@ public class SequenceManager : MonoBehaviour
 
         sequenceSkippedRequested = false;
         isRunningSequence = true;
+        if (gameMaster != null && MatchSettings.gameMode == MatchSettings.MatchGameMode.Tutorial)
+        {
+            gameMaster.SetTutorialMatchVictorySuppressed(false);
+        }
+
         Debug.Log($"[SequenceManager] Running sequence '{sequence.sequenceId}' ({sequence.steps.Count} steps).");
 
         int startStepIndex = 0;
@@ -485,6 +521,14 @@ public class SequenceManager : MonoBehaviour
                 SetInputLock(step.locked, step.reason);
                 break;
 
+            case "setMatchVictory":
+                if (gameMaster != null)
+                {
+                    gameMaster.SetTutorialMatchVictorySuppressed(step.suppressMatchVictory);
+                }
+
+                break;
+
             case "loadMap":
                 yield return ExecuteLoadMap(stepIndex, step);
                 break;
@@ -530,6 +574,10 @@ public class SequenceManager : MonoBehaviour
                 yield return ExecuteGuideClick(sequenceId, stepIndex, step);
                 break;
 
+            case "guideProduce":
+                yield return ExecuteGuideProduce(sequenceId, stepIndex, step);
+                break;
+
             case "endPlayerTurn":
                 yield return ExecuteEndPlayerTurn(stepIndex, step);
                 break;
@@ -558,10 +606,16 @@ public class SequenceManager : MonoBehaviour
         pendingGuideHighlightTarget = null;
         pendingGuideHighlightStepIndex = -1;
         guideClickHintHighlightActive = false;
+        waitingForProductionClick = false;
+        expectedProductionUnitType = null;
         EndGuidedClickGate();
         waitingForDialogContinue = false;
         isRunningSequence = false;
         inputLocked = false;
+        if (gameMaster != null)
+        {
+            gameMaster.SetTutorialMatchVictorySuppressed(false);
+        }
     }
 
     private void ShowTutorialComplete()
@@ -721,6 +775,26 @@ public class SequenceManager : MonoBehaviour
         EndGuidedClickGate();
     }
 
+    private IEnumerator ExecuteGuideProduce(string sequenceId, int stepIndex, SequenceStepDto step)
+    {
+        if (string.IsNullOrWhiteSpace(step.unitType))
+        {
+            LogStepError(stepIndex, "guideProduce requires unitType.");
+            yield break;
+        }
+
+        if (!string.IsNullOrWhiteSpace(step.text))
+        {
+            yield return PresentDialogueStep(sequenceId, stepIndex, step);
+        }
+
+        yield return WaitForProductionClick(
+            stepIndex,
+            step.unitType.Trim(),
+            step.timeoutMs,
+            step.clearHighlightOnComplete);
+    }
+
     private IEnumerator ExecuteEndPlayerTurn(int stepIndex, SequenceStepDto step)
     {
         int player = step.player > 0 ? step.player : 1;
@@ -775,14 +849,14 @@ public class SequenceManager : MonoBehaviour
         }
     }
 
-    void BeginGuidedClickGate(TargetDto target)
+    void BeginGuidedClickGate(TargetDto target, Selectable allowedSelectableOverride = null)
     {
         EndGuidedClickGate();
         guidedClickGateActive = true;
 
+        Selectable allowedSelectable = allowedSelectableOverride;
         string allowedUiKey = target != null ? target.uiTarget : null;
-        Selectable allowedSelectable = null;
-        if (!string.IsNullOrWhiteSpace(allowedUiKey))
+        if (allowedSelectable == null && !string.IsNullOrWhiteSpace(allowedUiKey))
         {
             TryGetUiSelectable(allowedUiKey, out allowedSelectable);
         }
@@ -1467,6 +1541,87 @@ public class SequenceManager : MonoBehaviour
         EndGuidedClickGate();
     }
 
+    private IEnumerator WaitForProductionClick(
+        int stepIndex,
+        string unitType,
+        int timeoutMs,
+        bool clearHintWhenDone = true)
+    {
+        if (gameMaster == null || gameMaster.productionPanel == null)
+        {
+            LogStepError(stepIndex, "guideProduce failed: productionPanel is not assigned.");
+            yield break;
+        }
+
+        MenuProductionPanel productionPanel = gameMaster.productionPanel;
+        MenuProductionButton productionButton = null;
+        const float findTimeoutSeconds = 30f;
+        float findElapsed = 0f;
+        while (productionButton == null && findElapsed < findTimeoutSeconds)
+        {
+            if (productionPanel.TryGetActiveProductionButton(unitType, out productionButton))
+            {
+                break;
+            }
+
+            findElapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        if (productionButton == null)
+        {
+            LogStepError(stepIndex, $"guideProduce could not find active production button for unitType='{unitType}'.");
+            yield break;
+        }
+
+        Button button = productionButton.GetComponent<Button>();
+        if (button == null)
+        {
+            LogStepError(stepIndex, $"guideProduce target '{unitType}' is not a Button.");
+            yield break;
+        }
+
+        string highlightKey = $"prod:{unitType}";
+        waitingForProductionClick = true;
+        expectedProductionUnitType = unitType;
+        BeginGuidedClickGate(null, button);
+        ApplyGameObjectUiHighlight(stepIndex, highlightKey, productionButton.gameObject, true);
+
+        bool clicked = false;
+        UnityEngine.Events.UnityAction listener = () => clicked = true;
+        button.onClick.AddListener(listener);
+
+        float timeout = timeoutMs > 0 ? timeoutMs / 1000f : -1f;
+        float elapsed = 0f;
+        while (!clicked)
+        {
+            if (TryGetPointerPressedScreenPosition(out Vector2 pressPosition)
+                && !IsPointerOverUiTarget(button, pressPosition))
+            {
+                ApplyGameObjectUiHighlight(stepIndex, highlightKey, productionButton.gameObject, true);
+            }
+
+            if (timeout > 0f && elapsed >= timeout)
+            {
+                LogStepError(stepIndex, $"guideProduce timed out for unitType='{unitType}'.");
+                break;
+            }
+
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        button.onClick.RemoveListener(listener);
+        if (clearHintWhenDone)
+        {
+            ApplyGameObjectUiHighlight(stepIndex, highlightKey, productionButton.gameObject, false);
+        }
+
+        waitingForProductionClick = false;
+        expectedProductionUnitType = null;
+        EndGuidedClickGate();
+    }
+
     static bool TryGetPointerPressedScreenPosition(out Vector2 screenPosition)
     {
         screenPosition = default;
@@ -1594,27 +1749,32 @@ public class SequenceManager : MonoBehaviour
             return;
         }
 
+        ApplyGameObjectUiHighlight(stepIndex, uiTarget, targetObject, enabled);
+    }
+
+    private void ApplyGameObjectUiHighlight(int stepIndex, string highlightKey, GameObject targetObject, bool enabled)
+    {
         if (enabled)
         {
-            if (uiHighlightCoroutines.ContainsKey(uiTarget))
+            if (uiHighlightCoroutines.ContainsKey(highlightKey))
             {
                 return;
             }
 
             if (!TryCollectUiHighlightTargets(targetObject, out List<UiHighlightFlashTarget> targets))
             {
-                LogStepError(stepIndex, $"highlightTarget failed, no flashable graphics on UI key '{uiTarget}'.");
+                LogStepError(stepIndex, $"highlightTarget failed, no flashable graphics on '{highlightKey}'.");
                 return;
             }
 
-            uiHighlightTargets[uiTarget] = targets;
-            highlightedUiTargets.Add(uiTarget);
-            uiHighlightCoroutines[uiTarget] = StartCoroutine(UiHighlightFlashCoroutine(uiTarget, targets));
+            uiHighlightTargets[highlightKey] = targets;
+            highlightedUiTargets.Add(highlightKey);
+            uiHighlightCoroutines[highlightKey] = StartCoroutine(UiHighlightFlashCoroutine(highlightKey, targets));
         }
         else
         {
-            StopUiHighlight(uiTarget);
-            highlightedUiTargets.Remove(uiTarget);
+            StopUiHighlight(highlightKey);
+            highlightedUiTargets.Remove(highlightKey);
         }
     }
 

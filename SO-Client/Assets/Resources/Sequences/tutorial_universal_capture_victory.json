@@ -18,6 +18,11 @@
       "reason": "tutorial_universal_capture_victory"
     },
     {
+      "id": "suppress_match_victory",
+      "type": "setMatchVictory",
+      "suppressMatchVictory": true
+    },
+    {
       "id": "dlg_summary",
       "type": "dialogue",
       "speaker": "Tutorial",
@@ -241,6 +246,11 @@
     {
       "id": "complete",
       "type": "showTutorialComplete"
+    },
+    {
+      "id": "allow_match_victory",
+      "type": "setMatchVictory",
+      "suppressMatchVictory": false
     },
     {
       "id": "unlock",

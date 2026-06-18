@@ -49,8 +49,8 @@
       "title": "1.3 Producing units",
       "notes": "Income loop, production overview",
       "mapType": "tutor",
-      "mapNum": 1,
-      "mapVersion": 1,
+      "mapNum": 4,
+      "mapVersion": 2,
       "progenys": [0, 0],
       "playerIsCpu": [0, 0]
     },

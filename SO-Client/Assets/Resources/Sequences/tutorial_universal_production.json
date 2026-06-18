@@ -2,8 +2,15 @@
   "schemaVersion": 1,
   "sequenceId": "tutorial_universal_production",
   "missionId": "tutorial_curriculum",
-  "description": "1.3 — Income and where units are produced.",
+  "description": "1.3 — Production, factories, airports, and combined arms.",
   "steps": [
+    {
+      "id": "load_map",
+      "type": "loadMap",
+      "mapType": "tutor",
+      "mapNum": 4,
+      "mapVersion": 2
+    },
     {
       "id": "lock",
       "type": "setInputLock",
@@ -11,28 +18,236 @@
       "reason": "tutorial_universal_production"
     },
     {
-      "id": "dlg_income",
-      "type": "dialogue",
-      "speaker": "Tutorial",
-      "text": "Each turn your structures pay <b>BISMUTH</b> into your treasury. Spend it to build your army.",
-      "waitForContinue": true
-    },
-    {
-      "id": "dlg_where",
-      "type": "dialogue",
-      "speaker": "Tutorial",
-      "text": "<b>Where units are produced</b><page/>◦ <b>Ertrians</b> — Factories and Airports<page/>◦ <b>Virix</b> — any owned BISMUTH tile<page/>◦ <b>Sentus</b> — Portals<page/>Faction tutorials cover the details next.",
-      "waitForContinue": true
-    },
-    {
-      "id": "camera_bismuth",
+      "id": "camera_factory",
       "type": "cameraFocus",
-      "target": { "structureId": "bismuth" },
-      "durationMs": 400
+      "target": { "structureId": "p1_factory" },
+      "durationMs": 500
+    },
+    {
+      "id": "dlg_intro",
+      "type": "dialogue",
+      "speaker": "Tutorial",
+      "text": "Spend <b>BISMUTH</b> from your treasury to build an army.<page/><b>Factories</b> train ground units. <b>Airports</b> train flyers.<page/>A unit standing on a production site blocks new builds — move your tank first.",
+      "waitForContinue": true
+    },
+    {
+      "id": "guide_tank",
+      "type": "guideClick",
+      "speaker": "Tutorial",
+      "text": "Select your tank.",
+      "target": { "unitId": "p1_tank" }
+    },
+    {
+      "id": "guide_move_tank",
+      "type": "guideClick",
+      "speaker": "Tutorial",
+      "text": "Move it off the factory tile.",
+      "target": { "x": 4, "y": 5 }
+    },
+    {
+      "id": "dlg_artillery",
+      "type": "dialogue",
+      "speaker": "Tutorial",
+      "text": "Select your <b>Factory</b> and build <b>Artillery</b>. It strikes from a distance but usually cannot move and fire the same turn.",
+      "waitForContinue": true
+    },
+    {
+      "id": "guide_factory",
+      "type": "guideClick",
+      "target": { "structureId": "p1_factory" }
+    },
+    {
+      "id": "guide_produce_artillery",
+      "type": "guideProduce",
+      "speaker": "Tutorial",
+      "text": "Build <b>Artillery</b>.",
+      "unitType": "Artillery"
+    },
+    {
+      "id": "dlg_helicopter",
+      "type": "dialogue",
+      "speaker": "Tutorial",
+      "text": "Now select your <b>Airport</b> and recruit a <b>Helicopter</b>. Flyers ignore terrain blocking — enemy units still block their path.",
+      "waitForContinue": true
+    },
+    {
+      "id": "guide_airport",
+      "type": "guideClick",
+      "target": { "structureId": "p1_airport" }
+    },
+    {
+      "id": "guide_produce_helicopter",
+      "type": "guideProduce",
+      "speaker": "Tutorial",
+      "text": "Recruit a <b>Helicopter</b>.",
+      "unitType": "Helicopter"
+    },
+    {
+      "id": "dlg_end_turn_1",
+      "type": "dialogue",
+      "speaker": "Tutorial",
+      "text": "Good. End your turn when production is finished.",
+      "waitForContinue": true
+    },
+    {
+      "id": "end_p1_turn_1",
+      "type": "endPlayerTurn",
+      "player": 1,
+      "waitForClick": true,
+      "endTurnUiTarget": "endTurnButton"
+    },
+    {
+      "id": "end_p2_turn_1",
+      "type": "endPlayerTurn",
+      "player": 2
+    },
+    {
+      "id": "dlg_turn_two",
+      "type": "dialogue",
+      "speaker": "Tutorial",
+      "text": "Your new units are ready. Position the artillery to support your helicopter.",
+      "waitForContinue": true
+    },
+    {
+      "id": "guide_artillery_1",
+      "type": "guideClick",
+      "speaker": "Tutorial",
+      "text": "Select your Artillery.",
+      "target": { "x": 3, "y": 5 }
+    },
+    {
+      "id": "guide_artillery_move",
+      "type": "guideClick",
+      "speaker": "Tutorial",
+      "text": "Move it toward the enemy lines.",
+      "target": { "x": 4, "y": 4 }
+    },
+    {
+      "id": "dlg_heli_strike",
+      "type": "dialogue",
+      "speaker": "Tutorial",
+      "text": "Send the helicopter ahead to engage the enemy vanguard.",
+      "waitForContinue": true
+    },
+    {
+      "id": "guide_helicopter_1",
+      "type": "guideClick",
+      "speaker": "Tutorial",
+      "text": "Select your Helicopter.",
+      "target": { "x": 4, "y": 7 }
+    },
+    {
+      "id": "guide_heli_move",
+      "type": "guideClick",
+      "speaker": "Tutorial",
+      "text": "Fly here to set up the attack.",
+      "target": { "x": 7, "y": 7 }
+    },
+    {
+      "id": "guide_attack_btn_1",
+      "type": "guideClick",
+      "speaker": "Tutorial",
+      "text": "Open <b>Attack</b>.",
+      "target": { "uiTarget": "attackButton" }
+    },
+    {
+      "id": "guide_attack_horsemen",
+      "type": "guideClick",
+      "speaker": "Tutorial",
+      "text": "Strike the Horsemen.",
+      "target": { "unitId": "p2_horsemen" }
+    },
+    {
+      "id": "dlg_artillery_hold",
+      "type": "dialogue",
+      "speaker": "Tutorial",
+      "text": "Advance the artillery onto its firing position, then end your turn.",
+      "waitForContinue": true
+    },
+    {
+      "id": "guide_artillery_onto",
+      "type": "guideClick",
+      "target": { "x": 5, "y": 4 }
+    },
+    {
+      "id": "end_p1_turn_2",
+      "type": "endPlayerTurn",
+      "player": 1,
+      "waitForClick": true,
+      "endTurnUiTarget": "endTurnButton"
+    },
+    {
+      "id": "end_p2_turn_2",
+      "type": "endPlayerTurn",
+      "player": 2
+    },
+    {
+      "id": "dlg_final_assault",
+      "type": "dialogue",
+      "speaker": "Tutorial",
+      "text": "Finish the exposed tank with your helicopter, then let the artillery shell the Blacksmith.",
+      "waitForContinue": true
+    },
+    {
+      "id": "guide_helicopter_2",
+      "type": "guideClick",
+      "speaker": "Tutorial",
+      "text": "Select your Helicopter.",
+      "target": { "x": 7, "y": 7 }
+    },
+    {
+      "id": "guide_heli_move_tank",
+      "type": "guideClick",
+      "speaker": "Tutorial",
+      "text": "Move adjacent to the enemy tank.",
+      "target": { "x": 8, "y": 7 }
+    },
+    {
+      "id": "guide_attack_btn_2",
+      "type": "guideClick",
+      "target": { "uiTarget": "attackButton" }
+    },
+    {
+      "id": "guide_attack_tank",
+      "type": "guideClick",
+      "speaker": "Tutorial",
+      "text": "Destroy the tank.",
+      "target": { "unitId": "p2_tank" }
+    },
+    {
+      "id": "guide_artillery_2",
+      "type": "guideClick",
+      "speaker": "Tutorial",
+      "text": "Select your Artillery.",
+      "target": { "x": 5, "y": 4 }
+    },
+    {
+      "id": "guide_attack_btn_3",
+      "type": "guideClick",
+      "target": { "uiTarget": "attackButton" }
+    },
+    {
+      "id": "guide_attack_blacksmith",
+      "type": "guideClick",
+      "speaker": "Tutorial",
+      "text": "Fire on the Blacksmith.",
+      "target": { "unitId": "p2_blacksmith" }
+    },
+    {
+      "id": "dlg_done",
+      "type": "dialogue",
+      "speaker": "Tutorial",
+      "text": "Well done! You can produce ground and air units, then combine their strengths to win the fight.",
+      "waitForContinue": true
     },
     {
       "id": "complete",
       "type": "showTutorialComplete"
+    },
+    {
+      "id": "allow_match_victory",
+      "type": "setMatchVictory",
+      "suppressMatchVictory": false
     },
     {
       "id": "unlock",

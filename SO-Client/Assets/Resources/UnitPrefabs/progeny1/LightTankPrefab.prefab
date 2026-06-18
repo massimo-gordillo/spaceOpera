@@ -967,6 +967,7 @@ MonoBehaviour:
   playerControl: 2
   team: 0
   orientation: 3
+  sequenceId: 
   pos: {x: 0, y: 0}
   movementNonExhausted: 0
   nonExhausted: 0
@@ -2183,7 +2184,7 @@ RectTransform:
   m_GameObject: {fileID: 6986009529861519976}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.01, y: 0.01, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 5573425366814191749}

@@ -2522,7 +2522,7 @@ public class MasterGrid : MonoBehaviour
             Debug.LogWarning($"Unit {unit.pos} is already at {pos} in the grid and attempting to place it again!");
         }
         else
-            Debug.LogError($"Setting unit {unit.pos} to {pos} but can't because there's a different unit there");
+            Debug.LogError($"Setting unit {unit.gamePieceId} to {pos} but can't because there's a different unit there: {WhatUnitIsInThisLocation(pos).gamePieceId}");
     }
 
     public void SetStructureInGrid(Vector2Int pos, BaseStructure structure)

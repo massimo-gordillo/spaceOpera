@@ -64,6 +64,9 @@ public class SequenceStepDto
     // Mission hook
     public string hook;
 
+    // setMatchVictory (tutorial only) — suppressMatchVictory true blocks win screen / command elimination
+    public bool suppressMatchVictory = false;
+
     // endPlayerTurn
     public int player;
     public bool waitForClick;
