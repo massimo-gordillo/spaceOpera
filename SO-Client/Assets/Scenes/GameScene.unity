@@ -14356,7 +14356,7 @@ MonoBehaviour:
   outroSequenceResourcePath: 
   playTestTutorialOnStart: 1
   useCustomPlayTestScenario: 1
-  playTestScenarioId: tutorial_universal_production
+  playTestScenarioId: tutorial_virix
   playTestSequenceResourcePathOverride: 
   autoRunFullCurriculum: 1
   autoAdvanceDelaySeconds: 0.35

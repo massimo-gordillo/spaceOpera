@@ -83,10 +83,11 @@ public static class MatchSettings {
     }
 
     /// <summary>
-    /// Configures a tutorial match from curriculum manifest metadata.
-    /// <paramref name="sequenceResourcePathOverride"/> is optional (Resources path without .json).
+    /// Applies a named scenario payload from the curriculum manifest into MatchSettings.
+    /// Used by the tutorial menu, lesson chaining, and editor play-test bootstrap.
     /// </summary>
-    public static bool ApplyTutorialMatch(string scenarioId, string sequenceResourcePathOverride = null)
+    /// <param name="sequenceResourcePathOverride">Optional Resources path without .json.</param>
+    public static bool ApplyScenarioPayload(string scenarioId, string sequenceResourcePathOverride = null)
     {
         if (!SequenceCurriculum.TryApplyScenarioToMatchSettings(
                 scenarioId,
@@ -98,6 +99,12 @@ public static class MatchSettings {
         }
 
         return true;
+    }
+
+    /// <summary>Alias for <see cref="ApplyScenarioPayload"/>.</summary>
+    public static bool ApplyTutorialMatch(string scenarioId, string sequenceResourcePathOverride = null)
+    {
+        return ApplyScenarioPayload(scenarioId, sequenceResourcePathOverride);
     }
 
     public static void GetMapLoadParameters(out string mapType, out int mapNum, out int versionNum)

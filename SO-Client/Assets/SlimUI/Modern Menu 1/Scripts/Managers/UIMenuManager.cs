@@ -518,8 +518,18 @@ namespace SlimUI.ModernMenu{
 
         public void StartPlayableTutorialFromMenu()
         {
+            StartTutorialScenarioFromMenu(playableTutorialScenarioId);
+        }
 
-            if (!MatchSettings.ApplyTutorialMatch(playableTutorialScenarioId))
+        /// <summary>Wire tutorial list buttons: pass scenarioId from tutorial_curriculum_manifest.json.</summary>
+        public void StartTutorialScenarioFromMenu(string scenarioId)
+        {
+            if (string.IsNullOrWhiteSpace(scenarioId))
+            {
+                return;
+            }
+
+            if (!MatchSettings.ApplyScenarioPayload(scenarioId.Trim()))
             {
                 return;
             }

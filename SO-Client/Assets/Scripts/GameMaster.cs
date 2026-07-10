@@ -145,28 +145,6 @@ public class GameMaster : MonoBehaviour
         match_id = Guid.Parse("aaaaaaaa-8761-4e77-a086-a7365ae9e0b4");
         turnNumber = 1;
         numPlayers = 2; //will set dynamically later
-        CPU_PlayersList = new bool[numPlayers + 1];
-        //Turn on CPU if game is started through MenuScene, otherwise if I've set it manually.
-        if (MatchSettings.CPU_isOn || (!MatchSettings.isInit && CPU_isOn_manual))
-        {
-            Debug.Log("CPU is on");
-            CPU_isOn = true;
-            //CPU_PlayersList = new bool[numPlayers + 1];
-            if (MatchSettings.playerIsCPU.Length == numPlayers)
-                for (int i = 0; i < numPlayers; i++)
-                {
-                    CPU_PlayersList[i + 1] = MatchSettings.playerIsCPU[i];
-                }
-            else
-                Debug.LogError("Incorrect number of players in MatchSettings CPU count");
-
-            if (!MatchSettings.CPU_isOn)
-            {
-                Debug.LogWarning("Match settings says CPU is off but manual CPU is on, defaulting to hard values.");
-                CPU_PlayersList[1] = false;
-                CPU_PlayersList[2] = true;
-            }
-        }
 
         if (Application.isEditor)
         {
@@ -191,31 +169,7 @@ public class GameMaster : MonoBehaviour
             SetPlayerColors(false);
         }
 
-        //if progeny is not set in MenuScene, set it to the inspector values.
-        playerProgeny = new Dictionary<byte, byte>();
-        if (MatchSettings.playerProgenys[0]>=0 && MatchSettings.playerProgenys[1] >= 0)
-        {   
-            playerProgeny.Add(1, (byte)MatchSettings.playerProgenys[0]);
-            playerProgeny.Add(2, (byte)MatchSettings.playerProgenys[1]);
-        }
-        else {
-            Debug.LogWarning("Progeny set to -1 selected, defaulting to hard values");
-            playerProgeny.Add(1, inspectorInputProgenyPlayer1);
-            playerProgeny.Add(2, inspectorInputProgenyPlayer2);
-        }
-
-        if (CPU_isOn)
-        {
-            bool allCPU = true;
-            for(int i = 1; i <= numPlayers; i++)
-            {
-                allCPU = allCPU && CPU_PlayersList[i];
-            }
-            if (allCPU)
-            {
-                concedeMenuButton.GetComponentInChildren<TMP_Text>().text = "End Game";
-            }
-        }
+        SyncFromMatchSettings(allowManualCpuFallback: matchSettingsWereUnsetOnAwake);
         if (unitCosts == null)
         {
             unitCosts = new List<(BaseUnit, int)>[3];
@@ -1588,6 +1542,119 @@ public class GameMaster : MonoBehaviour
         return playerResources[p];
     }
 
+    public void SetPlayerResourcesTo(int player, int amount)
+    {
+        if (playerResources == null || player < 1 || player >= playerResources.Length)
+        {
+            Debug.LogWarning($"[GameMaster] SetPlayerResourcesTo ignored invalid player {player}.");
+            return;
+        }
+
+        playerResources[player] = amount;
+        if (player == playerTurn)
+        {
+            playerResourceText.text = amount.ToString();
+        }
+    }
+
+    /// <summary>
+    /// Copies progeny and CPU flags from MatchSettings into live gameplay state.
+    /// Call after ApplyScenarioPayload when already in GameScene (e.g. chained lessons).
+    /// </summary>
+    public void SyncFromMatchSettings(bool allowManualCpuFallback = false)
+    {
+        numPlayers = MatchSettings.numPlayers > 0 ? MatchSettings.numPlayers : 2;
+        if (CPU_PlayersList == null || CPU_PlayersList.Length != numPlayers + 1)
+        {
+            CPU_PlayersList = new bool[numPlayers + 1];
+        }
+
+        if (MatchSettings.CPU_isOn)
+        {
+            Debug.Log("[GameMaster] CPU is on (MatchSettings).");
+            CPU_isOn = true;
+            if (MatchSettings.playerIsCPU != null && MatchSettings.playerIsCPU.Length >= numPlayers)
+            {
+                for (int i = 0; i < numPlayers; i++)
+                {
+                    CPU_PlayersList[i + 1] = MatchSettings.playerIsCPU[i];
+                }
+            }
+            else
+            {
+                Debug.LogError("[GameMaster] Incorrect number of players in MatchSettings CPU count.");
+            }
+        }
+        else if (allowManualCpuFallback && CPU_isOn_manual)
+        {
+            Debug.Log("[GameMaster] CPU is on (manual editor fallback).");
+            CPU_isOn = true;
+            CPU_PlayersList[1] = false;
+            CPU_PlayersList[2] = true;
+        }
+        else
+        {
+            CPU_isOn = false;
+        }
+
+        if (playerProgeny == null)
+        {
+            playerProgeny = new Dictionary<byte, byte>();
+        }
+        else
+        {
+            playerProgeny.Clear();
+        }
+
+        if (MatchSettings.playerProgenys != null
+            && MatchSettings.playerProgenys.Length >= 2
+            && MatchSettings.playerProgenys[0] >= 0
+            && MatchSettings.playerProgenys[1] >= 0)
+        {
+            playerProgeny[1] = (byte)MatchSettings.playerProgenys[0];
+            playerProgeny[2] = (byte)MatchSettings.playerProgenys[1];
+        }
+        else
+        {
+            Debug.LogWarning("[GameMaster] Progeny unset in MatchSettings, using inspector fallback.");
+            playerProgeny[1] = inspectorInputProgenyPlayer1;
+            playerProgeny[2] = inspectorInputProgenyPlayer2;
+        }
+
+        if (CPU_isOn)
+        {
+            bool allCpu = true;
+            for (int i = 1; i <= numPlayers; i++)
+            {
+                allCpu = allCpu && CPU_PlayersList[i];
+            }
+
+            if (allCpu && concedeMenuButton != null)
+            {
+                concedeMenuButton.GetComponentInChildren<TMP_Text>().text = "End Game";
+            }
+        }
+
+        EndTurnButtonSwitch();
+        RefreshProductionPanelIfOpen();
+    }
+
+    void RefreshProductionPanelIfOpen()
+    {
+        if (productionPanel == null
+            || !productionPanel.gameObject.activeInHierarchy
+            || selectedStructure == null
+            || playerResources == null)
+        {
+            return;
+        }
+
+        productionPanel.PresentProdList(
+            selectedStructure.structureType,
+            GetPlayerProgeny((byte)playerTurn),
+            playerResources[playerTurn]);
+    }
+
     public void SetCheapestUnits() //virix implementation
     {
         List<(BaseUnit, int)> virixCosts = unitCosts[1];
@@ -1793,10 +1860,12 @@ public class GameMaster : MonoBehaviour
 
         MatchSettings.GetMapLoadParameters(out string previousMapType, out int previousMapNum, out int previousMapVersion);
 
-        if (!MatchSettings.ApplyTutorialMatch(nextScenarioId))
+        if (!MatchSettings.ApplyScenarioPayload(nextScenarioId))
         {
             yield break;
         }
+
+        SyncFromMatchSettings();
 
         MatchSettings.GetMapLoadParameters(out string mapType, out int mapNum, out int mapVersion);
         bool sameMap = MapsMatch(previousMapType, previousMapNum, previousMapVersion, mapType, mapNum, mapVersion);

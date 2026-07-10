@@ -45,9 +45,9 @@
       "group": "1 · Universal rules",
       "sequenceResourcePath": "Sequences/tutorial_universal_production",
       "scenarioId": "tutorial_universal_production",
-      "nextScenarioId": "tutorial_ertrian",
+      "nextScenarioId": "tutorial_virix",
       "title": "1.3 Producing units",
-      "notes": "Income loop, production overview",
+      "notes": "Income loop, Ertrian factories/airports, combined arms",
       "mapType": "tutor",
       "mapNum": 4,
       "mapVersion": 2,
@@ -55,20 +55,7 @@
       "playerIsCpu": [0, 0]
     },
     {
-      "group": "2 · Ertrian rules",
-      "sequenceResourcePath": "Sequences/tutorial_ertrian",
-      "scenarioId": "tutorial_ertrian",
-      "nextScenarioId": "tutorial_virix",
-      "title": "Ertrian faction",
-      "notes": "Factories, airports, ranged",
-      "mapType": "tutor",
-      "mapNum": 5,
-      "mapVersion": 1,
-      "progenys": [0, 0],
-      "playerIsCpu": [0, 0]
-    },
-    {
-      "group": "3 · Virix rules",
+      "group": "2 · Virix rules",
       "sequenceResourcePath": "Sequences/tutorial_virix",
       "scenarioId": "tutorial_virix",
       "nextScenarioId": "tutorial_sentus",
@@ -81,7 +68,7 @@
       "playerIsCpu": [0, 0]
     },
     {
-      "group": "4 · Sentus rules",
+      "group": "3 · Sentus rules",
       "sequenceResourcePath": "Sequences/tutorial_sentus",
       "scenarioId": "tutorial_sentus",
       "nextScenarioId": "tutorial_outro",

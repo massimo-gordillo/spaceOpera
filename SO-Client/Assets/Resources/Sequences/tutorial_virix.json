@@ -5,6 +5,19 @@
   "description": "Virix — spores, flowers, production on BISMUTH.",
   "steps": [
     {
+      "id": "load_map",
+      "type": "loadMap",
+      "mapType": "tutor",
+      "mapNum": 6,
+      "mapVersion": 1
+    },
+    {
+      "id": "fund_player",
+      "type": "setPlayerResources",
+      "player": 1,
+      "resources": 5000
+    },
+    {
       "id": "lock",
       "type": "setInputLock",
       "locked": true,
@@ -14,88 +27,296 @@
       "id": "dlg_welcome",
       "type": "dialogue",
       "speaker": "Tutorial",
-      "text": "Welcome to the <b>Virix</b> tutorial. The hive thrives where <b>BISMUTH</b> burns hottest.",
+      "text": "Welcome to the <b>Virix</b> tutorial. The Virix are an organic hivemind with a special relationship to <b>BISMUTH</b>.<page/>◦ Produce combat units on captured <b>BISMUTH</b> tiles.<page/>◦ <b>Spores</b> fly, are weak, and cannot attack.<page/>◦ When a Spore finishes a capture it becomes a <b>seed</b> that blooms at the end of your turn.<page/>◦ Captured factories and airports bloom into flowers that make a free Spore every turn.",
       "waitForContinue": true
     },
     {
       "id": "dlg_spore",
       "type": "dialogue",
       "speaker": "Tutorial",
-      "text": "The <b>Spore</b> captures sites. It is fragile and cannot attack, but flies over terrain.",
+      "text": "The Virix capture unit is the <b>Spore</b>. It is very weak and cannot attack, but it flies over terrain.<page/>Capturing a site takes <b>two turns</b>. Move every Spore onto a site and begin the claim.",
       "waitForContinue": true
     },
     {
-      "id": "camera_spore",
+      "id": "camera_spore_1",
       "type": "cameraFocus",
-      "target": { "unitId": "p1_spore" },
+      "target": { "unitId": "p1_spore_1" },
       "durationMs": 400
     },
     {
-      "id": "guide_spore",
+      "id": "guide_spore_1",
       "type": "guideClick",
-      "target": { "unitId": "p1_spore" }
+      "speaker": "Tutorial",
+      "text": "Select this Spore.",
+      "target": { "unitId": "p1_spore_1" }
     },
     {
-      "id": "guide_capture",
+      "id": "guide_move_factory",
       "type": "guideClick",
+      "speaker": "Tutorial",
+      "text": "Fly onto the factory.",
+      "target": { "x": 5, "y": 4 }
+    },
+    {
+      "id": "guide_capture_factory_1",
+      "type": "guideClick",
+      "speaker": "Tutorial",
+      "text": "Press <b>Capture</b> to begin claiming the factory.",
+      "target": { "uiTarget": "captureButton" }
+    },
+    {
+      "id": "guide_spore_2",
+      "type": "guideClick",
+      "speaker": "Tutorial",
+      "text": "Select your next Spore.",
+      "target": { "unitId": "p1_spore_2" }
+    },
+    {
+      "id": "guide_move_bismuth",
+      "type": "guideClick",
+      "speaker": "Tutorial",
+      "text": "Fly onto the neutral BISMUTH.",
+      "target": { "x": 5, "y": 6 }
+    },
+    {
+      "id": "guide_capture_bismuth_1",
+      "type": "guideClick",
+      "speaker": "Tutorial",
+      "text": "Press <b>Capture</b>.",
+      "target": { "uiTarget": "captureButton" }
+    },
+    {
+      "id": "guide_spore_3",
+      "type": "guideClick",
+      "speaker": "Tutorial",
+      "text": "Select your last Spore.",
+      "target": { "unitId": "p1_spore_3" }
+    },
+    {
+      "id": "guide_move_airport",
+      "type": "guideClick",
+      "speaker": "Tutorial",
+      "text": "Fly onto the airport.",
+      "target": { "x": 5, "y": 2 }
+    },
+    {
+      "id": "guide_capture_airport_1",
+      "type": "guideClick",
+      "speaker": "Tutorial",
+      "text": "Press <b>Capture</b>.",
+      "target": { "uiTarget": "captureButton" }
+    },
+    {
+      "id": "dlg_two_turns",
+      "type": "dialogue",
+      "speaker": "Tutorial",
+      "text": "Good. Most sites take <b>two turns</b> to fully capture — you'll finish next turn.<page/>Virix also build combat units <b>on</b> captured <b>BISMUTH</b>. Produce from the node you already hold.",
+      "waitForContinue": true
+    },
+    {
+      "id": "guide_bismuth_t1",
+      "type": "guideClick",
+      "speaker": "Tutorial",
+      "text": "Click your owned BISMUTH.",
+      "target": { "structureId": "owned_bismuth" }
+    },
+    {
+      "id": "guide_produce_venus",
+      "type": "guideProduce",
+      "speaker": "Tutorial",
+      "text": "Build a <b>Venus</b>.",
+      "unitType": "Venus"
+    },
+    {
+      "id": "dlg_end_turn_1",
+      "type": "dialogue",
+      "speaker": "Tutorial",
+      "text": "End your turn when you are finished issuing orders.",
+      "waitForContinue": true
+    },
+    {
+      "id": "end_p1_turn_1",
+      "type": "endPlayerTurn",
+      "player": 1,
+      "waitForClick": true,
+      "endTurnUiTarget": "endTurnButton"
+    },
+    {
+      "id": "end_p2_turn_1",
+      "type": "endPlayerTurn",
+      "player": 2
+    },
+    {
+      "id": "dlg_finish_captures",
+      "type": "dialogue",
+      "speaker": "Tutorial",
+      "text": "Finish capturing with every Spore. When a Spore completes a capture, it turns into a <b>seed</b> that blooms at the end of your turn.",
+      "waitForContinue": true
+    },
+    {
+      "id": "guide_spore_1_t2",
+      "type": "guideClick",
+      "speaker": "Tutorial",
+      "text": "Select the Spore on the factory.",
+      "target": { "unitId": "p1_spore_1" }
+    },
+    {
+      "id": "guide_capture_factory_2",
+      "type": "guideClick",
+      "speaker": "Tutorial",
+      "text": "Press <b>Capture</b> to finish the claim.",
+      "target": { "uiTarget": "captureButton" }
+    },
+    {
+      "id": "guide_spore_2_t2",
+      "type": "guideClick",
+      "speaker": "Tutorial",
+      "text": "Select the Spore on the BISMUTH.",
+      "target": { "unitId": "p1_spore_2" }
+    },
+    {
+      "id": "guide_capture_bismuth_2",
+      "type": "guideClick",
+      "speaker": "Tutorial",
+      "text": "Press <b>Capture</b>.",
+      "target": { "uiTarget": "captureButton" }
+    },
+    {
+      "id": "guide_spore_3_t2",
+      "type": "guideClick",
+      "speaker": "Tutorial",
+      "text": "Select the Spore on the airport.",
+      "target": { "unitId": "p1_spore_3" }
+    },
+    {
+      "id": "guide_capture_airport_2",
+      "type": "guideClick",
+      "speaker": "Tutorial",
+      "text": "Press <b>Capture</b>.",
       "target": { "uiTarget": "captureButton" }
     },
     {
       "id": "dlg_seed",
       "type": "dialogue",
       "speaker": "Tutorial",
-      "text": "When a Spore captures a site it becomes a <b>seed</b> that blooms into a flower next turn.",
+      "text": "Each Spore became a <b>seed</b>. Seeds bloom at the <b>end of your turn</b> — factories and airports become pollenating flowers.<page/>Clear your BISMUTH and produce again this turn.",
       "waitForContinue": true
     },
     {
-      "id": "end_p1_bloom_turn",
+      "id": "guide_venus",
+      "type": "guideClick",
+      "speaker": "Tutorial",
+      "text": "Select your Venus.",
+      "target": { "x": 7, "y": 6, "clickKind": "unit" }
+    },
+    {
+      "id": "guide_venus_move",
+      "type": "guideClick",
+      "speaker": "Tutorial",
+      "text": "Move it off the BISMUTH tile.",
+      "target": { "x": 8, "y": 6 }
+    },
+    {
+      "id": "guide_bismuth_t2",
+      "type": "guideClick",
+      "speaker": "Tutorial",
+      "text": "Select the BISMUTH again.",
+      "target": { "structureId": "owned_bismuth" }
+    },
+    {
+      "id": "guide_produce_hornet",
+      "type": "guideProduce",
+      "speaker": "Tutorial",
+      "text": "Build a <b>Hornet</b>.",
+      "unitType": "Hornet"
+    },
+    {
+      "id": "dlg_end_turn_2",
+      "type": "dialogue",
+      "speaker": "Tutorial",
+      "text": "End your turn — the seeds will bloom.",
+      "waitForContinue": true
+    },
+    {
+      "id": "end_p1_turn_2",
       "type": "endPlayerTurn",
       "player": 1,
       "waitForClick": true,
       "endTurnUiTarget": "endTurnButton"
     },
     {
-      "id": "end_p2_bloom_turn",
+      "id": "end_p2_turn_2",
       "type": "endPlayerTurn",
       "player": 2
+    },
+    {
+      "id": "camera_flower",
+      "type": "cameraFocus",
+      "target": { "structureId": "neutral_factory" },
+      "durationMs": 400
     },
     {
       "id": "dlg_flower_spore",
       "type": "dialogue",
       "speaker": "Tutorial",
-      "text": "The flower pollenates the tile and spawns a free Spore each turn.",
+      "text": "The flowers have bloomed and spawned free <b>Spores</b>. Move every Spore, then clear BISMUTH and produce again.",
       "waitForContinue": true
     },
     {
-      "id": "dlg_produce_on_bismuth",
-      "type": "dialogue",
-      "speaker": "Tutorial",
-      "text": "Stronger Virix units are built <b>on</b> captured BISMUTH. Select your owned node.",
-      "waitForContinue": true
-    },
-    {
-      "id": "guide_bismuth",
+      "id": "guide_free_spore_factory",
       "type": "guideClick",
+      "speaker": "Tutorial",
+      "text": "Select the free Spore on the factory flower.",
+      "target": { "x": 5, "y": 4, "clickKind": "unit" }
+    },
+    {
+      "id": "guide_move_free_spore_factory",
+      "type": "guideClick",
+      "speaker": "Tutorial",
+      "text": "Fly it off the flower.",
+      "target": { "x": 4, "y": 4 }
+    },
+    {
+      "id": "guide_free_spore_airport",
+      "type": "guideClick",
+      "speaker": "Tutorial",
+      "text": "Select the free Spore on the airport flower.",
+      "target": { "x": 5, "y": 2, "clickKind": "unit" }
+    },
+    {
+      "id": "guide_move_free_spore_airport",
+      "type": "guideClick",
+      "speaker": "Tutorial",
+      "text": "Fly it off the flower.",
+      "target": { "x": 4, "y": 2 }
+    },
+    {
+      "id": "guide_hornet",
+      "type": "guideClick",
+      "speaker": "Tutorial",
+      "text": "Select your Hornet.",
+      "target": { "x": 7, "y": 6, "clickKind": "unit" }
+    },
+    {
+      "id": "guide_hornet_move",
+      "type": "guideClick",
+      "speaker": "Tutorial",
+      "text": "Move it off the BISMUTH tile.",
+      "target": { "x": 8, "y": 5 }
+    },
+    {
+      "id": "guide_bismuth_t3",
+      "type": "guideClick",
+      "speaker": "Tutorial",
+      "text": "Select the BISMUTH.",
       "target": { "structureId": "owned_bismuth" }
     },
     {
-      "id": "end_p1_cycle_turn",
-      "type": "endPlayerTurn",
-      "player": 1,
-      "waitForClick": true,
-      "endTurnUiTarget": "endTurnButton"
-    },
-    {
-      "id": "end_p2_cycle_turn",
-      "type": "endPlayerTurn",
-      "player": 2
-    },
-    {
-      "id": "dlg_produce_again",
-      "type": "dialogue",
+      "id": "guide_produce_ghoul",
+      "type": "guideProduce",
       "speaker": "Tutorial",
-      "text": "Produce again from the same node when you are ready.",
-      "waitForContinue": true
+      "text": "Build a <b>Ghoul</b>.",
+      "unitType": "Ghoul"
     },
     {
       "id": "dlg_done",

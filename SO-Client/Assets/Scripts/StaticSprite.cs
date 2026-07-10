@@ -21,26 +21,29 @@ public class StaticSprite : ClickableObject
     public bool isFlyingUnit = false;
     public RectTransform rt;
 
-    // Start is called before the first frame update
-    protected override void Start()
+    // Prefabs store baseColor/lightsColor as black; reset in Awake so spawn colouring
+    // (before Start) does not bake black highlight sprites.
+    void Awake()
     {
-        base.Start(); //call the start function in ClickableObject class this inherets from.
-        if (transform.parent != null && parentGameObject!=null)
+        EnsureNeutralSpriteColors();
+        if (parentGameObject != null)
         {
-            //parentGameObject = transform.parent.gameObject;
             parentComponentBaseUnit = parentGameObject.GetComponent<BaseUnit>();
             parentComponentBaseStructure = parentGameObject.GetComponent<BaseStructure>();
-            //baseColor = fillSR.color;
-            //lightsColor = lightsSR.color;
-            baseColor = new Color32(255, 255, 255, 255);
-            lightsColor = new Color32(255, 255, 255, 255);
-            
         }
-        /*        else
-                {
-                    Debug.Log("No parent found for StaticSprite " + this.GetInstanceID());
-                }*/
+    }
+
+    protected override void Start()
+    {
+        base.Start();
+        EnsureNeutralSpriteColors();
         rt = GetComponent<RectTransform>();
+    }
+
+    void EnsureNeutralSpriteColors()
+    {
+        baseColor = new Color32(255, 255, 255, 255);
+        lightsColor = new Color32(255, 255, 255, 255);
     }
 
     // Update is called once per frame

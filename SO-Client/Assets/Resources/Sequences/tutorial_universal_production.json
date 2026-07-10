@@ -12,6 +12,12 @@
       "mapVersion": 2
     },
     {
+      "id": "fund_player",
+      "type": "setPlayerResources",
+      "player": 1,
+      "resources": 2000
+    },
+    {
       "id": "lock",
       "type": "setInputLock",
       "locked": true,
@@ -27,7 +33,7 @@
       "id": "dlg_intro",
       "type": "dialogue",
       "speaker": "Tutorial",
-      "text": "Spend <b>BISMUTH</b> from your treasury to build an army.<page/><b>Factories</b> train ground units. <b>Airports</b> train flyers.<page/>A unit standing on a production site blocks new builds — move your tank first.",
+      "text": "Each turn your structures pay <b>BISMUTH</b> into your treasury. Spend it to build an army.<page/><b>Ertrians</b> earn a <b>10% income bonus</b> over other factions — more sites means more spending power.<page/>Ertrians train ground units from <b>Factories</b> and flyers from <b>Airports</b>.<page/>A unit standing on a production site blocks new builds — move your tank first.",
       "waitForContinue": true
     },
     {
@@ -113,14 +119,14 @@
       "type": "guideClick",
       "speaker": "Tutorial",
       "text": "Select your Artillery.",
-      "target": { "x": 3, "y": 5 }
+      "target": { "x": 3, "y": 5, "clickKind": "unit" }
     },
     {
       "id": "guide_artillery_move",
       "type": "guideClick",
       "speaker": "Tutorial",
       "text": "Move it toward the enemy lines.",
-      "target": { "x": 4, "y": 4 }
+      "target": { "x": 5, "y": 4 }
     },
     {
       "id": "dlg_heli_strike",
@@ -134,7 +140,7 @@
       "type": "guideClick",
       "speaker": "Tutorial",
       "text": "Select your Helicopter.",
-      "target": { "x": 4, "y": 7 }
+      "target": { "x": 4, "y": 7, "clickKind": "unit" }
     },
     {
       "id": "guide_heli_move",
@@ -154,20 +160,8 @@
       "id": "guide_attack_horsemen",
       "type": "guideClick",
       "speaker": "Tutorial",
-      "text": "Strike the Horsemen.",
+      "text": "Strike the Horsemen, then end your turn.",
       "target": { "unitId": "p2_horsemen" }
-    },
-    {
-      "id": "dlg_artillery_hold",
-      "type": "dialogue",
-      "speaker": "Tutorial",
-      "text": "Advance the artillery onto its firing position, then end your turn.",
-      "waitForContinue": true
-    },
-    {
-      "id": "guide_artillery_onto",
-      "type": "guideClick",
-      "target": { "x": 5, "y": 4 }
     },
     {
       "id": "end_p1_turn_2",
@@ -185,7 +179,7 @@
       "id": "dlg_final_assault",
       "type": "dialogue",
       "speaker": "Tutorial",
-      "text": "Finish the exposed tank with your helicopter, then let the artillery shell the Blacksmith.",
+      "text": "Finish the exposed Archer with your helicopter, then let the artillery shell the Blacksmith.",
       "waitForContinue": true
     },
     {
@@ -199,7 +193,7 @@
       "id": "guide_heli_move_tank",
       "type": "guideClick",
       "speaker": "Tutorial",
-      "text": "Move adjacent to the enemy tank.",
+      "text": "Move adjacent to the enemy Archer.",
       "target": { "x": 8, "y": 7 }
     },
     {
@@ -211,8 +205,8 @@
       "id": "guide_attack_tank",
       "type": "guideClick",
       "speaker": "Tutorial",
-      "text": "Destroy the tank.",
-      "target": { "unitId": "p2_tank" }
+      "text": "Destroy the archer.",
+      "target": { "unitId": "p2_archer" }
     },
     {
       "id": "guide_artillery_2",

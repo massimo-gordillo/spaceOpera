@@ -9,6 +9,9 @@ public class SequenceFileDto
     public string sequenceId;
     public string missionId;
     public string description;
+    /// <summary>Optional match overrides — applied after manifest payload when the sequence runs.</summary>
+    public int[] progenys;
+    public int[] playerIsCpu;
     public List<SequenceStepDto> steps = new List<SequenceStepDto>();
 }
 
@@ -67,8 +70,9 @@ public class SequenceStepDto
     // setMatchVictory (tutorial only) — suppressMatchVictory true blocks win screen / command elimination
     public bool suppressMatchVictory = false;
 
-    // endPlayerTurn
+    // endPlayerTurn / setPlayerResources
     public int player;
+    public int resources;
     public bool waitForClick;
     public string endTurnUiTarget;
 
@@ -103,6 +107,60 @@ public class TargetDto
     public string uiTarget;
     public int x;
     public int y;
+    /// <summary>
+    /// When <c>x</c>/<c>y</c> identify a tile with multiple occupants, picks which click to accept:
+    /// <c>unit</c>, <c>structure</c>, or <c>movement</c> (move overlay). Omit for legacy priority:
+    /// movement overlay, then structure, then unit.
+    /// </summary>
+    public string clickKind;
+}
+
+public enum TargetClickKind
+{
+    Auto,
+    Unit,
+    Structure,
+    Movement
+}
+
+public static class TargetClickKindParser
+{
+    public static TargetClickKind Parse(string clickKind)
+    {
+        if (string.IsNullOrWhiteSpace(clickKind))
+        {
+            return TargetClickKind.Auto;
+        }
+
+        switch (clickKind.Trim().ToLowerInvariant())
+        {
+            case "unit":
+                return TargetClickKind.Unit;
+            case "structure":
+                return TargetClickKind.Structure;
+            case "movement":
+            case "movementsquare":
+            case "move":
+                return TargetClickKind.Movement;
+            default:
+                return TargetClickKind.Auto;
+        }
+    }
+
+    public static string Describe(TargetClickKind kind)
+    {
+        switch (kind)
+        {
+            case TargetClickKind.Unit:
+                return "unit";
+            case TargetClickKind.Structure:
+                return "structure";
+            case TargetClickKind.Movement:
+                return "movement";
+            default:
+                return "auto";
+        }
+    }
 }
 
 public static class SequenceParser
@@ -329,20 +387,7 @@ public static class SequenceCurriculum
 
         MatchSettings.SetNumPlayers(2);
         MatchSettings.SetPlayerColours();
-        for (int i = 0; i < MatchSettings.numPlayers; i++)
-        {
-            MatchSettings.SetPlayerProgeny(i, track.progenys[i]);
-            bool isCpu = track.playerIsCpu != null
-                && i < track.playerIsCpu.Length
-                && track.playerIsCpu[i] != 0;
-            MatchSettings.playerIsCPU[i] = isCpu;
-        }
-
-        MatchSettings.CPU_isOn = false;
-        foreach (bool cpu in MatchSettings.playerIsCPU)
-        {
-            MatchSettings.CPU_isOn |= cpu;
-        }
+        ApplyPlayerMatchProfile(track.progenys, track.playerIsCpu);
 
         string sequencePath = string.IsNullOrWhiteSpace(sequenceResourcePathOverride)
             ? track.sequenceResourcePath
@@ -361,6 +406,67 @@ public static class SequenceCurriculum
         MatchSettings.matchMapVersion = track.mapVersion > 0 ? track.mapVersion : 1;
         MatchSettings.isInit = true;
         return true;
+    }
+
+    /// <summary>Applies optional progeny/CPU fields from sequence JSON over the manifest payload.</summary>
+    public static bool TryApplySequenceMatchOverrides(SequenceFileDto sequence)
+    {
+        if (sequence == null)
+        {
+            return false;
+        }
+
+        bool applied = false;
+        if (sequence.progenys != null && sequence.progenys.Length >= MatchSettings.numPlayers)
+        {
+            for (int i = 0; i < MatchSettings.numPlayers; i++)
+            {
+                MatchSettings.SetPlayerProgeny(i, sequence.progenys[i]);
+            }
+
+            applied = true;
+        }
+
+        if (sequence.playerIsCpu != null && sequence.playerIsCpu.Length >= MatchSettings.numPlayers)
+        {
+            ApplyPlayerMatchProfile(
+                GetCurrentMatchProgenys(),
+                sequence.playerIsCpu);
+            applied = true;
+        }
+
+        return applied;
+    }
+
+    static int[] GetCurrentMatchProgenys()
+    {
+        int[] progenys = new int[MatchSettings.numPlayers];
+        for (int i = 0; i < MatchSettings.numPlayers; i++)
+        {
+            progenys[i] = MatchSettings.playerProgenys != null && i < MatchSettings.playerProgenys.Length
+                ? MatchSettings.playerProgenys[i]
+                : -1;
+        }
+
+        return progenys;
+    }
+
+    static void ApplyPlayerMatchProfile(int[] progenys, int[] playerIsCpu)
+    {
+        for (int i = 0; i < MatchSettings.numPlayers; i++)
+        {
+            MatchSettings.SetPlayerProgeny(i, progenys[i]);
+            bool isCpu = playerIsCpu != null
+                && i < playerIsCpu.Length
+                && playerIsCpu[i] != 0;
+            MatchSettings.playerIsCPU[i] = isCpu;
+        }
+
+        MatchSettings.CPU_isOn = false;
+        for (int i = 0; i < MatchSettings.numPlayers; i++)
+        {
+            MatchSettings.CPU_isOn |= MatchSettings.playerIsCPU[i];
+        }
     }
 
     public static string GetFirstPlayableScenarioId()

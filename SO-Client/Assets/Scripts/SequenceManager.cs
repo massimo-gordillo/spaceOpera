@@ -245,7 +245,7 @@ public class SequenceManager : MonoBehaviour
         string sequenceOverride = string.IsNullOrWhiteSpace(playTestSequenceResourcePathOverride)
             ? null
             : playTestSequenceResourcePathOverride.Trim();
-        if (!MatchSettings.ApplyTutorialMatch(scenarioId, sequenceOverride))
+        if (!MatchSettings.ApplyScenarioPayload(scenarioId, sequenceOverride))
         {
             Debug.LogError($"[SequenceManager] playTestTutorialOnStart: could not apply scenario '{scenarioId}'.");
             return;
@@ -427,6 +427,14 @@ public class SequenceManager : MonoBehaviour
             yield break;
         }
 
+        if (SequenceCurriculum.TryApplySequenceMatchOverrides(sequence))
+        {
+            if (gameMaster != null)
+            {
+                gameMaster.SyncFromMatchSettings();
+            }
+        }
+
         sequenceSkippedRequested = false;
         isRunningSequence = true;
         if (gameMaster != null && MatchSettings.gameMode == MatchSettings.MatchGameMode.Tutorial)
@@ -527,6 +535,10 @@ public class SequenceManager : MonoBehaviour
                     gameMaster.SetTutorialMatchVictorySuppressed(step.suppressMatchVictory);
                 }
 
+                break;
+
+            case "setPlayerResources":
+                ExecuteSetPlayerResources(stepIndex, step);
                 break;
 
             case "loadMap":
@@ -1320,6 +1332,19 @@ public class SequenceManager : MonoBehaviour
         Debug.Log($"[SequenceManager] Input lock set to {locked}. reason='{reason}'");
     }
 
+    private void ExecuteSetPlayerResources(int stepIndex, SequenceStepDto step)
+    {
+        if (gameMaster == null)
+        {
+            LogStepError(stepIndex, "setPlayerResources failed: gameMaster is not assigned.");
+            return;
+        }
+
+        int player = step.player > 0 ? step.player : 1;
+        gameMaster.SetPlayerResourcesTo(player, step.resources);
+        Debug.Log($"[SequenceManager] setPlayerResources player={player} resources={step.resources}");
+    }
+
     private IEnumerator WaitForGameplayClick(
         int stepIndex,
         TargetDto expectedTarget,
@@ -1451,33 +1476,25 @@ public class SequenceManager : MonoBehaviour
         }
 
         Vector2Int tile = new Vector2Int(target.x, target.y);
-        MovementSquare movementSquare = masterGrid.FindMovementSquareAt(tile);
-        if (movementSquare != null)
-        {
-            expectation.clickable = movementSquare;
-            return true;
-        }
-
-        BaseStructure structureAtTile = masterGrid.WhatStructureIsInThisLocation(tile);
-        if (structureAtTile != null)
-        {
-            expectation.structure = structureAtTile;
-            return true;
-        }
-
-        BaseUnit unitAtTile = masterGrid.WhatUnitIsInThisLocation(tile);
-        if (unitAtTile != null)
+        if (TryResolveTileOccupant(tile, target.clickKind, out BaseUnit unitAtTile, out BaseStructure structureAtTile, out ClickableObject clickableAtTile))
         {
             expectation.unit = unitAtTile;
+            expectation.structure = structureAtTile;
+            expectation.clickable = clickableAtTile;
             return true;
         }
+
+        TargetClickKind clickKind = TargetClickKindParser.Parse(target.clickKind);
+        string clickKindHint = clickKind == TargetClickKind.Auto
+            ? "Hint: use unitId/structureId, clickKind (unit/structure/movement), or a tile with a visible piece or move overlay."
+            : $"Hint: no '{TargetClickKindParser.Describe(clickKind)}' occupant at this tile — check coordinates or clickKind.";
 
         LogStepError(stepIndex,
             $"requireClick could not resolve tile ({target.x},{target.y}): " +
-            $"no movement overlay, structure, or unit found. " +
+            $"no matching occupant found (clickKind={TargetClickKindParser.Describe(clickKind)}). " +
             $"inBounds={masterGrid.IsInBounds(tile)}, gridSize=({masterGrid.gridX},{masterGrid.gridY}). " +
             $"Target fields: {targetDescription}. " +
-            "Hint: use unitId/structureId, or a tile with a visible piece or move overlay.");
+            clickKindHint);
         return false;
     }
 
@@ -1703,23 +1720,21 @@ public class SequenceManager : MonoBehaviour
         }
 
         Vector2Int tile = new Vector2Int(target.x, target.y);
-        if (masterGrid != null)
+        if (masterGrid != null
+            && TryResolveTileOccupant(tile, target.clickKind, out BaseUnit unitAtTile, out BaseStructure structureAtTile, out ClickableObject clickableAtTile))
         {
-            MovementSquare movementSquare = masterGrid.FindMovementSquareAt(tile);
-            if (movementSquare != null)
+            if (clickableAtTile != null)
             {
-                ApplyClickableHighlight(movementSquare, enabled);
+                ApplyClickableHighlight(clickableAtTile, enabled);
                 return;
             }
 
-            BaseStructure structureAtTile = masterGrid.WhatStructureIsInThisLocation(tile);
             if (structureAtTile != null)
             {
                 ApplyStructureHighlight(structureAtTile, enabled);
                 return;
             }
 
-            BaseUnit unitAtTile = masterGrid.WhatUnitIsInThisLocation(tile);
             if (unitAtTile != null)
             {
                 ApplyUnitHighlight(unitAtTile, enabled);
@@ -2001,6 +2016,61 @@ public class SequenceManager : MonoBehaviour
         }
 
         return null;
+    }
+
+    private bool TryResolveTileOccupant(
+        Vector2Int tile,
+        string clickKind,
+        out BaseUnit unit,
+        out BaseStructure structure,
+        out ClickableObject clickable)
+    {
+        unit = null;
+        structure = null;
+        clickable = null;
+
+        if (masterGrid == null)
+        {
+            return false;
+        }
+
+        switch (TargetClickKindParser.Parse(clickKind))
+        {
+            case TargetClickKind.Unit:
+                unit = masterGrid.WhatUnitIsInThisLocation(tile);
+                return unit != null;
+
+            case TargetClickKind.Structure:
+                structure = masterGrid.WhatStructureIsInThisLocation(tile);
+                return structure != null;
+
+            case TargetClickKind.Movement:
+                MovementSquare movementOnly = masterGrid.FindMovementSquareAt(tile);
+                if (movementOnly != null)
+                {
+                    clickable = movementOnly;
+                    return true;
+                }
+
+                return false;
+
+            default:
+                MovementSquare movementSquare = masterGrid.FindMovementSquareAt(tile);
+                if (movementSquare != null)
+                {
+                    clickable = movementSquare;
+                    return true;
+                }
+
+                structure = masterGrid.WhatStructureIsInThisLocation(tile);
+                if (structure != null)
+                {
+                    return true;
+                }
+
+                unit = masterGrid.WhatUnitIsInThisLocation(tile);
+                return unit != null;
+        }
     }
 
     private bool TryResolveTargetPosition(TargetDto target, out Vector2Int pos)
@@ -2361,6 +2431,11 @@ public class SequenceManager : MonoBehaviour
         if (!string.IsNullOrWhiteSpace(target.uiTarget))
         {
             parts.Add($"uiTarget='{target.uiTarget}'");
+        }
+
+        if (!string.IsNullOrWhiteSpace(target.clickKind))
+        {
+            parts.Add($"clickKind='{target.clickKind}'");
         }
 
         parts.Add($"tile=({target.x},{target.y})");

@@ -1,1 +1,9 @@
-{"TilemapData":{"Width":13,"Height":9,"TileBytes":[4,4,4,4,4,4,4,4,4,4,4,4,4,4,3,3,3,3,3,3,3,3,3,3,3,4,4,3,3,1,1,1,1,1,1,1,3,3,4,4,3,1,1,1,1,1,1,1,1,1,3,4,4,3,1,1,1,1,1,1,1,1,1,3,4,4,3,1,1,1,1,1,1,1,1,1,3,4,4,3,3,1,1,1,1,1,1,1,3,3,4,4,3,3,3,3,3,3,3,3,3,3,3,4,4,4,4,4,4,4,4,4,4,4,4,4,4]},"GamePieceList":[{"x":3,"y":4,"typeNum":0,"playerID":1,"healthVal":100,"sequenceId":"p1_spore"},{"x":6,"y":4,"typeNum":200,"playerID":0,"healthVal":200,"sequenceId":"capture_site"},{"x":5,"y":5,"typeNum":200,"playerID":1,"healthVal":200,"sequenceId":"owned_bismuth"}]}
+{"TilemapData":{"Width":13,"Height":9,"TileBytes":[4,4,4,4,4,4,4,4,4,4,4,4,4,4,3,3,3,3,3,3,3,3,3,3,3,4,4,3,3,1,1,1,1,1,1,1,3,3,4,4,3,1,1,1,1,1,1,1,1,1,3,4,4,3,1,1,1,1,1,1,1,1,1,3,4,4,3,1,1,1,1,1,1,1,1,1,3,4,4,3,3,1,1,1,1,1,1,1,3,3,4,4,3,3,3,3,3,3,3,3,3,3,3,4,4,4,4,4,4,4,4,4,4,4,4,4,4]},"GamePieceList":[
+    {"x":3,"y":4,"typeNum":50,"playerID":1,"healthVal":100,"sequenceId":"p1_spore_1"},
+    {"x":3,"y":6,"typeNum":50,"playerID":1,"healthVal":100,"sequenceId":"p1_spore_2"},
+    {"x":3,"y":2,"typeNum":50,"playerID":1,"healthVal":100,"sequenceId":"p1_spore_3"},
+    {"x":5,"y":6,"typeNum":200,"playerID":0,"healthVal":200,"sequenceId":"neutral_bismuth"},
+    {"x":7,"y":6,"typeNum":200,"playerID":1,"healthVal":200,"sequenceId":"owned_bismuth"},
+    {"x":5,"y":4,"typeNum":201,"playerID":0,"healthVal":200,"sequenceId":"neutral_factory"},
+    {"x":5,"y":2,"typeNum":202,"playerID":0,"healthVal":200,"sequenceId":"neutral_airport"}
+    ]}
